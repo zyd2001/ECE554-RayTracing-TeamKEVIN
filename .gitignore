@@ -1,0 +1,9 @@
+transcript
+*.mpf
+work/
+*.mti
+*.bak
+*.vstf
+*.wlf
+synth/
+.vscode/
