@@ -1,0 +1,67 @@
+s_load_4byte r r i
+000000 5 5 16
+s_load_u4byte r r i
+000001 5 5 16
+s_store_4byte r r i
+000010 5 5 16
+s_write_high r x i
+000011 5 5 16
+s_write_low r x i
+000100 5 5 16
+s_get_from_v r r x index
+000101 5 5 14 2
+s_push r
+000110 5
+s_pop r
+000111 5
+v_load_16byte x r r i
+001000 1 5 5 16
+001001	v_load_u16byte
+001010	v_store_16byte
+001011	v_get_from_s
+001100	v_push
+001101	v_pop
+010000	vv_add
+010001	vv_sub
+010010	vv_mul_ele
+010011	vv_div
+010100	vv_mul_dot
+010101	v_magn
+011000	vi_add
+011001	vi_sub
+011010	vi_mul
+011011	vi_div
+011100	vf_add
+011101	vf_sub
+011110	vf_mul
+011111	vf_div
+100000	ii_add
+100001	ii_sub
+100010	ii_mul
+100011	ii_div
+100100	ff_add
+100101	ff_sub
+100110	ff_mul
+100111	ff_div
+101000	ii_addi
+101001	ii_subi
+101010	ii_muli
+101011	ii_divi
+101100	not
+101101	and
+101110	or
+101111	xor
+110000	trace
+110001	itof
+110010	ftoi
+110011	cmp_v
+110100	cmp_i
+110101	cmp_f
+110110	bne
+110111	bg
+111000	bl
+111001	bge
+111010	ble
+111011	jmp
+111100	jmp_link
+111101	ret
