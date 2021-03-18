@@ -98,19 +98,19 @@ cmp_i r r x
 110100 5 5 16
 cmp_fr r x
 110101 5 5 16
-bne x i
+bne x l
 110110 10 16	
-bg x i
+bg x l
 110111 10 16
-bl x i
+bl x l
 111000 10 16
-bge x i
+bge x l
 111001 10 16
-ble x i
+ble x l
 111010 10 16
-jmp x i
+jmp x l
 111011 10 16
-jmp_link x i
+jmp_link x l
 111100 10 16
 ret x
 111101 26
