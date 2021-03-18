@@ -10,58 +10,107 @@ s_write_low r x i
 000100 5 5 16
 s_get_from_v r r x index
 000101 5 5 14 2
-s_push r
-000110 5
-s_pop r
-000111 5
+s_push r x
+000110 5 21
+s_pop r x
+000111 5 21
 v_load_16byte x r r i
-001000 1 5 5 16
-001001	v_load_u16byte
-001010	v_store_16byte
-001011	v_get_from_s
-001100	v_push
-001101	v_pop
-010000	vv_add
-010001	vv_sub
-010010	vv_mul_ele
-010011	vv_div
-010100	vv_mul_dot
-010101	v_magn
-011000	vi_add
-011001	vi_sub
-011010	vi_mul
-011011	vi_div
-011100	vf_add
-011101	vf_sub
-011110	vf_mul
-011111	vf_div
-100000	ii_add
-100001	ii_sub
-100010	ii_mul
-100011	ii_div
-100100	ff_add
-100101	ff_sub
-100110	ff_mul
-100111	ff_div
-101000	ii_addi
-101001	ii_subi
-101010	ii_muli
-101011	ii_divi
-101100	not
-101101	and
-101110	or
-101111	xor
-110000	trace
-110001	itof
-110010	ftoi
-110011	cmp_v
-110100	cmp_i
-110101	cmp_f
-110110	bne
-110111	bg
-111000	bl
-111001	bge
-111010	ble
-111011	jmp
-111100	jmp_link
-111101	ret
+001000 1 4 5 16
+v_load_u16byte x r r i
+001001 1 4 5 16
+v_store_16byte x r r i
+001010 1 4 5 16
+v_get_from_s r x r x index
+001011 5 1 4 14 2
+v_push x r x
+001100 1 4 21
+v_pop x r x
+001101 1 4 1
+vv_add x r x r x r x
+010000 1 4 1 4 1 4 11
+vv_sub x r x r x r x
+010001 1 4 1 4 1 4 11
+vv_mul_ele x r x r x r x
+010010 1 4 1 4 1 4 11
+vv_div x r x r x r x
+010011 1 4 1 4 1 4 11
+vv_mul_dot r x r x r x
+010100 5 1 4 1 4 11
+v_magn r x r x
+010101 5 1 4 16
+vi_add x r x r r x
+011000 1 4 1 4 5 11
+vi_sub x r x r r x
+011001 1 4 1 4 5 11
+vi_mul x r x r r x
+011010 1 4 1 4 5 11
+vi_div x r x r r x
+011011 1 4 1 4 5 11
+vf_add x r x r r x
+011100 1 4 1 4 5 11
+vf_sub x r x r r x
+011101 1 4 1 4 5 11
+vf_mul x r x r r x
+011110 1 4 1 4 5 11
+vf_div x r x r r x
+011111 1 4 1 4 5 11
+ii_add r r r x
+100000 5 5 5 11
+ii_sub r r r x
+100001 5 5 5 11
+ii_mul r r r x
+100010 5 5 5 11
+ii_div r r r x
+100011 5 5 5 11
+ff_add r r r x
+100100 5 5 5 11
+ff_sub r r r x
+100101 5 5 5 11
+ff_mul r r r x
+100110 5 5 5 11
+ff_div r r r x
+100111 5 5 5 11
+ii_addi r r x
+101000 5 5 16
+ii_subi r r x
+101001 5 5 16
+ii_muli r r x
+101010 5 5 16
+ii_divi r r x
+101011 5 5 16
+not r r x
+101100 5 5 16
+and r r r x
+101101 5 5 5 11
+or r r r x
+101110 5 5 5 11
+xor r r r x
+101111 5 5 5 11
+trace x r x r x
+110000 1 4 1 4 16
+itof r r x
+110001 5 5 16
+ftoi r r x
+110010 5 5 16
+cmp_v x r x r x
+110011 1 4 1 4 16
+cmp_i r r x
+110100 5 5 16
+cmp_fr r x
+110101 5 5 16
+bne x i
+110110 10 16	
+bg x i
+110111 10 16
+bl x i
+111000 10 16
+bge x i
+111001 10 16
+ble x i
+111010 10 16
+jmp x i
+111011 10 16
+jmp_link x i
+111100 10 16
+ret x
+111101 26
