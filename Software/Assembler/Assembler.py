@@ -38,72 +38,104 @@ def binary(num, bits):
     else:
         return bin((1 << bits) + num)[2:]
 
-def genCode(ISAdict, tokens, ins, lineCounter):
-    entry = ISAdict[ins]
-    code = entry['opcode']
-    skip = 0
-    for i in range(len(entry['args'])):
-        arg = entry['args'][i]
-        if arg[0] == 'x':
-            code += 'x' * arg[1]
-            skip += 1
-        else: 
-            t = tokens[i - skip + 1].strip().lower()
-            if arg[0] == 'r':
-                if t[0] != 'r':
-                    error(str(lineCounter) +  ': syntax error')
-                reg = int(t[1:])
-                if reg >= 2**arg[1]:
-                    error(str(lineCounter) +  ': syntax error')
-                code += binary(reg, arg[1])
-            elif arg[0] == 'i':
-                imm = int(t)
-                if imm >= 2**arg[1]:
-                    error(str(lineCounter) +  ': too large immediate')
-                code += binary(imm, arg[1])
-            elif arg[0] == 'l':
-                pass
-    return code
-
-def assemble(ISAdict, inFile, outFile):
+class Assembler:
+    ISAdict = {}
     labels = {}
-    inFile = open(inFile)
-    # outFile = open()
-    directives = set(('.asciiz', '.space', '.word', '.byte'))
+    linesWaiting = []
     lineCounter = 0
-    codeCounter = 0
-    for line in inFile: # first pass
-        lineCounter += 1
-        tokens = line.split()
-        if tokens:
-            if line[0] == ' ' or line[0] == '\t':
-                pass
-            else: # label
-                if tokens[0][-1] != ':':
-                    error(str(lineCounter) +  ': expect :')
-                if len(tokens) > 1:
-                    labels[tokens[0][:-1]] = lineCounter
-                else:
-                    labels[tokens[0][:-1]] = lineCounter + 1
+    PCCounter = 0
 
-    lineCounter = 0
-    codeCounter = 0
-    inFile.seek(0, 0)
-    for line in inFile:
-        lineCounter += 1
-        tokens = line.split()
-        if tokens:
-            if line[0] != ' ' and line[0] != '\t':
-                if len(tokens) > 1:
-                    tokens = tokens[1:]
-            ins = tokens[0].lower()
-            if ins in ISAdict:
-                code = genCode(ISAdict, tokens, ins, lineCounter)
-                print(code)
-            elif ins in directives:
-                pass
-            else:
-                error(str(lineCounter) +  ': no such instruction')
+    def err(self, msg):
+        error(str(self.lineCounter) + ': ' + msg)
+
+    def genCode(self, tokens, ins, genLabeled=False):
+        entry = self.ISAdict[ins]
+        code = entry['opcode']
+        skip = 0
+        for i in range(len(entry['args'])):
+            arg = entry['args'][i]
+            if arg[0] == 'x':
+                code += 'x' * arg[1]
+                skip += 1
+            else: 
+                t = tokens[i - skip + 1].lower()
+                if arg[0] == 'r':
+                    if t[0] != 'r':
+                        self.err('syntax error')
+                    reg = int(t[1:])
+                    if reg >= 2**arg[1]:
+                        self.err('syntax error')
+                    code += binary(reg, arg[1])
+                elif arg[0] == 'i':
+                    imm = int(t)
+                    if imm >= 2**arg[1]:
+                        self.err('too large immediate')
+                    code += binary(imm, arg[1])
+                elif arg[0] == 'l':
+                    if genLabeled:
+                        l = tokens[i - skip + 1]
+                        if l in self.labels:
+                            target = self.labels[l]
+                            offset = target - self.PCCounter - 1
+                            if offset >= 2**arg[1]:
+                                self.err('cannot reach the label')
+                            code += binary(offset, arg[1])
+                    else:
+                        self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
+        return code
+
+    def assemble(self, ISA, inFile, outFile):
+        output = []
+        self.labels = {}
+        self.ISAdict = ISA
+        inFile = open(inFile)
+        # outFile = open()
+        directives = set(('.asciiz', '.space', '.word', '.byte'))
+        self.lineCounter = 0
+        self.PCCounter = 0
+        labelWait = ''
+        for line in inFile: # first pass
+            self.lineCounter += 1
+            tokens = line.split()
+            if tokens:
+                if line[0] == ' ' or line[0] == '\t':
+                    ins = tokens[0].lower()
+                    if ins in self.ISAdict:
+                        if labelWait:
+                            self.labels[labelWait] = self.PCCounter
+                            labelWait = ''
+                        output.append(self.genCode(tokens, ins))
+                        self.PCCounter += 1
+                    elif ins in directives:
+                        pass
+                    else:
+                        self.err('no such instruction')
+                else: # label
+                    if tokens[0][-1] != ':':
+                        self.err('expect :')
+                    if len(tokens) > 1:
+                        self.labels[tokens[0][:-1]] = self.PCCounter
+                        tokens = tokens[1:]
+                        ins = tokens[0].lower()
+                        if ins in self.ISAdict:
+                            output.append(self.genCode(tokens, ins))
+                            self.PCCounter += 1
+                        elif ins in directives:
+                            pass
+                        else:
+                            self.err('no such instruction')
+                    else:
+                        labelWait = tokens[0][:-1]
+
+        for line in self.linesWaiting:
+            PC = line[0]
+            self.lineCounter = line[1]
+            self.PCCounter = PC
+            code = self.genCode(line[2], line[3], True)
+            output[PC] = code
+        
+        return output
 
 ISA = parseISA('RT.isa')
-assemble(ISA, args.c, args.output)
+a = Assembler()
+print(a.assemble(ISA, args.c, args.output))
