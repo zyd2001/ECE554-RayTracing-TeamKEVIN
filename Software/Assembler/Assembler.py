@@ -185,3 +185,10 @@ a = Assembler()
 code = a.assemble(ISA, args.c, args.output)
 print(code)
 a.output(code, 'o')
+
+out_test_2 = a.assemble(ISA, 'test/2.asm', args.output)
+answers = ['0010000100110100', '11110000011110011', '010000010100001001000011', '00000000000000000000']
+for i in range(0,4):
+    if out_test_2[i] != answers[i]:
+        print("Error on line ", i, "! Output should be ", answers[i], " but the returned value is ", out_test_2[i])
+print(out_test_2)

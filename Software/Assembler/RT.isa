@@ -114,3 +114,5 @@ jmp_link x l
 111100 10 16
 ret x
 111101 26
+context_switch x
+111110 26
