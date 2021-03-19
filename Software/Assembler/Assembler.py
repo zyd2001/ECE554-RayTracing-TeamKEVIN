@@ -46,6 +46,9 @@ class Assembler:
     lineCounter = 0
     PCCounter = 0
 
+    def __init__(self, isa):
+        self.ISAdict = isa
+
     def err(self, msg):
         error(str(self.lineCounter) + ': ' + msg)
 
@@ -98,30 +101,33 @@ class Assembler:
         code = ''
         if ins == '.string':
             code = []
-            for i in tokens[1]:
+            for i in bytes(tokens[1].strip('"'), "utf-8").decode("unicode_escape"): # handle escape character
                 code.append(binary(ord(i), 8))
             code.append('0' * 8)
         elif ins == '.space':
-            code = '0' * 8 * int(tokens[2])
+            code = '0' * 8 * int(tokens[1])
         elif ins == '.word':
-            code += tokens[1]
+            num = int(tokens[1])
+            if num >= 2**32:
+                self.err('word too large')
+            code = binary(int(num), 32)
         else:
             code = []
             for i in tokens[1:]:
+                i = int(i)
                 if (i >= 256):
                     self.err('byte too large')
                 code.append(binary(i, 8))
         return code
 
-    def assemble(self, ISA, inFile, outFile):
+    def assemble(self, inFile):
         output = []
+        self.linesWaiting = []
         self.labels = {}
-        self.ISAdict = ISA
-        inFile = open(inFile)
-        # outFile = open()
-        directives = set(('.string', '.space', '.word', '.byte'))
         self.lineCounter = 0
         self.PCCounter = 0
+        inFile = open(inFile)
+        directives = set(('.string', '.space', '.word', '.byte'))
         labelWait = ''
         directivesWaiting = []
         for line in inFile: # first pass
@@ -141,7 +147,8 @@ class Assembler:
                             directivesWaiting.append((tokens, ins, self.lineCounter, labelWait))
                             labelWait = ''
                         else:
-                            print(str(self.lineCounter) + ": warning, constant without label")
+                            # print(str(self.lineCounter) + ": warning, constant without label")
+                            directivesWaiting.append((tokens, ins, self.lineCounter, labelWait))
                     else:
                         self.err('no such instruction')
                 else: # label
@@ -162,7 +169,8 @@ class Assembler:
                         labelWait = tokens[0][:-1]
 
         for line in directivesWaiting:
-            self.labels[line[3]] = self.PCCounter
+            if line[3]:
+                self.labels[line[3]] = self.PCCounter
             self.PCCounter += 1
             self.lineCounter = line[2]
             code = self.genDirective(line[0], line[1])
@@ -181,14 +189,15 @@ class Assembler:
         return output
 
 ISA = parseISA('RT.isa')
-a = Assembler()
-code = a.assemble(ISA, args.c, args.output)
+a = Assembler(ISA)
+code = a.assemble(args.c)
 print(code)
-a.output(code, 'o')
+# a.output(code, 'o')
 
-out_test_2 = a.assemble(ISA, 'test/2.asm', args.output)
+out_test_2 = a.assemble('test/2.asm')
 answers = ['0010000100110100', '11110000011110011', '010000010100001001000011', '00000000000000000000']
-for i in range(0,4):
-    if out_test_2[i] != answers[i]:
-        print("Error on line ", i, "! Output should be ", answers[i], " but the returned value is ", out_test_2[i])
+# for i in range(0,4):
+#     if out_test_2[i] != answers[i]:
+#         print("Error on line ", i, "! Output should be ", answers[i], " but the returned value is ", out_test_2[i])
 print(out_test_2)
+a.output(out_test_2, 'o')
