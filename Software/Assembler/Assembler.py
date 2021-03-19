@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import argparse
+import array
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', help="Command Processor's input file")
@@ -48,6 +49,15 @@ class Assembler:
     def err(self, msg):
         error(str(self.lineCounter) + ': ' + msg)
 
+    def output(self, code, outFile):
+        outFile = open(outFile, 'wb')
+        for line in code:
+            arr = array.array('B') 
+            for i in range(0, len(line), 8):
+                arr.append(int(line[i:i+8], base=2))
+            arr.reverse()
+            outFile.write(arr.tobytes())
+
     def genCode(self, tokens, ins, genLabeled=False):
         entry = self.ISAdict[ins]
         code = entry['opcode']
@@ -55,7 +65,7 @@ class Assembler:
         for i in range(len(entry['args'])):
             arg = entry['args'][i]
             if arg[0] == 'x':
-                code += 'x' * arg[1]
+                code += '0' * arg[1]
                 skip += 1
             else: 
                 t = tokens[i - skip + 1].lower()
@@ -84,16 +94,36 @@ class Assembler:
                         self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
         return code
 
+    def genDirective(self, tokens, ins):
+        code = ''
+        if ins == '.string':
+            code = []
+            for i in tokens[1]:
+                code.append(binary(ord(i), 8))
+            code.append('0' * 8)
+        elif ins == '.space':
+            code = '0' * 8 * int(tokens[2])
+        elif ins == '.word':
+            code += tokens[1]
+        else:
+            code = []
+            for i in tokens[1:]:
+                if (i >= 256):
+                    self.err('byte too large')
+                code.append(binary(i, 8))
+        return code
+
     def assemble(self, ISA, inFile, outFile):
         output = []
         self.labels = {}
         self.ISAdict = ISA
         inFile = open(inFile)
         # outFile = open()
-        directives = set(('.asciiz', '.space', '.word', '.byte'))
+        directives = set(('.string', '.space', '.word', '.byte'))
         self.lineCounter = 0
         self.PCCounter = 0
         labelWait = ''
+        directivesWaiting = []
         for line in inFile: # first pass
             self.lineCounter += 1
             tokens = line.split()
@@ -107,7 +137,11 @@ class Assembler:
                         output.append(self.genCode(tokens, ins))
                         self.PCCounter += 1
                     elif ins in directives:
-                        pass
+                        if labelWait:
+                            directivesWaiting.append((tokens, ins, self.lineCounter, labelWait))
+                            labelWait = ''
+                        else:
+                            print(str(self.lineCounter) + ": warning, constant without label")
                     else:
                         self.err('no such instruction')
                 else: # label
@@ -121,11 +155,21 @@ class Assembler:
                             output.append(self.genCode(tokens, ins))
                             self.PCCounter += 1
                         elif ins in directives:
-                            pass
+                            directivesWaiting.append((tokens, ins, self.lineCounter, tokens[0][:-1]))
                         else:
                             self.err('no such instruction')
                     else:
                         labelWait = tokens[0][:-1]
+
+        for line in directivesWaiting:
+            self.labels[line[3]] = self.PCCounter
+            self.PCCounter += 1
+            self.lineCounter = line[2]
+            code = self.genDirective(line[0], line[1])
+            if isinstance(code, list):
+                output.extend(code)
+            else:
+                output.append(code)
 
         for line in self.linesWaiting:
             PC = line[0]
@@ -138,4 +182,6 @@ class Assembler:
 
 ISA = parseISA('RT.isa')
 a = Assembler()
-print(a.assemble(ISA, args.c, args.output))
+code = a.assemble(ISA, args.c, args.output)
+print(code)
+a.output(code, 'o')

@@ -30,3 +30,7 @@ launch r r x
 1100 4 4 20
 loadt r x
 1101 4 24
+ldl r l
+# ld R15 $l
+stl r l
+# st R15 $l
