@@ -1,7 +1,5 @@
 s_load_4byte r r i
 000000 5 5 16
-s_load_u4byte r r i
-000001 5 5 16
 s_store_4byte r r i
 000010 5 5 16
 s_write_high r x i
@@ -16,8 +14,6 @@ s_pop r x
 000111 5 21
 v_load_16byte x r r i
 001000 1 4 5 16
-v_load_u16byte x r r i
-001001 1 4 5 16
 v_store_16byte x r r i
 001010 1 4 5 16
 v_get_from_s r x r x index
@@ -116,3 +112,13 @@ ret x
 111101 26
 context_switch x
 111110 26
+s_load_label r l
+# s_load_4byte $r0 R31 $l
+v_load_label r l
+# v_load_16byte $r0 R31 $l
+s_store_label r l
+# s_store_4byte $r0 R31 $l
+v_store_label r l
+# v_store_16byte $r0 R31 $l
+load_addr r l
+# ii_addi $r0 R31 $l
