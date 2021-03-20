@@ -18,11 +18,12 @@ def parseISA(file):
         encoding = f.readline().split()
         if not len(ins):
             break
-        Dict[ins[0]] = {'args': [], 'opcode': encoding[0]}
-        for i in range(1, len(ins)):
-            Dict[ins[0]]['args'].append((ins[i], int(encoding[i])))
-            if ins[i] == 'x':
-                pass
+        if encoding[0] == '#': # pseudo instruction
+            Dict[ins[0]] = {'args': [ins[i] for i in range(1, len(ins))], 'pseudo': encoding[1:]}
+        else:
+            Dict[ins[0]] = {'args': [(ins[i], int(encoding[i])) for i in range(1, len(ins))], 'opcode': encoding[0]}
+            # for i in range(1, len(ins)):
+            #     Dict[ins[0]]['args'].append((ins[i], int(encoding[i])))
     return Dict
 
 def error(msg):
@@ -61,41 +62,87 @@ class Assembler:
             arr.reverse()
             outFile.write(arr.tobytes())
 
+    def translate(self, tokens, entry, genLabeled):
+        trans = entry['pseudo']
+        retTokens = []
+        retIns = trans[0]
+        r = []
+        l = ''
+        imm = ''
+        if not genLabeled and 'l' in entry['args']:
+            self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, tokens[0]))
+            return []
+        args = entry['args']
+        for i in range(len(args)):
+            if args[i] == 'r':
+                r.append(tokens[i + 1])
+            elif args[i] == 'l':
+                if tokens[i + 1] in self.labels:
+                    target = self.labels[tokens[i + 1]]
+                    offset = target - self.PCCounter - 1
+                    l = str(offset)
+            elif args[i] == 'i':
+                imm = tokens[i + 1]
+            else:
+                self.err('syntax error')
+        for i in trans:
+            if i[0] == '$':
+                if i[1] == 'r':
+                    retTokens.append(r[int(i[2:])])
+                elif i[1] == 'l':
+                    retTokens.append(l)
+                elif i[1] == 'i':
+                    retTokens.append(imm)
+                else:
+                    self.err('syntax error')
+            else:
+                retTokens.append(i)
+        return (retTokens, retIns)
+
     def genCode(self, tokens, ins, genLabeled=False):
         entry = self.ISAdict[ins]
-        code = entry['opcode']
-        skip = 0
-        for i in range(len(entry['args'])):
-            arg = entry['args'][i]
-            if arg[0] == 'x':
-                code += '0' * arg[1]
-                skip += 1
-            else: 
-                t = tokens[i - skip + 1].lower()
-                if arg[0] == 'r':
-                    if t[0] != 'r':
-                        self.err('syntax error')
-                    reg = int(t[1:])
-                    if reg >= 2**arg[1]:
-                        self.err('syntax error')
-                    code += binary(reg, arg[1])
-                elif arg[0] == 'i':
-                    imm = int(t)
-                    if imm >= 2**arg[1]:
-                        self.err('too large immediate')
-                    code += binary(imm, arg[1])
-                elif arg[0] == 'l':
-                    if genLabeled:
-                        l = tokens[i - skip + 1]
-                        if l in self.labels:
-                            target = self.labels[l]
-                            offset = target - self.PCCounter - 1
-                            if offset >= 2**arg[1]:
-                                self.err('cannot reach the label')
-                            code += binary(offset, arg[1])
+        if 'pseudo' in entry:
+            trans = self.translate(tokens, entry, genLabeled)
+            if trans:
+                return self.genCode(*trans)
+            else:
+                return ''
+        else:
+            code = entry['opcode']
+            skip = 0
+            for i in range(len(entry['args'])):
+                arg = entry['args'][i]
+                if arg[0] == 'x':
+                    code += '0' * arg[1]
+                    skip += 1
+                else: 
+                    t = tokens[i - skip + 1].lower()
+                    if arg[0] == 'r':
+                        if t[0] != 'r':
+                            self.err('syntax error')
+                        reg = int(t[1:])
+                        if reg >= 2**arg[1]:
+                            self.err('syntax error')
+                        code += binary(reg, arg[1])
+                    elif arg[0] == 'i':
+                        imm = int(t)
+                        if imm >= 2**arg[1]:
+                            self.err('too large immediate')
+                        code += binary(imm, arg[1])
+                    elif arg[0] == 'l':
+                        if genLabeled:
+                            l = tokens[i - skip + 1]
+                            if l in self.labels:
+                                target = self.labels[l]
+                                offset = target - self.PCCounter - 1
+                                if offset >= 2**arg[1]:
+                                    self.err('cannot reach the label')
+                                code += binary(offset, arg[1])
+                        else:
+                            self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
                     else:
-                        self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
-        return code
+                        self.err('syntax error')
+            return code
 
     def genDirective(self, tokens, ins):
         code = ''
@@ -179,9 +226,9 @@ class Assembler:
             else:
                 output.append(code)
 
-        for line in self.linesWaiting:
+        for line in self.linesWaiting: # lines that contains label need second pass
             PC = line[0]
-            self.lineCounter = line[1]
+            self.lineCounter = line[1] # set lineCounter for error message
             self.PCCounter = PC
             code = self.genCode(line[2], line[3], True)
             output[PC] = code
@@ -195,7 +242,7 @@ print(code)
 # a.output(code, 'o')
 
 out_test_2 = a.assemble('test/2.asm')
-answers = ['0010000100110100', '11110000011110011', '010000010100001001000011', '00000000000000000000']
+# answers = ['0010000100110100', '11110000011110011', '010000010100001001000011', '00000000000000000000']
 # for i in range(0,4):
 #     if out_test_2[i] != answers[i]:
 #         print("Error on line ", i, "! Output should be ", answers[i], " but the returned value is ", out_test_2[i])

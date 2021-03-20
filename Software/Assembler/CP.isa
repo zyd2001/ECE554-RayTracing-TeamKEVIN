@@ -34,3 +34,5 @@ ldl r l
 # ld R15 $l
 stl r l
 # st R15 $l
+la r l
+# addi $r0 R15 $l
