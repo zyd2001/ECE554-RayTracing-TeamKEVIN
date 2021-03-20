@@ -6,7 +6,9 @@ import array
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', help="Command Processor's input file")
 parser.add_argument('-r', help="RT Core's input file")
-parser.add_argument('output', help="output file")
+parser.add_argument('-co', help="output file for Command Processor")
+parser.add_argument('-ro', help="output file for RT Core")
+parser.add_argument('-p', help='print the output in binary', action='store_true')
 args = parser.parse_args()
     
 # Parse the ISA structure
@@ -235,16 +237,27 @@ class Assembler:
         
         return output
 
-ISA = parseISA('RT.isa')
-a = Assembler(ISA)
-code = a.assemble(args.c)
-print(code)
-# a.output(code, 'o')
-
-out_test_2 = a.assemble('test/2.asm')
-# answers = ['0010000100110100', '11110000011110011', '010000010100001001000011', '00000000000000000000']
-# for i in range(0,4):
-#     if out_test_2[i] != answers[i]:
-#         print("Error on line ", i, "! Output should be ", answers[i], " but the returned value is ", out_test_2[i])
-print(out_test_2)
-a.output(out_test_2, 'o')
+if args.c:
+    CPISA = parseISA('CP.isa')
+    a = Assembler(CPISA)
+    code = a.assemble(args.c)
+    if args.p:
+        print('Output for CP:')
+        for i in code:
+            print(i)
+    if args.co:
+        a.output(code, args.co)
+    else:
+        a.output(code, args.c + '.out')
+if args.r:
+    RTISA = parseISA('RT.isa')
+    a = Assembler(RTISA)
+    code = a.assemble(args.r)
+    if args.p:
+        print('Output for RT:')
+        for i in code:
+            print(i)
+    if args.ro:
+        a.output(code, args.ro)
+    else:
+        a.output(code, args.r + '.out')
