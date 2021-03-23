@@ -110,7 +110,7 @@ jmp_link x l
 111100 10 16
 ret x
 111101 26
-context_switch x
+fin x
 111110 26
 s_load_label r l
 # s_load_4byte $r0 R31 $l
