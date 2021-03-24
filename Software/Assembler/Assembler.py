@@ -11,6 +11,8 @@ parser.add_argument('-ro', help="output file for RT Core")
 parser.add_argument('-p', help='print the output in binary', action='store_true')
 args = parser.parse_args()
     
+# TODO: add some debug info in output
+
 # Parse the ISA structure
 def parseISA(file):
     f = open(file)
