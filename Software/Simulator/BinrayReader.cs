@@ -1,0 +1,7 @@
+namespace Simulator
+{
+    class BinaryReader
+    {
+        
+    }
+}
