@@ -9,3 +9,4 @@ L2: bne L2
     not r1 r2
     bge test
     s_load_label r1 L2
+    ii_mod r1 r2 r3

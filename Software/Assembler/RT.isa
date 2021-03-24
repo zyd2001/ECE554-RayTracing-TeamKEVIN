@@ -122,3 +122,7 @@ v_store_label r l
 # v_store_16byte $r0 R31 $l
 load_addr r l
 # ii_addi $r0 R31 $l
+ii_mod r r r
+# ii_div $r0 $r1 $r2, ii_mul $r0 $r0 $r2, ii_sub $r0 $r1 $r0
+ii_modi r r i
+# ii_divi $r0 $r1 $i, ii_muli $r0 $r0 $i, ii_sub $r0 $r1 $r0

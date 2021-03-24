@@ -10,10 +10,6 @@ mul r r r x
 0010 4 4 4 16
 muli r r i
 0011 4 4 20
-mov r r x 
-0100 4 4 20
-movi r i
-0101 4 24
 bz r l
 0110 4 24
 bnz r l
@@ -36,3 +32,7 @@ stl r l
 # st R15 $l
 la r l
 # addi $r0 R15 $l
+mov r r
+# add $r0 $r1 R0
+movi r i
+# addi $r0 R0 $i
