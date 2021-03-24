@@ -17,11 +17,12 @@ def parseISA(file):
     Dict = {}
     while True:
         ins = f.readline().split()
-        encoding = f.readline().split()
+        line = f.readline()
+        encoding = line.split()
         if not len(ins):
             break
         if encoding[0] == '#': # pseudo instruction
-            Dict[ins[0]] = {'args': [ins[i] for i in range(1, len(ins))], 'pseudo': encoding[1:]}
+            Dict[ins[0]] = {'args': [ins[i] for i in range(1, len(ins))], 'pseudo': line[1:].strip().split(',')}
         else:
             Dict[ins[0]] = {'args': [(ins[i], int(encoding[i])) for i in range(1, len(ins))], 'opcode': encoding[0]}
             # for i in range(1, len(ins)):
@@ -65,50 +66,54 @@ class Assembler:
             outFile.write(arr.tobytes())
 
     def translate(self, tokens, entry, genLabeled):
-        trans = entry['pseudo']
-        retTokens = []
-        retIns = trans[0]
-        r = []
-        l = ''
-        imm = ''
-        if not genLabeled and 'l' in entry['args']:
-            self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, tokens[0]))
-            return []
-        args = entry['args']
-        for i in range(len(args)):
-            if args[i] == 'r':
-                r.append(tokens[i + 1])
-            elif args[i] == 'l':
-                if tokens[i + 1] in self.labels:
-                    target = self.labels[tokens[i + 1]]
-                    offset = target - self.PCCounter - 1
-                    l = str(offset)
-            elif args[i] == 'i':
-                imm = tokens[i + 1]
-            else:
-                self.err('syntax error')
-        for i in trans:
-            if i[0] == '$':
-                if i[1] == 'r':
-                    retTokens.append(r[int(i[2:])])
-                elif i[1] == 'l':
-                    retTokens.append(l)
-                elif i[1] == 'i':
-                    retTokens.append(imm)
+        rets = []
+        for rule in entry['pseudo']:
+            trans = rule.split()
+            retTokens = []
+            retIns = trans[0]
+            r = []
+            l = ''
+            imm = ''
+            if not genLabeled and 'l' in entry['args']:
+                self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, tokens[0]))
+                rets.append(())
+            args = entry['args']
+            for i in range(len(args)):
+                if args[i] == 'r':
+                    r.append(tokens[i + 1])
+                elif args[i] == 'l':
+                    if tokens[i + 1] in self.labels:
+                        target = self.labels[tokens[i + 1]]
+                        offset = target - self.PCCounter - 1
+                        l = str(offset)
+                elif args[i] == 'i':
+                    imm = tokens[i + 1]
                 else:
                     self.err('syntax error')
-            else:
-                retTokens.append(i)
-        return (retTokens, retIns)
+            for i in trans:
+                if i[0] == '$':
+                    if i[1] == 'r':
+                        retTokens.append(r[int(i[2:])])
+                    elif i[1] == 'l':
+                        retTokens.append(l)
+                    elif i[1] == 'i':
+                        retTokens.append(imm)
+                    else:
+                        self.err('syntax error')
+                else:
+                    retTokens.append(i)
+            rets.append((retTokens, retIns))
+        return rets
 
     def genCode(self, tokens, ins, genLabeled=False):
         entry = self.ISAdict[ins]
         if 'pseudo' in entry:
             trans = self.translate(tokens, entry, genLabeled)
-            if trans:
-                return self.genCode(*trans)
-            else:
-                return ''
+            code = []
+            for t in trans:
+                if t:
+                    code.append(self.genCode(*t))
+            return code
         else:
             code = entry['opcode']
             skip = 0
@@ -133,7 +138,7 @@ class Assembler:
                         code += binary(imm, arg[1])
                     elif arg[0] == 'l':
                         if genLabeled:
-                            l = tokens[i - skip + 1]
+                            l = tokens[i - skip + 1] # case-sensitive
                             if l in self.labels:
                                 target = self.labels[l]
                                 offset = target - self.PCCounter - 1
@@ -189,14 +194,17 @@ class Assembler:
                         if labelWait:
                             self.labels[labelWait] = self.PCCounter
                             labelWait = ''
-                        output.append(self.genCode(tokens, ins))
+                        gen = self.genCode(tokens, ins)
+                        if isinstance(gen, list):
+                            output.extend(gen)
+                        else:
+                            output.append(gen)
                         self.PCCounter += 1
                     elif ins in directives:
                         if labelWait:
                             directivesWaiting.append((tokens, ins, self.lineCounter, labelWait))
                             labelWait = ''
                         else:
-                            # print(str(self.lineCounter) + ": warning, constant without label")
                             directivesWaiting.append((tokens, ins, self.lineCounter, labelWait))
                     else:
                         self.err('no such instruction')
@@ -208,7 +216,10 @@ class Assembler:
                         tokens = tokens[1:]
                         ins = tokens[0].lower()
                         if ins in self.ISAdict:
-                            output.append(self.genCode(tokens, ins))
+                            if isinstance(gen, list):
+                                output.extend(gen)
+                            else:
+                                output.append(gen)
                             self.PCCounter += 1
                         elif ins in directives:
                             directivesWaiting.append((tokens, ins, self.lineCounter, tokens[0][:-1]))
@@ -261,3 +272,6 @@ if args.r:
         a.output(code, args.ro)
     else:
         a.output(code, args.r + '.out')
+
+if not args.r and not args.c:
+    parser.print_help()
