@@ -67,6 +67,9 @@ class Assembler:
 
     def translate(self, tokens, entry, genLabeled):
         rets = []
+        if not genLabeled and 'l' in entry['args']:
+            rets.append((len(entry['pseudo']), self.lineCounter, tokens, tokens[0]))
+            return rets
         for rule in entry['pseudo']:
             trans = rule.split()
             retTokens = []
@@ -74,9 +77,6 @@ class Assembler:
             r = []
             l = ''
             imm = ''
-            if not genLabeled and 'l' in entry['args']:
-                self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, tokens[0]))
-                rets.append(())
             args = entry['args']
             for i in range(len(args)):
                 if args[i] == 'r':
@@ -84,7 +84,7 @@ class Assembler:
                 elif args[i] == 'l':
                     if tokens[i + 1] in self.labels:
                         target = self.labels[tokens[i + 1]]
-                        offset = target - self.PCCounter - 1
+                        offset = target - self.PCCounter - 4
                         l = str(offset)
                 elif args[i] == 'i':
                     imm = tokens[i + 1]
@@ -111,7 +111,10 @@ class Assembler:
             trans = self.translate(tokens, entry, genLabeled)
             code = []
             for t in trans:
-                if t:
+                if isinstance(t[0], int):
+                    self.linesWaiting.append((self.PCCounter, t[1], t[2], t[3]))
+                    code.extend([''] * t[0]) # placeholder
+                else:
                     code.append(self.genCode(*t))
             return code
         else:
@@ -141,12 +144,13 @@ class Assembler:
                             l = tokens[i - skip + 1] # case-sensitive
                             if l in self.labels:
                                 target = self.labels[l]
-                                offset = target - self.PCCounter - 1
+                                offset = target - self.PCCounter - 4
                                 if offset >= 2**arg[1]:
                                     self.err('cannot reach the label')
                                 code += binary(offset, arg[1])
                         else:
                             self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
+                            # still return a string for placeholder
                     else:
                         self.err('syntax error')
             return code
@@ -191,15 +195,16 @@ class Assembler:
                 if line[0] == ' ' or line[0] == '\t':
                     ins = tokens[0].lower()
                     if ins in self.ISAdict:
-                        if labelWait:
+                        if labelWait: # if previous line is a label
                             self.labels[labelWait] = self.PCCounter
                             labelWait = ''
                         gen = self.genCode(tokens, ins)
-                        if isinstance(gen, list):
+                        if isinstance(gen, list): # pseudo instruction may generate multiple ins
                             output.extend(gen)
+                            self.PCCounter += 4 * len(gen)
                         else:
                             output.append(gen)
-                        self.PCCounter += 1
+                            self.PCCounter += 4
                     elif ins in directives:
                         if labelWait:
                             directivesWaiting.append((tokens, ins, self.lineCounter, labelWait))
@@ -216,11 +221,13 @@ class Assembler:
                         tokens = tokens[1:]
                         ins = tokens[0].lower()
                         if ins in self.ISAdict:
-                            if isinstance(gen, list):
+                            gen = self.genCode(tokens, ins)
+                            if isinstance(gen, list): # pseudo instruction may generate multiple ins
                                 output.extend(gen)
+                                self.PCCounter += 4 * len(gen)
                             else:
                                 output.append(gen)
-                            self.PCCounter += 1
+                                self.PCCounter += 4
                         elif ins in directives:
                             directivesWaiting.append((tokens, ins, self.lineCounter, tokens[0][:-1]))
                         else:
@@ -231,20 +238,26 @@ class Assembler:
         for line in directivesWaiting:
             if line[3]:
                 self.labels[line[3]] = self.PCCounter
-            self.PCCounter += 1
             self.lineCounter = line[2]
             code = self.genDirective(line[0], line[1])
             if isinstance(code, list):
                 output.extend(code)
+                self.PCCounter += len(''.join(code)) // 8
             else:
                 output.append(code)
+                self.PCCounter += len(code) // 8
 
         for line in self.linesWaiting: # lines that contains label need second pass
             PC = line[0]
             self.lineCounter = line[1] # set lineCounter for error message
             self.PCCounter = PC
             code = self.genCode(line[2], line[3], True)
-            output[PC] = code
+            if isinstance(code, list): # pseudo instruction may generate multiple ins
+                # there will be placeholder for all waiting instruction
+                for i in range(len(code)):
+                    output[PC // 4 + i] = code[i]
+            else:
+                output[PC // 4] = code
         
         return output
 
