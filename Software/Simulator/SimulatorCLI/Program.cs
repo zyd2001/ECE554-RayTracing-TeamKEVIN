@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Simulator
+namespace SimulatorCLI
 {
     class Program
     {

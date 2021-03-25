@@ -1,7 +1,0 @@
-namespace Simulator
-{
-    class CommandProcessor
-    {
-        
-    }
-}
