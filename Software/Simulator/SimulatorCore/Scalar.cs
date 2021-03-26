@@ -2,6 +2,10 @@ using System.Runtime.InteropServices;
 
 namespace SimulatorCore
 {
+    /// <summary>
+    /// This value type can represent both float and integer
+    /// for use in scalar register file
+    /// </summary>
     [StructLayout(LayoutKind.Explicit)]
     public struct Scalar
     {

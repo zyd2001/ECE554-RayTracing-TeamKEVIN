@@ -1,7 +1,0 @@
-namespace SimulatorCore
-{
-    class Vector
-    {
-        
-    }
-}
