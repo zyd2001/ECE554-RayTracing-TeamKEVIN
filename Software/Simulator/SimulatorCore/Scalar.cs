@@ -14,6 +14,9 @@ namespace SimulatorCore
         [FieldOffset(0)]
         public float f;
 
+        public static implicit operator Scalar(int i) => new Scalar(i);
+        public static implicit operator Scalar(float f) => new Scalar(f);
+
         public Scalar(int i) : this()
         {
             this.i = i;
