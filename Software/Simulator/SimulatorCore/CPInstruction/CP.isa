@@ -1,0 +1,38 @@
+add r r r x 
+0000 4 4 4 16
+addi r r i 
+0001 4 4 20 
+sub r r r x
+1110 4 4 4 16
+subi r r i
+1111 4 4 20
+mul r r r x 
+0010 4 4 4 16
+muli r r i
+0011 4 4 20
+bz r l
+0110 4 24
+bnz r l
+0111 4 24
+bge r l
+1000 4 24
+ble r l
+1001 4 24
+ld r r i
+1010 4 4 20
+st r r i
+1011 4 4 20
+launch r r x
+1100 4 4 20
+loadt r x
+1101 4 24
+ldl r l
+# ld R15 $l
+stl r l
+# st R15 $l
+la r l
+# addi $r0 R15 $l
+mov r r
+# add $r0 $r1 R0
+movi r i
+# addi $r0 R0 $i
