@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace SimulatorCore
 {
-    public interface IInstruction {}
+    public interface IInstruction { }
 
     class Parser
     {
@@ -12,12 +13,14 @@ namespace SimulatorCore
         {
             internal string name;
             internal int[] bitWidths;
+            internal bool[] section;
             internal int realSize;
 
             internal Definition(string name, int size)
             {
                 this.name = name;
                 bitWidths = new int[size];
+                section = new bool[size];
                 realSize = 0;
             }
         }
@@ -41,9 +44,14 @@ namespace SimulatorCore
                 Definition newDef = new Definition(insTokens[0], insTokens.Length - 1);
                 for (int i = 1; i < insTokens.Length; i++)
                 {
-                    newDef.bitWidths[i-1] = int.Parse(encodingTokens[i]);
+                    newDef.bitWidths[i - 1] = int.Parse(encodingTokens[i]);
                     if (insTokens[i] != "x")
+                    {
+                        newDef.section[i-1] = true;
                         newDef.realSize++;
+                    }
+                    else
+                        newDef.section[i-1] = false;
                 }
                 dict[Convert.ToUInt32(encodingTokens[0], 2)] = newDef;
             }
@@ -56,17 +64,23 @@ namespace SimulatorCore
             uint mask = 0xffffffff >> opcodeLength;
             int bitsLeft = 32 - opcodeLength;
             var def = dict[opcode];
-            Type t = Type.GetType("SimulatorCore" + def.name);
+            Type t = Type.GetType("SimulatorCore." + def.name);
             object[] arguments = new object[def.realSize];
-            for (int i = 0; i < def.realSize; i++)
+            int counter = 0;
+            for (int i = 0; i < def.section.Length; i++)
             {
                 uint shiftedMask = mask >> def.bitWidths[i];
                 uint newMask = mask & ~shiftedMask;
                 bitsLeft -= def.bitWidths[i];
-                arguments[i] = (value & newMask) >> bitsLeft;
+                if (def.section[i])
+                {
+                    arguments[counter] = (int) (value & newMask) >> bitsLeft;
+                    counter++;
+                }
                 mask = shiftedMask;
             }
-            return (IInstruction) t.GetConstructors()[0].Invoke(arguments);
+            return (IInstruction) t.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]
+                .Invoke(arguments);
         }
     }
 }
