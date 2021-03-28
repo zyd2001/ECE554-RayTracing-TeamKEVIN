@@ -2,18 +2,16 @@ namespace SimulatorCore
 {
     public class RegisterFile<T>
     {
-        T[] arr;
-        int size {get;}
+        public T[] Array {get;}
         public RegisterFile(int size)
         {
-            this.size = size;
-            arr = new T[size];
+            Array = new T[size];
         }
 
         public T this[int i]
         {
-            get => arr[i];
-            set => arr[i] = value;
+            get => Array[i];
+            set => Array[i] = value;
         }
     }
 }

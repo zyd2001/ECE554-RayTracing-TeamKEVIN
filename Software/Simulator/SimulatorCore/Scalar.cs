@@ -16,6 +16,8 @@ namespace SimulatorCore
 
         public static implicit operator Scalar(int i) => new Scalar(i);
         public static implicit operator Scalar(float f) => new Scalar(f);
+        public static implicit operator int(Scalar s) => s.i;
+        public static implicit operator float(Scalar s) => s.f;
 
         public Scalar(int i) : this()
         {
