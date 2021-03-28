@@ -13,7 +13,7 @@ namespace SimulatorCore
         internal override void process(RegisterFile<int> RF, Memory mem)
         {
             if(RF[rd] == 0){
-                RF[16] = imm; // 17th reg of a reg file representing the CP PC
+                RF[15] = imm; // 17th reg of a reg file representing the CP PC
                               // In the hardware, the PC will not actually
                               // be in the main reg file
             }
@@ -33,9 +33,7 @@ namespace SimulatorCore
         internal override void process(RegisterFile<int> RF, Memory mem)
         {
             if(RF[rd] != 0){
-                RF[16] = imm; // 17th reg of a reg file representing the CP PC
-                              // In the hardware, the PC will not actually
-                              // be in the main reg file
+                RF[15] = RF[15] + imm; 
             }
         }
     }
@@ -53,9 +51,7 @@ namespace SimulatorCore
         internal override void process(RegisterFile<int> RF, Memory mem)
         {
             if(RF[rd] >= 0){
-                RF[16] = imm; // 17th reg of a reg file representing the CP PC
-                              // In the hardware, the PC will not actually
-                              // be in the main reg file
+                RF[15] = imm; 
             }
         }
     }
@@ -73,9 +69,7 @@ namespace SimulatorCore
         internal override void process(RegisterFile<int> RF, Memory mem)
         {
             if(RF[rd] <= 0){
-                RF[16] = imm; // 17th reg of a reg file representing the CP PC
-                              // In the hardware, the PC will not actually
-                              // be in the main reg file
+                RF[15] = imm; 
             }
         }
     }
