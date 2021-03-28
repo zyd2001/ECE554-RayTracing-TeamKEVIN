@@ -55,25 +55,25 @@ namespace SimulatorTest
         public void TestMethod5()
         {
             // test bz (take branch)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             bz b = new bz(2, 10);
             
             b.process(iRF, m);
-            Assert.AreEqual<int>(10, iRF[16]);
+            Assert.AreEqual<int>(10, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod6()
         {
             // test bz (don't take branch)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             bz b = new bz(2, 10);
             a.process(iRF, m);
             b.process(iRF, m);
-            Assert.AreEqual<int>(0, iRF[16]);
+            Assert.AreEqual<int>(0, iRF[15]);
         }
         
 
@@ -81,116 +81,140 @@ namespace SimulatorTest
         public void TestMethod7()
         {
             // test bnz (take branch)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             bnz b = new bnz(2, 10);
             a.process(iRF, m);
             b.process(iRF, m);
-            Assert.AreEqual<int>(10, iRF[16]);
+            Assert.AreEqual<int>(10, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod8()
         {
             // test bnz (don't take branch)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             bnz b = new bnz(2, 10);
             
             b.process(iRF, m);
-            Assert.AreEqual<int>(0, iRF[16]);
+            Assert.AreEqual<int>(0, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod9()
         {
             // test bge (take branch with rd = 0)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             bge b = new bge(2, 10);
             
             b.process(iRF, m);
-            Assert.AreEqual<int>(10, iRF[16]);
+            Assert.AreEqual<int>(10, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod10()
         {
             // test bge (take branch with rd > 0)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             bge b = new bge(2, 10);
             a.process(iRF, m);
             b.process(iRF, m);
-            Assert.AreEqual<int>(10, iRF[16]);
+            Assert.AreEqual<int>(10, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod11()
         {
             // test bge (don't take branch with rd < 0)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             subi a = new subi(2, 0, 1);
             bge b = new bge(2, 10);
             a.process(iRF, m);
             b.process(iRF, m);
-            Assert.AreEqual<int>(0, iRF[16]);
+            Assert.AreEqual<int>(0, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod12()
         {
             // test ble (take branch with rd = 0)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             ble b = new ble(2, 10);
             
             b.process(iRF, m);
-            Assert.AreEqual<int>(10, iRF[16]);
+            Assert.AreEqual<int>(10, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod13()
         {
             // test ble (don't take branch with rd > 0)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             ble b = new ble(2, 10);
             a.process(iRF, m);
             b.process(iRF, m);
-            Assert.AreEqual<int>(0, iRF[16]);
+            Assert.AreEqual<int>(0, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod14()
         {
             // test ble (take branch with rd < 0)
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             subi a = new subi(2, 0, 1);
             ble b = new ble(2, 10);
             a.process(iRF, m);
             b.process(iRF, m);
-            Assert.AreEqual<int>(10, iRF[16]);
+            Assert.AreEqual<int>(10, iRF[15]);
         }
 
         [TestMethod]
         public void TestMethod15()
         {
+            
             // test ld 
-            RegisterFile<int> iRF = new RegisterFile<int>(17);
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
-            byte[] val = {5, 1, 5, 1};
+            byte[] val = BitConverter.GetBytes(5);
             m.write(15, val);
             ld l = new ld(0, 1, 15);
             
             l.process(iRF, m);
             
-            Assert.AreEqual()
+            Assert.AreEqual(5, iRF[0]);
+            
+        }
+
+        [TestMethod]
+        public void TestMethod16()
+        {
+            
+            // test st
+            RegisterFile<int> iRF = new RegisterFile<int>(16);
+            Memory m = new Memory(5000);
+            
+            addi a = new addi(0,1, 1);
+            addi b = new addi(1,1, 1);
+            st s = new st(0, 1, 1);
+            ld l = new ld(0, 1, 1);
+            
+            a.process(iRF, m);
+            b.process(iRF, m);
+            s.process(iRF, m);
+            l.process(iRF, m);
+            
+            Assert.AreEqual(1, iRF[0]);
+            
         }
     }
 }
