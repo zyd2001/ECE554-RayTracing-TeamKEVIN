@@ -1,6 +1,8 @@
 synth/
 .vscode/
 
+.venv/
+
 [_@]*
 
 # ignore compilation output of ModelSim
