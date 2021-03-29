@@ -421,5 +421,453 @@ namespace SimulatorTest
 
         }
 
+        [TestMethod]
+        public void TestMethod18()
+        {
+            // testing itof
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(32);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+            sRF[1] = 10;
+
+            itof it = new itof(0, 1);
+
+
+
+            it.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<float>((float)10, sRF[0].f);
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod19()
+        {
+            // testing ftoi
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(32);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+            sRF[1] = (float)10.6;
+
+            ftoi ft = new ftoi(0, 1);
+
+
+
+            ft.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>((int)10, sRF[0].i);
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod20()
+        {
+            // testing cmp_v
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+            vRF[1] = new Vector4(1, 2, 3, 4);
+            vRF[2] = new Vector4(1, 2, 3, 5);
+
+            cmp_v c = new cmp_v(1, 2);
+
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(3, sRF[32].i);
+
+            vRF[2] = new Vector4(1, 2, 3, 4);
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(0, sRF[32].i);
+        }
+
+        [TestMethod]
+        public void TestMethod21()
+        {
+            // testing cmp_i
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_i c = new cmp_i(1, 2);
+
+            sRF[1] = 1;
+            sRF[2] = 1;
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(0, sRF[32].i);
+
+            sRF[1] = 1;
+            sRF[2] = 2;
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(1, sRF[32].i);
+
+
+            sRF[1] = 2;
+            sRF[2] = 1;
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(2, sRF[32].i);
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod22()
+        {
+            // testing cmp_f
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(0, sRF[32].i);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)2;
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(1, sRF[32].i);
+
+
+            sRF[1] = (float)2.5;
+            sRF[2] = (float)1;
+            c.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(2, sRF[32].i);
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod23()
+        {
+            // testing bne
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+            bne b = new bne(5);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(0, sRF[31].i);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)2;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(5, sRF[31].i);
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod24()
+        {
+            // testing bg
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+            bg b = new bg(5);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(0, sRF[31].i);
+
+            sRF[1] = (float)2;
+            sRF[2] = (float)1;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(5, sRF[31].i);
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod25()
+        {
+            // testing bl
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+            bl b = new bl(5);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(0, sRF[31].i);
+
+            sRF[1] = (float)1;
+            sRF[2] = (float)2;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(5, sRF[31].i);
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod26()
+        {
+            // testing bge_rt
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+            bge_rt b = new bge_rt(5);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(5, sRF[31].i);
+
+            sRF[1] = (float)2;
+            sRF[2] = (float)1;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(10, sRF[31].i);
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod27()
+        {
+            // testing ble_rt
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+            ble_rt b = new ble_rt(5);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(5, sRF[31].i);
+
+            sRF[1] = (float)1;
+            sRF[2] = (float)2;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(10, sRF[31].i);
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod28()
+        {
+            // testing bge_rt
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            cmp_f c = new cmp_f(1, 2);
+            bge_rt b = new bge_rt(5);
+
+            sRF[1] = (float)1.5;
+            sRF[2] = (float)1.5;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(5, sRF[31].i);
+
+            sRF[1] = (float)2;
+            sRF[2] = (float)1;
+            c.process(vRF, sRF, m, ic);
+
+            b.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual<int>(10, sRF[31].i);
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod29()
+        {
+            // testing jmp
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            jmp j = new jmp(10);
+
+
+            j.process(vRF, sRF, m, ic);
+            Assert.AreEqual<int>(10, sRF[31].i);
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod30()
+        {
+            // testing jmp_link and ret
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+
+            jmp_link j = new jmp_link(10);
+
+            sRF[31] = 1;
+
+            j.process(vRF, sRF, m, ic);
+            Assert.AreEqual<int>(1, sRF[30].i);
+            Assert.AreEqual<int>(11, sRF[31].i);
+
+            ret r = new ret();
+            r.process(vRF, sRF, m, ic);
+            Assert.AreEqual<int>(1, sRF[31]);
+
+        }
+
     }
 }
