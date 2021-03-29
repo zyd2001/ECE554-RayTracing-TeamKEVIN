@@ -15,11 +15,11 @@ namespace SimulatorCore
 
         internal override void process(RegisterFile<int> RF, Memory mem)
         {
-            
+
             var bytes = BitConverter.GetBytes(RF[r0]);
-            mem.write(RF[r1]+imm, bytes);
-            
-            
+            mem.write(RF[r1] + imm, bytes);
+
+
         }
     }
 
