@@ -3,20 +3,20 @@ using System.Runtime.InteropServices;
 
 namespace SimulatorCore
 {
-    class s_load_4byte : RTInstruction
+    class and : RTInstruction
     {
-        int r0, r1, imm;
+        int r0, r1, r2;
 
-        internal s_load_4byte(int r0, int r1, int imm)
+        internal and(int r0, int r1, int r2)
         {
             this.r0 = r0;
             this.r1 = r1;
-            this.imm = imm;
+            this.r2 = r2;
         }
 
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            sRF[r0] = MemoryMarshal.Read<int>(mem.read(sRF[r1].i + imm));
+            sRF[r0] = sRF[r1].i & sRF[r2].i;
 
 
         }

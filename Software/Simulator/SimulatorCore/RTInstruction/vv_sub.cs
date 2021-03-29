@@ -1,23 +1,22 @@
 using System.Numerics;
-using System.Runtime.InteropServices;
+
 
 namespace SimulatorCore
 {
-    class s_load_4byte : RTInstruction
+    class vv_sub : RTInstruction
     {
-        int r0, r1, imm;
+        int r0, r1, r2;
 
-        internal s_load_4byte(int r0, int r1, int imm)
+        internal vv_sub(int r0, int r1, int r2)
         {
             this.r0 = r0;
             this.r1 = r1;
-            this.imm = imm;
+            this.r2 = r2;
         }
 
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            sRF[r0] = MemoryMarshal.Read<int>(mem.read(sRF[r1].i + imm));
-
+            vRF[r0] = Vector4.Subtract(vRF[r1], vRF[r2]);
 
         }
     }

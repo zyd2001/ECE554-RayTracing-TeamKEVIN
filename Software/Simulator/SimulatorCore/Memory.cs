@@ -5,7 +5,7 @@ namespace SimulatorCore
 {
     public class Memory
     {
-        byte[] mem {get;}
+        byte[] mem { get; }
 
         public Memory(int size)
         {
@@ -14,7 +14,7 @@ namespace SimulatorCore
 
         public void loadToMemory(FileStream binaryFile)
         {
-            binaryFile.Read(new Span<byte>(mem, 0, (int) binaryFile.Length));
+            binaryFile.Read(new Span<byte>(mem, 0, (int)binaryFile.Length));
         }
 
         public void write(int address, byte[] data)
