@@ -7,27 +7,33 @@ namespace SimulatorCore
 {
     public interface IInstruction { }
 
-    class Parser
+    class Decoder
     {
+        enum OperandType
+        {
+            Placeholder,
+            Register,
+            Immediate
+        }
         struct Definition
         {
             internal string name;
             internal int[] bitWidths;
-            internal bool[] section;
+            internal OperandType[] section;
             internal int realSize;
 
             internal Definition(string name, int size)
             {
                 this.name = name;
                 bitWidths = new int[size];
-                section = new bool[size];
+                section = new OperandType[size];
                 realSize = 0;
             }
         }
 
         Dictionary<uint, Definition> dict;
         int opcodeLength;
-        internal Parser(StreamReader file, int opcodeLength)
+        internal Decoder(StreamReader file, int opcodeLength)
         {
             this.opcodeLength = opcodeLength;
             dict = new Dictionary<uint, Definition>();
@@ -45,39 +51,52 @@ namespace SimulatorCore
                 for (int i = 1; i < insTokens.Length; i++)
                 {
                     newDef.bitWidths[i - 1] = int.Parse(encodingTokens[i]);
-                    if (insTokens[i] != "x")
+                    switch (insTokens[i])
                     {
-                        newDef.section[i-1] = true;
-                        newDef.realSize++;
+                        case "r":
+                            newDef.section[i-1] = OperandType.Register;
+                            newDef.realSize++;
+                            break;
+                        case "i":
+                        case "l":
+                            newDef.section[i-1] = OperandType.Immediate;
+                            newDef.realSize++;
+                            break;
+                        default:
+                            newDef.section[i-1] = OperandType.Placeholder;
+                            break;
                     }
-                    else
-                        newDef.section[i-1] = false;
                 }
                 dict[Convert.ToUInt32(encodingTokens[0], 2)] = newDef;
             }
         }
 
-        internal IInstruction parse(ReadOnlySpan<byte> code)
+        internal IInstruction Decode(ReadOnlySpan<byte> code)
         {
             uint value = BitConverter.ToUInt32(code);
             uint opcode = value >> (32 - opcodeLength);
-            uint mask = 0xffffffff >> opcodeLength;
-            int bitsLeft = 32 - opcodeLength;
+            int bitsBefore = opcodeLength;
             var def = dict[opcode];
             Type t = Type.GetType("SimulatorCore." + def.name);
             object[] arguments = new object[def.realSize];
             int counter = 0;
             for (int i = 0; i < def.section.Length; i++)
             {
-                uint shiftedMask = mask >> def.bitWidths[i];
-                uint newMask = mask & ~shiftedMask;
-                bitsLeft -= def.bitWidths[i];
-                if (def.section[i])
+                switch (def.section[i])
                 {
-                    arguments[counter] = (int) (value & newMask) >> bitsLeft;
-                    counter++;
+                    case OperandType.Register:
+                        // convert to int, no operand will have larger value
+                        arguments[counter] = (int) ((value << bitsBefore) >> (32 - def.bitWidths[i]));
+                        counter++;
+                        break;
+                    case OperandType.Immediate:
+                        arguments[counter] = ((int) value << bitsBefore) >> (32 - def.bitWidths[i]);
+                        counter++;
+                        break;
+                    default:
+                        break;
                 }
-                mask = shiftedMask;
+                bitsBefore += def.bitWidths[i];
             }
             return (IInstruction) t.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]
                 .Invoke(arguments);
