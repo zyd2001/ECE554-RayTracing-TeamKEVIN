@@ -61,7 +61,7 @@ namespace SimulatorTest
             s_write_high swh = new s_write_high(0, "1010101011001100");
             swh.process(vRF, sRF, m, ic);
 
-            Assert.AreEqual<int>(52224, sRF[0].i);
+            Assert.AreEqual<int>(-1429471232, sRF[0].i);
 
         }
 
@@ -81,7 +81,7 @@ namespace SimulatorTest
             s_write_low swl = new s_write_low(0, "1010101011001100");
             swl.process(vRF, sRF, m, ic);
 
-            Assert.AreEqual<int>(204, sRF[0].i);
+            Assert.AreEqual<int>(43724, sRF[0].i);
 
         }
 

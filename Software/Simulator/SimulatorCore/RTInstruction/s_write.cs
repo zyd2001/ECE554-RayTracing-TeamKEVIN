@@ -19,8 +19,8 @@ namespace SimulatorCore
         {
 
 
-            int integer = Convert.ToInt32(imm.Substring(imm.Length - 8), 2);
-            integer = integer << 8;
+            int integer = Convert.ToInt32(imm, 2);
+            integer = integer << 16;
             sRF[r0] = sRF[r0].i | integer;
 
         }
@@ -41,7 +41,7 @@ namespace SimulatorCore
         {
 
 
-            int integer = Convert.ToInt32(imm.Substring(imm.Length - 8), 2);
+            int integer = Convert.ToInt32(imm, 2);
 
             sRF[r0] = sRF[r0].i | integer;
 
