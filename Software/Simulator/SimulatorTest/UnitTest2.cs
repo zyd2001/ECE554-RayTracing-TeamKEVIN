@@ -869,5 +869,55 @@ namespace SimulatorTest
 
         }
 
+        [TestMethod]
+        public void TestMethod31()
+        {
+            // testing s_push and s_pop
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+
+
+            sRF[0] = 15;
+            s_push pu = new s_push(0);
+            s_pop po = new s_pop(0);
+
+            pu.process(vRF, sRF, m, ic);
+            po.process(vRF, sRF, m, ic);
+            Assert.AreEqual<int>(15, sRF[0].i);
+
+
+        }
+
+        [TestMethod]
+        public void TestMethod32()
+        {
+            // testing v_push and v_pop
+
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(32);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+
+            vRF[2] = new Vector4(5, 6, 7, 8);
+            v_push vs = new v_push(2);
+
+            v_pop vl = new v_pop(0);
+
+            vs.process(vRF, sRF, m, ic);
+            vl.process(vRF, sRF, m, ic);
+            //Console.Write(MemoryMarshal.Read<int>(m.read(1)));
+            //Console.Write(MemoryMarshal.Read<float>(BitConverter.GetBytes((float)5)));
+            Console.Write(vRF[0]);
+
+            Assert.AreEqual<float>(7, vRF[0].Z);
+        }
     }
 }
