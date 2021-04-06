@@ -20,7 +20,7 @@ namespace SimulatorTest
             Memory m_ic = new Memory(5000);
             IntersectionCore ic = new IntersectionCore(m_ic);
 
-            m.write(15, BitConverter.GetBytes(2500));
+            m.Write(15, BitConverter.GetBytes(2500));
             s_load_4byte ld = new s_load_4byte(0, 1, 15);
             ld.process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(2500, sRF[0].i);

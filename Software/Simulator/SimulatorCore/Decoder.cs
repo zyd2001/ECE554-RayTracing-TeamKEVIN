@@ -54,16 +54,16 @@ namespace SimulatorCore
                     switch (insTokens[i])
                     {
                         case "r":
-                            newDef.section[i-1] = OperandType.Register;
+                            newDef.section[i - 1] = OperandType.Register;
                             newDef.realSize++;
                             break;
                         case "i":
                         case "l":
-                            newDef.section[i-1] = OperandType.Immediate;
+                            newDef.section[i - 1] = OperandType.Immediate;
                             newDef.realSize++;
                             break;
                         default:
-                            newDef.section[i-1] = OperandType.Placeholder;
+                            newDef.section[i - 1] = OperandType.Placeholder;
                             break;
                     }
                 }
@@ -86,11 +86,11 @@ namespace SimulatorCore
                 {
                     case OperandType.Register:
                         // convert to int, no operand will have larger value
-                        arguments[counter] = (int) ((value << bitsBefore) >> (32 - def.bitWidths[i]));
+                        arguments[counter] = (int)((value << bitsBefore) >> (32 - def.bitWidths[i]));
                         counter++;
                         break;
                     case OperandType.Immediate:
-                        arguments[counter] = ((int) value << bitsBefore) >> (32 - def.bitWidths[i]);
+                        arguments[counter] = ((int)value << bitsBefore) >> (32 - def.bitWidths[i]);
                         counter++;
                         break;
                     default:
@@ -98,7 +98,7 @@ namespace SimulatorCore
                 }
                 bitsBefore += def.bitWidths[i];
             }
-            return (IInstruction) t.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]
+            return (IInstruction)t.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]
                 .Invoke(arguments);
         }
     }

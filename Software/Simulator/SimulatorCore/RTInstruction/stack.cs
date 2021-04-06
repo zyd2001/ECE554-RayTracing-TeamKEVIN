@@ -18,7 +18,7 @@ namespace SimulatorCore
         {
             sRF[29] = sRF[29] + 4;
             var bytes = BitConverter.GetBytes(sRF[r0]);
-            mem.write(sRF[29] + sRF[28], bytes);
+            mem.Write(sRF[29] + sRF[28], bytes);
 
 
         }
@@ -42,7 +42,7 @@ namespace SimulatorCore
                 return;
             }
 
-            sRF[r0] = MemoryMarshal.Read<int>(mem.read(sRF[29] + sRF[28]));
+            sRF[r0] = MemoryMarshal.Read<int>(mem.Read(sRF[29] + sRF[28]));
             sRF[29] = sRF[29] - 4;
 
 
@@ -61,13 +61,13 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[29] = sRF[29] + 4;
-            mem.write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].X));
+            mem.Write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].X));
             sRF[29] = sRF[29] + 4;
-            mem.write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].Y));
+            mem.Write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].Y));
             sRF[29] = sRF[29] + 4;
-            mem.write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].Z));
+            mem.Write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].Z));
             sRF[29] = sRF[29] + 4;
-            mem.write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].W));
+            mem.Write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].W));
 
 
         }
@@ -91,10 +91,10 @@ namespace SimulatorCore
                 return;
             }
 
-            Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.read(sRF[29] + sRF[28] - 12)),
-            MemoryMarshal.Read<float>(mem.read(sRF[29] + sRF[28] - 8)),
-            MemoryMarshal.Read<float>(mem.read(sRF[29] + sRF[28] - 4)),
-            MemoryMarshal.Read<float>(mem.read(sRF[29] + sRF[28])));
+            Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.Read(sRF[29] + sRF[28] - 12)),
+            MemoryMarshal.Read<float>(mem.Read(sRF[29] + sRF[28] - 8)),
+            MemoryMarshal.Read<float>(mem.Read(sRF[29] + sRF[28] - 4)),
+            MemoryMarshal.Read<float>(mem.Read(sRF[29] + sRF[28])));
             sRF[29] = sRF[29] - 16;
             vRF[r0] = vec;
 
