@@ -65,9 +65,12 @@ namespace SimulatorCore
                 output.Set();
             }
             if (ins is finish)
+            {
+                blocking.WaitOne();
                 return true;
-            ins.process(RegisterFile, Memory);
+            }
             RegisterFile[15] += 4;
+            ins.process(RegisterFile, Memory);
             return false;
         }
     }
