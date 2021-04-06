@@ -24,7 +24,7 @@ namespace SimulatorCore
         public void Write(int address, byte[] data)
         {
             if (trace)
-                TraceLog.AddLast((address, BitConverter.ToInt32(data), BitConverter.ToInt32(Mem, address)));
+                TraceLog.AddLast((address, BitConverter.ToInt32(Mem, address), BitConverter.ToInt32(data)));
             Array.Copy(data, 0, Mem, address, 4);
         }
 
