@@ -16,10 +16,10 @@ namespace SimulatorCore
 
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.read(sRF[r1].i + imm)),
-            MemoryMarshal.Read<float>(mem.read(sRF[r1].i + imm + 4)),
-            MemoryMarshal.Read<float>(mem.read(sRF[r1].i + imm + 8)),
-            MemoryMarshal.Read<float>(mem.read(sRF[r1].i + imm + 12)));
+            Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm)),
+            MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 4)),
+            MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 8)),
+            MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 12)));
             vRF[r0] = vec;
 
 

@@ -17,10 +17,10 @@ namespace SimulatorCore
 
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            mem.write(sRF[r1].i + imm, BitConverter.GetBytes(vRF[r0].X));
-            mem.write(sRF[r1].i + imm + 4, BitConverter.GetBytes(vRF[r0].Y));
-            mem.write(sRF[r1].i + imm + 8, BitConverter.GetBytes(vRF[r0].Z));
-            mem.write(sRF[r1].i + imm + 12, BitConverter.GetBytes(vRF[r0].W));
+            mem.Write(sRF[r1].i + imm, BitConverter.GetBytes(vRF[r0].X));
+            mem.Write(sRF[r1].i + imm + 4, BitConverter.GetBytes(vRF[r0].Y));
+            mem.Write(sRF[r1].i + imm + 8, BitConverter.GetBytes(vRF[r0].Z));
+            mem.Write(sRF[r1].i + imm + 12, BitConverter.GetBytes(vRF[r0].W));
 
 
         }
