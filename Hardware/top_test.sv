@@ -8,11 +8,11 @@ module top_test(clk, rst);
     reg we_RT[3:0];
     reg re_MC;
     reg [31:0] addr_RT[3:0], data_RT_in[31:0], addr_MC;
-    wire rdy_RT, rdy_RT, rdy_MC;
+    wire rdy_RT, rdy_MC;
     wire [31:0] data_RT_out[3:0], data_MC_out;
     mem_main main_mem(.clk(rst), .rst_n(rst_n), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
     , .addr_MC(addr_MC), .re_MC(re_MC), .data_RT_out(data_RT_out), .rdy_RT(rdy_RT), .data_MC_out(data_MC_out)
-    , rdy_MC(rdy_MC);
+    , .rdy_MC(rdy_MC));
 
     // reg addr_inc;
     always_ff @( posedge clk, negedge rst_n ) begin
