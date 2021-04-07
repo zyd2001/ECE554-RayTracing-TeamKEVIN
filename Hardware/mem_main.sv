@@ -28,7 +28,7 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   generate
     for (i = 0; i < NUM_THREAD; i = i + 1) begin: hit_thread
       for (j = 0; j < NUM_CORE; j = j + 1) begin: port
-        assign thread_hit[i][j] = (i == addr_RT[j][17:14]);
+        assign thread_hit[i][j] = (i == addr_RT[j][21:16]);
       end
     end
   endgenerate
@@ -46,18 +46,28 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   generate
     for (i = 0; i < NUM_THREAD; i = i + 1) begin: address_group
       assign group_address[0][i] = re_MC ? addr_MC :
-                                   thread_hit[0] ? addr_RT[0][13:2] :
-                                   thread_hit[1] ? addr_RT[1][13:2] :
-                                   thread_hit[2] ? addr_RT[2][13:2] : addr_RT[3][13:2];
-      assign group_address[3:1][i] = group_address[2:0][i] + 4;
+                                   thread_hit[i][0] ? addr_RT[0][13:2] :
+                                   thread_hit[i][1] ? addr_RT[1][13:2] :
+                                   thread_hit[i][2] ? addr_RT[2][13:2] : addr_RT[3][13:2];
+      assign group_address[1][i] = group_address[0][i] + 4;
+      assign group_address[2][i] = group_address[1][i] + 4;
+      assign group_address[3][i] = group_address[2][i] + 4;
       for(j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: data_group 
-        assign group_data_in[j][i] = thread_hit[0] ? data_RT_in[0][j*32+31:j*32] :
-                                     thread_hit[1] ? data_RT_in[1][j*32+31:j*32] :
-                                     thread_hit[2] ? data_RT_in[2][j*32+31:j*32] : data_RT_in[3][j*32+31:j*32];
+        assign group_data_in[j][i] = thread_hit[i][0] ? data_RT_in[0][j*32+31:j*32] :
+                                     thread_hit[i][1] ? data_RT_in[1][j*32+31:j*32] :
+                                     thread_hit[i][2] ? data_RT_in[2][j*32+31:j*32] : data_RT_in[3][j*32+31:j*32];
       end
     end
   endgenerate
-  
+  // output map
+  assign data_RT_out[0] = {dout_bank[4*addr_RT[0][21:16]],dout_bank[4*addr_RT[0][21:16]+1],
+                           dout_bank[4*addr_RT[0][21:16]+2],dout_bank[4*addr_RT[0][21:16]+3]};
+  assign data_RT_out[1] = {dout_bank[4*addr_RT[1][21:16]],dout_bank[4*addr_RT[1][21:16]+1],
+                           dout_bank[4*addr_RT[1][21:16]+2],dout_bank[4*addr_RT[1][21:16]+3];
+  assign data_RT_out[2] = {dout_bank[4*addr_RT[2][21:16]],dout_bank[4*addr_RT[2][21:16]+1],
+                           dout_bank[4*addr_RT[2][21:16]+2],dout_bank[4*addr_RT[2][21:16]+3];
+  assign data_RT_out[3] = {dout_bank[4*addr_RT[3][21:16]],dout_bank[4*addr_RT[3][21:16]+1],
+                           dout_bank[4*addr_RT[3][21:16]+2],dout_bank[4*addr_RT[3][21:16]+3];
   
   // 4 to 4 mapping logic from group_address and group_data_in to din_bank and addr_bank
   logic [31:0] din_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0], dout_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0];;
