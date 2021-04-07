@@ -20,6 +20,11 @@ namespace SimulatorCore
             vRF[r0] = Vector4.Add(vRF[r1], vec);
 
         }
+
+        public override string ToString()
+        {
+            return "vi_add r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
     class vi_sub : RTInstruction
@@ -38,6 +43,11 @@ namespace SimulatorCore
             Vector4 vec = new Vector4(sRF[r2].i, sRF[r2].i, sRF[r2].i, sRF[r2].i);
             vRF[r0] = Vector4.Subtract(vRF[r1], vec);
 
+        }
+
+        public override string ToString()
+        {
+            return "vi_sub r" + r0 + " r" + r1 + " r" + r2;
         }
     }
 
@@ -58,6 +68,11 @@ namespace SimulatorCore
             vRF[r0] = Vector4.Multiply(vRF[r1], vec);
 
         }
+
+        public override string ToString()
+        {
+            return "vi_mul r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
     class vi_div : RTInstruction
@@ -76,6 +91,11 @@ namespace SimulatorCore
             Vector4 vec = new Vector4(sRF[r2].i, sRF[r2].i, sRF[r2].i, sRF[r2].i);
             vRF[r0] = Vector4.Divide(vRF[r1], vec);
 
+        }
+
+        public override string ToString()
+        {
+            return "vi_div r" + r0 + " r" + r1 + " r" + r2;
         }
     }
 

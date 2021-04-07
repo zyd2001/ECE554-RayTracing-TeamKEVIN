@@ -19,6 +19,11 @@ namespace SimulatorCore
             vRF[r0] = Vector4.Divide(vRF[r1], vRF[r2]);
 
         }
+
+        public override string ToString()
+        {
+            return "vv_div r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 

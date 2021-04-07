@@ -22,6 +22,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "s_push r" + r0;
+        }
     }
 
     class s_pop : RTInstruction
@@ -47,6 +52,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "s_pop r" + r0;
+        }
     }
 
     class v_push : RTInstruction
@@ -70,6 +80,11 @@ namespace SimulatorCore
             mem.Write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].W));
 
 
+        }
+
+        public override string ToString()
+        {
+            return "v_push r" + r0;
         }
     }
 
@@ -99,6 +114,11 @@ namespace SimulatorCore
             vRF[r0] = vec;
 
 
+        }
+
+        public override string ToString()
+        {
+            return "v_pop r" + r0;
         }
     }
 

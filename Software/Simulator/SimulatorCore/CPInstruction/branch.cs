@@ -19,6 +19,11 @@ namespace SimulatorCore
                               // be in the main reg file
             }
         }
+
+        public override string ToString()
+        {
+            return "bz r" + rd + " " + imm;
+        }
     }
 
     class bnz : CPInstruction
@@ -37,6 +42,11 @@ namespace SimulatorCore
             {
                 RF[15] = RF[15] + imm;
             }
+        }
+
+        public override string ToString()
+        {
+            return "bnz r" + rd + " " + imm;
         }
     }
 
@@ -57,6 +67,11 @@ namespace SimulatorCore
                 RF[15] = imm;
             }
         }
+
+        public override string ToString()
+        {
+            return "bge r" + rd + " " + imm;
+        }
     }
 
     class ble : CPInstruction
@@ -75,6 +90,11 @@ namespace SimulatorCore
             {
                 RF[15] = imm;
             }
+        }
+
+        public override string ToString()
+        {
+            return "ble r" + rd + " " + imm;
         }
     }
 

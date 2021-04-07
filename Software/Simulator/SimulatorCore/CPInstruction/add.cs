@@ -15,6 +15,12 @@ namespace SimulatorCore
         {
             RF[r0] = RF[r1] + RF[r2];
         }
+
+        public override string ToString()
+        {
+            return "add r" + r0 + " r" + r1 + " r" + r2;
+        }
+
     }
 
     class addi : CPInstruction
@@ -31,6 +37,11 @@ namespace SimulatorCore
         internal override void process(RegisterFile<int> RF, Memory mem)
         {
             RF[r0] = RF[r1] + imm;
+        }
+
+        public override string ToString()
+        {
+            return "addi r" + r0 + " r" + r1 + " " + imm;
         }
     }
 }

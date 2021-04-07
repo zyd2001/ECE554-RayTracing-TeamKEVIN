@@ -13,5 +13,10 @@ namespace SimulatorCore
         {
 
         }
+
+        public override string ToString()
+        {
+            return "launch r" + r0;
+        }
     }
 }

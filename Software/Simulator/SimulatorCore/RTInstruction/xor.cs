@@ -20,6 +20,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "xor r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 

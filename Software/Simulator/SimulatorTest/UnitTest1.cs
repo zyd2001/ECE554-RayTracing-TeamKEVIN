@@ -216,5 +216,23 @@ namespace SimulatorTest
             Assert.AreEqual(1, iRF[0]);
 
         }
+
+        [TestMethod]
+        public void TestMethod17()
+        {
+            // ToString() test
+            add a = new add(0, 1, 5);
+            Assert.AreEqual("add r0 r1 r5", a.ToString());
+            addi ai = new addi(0, 1, 5);
+            Assert.AreEqual("addi r0 r1 5", ai.ToString());
+            bz bz = new bz(1, 1);
+            Assert.AreEqual("bz r1 1", bz.ToString());
+            bge bge = new bge(1, 1);
+            Assert.AreEqual("bge r1 1", bge.ToString());
+            bnz bnz = new bnz(1, 1);
+            Assert.AreEqual("bnz r1 1", bnz.ToString());
+            ble ble = new ble(1, 1);
+            Assert.AreEqual("ble r1 1", ble.ToString());
+        }
     }
 }
