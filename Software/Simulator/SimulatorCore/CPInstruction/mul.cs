@@ -37,5 +37,10 @@ namespace SimulatorCore
         {
             RF[r0] = RF[r1] * imm;
         }
+
+        public override string ToString()
+        {
+            return "muli r" + r0 + " r" + r1 + " " + imm;
+        }
     }
 }

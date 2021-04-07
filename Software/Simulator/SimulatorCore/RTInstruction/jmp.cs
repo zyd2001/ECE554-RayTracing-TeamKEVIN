@@ -19,6 +19,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "jmp " + imm;
+        }
     }
 
     class jmp_link : RTInstruction
@@ -41,7 +46,7 @@ namespace SimulatorCore
 
         public override string ToString()
         {
-            return "jmp " + imm;
+            return "jmp_link " + imm;
         }
     }
 
