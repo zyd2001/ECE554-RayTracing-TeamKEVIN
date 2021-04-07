@@ -7,9 +7,10 @@ module top_test(clk, rst);
 
     reg we_RT[3:0];
     reg re_MC;
-    reg [31:0] addr_RT[3:0], data_RT_in[31:0], addr_MC;
-    wire rdy_RT, rdy_MC;
-    wire [31:0] data_RT_out[3:0], data_MC_out;
+    reg [31:0] addr_RT[3:0], addr_MC;
+    reg [127:0] data_RT_in[3:0];
+    wire rdy_RT[3:0], rdy_MC;
+    wire [127:0] data_RT_out[3:0], data_MC_out;
     mem_main main_mem(.clk(rst), .rst_n(rst_n), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
     , .addr_MC(addr_MC), .re_MC(re_MC), .data_RT_out(data_RT_out), .rdy_RT(rdy_RT), .data_MC_out(data_MC_out)
     , .rdy_MC(rdy_MC));
@@ -33,10 +34,10 @@ module top_test(clk, rst);
 
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
-            data_RT_in[0] <= 32'b0;
-            data_RT_in[1] <= 32'b0;
-            data_RT_in[2] <= 32'b0;
-            data_RT_in[3] <= 32'b0;
+            data_RT_in[0] <= 128'b0;
+            data_RT_in[1] <= 128'b0;
+            data_RT_in[2] <= 128'b0;
+            data_RT_in[3] <= 128'b0;
         end
     end
 
@@ -64,14 +65,14 @@ module top_test(clk, rst);
         end
     end
     
-     reg [31:0] data_RT_out_reg[3:0], data_MC_out_reg;
+     reg [127:0] data_RT_out_reg[3:0], data_MC_out_reg;
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
-            data_RT_out_reg[0] <= 32'b0;
-            data_RT_out_reg[1] <= 32'b0;
-            data_RT_out_reg[2] <= 32'b0;
-            data_RT_out_reg[3] <= 32'b0;
-            data_MC_out_reg <= 32'b0;
+            data_RT_out_reg[0] <= 128'b0;
+            data_RT_out_reg[1] <= 128'b0;
+            data_RT_out_reg[2] <= 128'b0;
+            data_RT_out_reg[3] <= 128'b0;
+            data_MC_out_reg <= 128'b0;
         end
         else begin
             data_RT_out_reg[0] <= data_RT_out[0];
