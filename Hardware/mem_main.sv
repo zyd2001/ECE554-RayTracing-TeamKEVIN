@@ -27,7 +27,7 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   wire [3:0] thread_hit[NUM_THREAD-1:0];
   generate
     for (i = 0; i < NUM_THREAD; i = i + 1) begin: hit_thread
-      for (j = 0; j < NUM_CORE; j = j + 1) begin: port
+      for (j = 0; j < NUM_RT; j = j + 1) begin: port
         assign thread_hit[i][j] = (i == addr_RT[j][21:16]);
       end
     end
@@ -36,7 +36,7 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   wire we_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0];
   generate
     for (i = 0; i < NUM_THREAD; i = i + 1) begin: thread
-      assign we_bank[i*4+3:i*4] = 4{|(thread_hit[i][3:0] & we_RT[3:0])};
+      assign we_bank[i*4+3:i*4] = '{4{|(thread_hit[i] & {we_RT[3],we_RT[2],we_RT[1],we_RT[0]})}};
     end
   endgenerate
   // address and data for each group
@@ -60,64 +60,63 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     end
   endgenerate
   // output map
+  logic [31:0] din_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0], dout_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0];;
+  logic [11:0] addr_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0];
   assign data_RT_out[0] = {dout_bank[4*addr_RT[0][21:16]],dout_bank[4*addr_RT[0][21:16]+1],
                            dout_bank[4*addr_RT[0][21:16]+2],dout_bank[4*addr_RT[0][21:16]+3]};
   assign data_RT_out[1] = {dout_bank[4*addr_RT[1][21:16]],dout_bank[4*addr_RT[1][21:16]+1],
-                           dout_bank[4*addr_RT[1][21:16]+2],dout_bank[4*addr_RT[1][21:16]+3];
+                           dout_bank[4*addr_RT[1][21:16]+2],dout_bank[4*addr_RT[1][21:16]+3]};
   assign data_RT_out[2] = {dout_bank[4*addr_RT[2][21:16]],dout_bank[4*addr_RT[2][21:16]+1],
-                           dout_bank[4*addr_RT[2][21:16]+2],dout_bank[4*addr_RT[2][21:16]+3];
+                           dout_bank[4*addr_RT[2][21:16]+2],dout_bank[4*addr_RT[2][21:16]+3]};
   assign data_RT_out[3] = {dout_bank[4*addr_RT[3][21:16]],dout_bank[4*addr_RT[3][21:16]+1],
-                           dout_bank[4*addr_RT[3][21:16]+2],dout_bank[4*addr_RT[3][21:16]+3];
+                           dout_bank[4*addr_RT[3][21:16]+2],dout_bank[4*addr_RT[3][21:16]+3]};
   
   // 4 to 4 mapping logic from group_address and group_data_in to din_bank and addr_bank
-  logic [31:0] din_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0], dout_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0];;
-  logic [11:0] addr_bank[NUM_BANK_PTHREAD*NUM_THREAD-1:0];
   generate
     for (i = 0; i < NUM_THREAD; i = i + 1) begin: hit_port_thread
       always_comb begin
-        case(group_address[0][i][3:2]) begin
-
+        case(group_address[0][i][3:2])
           2'b00: begin
-            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[0];
-            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[1];
-            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[2];
-            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[3];
-            addr_bank[i*NUM_BANK_PTHREAD] = group_address[0];
-            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[1];
-            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[2];
-            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[3];
+            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[0][i];
+            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[1][i];
+            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[2][i];
+            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[3][i];
+            addr_bank[i*NUM_BANK_PTHREAD] = group_address[0][i];
+            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[1][i];
+            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[2][i];
+            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[3][i];
           end
           2'b01: begin
-            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[0];
-            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[1];
-            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[2];
-            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[3];
-            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[0];
-            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[1];
-            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[2];
-            addr_bank[i*NUM_BANK_PTHREAD] = group_address[3];
+            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[0][i];
+            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[1][i];
+            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[2][i];
+            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[3][i];
+            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[0][i];
+            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[1][i];
+            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[2][i];
+            addr_bank[i*NUM_BANK_PTHREAD] = group_address[3][i];
           end
           2'b10: begin
-            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[0];
-            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[1];
-            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[2];
-            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[3];
-            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[0];
-            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[1];
-            addr_bank[i*NUM_BANK_PTHREAD] = group_address[2];
-            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[3];
+            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[0][i];
+            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[1][i];
+            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[2][i];
+            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[3][i];
+            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[0][i];
+            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[1][i];
+            addr_bank[i*NUM_BANK_PTHREAD] = group_address[2][i];
+            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[3][i];
           end
           2'b11: begin
-            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[0];
-            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[1];
-            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[2];
-            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[3];
-            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[0];
-            addr_bank[i*NUM_BANK_PTHREAD] = group_address[1];
-            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[2];
-            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[3];
+            din_bank[i*NUM_BANK_PTHREAD+3] = group_data_in[0][i];
+            din_bank[i*NUM_BANK_PTHREAD] = group_data_in[1][i];
+            din_bank[i*NUM_BANK_PTHREAD+1] = group_data_in[2][i];
+            din_bank[i*NUM_BANK_PTHREAD+2] = group_data_in[3][i];
+            addr_bank[i*NUM_BANK_PTHREAD+3] = group_address[0][i];
+            addr_bank[i*NUM_BANK_PTHREAD] = group_address[1][i];
+            addr_bank[i*NUM_BANK_PTHREAD+1] = group_address[2][i];
+            addr_bank[i*NUM_BANK_PTHREAD+2] = group_address[3][i];
           end
-        end
+        endcase
       end
     end
   endgenerate
@@ -127,6 +126,7 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     for (a = 0; a < NUM_BANK_PTHREAD*NUM_THREAD; a = a + 1) begin: main_memory
       ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[a]),
             .din(din_bank[a]),.addr(addr_bank[a]), .dout(dout_bank[a]));
+    end
   endgenerate
 
 endmodule
