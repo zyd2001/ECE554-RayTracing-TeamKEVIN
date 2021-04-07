@@ -24,6 +24,11 @@ namespace SimulatorCore
             sRF[r0] = (float)Math.Sqrt(x2 + y2 + z2);
 
         }
+
+        public override string ToString()
+        {
+            return "v_magn r" + r0 + " r" + r1;
+        }
     }
 
 

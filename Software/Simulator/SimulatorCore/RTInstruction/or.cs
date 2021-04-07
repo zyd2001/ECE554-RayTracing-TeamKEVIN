@@ -20,6 +20,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "or r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 

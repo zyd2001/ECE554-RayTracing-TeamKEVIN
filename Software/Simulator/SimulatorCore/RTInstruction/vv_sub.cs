@@ -19,6 +19,11 @@ namespace SimulatorCore
             vRF[r0] = Vector4.Subtract(vRF[r1], vRF[r2]);
 
         }
+
+        public override string ToString()
+        {
+            return "vv_sub r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 

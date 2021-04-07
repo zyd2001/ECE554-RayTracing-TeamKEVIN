@@ -19,6 +19,11 @@ namespace SimulatorCore
             sRF[r0] = Vector4.Dot(vRF[r1], vRF[r2]);
 
         }
+
+        public override string ToString()
+        {
+            return "vv_mul_dot r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 

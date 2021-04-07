@@ -17,7 +17,12 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             vRF[r0] = Vector4.Multiply(vRF[r1], vRF[r2]);
-            
+
+        }
+
+        public override string ToString()
+        {
+            return "vv_mul_ele r" + r0 + " r" + r1 + " r" + r2;
         }
     }
 

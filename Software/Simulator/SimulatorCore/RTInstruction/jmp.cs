@@ -38,6 +38,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "jmp " + imm;
+        }
     }
 
 

@@ -24,6 +24,11 @@ namespace SimulatorCore
             sRF[r0] = sRF[r0].i | integer;
 
         }
+
+        public override string ToString()
+        {
+            return "s_write_high r" + r0 + " " + imm;
+        }
     }
 
     class s_write_low : RTInstruction
@@ -45,6 +50,11 @@ namespace SimulatorCore
 
             sRF[r0] = sRF[r0].i | integer;
 
+        }
+
+        public override string ToString()
+        {
+            return "s_write_low r" + r0 + " " + imm;
         }
     }
 

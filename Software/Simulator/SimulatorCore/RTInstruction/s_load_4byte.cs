@@ -20,6 +20,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "s_load_4byte r" + r0 + " r" + r1 + " " + imm;
+        }
     }
 
 

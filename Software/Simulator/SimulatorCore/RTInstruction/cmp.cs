@@ -30,6 +30,11 @@ namespace SimulatorCore
 
         }
 
+        public override string ToString()
+        {
+            return "cmp_v r" + r0 + " r" + r1;
+        }
+
 
     }
 
@@ -62,6 +67,10 @@ namespace SimulatorCore
             }
 
 
+        }
+        public override string ToString()
+        {
+            return "cmp_i r" + r0 + " r" + r1;
         }
 
 
@@ -96,6 +105,11 @@ namespace SimulatorCore
             }
 
 
+        }
+
+        public override string ToString()
+        {
+            return "cmp_f r" + r0 + " r" + r1;
         }
 
 

@@ -20,6 +20,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "itof r" + r0 + " r" + r1;
+        }
     }
 
 

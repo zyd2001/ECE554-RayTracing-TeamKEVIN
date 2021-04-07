@@ -18,6 +18,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].i + sRF[r2].i;
         }
+
+        public override string ToString()
+        {
+            return "ii_add r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
     class ii_addi : RTInstruction
@@ -34,6 +39,11 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].i + imm;
+        }
+
+        public override string ToString()
+        {
+            return "ii_addi r" + r0 + " r" + r1 + " " + imm;
         }
     }
 
@@ -52,6 +62,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].i - sRF[r2].i;
         }
+
+        public override string ToString()
+        {
+            return "ii_sub r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
     class ii_subi : RTInstruction
@@ -69,6 +84,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].i - imm;
         }
+
+        public override string ToString()
+        {
+            return "ii_subi r" + r0 + " r" + r1 + " " + imm;
+        }
     }
     class ii_mul : RTInstruction
     {
@@ -84,6 +104,11 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].i * sRF[r2].i;
+        }
+
+        public override string ToString()
+        {
+            return "ii_mul r" + r0 + " r" + r1 + " r" + r2;
         }
     }
 
@@ -102,6 +127,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].i * imm;
         }
+
+        public override string ToString()
+        {
+            return "ii_muli r" + r0 + " r" + r1 + " " + imm;
+        }
     }
 
     class ii_div : RTInstruction
@@ -119,6 +149,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].i / sRF[r2].i;
         }
+
+        public override string ToString()
+        {
+            return "ii_div r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
     class ii_divi : RTInstruction
@@ -135,6 +170,11 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].i / imm;
+        }
+
+        public override string ToString()
+        {
+            return "ii_divi r" + r0 + " r" + r1 + " " + imm;
         }
     }
 }

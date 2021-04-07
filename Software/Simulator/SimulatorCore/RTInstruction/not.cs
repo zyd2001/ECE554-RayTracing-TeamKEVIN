@@ -20,6 +20,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "not r" + r0 + " r" + r1;
+        }
     }
 
 

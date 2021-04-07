@@ -19,6 +19,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "ld r" + r0 + " r" + r1 + " " + imm;
+        }
     }
 
 

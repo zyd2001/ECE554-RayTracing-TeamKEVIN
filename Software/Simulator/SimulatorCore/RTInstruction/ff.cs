@@ -18,6 +18,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].f + sRF[r2].f;
         }
+
+        public override string ToString()
+        {
+            return "ff_add r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 
@@ -37,6 +42,11 @@ namespace SimulatorCore
         {
             sRF[r0] = sRF[r1].f - sRF[r2].f;
         }
+
+        public override string ToString()
+        {
+            return "ff_sub r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
 
@@ -54,6 +64,11 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].f * sRF[r2].f;
+        }
+
+        public override string ToString()
+        {
+            return "ff_mul r" + r0 + " r" + r1 + " r" + r2;
         }
     }
 
@@ -73,6 +88,11 @@ namespace SimulatorCore
         internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].f / sRF[r2].f;
+        }
+
+        public override string ToString()
+        {
+            return "ff_div r" + r0 + " r" + r1 + " r" + r2;
         }
     }
 

@@ -21,6 +21,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "bne " + imm;
+        }
     }
 
     class bg : RTInstruction
@@ -40,6 +45,11 @@ namespace SimulatorCore
             }
 
 
+        }
+
+        public override string ToString()
+        {
+            return "bg " + imm;
         }
     }
 
@@ -61,6 +71,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "bl " + imm;
+        }
     }
 
     class bge_rt : RTInstruction
@@ -81,6 +96,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "bge_rt" + imm;
+        }
     }
 
     class ble_rt : RTInstruction
@@ -100,6 +120,11 @@ namespace SimulatorCore
             }
 
 
+        }
+
+        public override string ToString()
+        {
+            return "ble_rt" + imm;
         }
     }
 

@@ -36,6 +36,11 @@ namespace SimulatorCore
 
 
         }
+
+        public override string ToString()
+        {
+            return "v_get_from_s r" + r0 + " r" + r1 + " " + index;
+        }
     }
 
 

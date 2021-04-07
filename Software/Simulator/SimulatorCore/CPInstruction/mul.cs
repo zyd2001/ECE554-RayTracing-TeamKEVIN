@@ -15,6 +15,11 @@ namespace SimulatorCore
         {
             RF[r0] = RF[r1] * RF[r2];
         }
+
+        public override string ToString()
+        {
+            return "mul r" + r0 + " r" + r1 + " r" + r2;
+        }
     }
 
     class muli : CPInstruction
