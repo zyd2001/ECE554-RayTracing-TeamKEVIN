@@ -12,13 +12,13 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   input [127:0] data_RT_in[NUM_RT-1:0];
 
   input re_MC;
-  input [31:0] addr_MC;
+  input [31:0] addr_MC; //
 
 
-  output rdy_RT[NUM_RT-1:0];
+  output rdy_RT[NUM_RT-1:0];//
   output [127:0] data_RT_out[NUM_RT-1:0];
 
-  output rdy_MC;
+  output rdy_MC;//
   output [127:0] data_MC_out;
 
   // reg [11:0] addr_bank[255:0];
@@ -45,7 +45,8 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   wire [31:0] group_data_out[NUM_BANK_PTHREAD][NUM_THREAD-1:0];
   generate
     for (i = 0; i < NUM_THREAD; i = i + 1) begin: address_group
-      assign group_address[0][i] = thread_hit[0] ? addr_RT[0][13:2] :
+      assign group_address[0][i] = re_MC ? addr_MC :
+                                   thread_hit[0] ? addr_RT[0][13:2] :
                                    thread_hit[1] ? addr_RT[1][13:2] :
                                    thread_hit[2] ? addr_RT[2][13:2] : addr_RT[3][13:2];
       assign group_address[3:1][i] = group_address[2:0][i] + 4;
