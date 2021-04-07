@@ -233,6 +233,22 @@ namespace SimulatorTest
             Assert.AreEqual("bnz r1 1", bnz.ToString());
             ble ble = new ble(1, 1);
             Assert.AreEqual("ble r1 1", ble.ToString());
+            finish f = new finish();
+            Assert.AreEqual("finish", f.ToString());
+            launch l = new launch(1);
+            Assert.AreEqual("launch r1", l.ToString());
+            ld ld = new ld(2, 1, 3);
+            Assert.AreEqual("ld r2 r1 3", ld.ToString());
+            mul m = new mul(1, 2, 3);
+            Assert.AreEqual("mul r1 r2 r3", m.ToString());
+            muli mi = new muli(1, 2, 3);
+            Assert.AreEqual("muli r1 r2 3", mi.ToString());
+            st s = new st(1, 2, 3);
+            Assert.AreEqual("st r1 r2 3", s.ToString());
+            sub sub = new sub(1, 2, 3);
+            Assert.AreEqual("sub r1 r2 r3", sub.ToString());
+            subi subi = new subi(1, 2, 3);
+            Assert.AreEqual("subi r1 r2 3", subi.ToString());
         }
     }
 }

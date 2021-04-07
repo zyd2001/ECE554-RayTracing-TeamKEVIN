@@ -99,7 +99,7 @@ namespace SimulatorCore
 
         public override string ToString()
         {
-            return "bge_rt" + imm;
+            return "bge_rt " + imm;
         }
     }
 
@@ -124,7 +124,7 @@ namespace SimulatorCore
 
         public override string ToString()
         {
-            return "ble_rt" + imm;
+            return "ble_rt " + imm;
         }
     }
 
