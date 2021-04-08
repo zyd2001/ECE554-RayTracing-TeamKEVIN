@@ -66,7 +66,7 @@ module ccip_std_afu
    // =============================================================
    // Register PR <--> PR signals near interface before consuming it
    // =============================================================
-/*
+
    ccip_interface_reg inst_green_ccip_interface_reg
      (
       .pClk                     (pClk),
@@ -82,7 +82,7 @@ module ccip_std_afu
       .pck_cp2af_sRx_T1         (pck_cp2af_sRx_T1),
       .pck_af2cp_sTx_T1         (pck_af2cp_sTx)
       );
-*/
+
 
    // =============================================================
    // Instantiate AFU logic
@@ -96,6 +96,6 @@ module ccip_std_afu
   //     .tx  (pck_af2cp_sTx_T0)
   //     );
 
-  top_test top_test(.clk(pClk), .rst(pck_cp2af_softReset_T1));
+  top_test top_test(.clk(pClk),.rst(pck_cp2af_softReset_T1),.rx(pck_cp2af_sRx_T1),.tx(pck_af2cp_sTx_T0));
 
 endmodule
