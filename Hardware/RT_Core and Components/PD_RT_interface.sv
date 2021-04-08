@@ -1,4 +1,5 @@
 module PD_RT_interface (
+    clk, rst_n,
     Assigned_core_id, Pixel_id, Thread_id_in, Stack_Pointer_in, PC_in,
     Thread_id_out, Stack_pointer_out, PC_out, Task_finished_out, Context_switch_out,
     Ray_direction, Ray_origin, Ray_hit_point, Ray_hit_normal, Ray_shader_id
@@ -10,6 +11,8 @@ module PD_RT_interface (
     PD_scalar_read1, PD_scalar_read2,
     PD_vector_read1, PD_vector_read2
 );
+    input clk, rst_n
+    
     // Patch Dispatcher Related Signal
     input [1:0] Assigned_core_id;
     input [5:0] Thread_id_in;
