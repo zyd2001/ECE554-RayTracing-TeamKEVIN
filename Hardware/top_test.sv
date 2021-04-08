@@ -1,6 +1,10 @@
-module top_test(clk, rst);
+`include "platform_if.vh"
+`include "afu_json_info.vh"
+module top_test(clk, rst, rx, tx);
     
     input clk, rst;
+    input  t_if_ccip_Rx rx,
+    output t_if_ccip_Tx tx
 
     wire rst_n;
     assign rst_n = ~rst;
@@ -8,38 +12,49 @@ module top_test(clk, rst);
     reg we_RT[3:0];
     reg re_MC;
     reg [31:0] addr_RT[3:0], addr_MC;
-    reg [127:0] data_RT_in[3:0];
     wire rdy_RT[3:0], rdy_MC;
     wire [127:0] data_RT_out[3:0], data_MC_out;
+
+    wire [127:0] data_RT_in[3:0];
+
     mem_main main_mem(.clk(rst), .rst_n(rst_n), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
     , .addr_MC(addr_MC), .re_MC(re_MC), .data_RT_out(data_RT_out), .rdy_RT(rdy_RT), .data_MC_out(data_MC_out)
     , .rdy_MC(rdy_MC));
 
+    assign data_RT_in[0] = rx.c0.data[127:0];
+    assign data_RT_in[1] = rx.c0.data[127:0]; 
+    assign data_RT_in[2] = rx.c0.data[127:0];
+    assign data_RT_in[3] = rx.c0.data[127:0];
+    wire [127:0] data_out;
+    assign data_out = data_RT_out[0] & data_RT_out[1] & data_RT_out[2] & data_RT_out[3];
+    assign tx.c2.data = data_out;
+
     // reg addr_inc;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
-            addr_RT[0] <= 32'b0;
-            addr_RT[1] <= 32'b0;
-            addr_RT[2] <= 32'b0;
-            addr_RT[3] <= 32'b0;
+            addr_RT[0] <= 32'h00000000;
+            addr_RT[1] <= 32'h00100000;
+            addr_RT[2] <= 32'h00200000;
+            addr_RT[3] <= 32'h00300000;
             addr_MC <= 32'b0;
         end
-        // else if (addr_inc) begin
-        //     addr_RT[0] = addr_RT[0] + 32'b1;
-        //     addr_RT[1] = addr_RT[1] + 32'b1;
-        //     addr_RT[1] = addr_RT[1] + 32'b1;
-        //     addr_RT[1] = addr_RT[1] + 32'b1;
-        // end
-    end
-
-    always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n) begin 
-            data_RT_in[0] <= 128'b0;
-            data_RT_in[1] <= 128'b0;
-            data_RT_in[2] <= 128'b0;
-            data_RT_in[3] <= 128'b0;
+        else begin
+             addr_RT[0] <= {addr_RT[0][31:22], {addr_RT[0][21:16] + 6'b1}, {addr_RT[0][15:0] + 16'b1}};
+             addr_RT[1] <= {addr_RT[1][31:22], {addr_RT[1][21:16] + 6'b1}, {addr_RT[1][15:0] + 16'b1}};
+             addr_RT[2] <= {addr_RT[2][31:22], {addr_RT[2][21:16] + 6'b1}, {addr_RT[2][15:0] + 16'b1}};
+             addr_RT[3] <= {addr_RT[3][31:22], {addr_RT[3][21:16] + 6'b1}, {addr_RT[3][15:0] + 16'b1}};
+             addr_MC <= addr_MC + 32'b1;
         end
     end
+
+    // always_ff @( posedge clk, negedge rst_n ) begin
+    //     if (!rst_n) begin 
+    //         data_RT_in[0] <= 128'b0;
+    //         data_RT_in[1] <= 128'b0;
+    //         data_RT_in[2] <= 128'b0;
+    //         data_RT_in[3] <= 128'b0;
+    //     end
+    // end
 
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
