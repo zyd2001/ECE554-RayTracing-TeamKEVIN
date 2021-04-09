@@ -133,12 +133,13 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   reg [31:0] din_0[3:0];
   reg [31:0] din_1;
   always_ff @( posedge clk, negedge rst_n ) begin 
-    if (!rst_n) 
+    if (!rst_n) begin
       din_0[0] <= 32'b0;
       din_0[1] <= 32'b0;
       din_0[2] <= 32'b0;
       din_0[3] <= 32'b0;
-    else 
+    end
+    else begin
       din_0[0] <= data_RT_in[0][31:0] & data_RT_in[0][63:32] & data_RT_in[0][95:64] & data_RT_in[0][127:96];
       din_0[1] <= data_RT_in[1][31:0] & data_RT_in[1][63:32] & data_RT_in[1][95:64] & data_RT_in[1][127:96];
       din_0[2] <= data_RT_in[2][31:0] & data_RT_in[2][63:32] & data_RT_in[2][95:64] & data_RT_in[2][127:96];
@@ -195,10 +196,11 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
       always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) 
           dout_2[x] <= 128'b0;
-        else 
+        else begin
           dout_2[x] <= dout_1[x*16+0] & dout_1[x*16+1] & dout_1[x*16+2] + dout_1[x*16+3] & dout_1[x*16+4] & dout_1[x*16+5]
                     &  dout_1[x*16+6] & dout_1[x*16+7] & dout_1[x*16+8] + dout_1[x*16+9] & dout_1[x*16+10] & dout_1[x*16+11]
                     &  dout_1[x*16+12] & dout_1[x*16+13] & dout_1[x*16+14] & dout_1[x*16+15];
+        end
       end
     end
   endgenerate
