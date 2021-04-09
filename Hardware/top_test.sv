@@ -52,7 +52,7 @@ module top_test(clk, rst, rx, tx);
 
     always_ff @( posedge clk, negedge rst_n ) begin 
         if (!rst_n)
-            data_out_2 <= 64'b;
+            data_out_2 <= 64'b0;
         else 
             data_out_2 <= data_out_1[0] & data_out_1[1];
     end
