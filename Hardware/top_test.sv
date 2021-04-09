@@ -21,14 +21,43 @@ module top_test(clk, rst, rx, tx);
     , .addr_MC(addr_MC), .re_MC(re_MC), .data_RT_out(data_RT_out), .rdy_RT(rdy_RT), .data_MC_out()
     , .rdy_MC());
 	
-    wire [63:0] data_out;
+    reg [63:0] data_out_0[3:0];
+    reg [63:0] data_out_1[1:0];
+    reg [63:0] data_out_2;
 	reg [127:0] data_RT_out_reg[3:0];
-    assign data_out = data_RT_out_reg[0][63:0] & data_RT_out_reg[0][127:64] 
-                    & data_RT_out_reg[1][63:0] & data_RT_out_reg[1][127:64]
-                    & data_RT_out_reg[2][63:0] & data_RT_out_reg[2][127:64]
-                    & data_RT_out_reg[3][63:0] & data_RT_out_reg[3][127:64];
+    always_ff @( posedge clk, negedge rst_n ) begin 
+        if (!rst_n) begin
+            data_out_0[0] <= 64'b0;
+            data_out_0[1] <= 64'b0;
+            data_out_0[2] <= 64'b0;
+            data_out_0[3] <= 64'b0;
+        end
+        else begin
+            data_out_0[0] <= data_RT_out_reg[0][63:0] & data_RT_out_reg[0][127:64];
+            data_out_0[1] <= data_RT_out_reg[1][63:0] & data_RT_out_reg[1][127:64];
+            data_out_0[2] <= data_RT_out_reg[2][63:0] & data_RT_out_reg[2][127:64];
+            data_out_0[3] <= data_RT_out_reg[3][63:0] & data_RT_out_reg[3][127:64];
+        end
+    end
+    always_ff @( posedge clk, negedge rst_n ) begin 
+        if (!rst_n) begin
+            data_out_1[0] <= 64'b0;
+            data_out_1[1] <= 64'b0;
+        end
+        else begin
+            data_out_1[0] <= data_out_0[0] & data_out_0[1]; 
+            data_out_1[1] <= data_out_0[2] & data_out_0[3]; 
+        end
+    end
 
-    assign tx.c2.data = data_out;
+    always_ff @( posedge clk, negedge rst_n ) begin 
+        if (!rst_n)
+            data_out_2 <= 64'b;
+        else 
+            data_out_2 <= data_out_1[0] & data_out_1[1];
+    end
+
+    assign tx.c2.data = data_out_2;
 
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
