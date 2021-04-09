@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2021.04.08.19:26:28"
+ outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Float_Add/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="Stratix 10"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="1SX280HN2F43E2VG"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="2"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK0_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK0_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK0_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="clk0" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clk0" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="ena" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="ena" direction="input" role="ena" width="1" />
+  </interface>
+  <interface name="clr0" kind="reset" start="0">
+   <property name="associatedClock" value="clk0" />
+   <property name="synchronousEdges" value="DEASSERT" />
+   <port name="clr0" direction="input" role="reset" width="1" />
+  </interface>
+  <interface name="clr1" kind="reset" start="0">
+   <property name="associatedClock" value="clk0" />
+   <property name="synchronousEdges" value="DEASSERT" />
+   <port name="clr1" direction="input" role="reset" width="1" />
+  </interface>
+  <interface name="result" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="result" direction="output" role="result" width="32" />
+  </interface>
+  <interface name="ax" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="ax" direction="input" role="ax" width="32" />
+  </interface>
+  <interface name="ay" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="ay" direction="input" role="ay" width="32" />
+  </interface>
+ </perimeter>
+ <entity kind="Float_Add" version="1.0" name="Float_Add">
+  <parameter name="AUTO_CLK0_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK0_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_GENERATION_ID" value="0" />
+  <parameter name="AUTO_DEVICE" value="1SX280HN2F43E2VG" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Stratix 10" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_CLK0_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="2" />
+  <generatedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Float_Add/synth/Float_Add.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Float_Add/synth/Float_Add.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Float_Add.ip" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fpdsp_block/S10/S10FPDSP_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Info" culprit="Float_Add">"Generating: Float_Add"</message>
+   <message level="Info" culprit="Float_Add">"Generating: Float_Add_altera_s10fpdsp_block_191_k4i4nqa"</message>
+  </messages>
+ </entity>
+ <entity
+   kind="altera_s10fpdsp_block"
+   version="19.1"
+   name="Float_Add_altera_s10fpdsp_block_191_k4i4nqa">
+  <parameter name="mult_2nd_pipeline_clock" value="0" />
+  <parameter name="adder_input_clock_2" value="0" />
+  <parameter name="az_clock" value="0" />
+  <parameter name="clk0_used" value="true" />
+  <parameter name="ay_clock_derived" value="0" />
+  <parameter name="ax_clock" value="0" />
+  <parameter name="ax_chainin_pl_clock" value="0" />
+  <parameter name="accum_2nd_pipeline_clock" value="0" />
+  <parameter name="adder_subtract" value="false" />
+  <parameter name="chain_mux" value="0" />
+  <parameter name="accumulate_clock" value="0" />
+  <parameter name="ax_chainin_2nd_pl_clock" value="0" />
+  <parameter name="mult_pipeline_clock_derived" value="NONE" />
+  <parameter name="use_chainout" value="false" />
+  <parameter name="VIEW" value="Register Enables" />
+  <parameter name="adder_input_clock_derived" value="0" />
+  <parameter name="total_clks_used" value="1" />
+  <parameter name="accum_adder_clock" value="0" />
+  <parameter name="output_clock" value="0" />
+  <parameter name="clk1_used" value="false" />
+  <parameter name="mult_2nd_pipeline_clock_derived" value="NONE" />
+  <parameter name="output_clock_2" value="0" />
+  <parameter name="output_clock_derived" value="0" />
+  <parameter name="az_clock_derived" value="NONE" />
+  <parameter name="single_clear" value="false" />
+  <parameter name="ax_clock_derived" value="0" />
+  <parameter name="ay_clock" value="0" />
+  <parameter name="mult_exceptions" value="false" />
+  <parameter name="mult_pipeline_clock" value="0" />
+  <parameter name="accum_adder_clock_derived" value="NONE" />
+  <parameter name="adder_exceptions" value="false" />
+  <parameter name="accum_pipeline_clock_derived" value="NONE" />
+  <parameter name="accum_2nd_pipeline_clock_derived" value="NONE" />
+  <parameter
+     name="possible_registers"
+     value="ax_clock,ay_clock,ax_chainin_pl_clock,ax_chainin_2nd_pl_clock,adder_input_clock,adder_input_clock_2,output_clock,output_clock_2" />
+  <parameter name="accumulate_clock_derived" value="NONE" />
+  <parameter name="design_env" value="NATIVE" />
+  <parameter name="ax_chainin_pl_clock_derived" value="0" />
+  <parameter name="use_chainin" value="false" />
+  <parameter name="ax_chainin_2nd_pl_clock_derived" value="0" />
+  <parameter name="OPERATION" value="sp_add" />
+  <parameter name="adder_input_clock" value="0" />
+  <parameter name="clk2_used" value="false" />
+  <parameter name="exception_flags" value="false" />
+  <parameter name="clear_type" value="sclr" />
+  <parameter name="accum_pipeline_clock" value="0" />
+  <parameter name="chain_out_mux" value="0" />
+  <generatedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Float_Add/altera_s10fpdsp_block_191/synth/Float_Add_altera_s10fpdsp_block_191_k4i4nqa.sv"
+       attributes="TOP_LEVEL_FILE" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Float_Add/altera_s10fpdsp_block_191/synth/Float_Add_altera_s10fpdsp_block_191_k4i4nqa.sv"
+       attributes="TOP_LEVEL_FILE" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fpdsp_block/S10/S10FPDSP_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="Float_Add" as="s10fpdsp_block_0" />
+  <messages>
+   <message level="Info" culprit="Float_Add">"Generating: Float_Add_altera_s10fpdsp_block_191_k4i4nqa"</message>
+  </messages>
+ </entity>
+</deploy>
