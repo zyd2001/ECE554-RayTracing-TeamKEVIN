@@ -21,24 +21,14 @@ module top_test(clk, rst, rx, tx);
     , .addr_MC(addr_MC), .re_MC(re_MC), .data_RT_out(data_RT_out), .rdy_RT(rdy_RT), .data_MC_out()
     , .rdy_MC());
 	
-    // assign data_RT_in[0] = rx.c0.data[127:0];
-    // assign data_RT_in[1] = rx.c0.data[255:128]; 
-    // assign data_RT_in[2] = rx.c0.data[383:256];
-    // assign data_RT_in[3] = rx.c0.data[511:384];
-	//  assign addr_RT[0] = rx.c0.data[127:0];
-	//  assign addr_RT[1] = rx.c0.data[255:128];
-	//  assign addr_RT[2] = rx.c0.data[383:256];
-	//  assign addr_RT[3] = rx.c0.data[511:384];
-	//  assign addr_MC =  rx.c0.data[255:128];
-    wire [127:0] data_out;
+    wire [63:0] data_out;
 	reg [127:0] data_RT_out_reg[3:0];
-    assign data_out = data_RT_out_reg[0] & data_RT_out_reg[1] & data_RT_out_reg[2] & data_RT_out_reg[3];
+    assign data_out = data_RT_out_reg[0][63:0] & data_RT_out_reg[0][127:64] 
+                    & data_RT_out_reg[1][63:0] & data_RT_out_reg[1][127:64]
+                    & data_RT_out_reg[2][63:0] & data_RT_out_reg[2][127:64]
+                    & data_RT_out_reg[3][63:0] & data_RT_out_reg[3][127:64];
+                    
     assign tx.c2.data = data_out;
-	 /*wire we_RT[0] = rx.c0.data[256];
-	 wire we_RT[1] = rx.c0.data[257];
-	 wire we_RT[2] = rx.c0.data[258];
-	 wire we_RT[3] = rx.c0.data[259];
-	 wire re_MC = rx.c0.data[300];*/
 
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
