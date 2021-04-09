@@ -27,7 +27,7 @@ module top_test(clk, rst, rx, tx);
                     & data_RT_out_reg[1][63:0] & data_RT_out_reg[1][127:64]
                     & data_RT_out_reg[2][63:0] & data_RT_out_reg[2][127:64]
                     & data_RT_out_reg[3][63:0] & data_RT_out_reg[3][127:64];
-                    
+
     assign tx.c2.data = data_out;
 
      always_ff @( posedge clk, negedge rst_n ) begin
@@ -62,34 +62,6 @@ module top_test(clk, rst, rx, tx);
         end
     end
 
-/*
-    // reg addr_inc;
-    always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n) begin 
-            addr_RT[0] <= 32'h00000000;
-            addr_RT[1] <= 32'h00100000;
-            addr_RT[2] <= 32'h00200000;
-            addr_RT[3] <= 32'h00300000;
-            addr_MC <= 32'b0;
-        end
-        else begin
-             addr_RT[0] <= {addr_RT[0][31:22], {addr_RT[0][21:16] + 6'b1}, {addr_RT[0][15:0] + 16'b1}};
-             addr_RT[1] <= {addr_RT[1][31:22], {addr_RT[1][21:16] + 6'b1}, {addr_RT[1][15:0] + 16'b1}};
-             addr_RT[2] <= {addr_RT[2][31:22], {addr_RT[2][21:16] + 6'b1}, {addr_RT[2][15:0] + 16'b1}};
-             addr_RT[3] <= {addr_RT[3][31:22], {addr_RT[3][21:16] + 6'b1}, {addr_RT[3][15:0] + 16'b1}};
-             addr_MC <= addr_MC + 32'b1;
-        end
-    end
-
-    // always_ff @( posedge clk, negedge rst_n ) begin
-    //     if (!rst_n) begin 
-    //         data_RT_in[0] <= 128'b0;
-    //         data_RT_in[1] <= 128'b0;
-    //         data_RT_in[2] <= 128'b0;
-    //         data_RT_in[3] <= 128'b0;
-    //     end
-    // end
-*/
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
             we_RT[0] <= 1'b1;
