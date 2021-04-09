@@ -1,0 +1,7 @@
+top_test.json
+
+mem_main.sv
+ram.sv
+top_test.sv
+ccip_std_afu.sv
+ccip_interface_reg.sv
