@@ -1,5 +1,6 @@
 top_test.json
 
+dual_port.sv
 mem_main.sv
 ram.sv
 top_test.sv

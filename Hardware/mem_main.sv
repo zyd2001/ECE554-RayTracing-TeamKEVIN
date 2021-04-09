@@ -158,8 +158,9 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   always_ff @( posedge clk, negedge rst_n ) begin 
     if (!rst_n)
       addr_0 <= 12'b0;
-    else 
-      addr_0 <= addr_RT[0][11:0] & addr_RT[1][11:0] & addr_RT[2][11:0] & addr_RT[3][11:0]
+    else begin 
+      addr_0 <= addr_RT[0][11:0] & addr_RT[1][11:0] & addr_RT[2][11:0] & addr_RT[3][11:0];
+    end
   end
 
   wire [31:0] dout[255:0];
@@ -186,7 +187,7 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
         if (!rst_n)
           dout_1[x] <= 128'b0;
         else 
-          dout_1[x] <= dout_0[x*4], dout_0[x*4+1], dout_0[x*4+2], dout_0[x*4+3]};
+          dout_1[x] <= {dout_0[x*4],dout_0[x*4+1],dout_0[x*4+2],dout_0[x*4+3]};
       end
     end
   endgenerate 
@@ -212,9 +213,12 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
 
   genvar a;
   generate
-    for (a = 0; a < NUM_BANK; a = a + 1) begin: main_memory
-      ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_RT[0]||we RT[1]|we_RT[2]||we_RT[3]|),
-            .din(din_1),.addr(addr_0), .dout(dout[a]));
+    for (a = 0; a < 256; a = a + 1) begin: main_memory
+      //ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_RT[0]| we_RT[1]| we_RT[2] | we_RT[3]),
+      //      .din(din_1),.addr(addr_0), .dout(dout[a]));
+		simple_dual_port_ram_single_clock #(.DATA_WIDTH(32),.ADDR_WIDTH(12)) bank(.clk(clk)
+		,.we(we_RT[0]| we_RT[1]| we_RT[2] | we_RT[3]),.data(din_1),.read_addr(addr_0),.write_addr(~addr_0),
+		.q(dout[a]));
     end
   endgenerate
 

@@ -102,16 +102,16 @@ module top_test(clk, rst, rx, tx);
 */
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
-            we_RT[0] <= 0;
-            we_RT[1] <= 0;
-            we_RT[2] <= 0;
-            we_RT[3] <= 0;
+            we_RT[0] <= 1'b1;
+            we_RT[1] <= 1'b1;
+            we_RT[2] <= 1'b1;
+            we_RT[3] <= 1'b1;
         end
         else begin
-            we_RT[0] <= ~we_RT[0];
-            we_RT[1] <= ~we_RT[1];
-            we_RT[2] <= ~we_RT[2];
-            we_RT[3] <= ~we_RT[3]; 
+            we_RT[0] <= we_RT[0];
+            we_RT[1] <= we_RT[1];
+            we_RT[2] <= we_RT[2];
+            we_RT[3] <= we_RT[3]; 
         end
     end
 
