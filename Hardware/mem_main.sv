@@ -125,8 +125,8 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
   genvar a;
   generate
     for (a = 0; a < NUM_BANK; a = a + 1) begin: main_memory
-      ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[a]),
-            .din(din_bank[a]),.addr(addr_bank[a]), .dout(dout_bank[a]));
+      single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[a]),
+            .data(din_bank[a]),.addr(addr_bank[a]), .q(dout_bank[a]));
     end
   endgenerate
 /*
