@@ -16,7 +16,7 @@ module single_port_ram
 	always @ (posedge clk)
 	begin
 		if (we)
-			ram[addr] = data;
+			ram[addr] <= data;
 
 		// Read returns OLD data.	To return
 		// NEW data, use = (blocking write) rather than <= (non-blocking write)

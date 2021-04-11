@@ -122,104 +122,33 @@ module mem_main(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     end
   endgenerate
 
+  logic [31:0] din_bank_real[NUM_BANK-1:0];
+  logic [11:0] addr_bank_real[NUM_BANK-1:0];
+  generate
+    for (i = 0; i < NUM_BANK; i = i + 1) begin: memory_input
+      always_ff @(posedge clk, negedge rst_n ) begin 
+        if (!rst_n)
+          din_bank_real[i] <= 32'b0;
+        else 
+          din_bank_real[i] <= din_bank[i];
+      end
+
+      always_ff @(posedge clk, negedge rst_n ) begin 
+        if (!rst_n)
+          addr_bank_real[i] <= 12'b0;
+        else 
+          addr_bank_real[i] <= addr_bank[i];
+      end
+    end 
+  endgenerate
+  
+
   genvar a;
   generate
     for (a = 0; a < NUM_BANK; a = a + 1) begin: main_memory
       single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[a]),
-            .data(din_bank[a]),.addr(addr_bank[a]), .q(dout_bank[a]));
-    end
-  endgenerate
-/*
-  reg [31:0] din_0[3:0];
-  reg [31:0] din_1;
-  always_ff @( posedge clk, negedge rst_n ) begin 
-    if (!rst_n) begin
-      din_0[0] <= 32'b0;
-      din_0[1] <= 32'b0;
-      din_0[2] <= 32'b0;
-      din_0[3] <= 32'b0;
-    end
-    else begin
-      din_0[0] <= data_RT_in[0][31:0] & data_RT_in[0][63:32] & data_RT_in[0][95:64] & data_RT_in[0][127:96];
-      din_0[1] <= data_RT_in[1][31:0] & data_RT_in[1][63:32] & data_RT_in[1][95:64] & data_RT_in[1][127:96];
-      din_0[2] <= data_RT_in[2][31:0] & data_RT_in[2][63:32] & data_RT_in[2][95:64] & data_RT_in[2][127:96];
-      din_0[3] <= data_RT_in[3][31:0] & data_RT_in[3][63:32] & data_RT_in[3][95:64] & data_RT_in[3][127:96];
-    end
-  end
-
-  always_ff @( posedge clk, negedge rst_n ) begin 
-    if (!rst_n)
-      din_1 <= 32'b0;
-    else 
-      din_1 <= din_0[0] & din_0[1] & din_0[2] & din_0[3];
-  end
-
-  reg [11:0] addr_0;
-  always_ff @( posedge clk, negedge rst_n ) begin 
-    if (!rst_n)
-      addr_0 <= 12'b0;
-    else begin 
-      addr_0 <= addr_RT[0][11:0] & addr_RT[1][11:0] & addr_RT[2][11:0] & addr_RT[3][11:0];
-    end
-  end
-
-  wire [31:0] dout[255:0];
-  reg [31:0] dout_0[255:0];
-  reg [127:0] dout_1[63:0];
-  reg [127:0] dout_2[3:0];
-
-  genvar y;
-  generate
-    for (y = 0; y < 256; y = y + 1) begin: out_loop_0
-      always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n)
-          dout_0[y] <= 32'b0;
-        else 
-          dout_0[y] <= dout[y];
-      end
+            .data(din_bank_real[a]),.addr(addr_bank_real[a]), .q(dout_bank[a]));
     end
   endgenerate
 
-  genvar x;
-  generate
-    for (x = 0; x < 64; x = x + 1 ) begin: out_loop_1
-      always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n)
-          dout_1[x] <= 128'b0;
-        else 
-          dout_1[x] <= {dout_0[x*4],dout_0[x*4+1],dout_0[x*4+2],dout_0[x*4+3]};
-      end
-    end
-  endgenerate 
-
-  generate
-    for (x = 0; x < 4; x = x + 1) begin: out_loop_2
-      always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n) 
-          dout_2[x] <= 128'b0;
-        else begin
-          dout_2[x] <= dout_1[x*16+0] & dout_1[x*16+1] & dout_1[x*16+2] + dout_1[x*16+3] & dout_1[x*16+4] & dout_1[x*16+5]
-                    &  dout_1[x*16+6] & dout_1[x*16+7] & dout_1[x*16+8] + dout_1[x*16+9] & dout_1[x*16+10] & dout_1[x*16+11]
-                    &  dout_1[x*16+12] & dout_1[x*16+13] & dout_1[x*16+14] & dout_1[x*16+15];
-        end
-      end
-    end
-  endgenerate
-
-  assign data_RT_out[0] = dout_2[0];
-  assign data_RT_out[1] = dout_2[1];
-  assign data_RT_out[2] = dout_2[2];
-  assign data_RT_out[3] = dout_2[3];
-
-  genvar a;
-  generate
-    for (a = 0; a < 256; a = a + 1) begin: main_memory
-      //ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_RT[0]| we_RT[1]| we_RT[2] | we_RT[3]),
-      //      .din(din_1),.addr(addr_0), .dout(dout[a]));
-		simple_dual_port_ram_single_clock #(.DATA_WIDTH(32),.ADDR_WIDTH(12)) bank(.clk(clk)
-		,.we(we_RT[0]| we_RT[1]| we_RT[2] | we_RT[3]),.data(din_1),.read_addr(addr_0),.write_addr(~addr_0),
-		.q(dout[a]));
-    end
-  endgenerate
-*/
 endmodule
