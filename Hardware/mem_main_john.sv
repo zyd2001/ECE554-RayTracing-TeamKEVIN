@@ -44,12 +44,13 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
+                if (!rst_n) begin
                     addr_bank_0[i][0] <= 12'b0;
                     addr_bank_0[i][1] <= 12'b0;
                     addr_bank_0[i][2] <= 12'b0;
                     addr_bank_0[i][3] <= 12'b0;
-                else
+					 end
+                else begin
                     addr_bank_0[i][0] <= addr_RT[i][3:2] == 2'h0 ? addr_RT[i][13:2]
                                         : (addr_RT[i][3:2] + 2'h1) == 2'h0 ? (addr_RT[i][13:2] + 12'h1)
                                         : (addr_RT[i][3:2] + 2'h2) == 2'h0 ? (addr_RT[i][13:2] + 12'h2)
@@ -66,6 +67,7 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                         : (addr_RT[i][3:2] + 2'h1) == 2'h3 ? (addr_RT[i][13:2] + 12'h1)
                                         : (addr_RT[i][3:2] + 2'h2) == 2'h3 ? (addr_RT[i][13:2] + 12'h2)
                                         : (addr_RT[i][13:2] + 12'h3);
+					end
             end
         end
     endgenerate 
@@ -74,12 +76,13 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
+                if (!rst_n) begin
                     data_bank_0[i][0] <= 32'b0;
                     data_bank_0[i][1] <= 32'b0;
                     data_bank_0[i][2] <= 32'b0;
                     data_bank_0[i][3] <= 32'b0;
-                else
+					 end
+                else begin
                     data_bank_0[i][0] <= addr_RT[i][3:2] == 2'h0 ? data_RT_in[i][31:0]
                                         : (addr_RT[i][3:2] + 2'h1) == 2'h0 ? data_RT_in[i][63:32]
                                         : (addr_RT[i][3:2] + 2'h2) == 2'h0 ? data_RT_in[i][95:64]
@@ -96,6 +99,8 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                         : (addr_RT[i][3:2] + 2'h1) == 2'h3 ? data_RT_in[i][63:32]
                                         : (addr_RT[i][3:2] + 2'h2) == 2'h3 ? data_RT_in[i][95:64]
                                         : data_RT_in[i][127:96];
+					end
+				end
         end
     endgenerate 
 
@@ -165,7 +170,7 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < 4; j = j + 1) begin: main_memory_bank
                 single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[i]),
-                .data(data_bank[i][j]),.addr(addr_bank[i][j]), .q(q_bank[i][j]);
+                .data(data_bank[i][j]),.addr(addr_bank[i][j]), .q(q_bank[i][j]));
             end
         end
     endgenerate
