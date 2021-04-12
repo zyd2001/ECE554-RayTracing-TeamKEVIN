@@ -142,36 +142,48 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
 
     logic [31:0] q_bank[NUM_THREAD-1:0][3:0];
     generate
-        for (i = 0; i < NUM_RT; i = i + 1) begin
-            assign data_RT_out[i][31:0] = addr_RT[i][3:2] == 2'h0 ? q_bank[addr_RT[i][21:16]][0]
-                                        : addr_RT[i][3:2] == 2'h1 ? q_bank[addr_RT[i][21:16]][1]
-                                        : addr_RT[i][3:2] == 2'h2 ? q_bank[addr_RT[i][21:16]][2]
-                                        : q_bank[addr_RT[i][21:16]][3];
-            
-            assign data_RT_out[i][63:32] = (addr_RT[i][3:2] + 2'h1) == 2'h0 ? q_bank[addr_RT[i][21:16]][0]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h1 ? q_bank[addr_RT[i][21:16]][1]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h2 ? q_bank[addr_RT[i][21:16]][2]
-                                        : q_bank[addr_RT[i][21:16]][3];
-
-            assign data_RT_out[i][95:64] = (addr_RT[i][3:2] + 2'h2) == 2'h0 ? q_bank[addr_RT[i][21:16]][0]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h1 ? q_bank[addr_RT[i][21:16]][1]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h2 ? q_bank[addr_RT[i][21:16]][2]
-                                        : q_bank[addr_RT[i][21:16]][3];
-                                        
-            assign data_RT_out[i][127:96] = (addr_RT[i][3:2] + 2'h3) == 2'h0 ? q_bank[addr_RT[i][21:16]][0]
-                                        : (addr_RT[i][3:2] + 2'h3) == 2'h1 ? q_bank[addr_RT[i][21:16]][1]
-                                        : (addr_RT[i][3:2] + 2'h3) == 2'h2 ? q_bank[addr_RT[i][21:16]][2]
-                                        : q_bank[addr_RT[i][21:16]][3];
-            
-        end
-    endgenerate
-
-    generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < 4; j = j + 1) begin: main_memory_bank
                 single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[i]),
                 .data(data_bank[i][j]),.addr(addr_bank[i][j]), .q(q_bank[i][j]));
             end
+        end
+    endgenerate
+
+    logic [31:0] data_RT_out_0[NUM_RT-1:0][3:0];
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            for (j = 0; j < 4; j = j + 1) begin
+                if (!rst_n) 
+                    data_RT_out_0[i][j] <= 32'b0;
+            1   else  
+                    data_RT_out_0[i][j] <= q_bank[addr_RT[i][21:16]][j];
+            end   
+        end
+    endgenerate 
+
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            assign data_RT_out[i][31:0] = addr_RT[i][3:2] == 2'h0 ? data_RT_out_0[i][0]
+                                        : addr_RT[i][3:2] == 2'h1 ? data_RT_out_0[i][1]
+                                        : addr_RT[i][3:2] == 2'h2 ? data_RT_out_0[i][2]
+                                        : data_RT_out_0[i][3];
+            
+            assign data_RT_out[i][63:32] = (addr_RT[i][3:2] + 2'h1) == 2'h0 ? data_RT_out_0[i][0]
+                                        : (addr_RT[i][3:2] + 2'h1) == 2'h1 ? data_RT_out_0[i][1]
+                                        : (addr_RT[i][3:2] + 2'h1) == 2'h2 ? data_RT_out_0[i][2]
+                                        : data_RT_out_0[i][3];
+
+            assign data_RT_out[i][95:64] = (addr_RT[i][3:2] + 2'h2) == 2'h0 ? data_RT_out_0[i][0]
+                                        : (addr_RT[i][3:2] + 2'h2) == 2'h1 ? data_RT_out_0[i][1]
+                                        : (addr_RT[i][3:2] + 2'h2) == 2'h2 ? data_RT_out_0[i][2]
+                                        : data_RT_out_0[i][3];
+                                        
+            assign data_RT_out[i][127:96] = (addr_RT[i][3:2] + 2'h3) == 2'h0 ? data_RT_out_0[i][0]
+                                        : (addr_RT[i][3:2] + 2'h3) == 2'h1 ? data_RT_out_0[i][1]
+                                        : (addr_RT[i][3:2] + 2'h3) == 2'h2 ? data_RT_out_0[i][2]
+                                        : data_RT_out_0[i][3];
+            
         end
     endgenerate
 
