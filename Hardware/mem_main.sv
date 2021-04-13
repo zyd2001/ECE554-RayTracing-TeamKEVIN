@@ -36,19 +36,20 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
         for (i = 0; i < NUM_RT; i++) begin
             assign rdy_RT[i] = fin_counter_RT[i] === CYCLE_TO_FINISH;
             always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
+                if (!rst_n) begin
                     fin_counter_RT_en[i] <= 1'b0;
                     fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
+                end
                 else if(rdy_RT[i]) begin
                     fin_counter_RT_en[i] <= 1'b0;
                     fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
                 end
                 else if(!fin_counter_RT_en[i]) begin
                     fin_counter_RT_en[i] <= we_RT[i] | re_RT[i];
-                    fin_counter_RT[i] <= fin_counter_RT[i] + {(FIN_COUNTER_BIT-1){1'b0}, we_RT[i] | re_RT[i]};
+                    fin_counter_RT[i] <= fin_counter_RT[i] + {{(FIN_COUNTER_BIT-1){1'b0}}, (we_RT[i] | re_RT[i])};
                 end
                 else begin
-                    fin_counter_RT_en[i] <= fin_counter_RT_en;
+                    fin_counter_RT_en[i] <= fin_counter_RT_en[i];
                     fin_counter_RT[i] <= fin_counter_RT[i] + 1;
                 end
             end
@@ -57,20 +58,21 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     // ready logic for MC
     assign rdy_MC = fin_counter_MC === CYCLE_TO_FINISH;
     always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
+        if (!rst_n) begin
             fin_counter_MC_en <= 1'b0;
             fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
+        end
         else if(rdy_MC) begin
             fin_counter_MC_en <= 1'b0;
             fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
         end
         else if(!fin_counter_MC_en) begin
             fin_counter_MC_en <= re_MC;
-            fin_counter_MC <= fin_counter_MC[i] + {(FIN_COUNTER_BIT-1){1'b0}, re_MC};
+            fin_counter_MC <= fin_counter_MC + {{(FIN_COUNTER_BIT-1){1'b0}}, re_MC};
         end
         else begin
             fin_counter_MC_en <= fin_counter_MC_en;
-            fin_counter_MC <= fin_counter_MC[i] + 1;
+            fin_counter_MC <= fin_counter_MC + 1;
         end
     end
 
