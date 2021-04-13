@@ -58,7 +58,7 @@ module mem_main_tb();
             for(int k = 0; k < TEST_CYCLE; k++) begin
                 // test foreach core
                 for(int i = 0; i < NUM_RT; i++) begin
-                    if(!we_RT[i]) begin
+                    if(!we_RT[i] & !re_RT[i]) begin
                         we_RT[i] = $random;
                         data_RT_in[i] = $random;
                         addr_RT_rand[i] = $random;
