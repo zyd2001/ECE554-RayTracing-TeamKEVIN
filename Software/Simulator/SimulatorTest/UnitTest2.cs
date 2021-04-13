@@ -58,7 +58,7 @@ namespace SimulatorTest
 
 
 
-            s_write_high swh = new s_write_high(0, "1010101011001100");
+            s_write_high swh = new s_write_high(0, 43724);
             swh.process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(-1429471232, sRF[0].i);
@@ -78,7 +78,7 @@ namespace SimulatorTest
 
 
 
-            s_write_low swl = new s_write_low(0, "1010101011001100");
+            s_write_low swl = new s_write_low(0, 43724);
             swl.process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(43724, sRF[0].i);
@@ -988,10 +988,10 @@ namespace SimulatorTest
             Assert.AreEqual("s_load_4byte r1 r2 3", sl4b.ToString());
             s_store_4byte ss4b = new s_store_4byte(1, 2, 3);
             Assert.AreEqual("s_store_4byte r1 r2 3", ss4b.ToString());
-            s_write_high swh = new s_write_high(1, "01010101");
-            Assert.AreEqual("s_write_high r1 01010101", swh.ToString());
-            s_write_low swl = new s_write_low(1, "10101010");
-            Assert.AreEqual("s_write_low r1 10101010", swl.ToString());
+            s_write_high swh = new s_write_high(1, 5);
+            Assert.AreEqual("s_write_high r1 5", swh.ToString());
+            s_write_low swl = new s_write_low(1, 5);
+            Assert.AreEqual("s_write_low r1 5", swl.ToString());
             s_push s_push = new s_push(1);
             Assert.AreEqual("s_push r1", s_push.ToString());
             s_pop s_pop = new s_pop(1);
@@ -1036,6 +1036,42 @@ namespace SimulatorTest
             Assert.AreEqual("vv_div r1 r2 r3", vv_div.ToString());
             xor xor = new xor(1, 2, 3);
             Assert.AreEqual("xor r1 r2 r3", xor.ToString());
+        }
+
+        [TestMethod]
+        public void TestMethod34()
+        {
+            // Test s_sqrt
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(32);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+            sRF[1] = (float)16.0;
+            s_sqrt sq = new s_sqrt(0, 1);
+            sq.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual(4.0, sRF[0].f);
+
+        }
+
+        [TestMethod]
+        public void TestMethod35()
+        {
+            // Test v_reduce
+            RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
+            RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(32);
+            Memory m = new Memory(5000);
+            Memory m_ic = new Memory(5000);
+            IntersectionCore ic = new IntersectionCore(m_ic);
+
+            vRF[0] = new Vector4(1, 2, 3, 4);
+            v_reduce vr = new v_reduce(0, 0);
+            vr.process(vRF, sRF, m, ic);
+
+            Assert.AreEqual(10, sRF[0].f);
+
         }
     }
 }
