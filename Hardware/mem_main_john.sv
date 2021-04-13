@@ -118,6 +118,10 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                     : addr_bank_0[3][j];
                     end
                 end 
+//						assign addr_bank[i][j] = (i == addr_RT[0][21:16]) ? addr_bank_0[0][j]
+//                                    : (i == addr_RT[1][21:16]) ? addr_bank_0[1][j]
+//                                    : (i == addr_RT[2][21:16]) ? addr_bank_0[2][j] 
+//                                    : addr_bank_0[3][j];
             end
         end
     endgenerate
@@ -135,7 +139,11 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                     : (i == addr_RT[2][21:16]) ? data_bank_0[2][j] 
                                     : data_bank_0[3][j];
                     end
-                end 
+                end
+//						assign data_bank[i][j] = (i == addr_RT[0][21:16]) ? data_bank_0[0][j]
+//                                    : (i == addr_RT[1][21:16]) ? data_bank_0[1][j]
+//                                    : (i == addr_RT[2][21:16]) ? data_bank_0[2][j] 
+//                                    : data_bank_0[3][j];
             end
         end
     endgenerate
@@ -154,10 +162,12 @@ module mem_main_john(clk, rst_n, we_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             for (j = 0; j < 4; j = j + 1) begin
-                if (!rst_n) 
+					always_ff @(posedge clk, negedge rst_n) begin
+						if (!rst_n) 
                     data_RT_out_0[i][j] <= 32'b0;
-            1   else  
+						else  
                     data_RT_out_0[i][j] <= q_bank[addr_RT[i][21:16]][j];
+					end
             end   
         end
     endgenerate 
