@@ -18,7 +18,7 @@ namespace SimulatorCore
             Memory = mem;
             // cache that stores decoded instructions
             cache = new Dictionary<int, CPInstruction>(mem.Mem.Length / 4);
-            decoder = new Decoder(File.OpenText("SimulatorCore/CPInstruction/CP.isa"), 4);
+            decoder = new Decoder(File.OpenText("CP.isa"), 4);
         }
 
         public bool Step(int[] transferData, out bool isLaunch)
@@ -41,8 +41,8 @@ namespace SimulatorCore
             }
             if (ins is finish)
                 return true;
-            ins.process(RegisterFile, Memory);
             RegisterFile[15] += 4;
+            ins.process(RegisterFile, Memory);
             return false;
         }
 
@@ -72,6 +72,18 @@ namespace SimulatorCore
             RegisterFile[15] += 4;
             ins.process(RegisterFile, Memory);
             return false;
+        }
+
+        public void StartTrace()
+        {
+            Memory.StartTrace();
+            RegisterFile.StartTrace();
+        }
+
+        public void EndTrace()
+        {
+            Memory.EndTrace();
+            RegisterFile.EndTrace();
         }
     }
 }
