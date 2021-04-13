@@ -3,7 +3,7 @@ top_test.json
 ram_single_port.sv
 ram_dual_port.sv
 mem_main.sv
-mem_main_john.sv
+mem_main_old.sv
 ram.sv
 top_test.sv
 ccip_std_afu.sv

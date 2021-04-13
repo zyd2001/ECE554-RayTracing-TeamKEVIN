@@ -17,7 +17,7 @@ module top_test(clk, rst, rx, tx);
 
     reg [127:0] data_RT_in[3:0];
 
-    mem_main_john mem_main_john(.clk(clk), .rst_n(rst_n), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
+    mem_main mem_main(.clk(clk), .rst_n(rst_n), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
     , .addr_MC(addr_MC), .re_MC(re_MC), .data_RT_out(data_RT_out), .rdy_RT(rdy_RT), .data_MC_out()
     , .rdy_MC());
 	
