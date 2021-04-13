@@ -1,5 +1,11 @@
 module mem_main_tb();
     
+    parameter NUM_RT = 4;
+    parameter NUM_THREAD = 64;
+    parameter NUM_BANK_PTHREAD = 4;
+    localparam TESTS=10;
+    localparam TEST_CYCLE = 1000;
+    
     logic clk;
     logic rst_n;
     logic we_RT[NUM_RT-1:0];
@@ -22,10 +28,6 @@ module mem_main_tb();
 
     always #1 clk = ~clk;
 
-    parameter NUM_RT = 4;
-    parameter NUM_THREAD = 64;
-    parameter NUM_BANK_PTHREAD = 4;
-    localparam TESTS=10;
 
     mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                   data_RT_out, rdy_RT, data_MC_out, rdy_MC);
@@ -36,8 +38,8 @@ module mem_main_tb();
     initial begin
         clk = 0;
         rst_n = 1;
-        we_RT = `{NUM_RT{0}};
-        re_RT = `{NUM_RT{0}};
+        we_RT = '{NUM_RT{1'b0}};
+        re_RT = '{NUM_RT{1'b0}};
         for(int i=0;i<NUM_RT;++i) begin
             addr_RT[i] = 32'b0;
             data_RT_in[i] = 128'b0;
@@ -53,17 +55,16 @@ module mem_main_tb();
         @(posedge clk) begin end
         // test on RT
         for(int test = 0; test < TESTS; test++) begin
-            int testcycle = 1000;
-            for(int k = 0; k < testcycle; k++) begin
+            for(int k = 0; k < TEST_CYCLE; k++) begin
                 // test foreach core
                 for(int i = 0; i < NUM_RT; i++) begin
                     if(!we_RT[i]) begin
                         we_RT[i] = $random;
                         data_RT_in[i] = $random;
                         addr_RT_rand[i] = $random;
-                        addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0}
+                        addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
                     end
-                    if(we_RT[i] & !re_RT) begin
+                    if(we_RT[i] & !re_RT[i]) begin
                         data_RT_copy[i] = data_RT_in[i];
                         addr_RT_copy[i] = addr_RT[i];
                     end
@@ -81,7 +82,7 @@ module mem_main_tb();
                                 $display("Error! Failed W/R at address: 0x%h, port %d, data expecting: 0x%h, data got: 0x%h", 
                                      addr_RT_copy[j], j, data_RT_copy[j], data_RT_out[j]); 
                             end
-                            re_RT[i] = 0;
+                            re_RT[j] = 0;
                         end
                     end
                 end    
