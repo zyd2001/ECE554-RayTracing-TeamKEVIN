@@ -4,7 +4,9 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
-    parameter NUM_BANK = NUM_THREAD * NUM_BANK_PTHREAD;
+    localparam NUM_BANK = NUM_THREAD * NUM_BANK_PTHREAD;
+    localparam CYCLE_TO_FINISH = 4;
+    localparam FIN_COUNTER_BIT = $clog2(CYCLE_TO_FINISH);
 
     input clk, rst_n;
 
@@ -23,8 +25,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     output rdy_MC;
     output [127:0] data_MC_out;
 
-    localparam CYCLE_TO_FINISH = 4;
-    localparam FIN_COUNTER_BIT = $clog2(CYCLE_TO_FINISH);
     genvar i, j;
     
     logic [FIN_COUNTER_BIT-1:0] fin_counter_RT [NUM_RT-1:0];
