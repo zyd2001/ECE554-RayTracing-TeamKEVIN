@@ -22,7 +22,7 @@ namespace SimulatorCore
             DataMemory = dataMem;
             IC = new IntersectionCore(triangleMem);
             cache = new Dictionary<int, RTInstruction>(insMem.Mem.Length / 4);
-            decoder = new Decoder(File.OpenText("SimulatorCore/RTInstruction/RT.isa"), 6);
+            decoder = new Decoder(File.OpenText("RT.isa"), 6);
         }
 
         public bool Step()
@@ -33,12 +33,26 @@ namespace SimulatorCore
             {
                 ins = (RTInstruction)decoder.Decode(InstructionMemory.Read(PC));
                 cache[PC] = ins;
-                if (ins is fin)
-                    return true;
             }
-            ins.process(VectorRegisterFile, ScalarRegisterFile, DataMemory, IC);
+            if (ins is fin)
+                return true;
             ScalarRegisterFile[31] += 4;
+            ins.process(VectorRegisterFile, ScalarRegisterFile, DataMemory, IC);
             return false;
+        }
+
+        public void StartTrace()
+        {
+            DataMemory.StartTrace();
+            ScalarRegisterFile.StartTrace();
+            VectorRegisterFile.StartTrace();
+        }
+
+        public void EndTrace()
+        {
+            DataMemory.EndTrace();
+            ScalarRegisterFile.EndTrace();
+            VectorRegisterFile.EndTrace();
         }
     }
 }
