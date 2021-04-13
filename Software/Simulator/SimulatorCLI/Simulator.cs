@@ -50,8 +50,7 @@ namespace SimulatorCLI
                         {
                             RT.ScalarRegisterFile[30] = 0 + RT.DataMemory.Mem.Length / 64 * i; // set Stack Pointer
                             RT.ScalarRegisterFile[31] = 0; // set PC
-                            int threadID = data[i];
-                            runRT(threadID);
+                            runRT(data[i]);
                         }
                         canLaunch.Set();
                     });
@@ -69,7 +68,7 @@ namespace SimulatorCLI
             lastRTRun?.Wait(); // wait the last launch to complete
         }
 
-        internal void runRT(int threadID)
+        internal void runRT(int pixelID)
         {
             while (true)
             {
@@ -79,7 +78,7 @@ namespace SimulatorCLI
                 RT.EndTrace();
                 if (!disableTrace)
                 {
-                    Console.Write($"T{threadID}: ");
+                    Console.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
                         Console.Write("S{0} {1} => {2}; ", trace.id, trace.before.i, trace.after.i);
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
