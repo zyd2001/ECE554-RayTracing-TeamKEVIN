@@ -17,10 +17,10 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     input [31:0] addr_MC; //
 
 
-    output logic rdy_RT[NUM_RT-1:0];//
+    output rdy_RT[NUM_RT-1:0];
     output [127:0] data_RT_out[NUM_RT-1:0];
 
-    output logic rdy_MC;//
+    output rdy_MC;
     output [127:0] data_MC_out;
 
     localparam CYCLE_TO_FINISH = 4;
