@@ -6,10 +6,8 @@ s_write_high r x i
 100000 5 5 16
 s_write_low r x i
 100001 5 5 16
-s_get_from_v r r x index
-100101 5 5 14 2
-s_sqrt r r x
-100110 5 5 16
+s_get_from_v r x r x index
+100101 5 1 4 14 2
 v_load_16byte x r r i
 101111 1 4 5 16
 v_store_16byte x r r i
@@ -24,6 +22,10 @@ vv_mul_ele x r x r x r x
 000010 1 4 1 4 1 4 11
 vv_div x r x r x r x
 000011 1 4 1 4 1 4 11
+v_reduce r x r x
+100100 5 1 4 16
+s_sqrt r r x
+100110 5 5 16
 vf_add x r x r r x
 001000 1 4 1 4 5 11
 vf_sub x r x r r x
@@ -32,8 +34,6 @@ vf_mul x r x r r x
 001010 1 4 1 4 5 11
 vf_div x r x r r x
 001011 1 4 1 4 5 11
-v_reduce r x r x
-100100 5 1 4 16
 ii_add r r r x
 011000 5 5 5 11
 ii_sub r r r x
