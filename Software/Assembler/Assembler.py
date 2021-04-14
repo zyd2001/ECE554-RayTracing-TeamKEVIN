@@ -12,7 +12,6 @@ parser.add_argument('-p', help='print the output in binary', action='store_true'
 args = parser.parse_args()
     
 # TODO: add some debug info in output
-# TODO: add comment support
 # Parse the ISA structure
 def parseISA(file):
     f = open(file)
@@ -97,6 +96,8 @@ class Assembler:
                         target = self.labels[tokens[i + 1]]
                         offset = target - (self.PCCounter + line * 4) - 4
                         l = str(offset)
+                    else:
+                        self.err("No such label: " + tokens[i + 1])
                 elif args[i] == 'i':
                     imm = tokens[i + 1]
                 else:
@@ -169,6 +170,8 @@ class Assembler:
                                 if not offset:
                                     self.err('cannot reach the label ' + l)
                                 code += offset
+                            else:
+                                self.err("No such label: " + l)
                         else:
                             self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
                             # still return a string for placeholder
@@ -213,6 +216,8 @@ class Assembler:
             self.lineCounter += 1
             tokens = line.split()
             if tokens:
+                if tokens[0] == '@':
+                    continue
                 if line[0] == ' ' or line[0] == '\t':
                     ins = tokens[0].lower()
                     if ins in self.ISAdict:
