@@ -27,20 +27,27 @@ module RT_Core_single (
     output [31:0] MRTI_addr_rd;
 
     logic [31:0] PC_reg;
+    logic jump_enable;
     logic [31:0] IF_PC_plus_four, IF_next_PC, IF_instruction;
 
     logic IF_DE_enable, IF_DE_reset;
     logic [31:0] IF_DE_current_PC, IF_DE_instruction, IF_DE_current_PC_plus_four, IF_DE_instruction_bypass;
+    
 
     logic [31:0] RF_scalar1_out, RF_scalar2_out, DE_scalar1, DE_scalar2;
     logic [127:0] DE_vector1, DE_vector2;
+    logic [31:0] DE_PC_plus_four_offset;
     //////////////////////////
     // Instruction Fetch Stage
     //////////////////////////
+    assign jump_enable = IF_instruction[31:26] == 6'b111011 | IF_instruction[31:26] == 6'b111100;
+    assign IF_jump_address = {16'h0, IF_instruction[15:0]};
+
     assign IF_PC_plus_four = PC_reg + 4;
-    assign IF_next_PC = IF_PC_plus_four; // more to come
+    assign IF_next_PC =  jump_enable ? IF_jump_address : IF_PC_plus_four; // more to come
     assign MRTI_addr_rd = IF_next_PC; // read first
     assign IF_instruction = MRTI_data_rd;
+
 
     always_ff @(posedge clk, negedge rst_n) begin    
         if (!rst_n) 
@@ -84,8 +91,38 @@ module RT_Core_single (
         .vector_read_address1(Kernel_mode ? PD_vector_read_address1 : IF_DE_instruction_bypass[24:21]), .vector_read_address2(Kernel_mode ? PD_vector_read_address2 : IF_DE_instruction_bypass[19:16]), 
         .scalar_read1(RF_scalar1_out), .scalar_read2(RF_scalar2_out), 
         .vector_read1(DE_vector1), .vector_read2(DE_vector2)
-    )
+    );
 
-    assign 
+    assign DE_scalar1 = IF_DE_instruction[25:21] == 6'b111111 ? IF_DE_current_PC_plus_four : RF_scalar1_out;
+    assign DE_scalar2 = IF_DE_instruction[25:21] == 6'b111111 ? IF_DE_current_PC_plus_four : RF_scalar2_out;
 
+    assign PD_scalar_read1 = PD_scalar_read_address1 == 6'b111111 ? IF_PC_plus_four : RF_scalar1_out;
+    assign PD_scalar_read2 = PD_scalar_read_address2 == 6'b111111 ? IF_PC_plus_four : RF_scalar2_out;
+    assign PD_vector_read1 = DE_vector1;
+    assign PD_vector_read2 = DE_vector2;
+
+    assign DE_PC_plus_four_offset = IF_DE_current_PC_plus_four + {{17{IF_DE_instruction[15]}}, IF_DE_instruction[14:0]}; 
+
+    //////////////////////////
+    // DE EX Pipeline
+    ////////////////////////// 
+
+    always @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            IF_DE_current_PC <= 31'h0000;
+            IF_DE_instruction <= 31'h0000;
+            IF_DE_current_PC_plus_four <= 31'h0000;
+        end else begin
+            if (IF_DE_enable && IF_DE_reset) begin
+                IF_DE_current_PC <= 31'h0000;
+                IF_DE_instruction <= 31'h0000;
+                IF_DE_current_PC_plus_four <= 31'h0000;
+            end else if (IF_DE_enable && !IF_DE_reset) begin
+                IF_DE_current_PC <= PC_reg;
+                IF_DE_instruction <= IF_instruction;
+                IF_DE_current_PC_plus_four <= IF_PC_plus_four;
+            end
+        end
+    end
+    
 endmodule
