@@ -14,7 +14,7 @@ namespace SimulatorCore
 
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             // flag register represented by 33rd register in scalar reg file
             // only for simulator representation
@@ -49,7 +49,7 @@ namespace SimulatorCore
 
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             // flag register represented by 33rd register in scalar reg file
             // only for simulator representation
@@ -87,7 +87,7 @@ namespace SimulatorCore
 
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             // flag register represented by 33rd register in scalar reg file
             // only for simulator representation

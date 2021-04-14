@@ -15,7 +15,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             imm = imm << 16;
             sRF[r0] = sRF[r0].i | imm;
@@ -39,7 +39,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r0].i | imm;
 

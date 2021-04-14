@@ -13,7 +13,7 @@ namespace SimulatorCore
             this.r1 = r1;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = vRF[r1].W + vRF[r1].X + vRF[r1].Y + vRF[r1].Z;
 

@@ -10,7 +10,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             if (RF[rd] == 0)
             {
@@ -36,7 +36,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             if (RF[rd] != 0)
             {
@@ -60,7 +60,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             if (RF[rd] >= 0)
             {
@@ -84,7 +84,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             if (RF[rd] <= 0)
             {

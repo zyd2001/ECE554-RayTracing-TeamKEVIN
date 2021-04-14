@@ -14,7 +14,7 @@ namespace SimulatorCore
             this.r1 = r1;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = MathF.Sqrt(sRF[r1]);
 

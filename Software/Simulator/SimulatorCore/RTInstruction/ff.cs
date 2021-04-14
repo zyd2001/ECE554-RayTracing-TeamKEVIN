@@ -14,7 +14,7 @@ namespace SimulatorCore
             this.r2 = r2;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].f + sRF[r2].f;
         }
@@ -38,7 +38,7 @@ namespace SimulatorCore
             this.r2 = r2;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].f - sRF[r2].f;
         }
@@ -61,7 +61,7 @@ namespace SimulatorCore
             this.r2 = r2;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].f * sRF[r2].f;
         }
@@ -85,7 +85,7 @@ namespace SimulatorCore
             this.r2 = r2;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[r0] = sRF[r1].f / sRF[r2].f;
         }

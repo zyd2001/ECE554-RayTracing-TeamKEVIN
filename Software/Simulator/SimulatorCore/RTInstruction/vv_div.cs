@@ -14,7 +14,7 @@ namespace SimulatorCore
             this.r2 = r2;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             vRF[r0] = Vector4.Divide(vRF[r1], vRF[r2]);
 

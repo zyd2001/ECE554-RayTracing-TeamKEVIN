@@ -15,7 +15,7 @@ namespace SimulatorCore
 
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             double x2 = Math.Pow(vRF[r1].X, 2);
             double y2 = Math.Pow(vRF[r1].Y, 2);

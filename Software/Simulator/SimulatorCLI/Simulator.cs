@@ -36,7 +36,7 @@ namespace SimulatorCLI
             this.CPOutputFile = CPOutputFile?.CreateText() ?? Console.Out;
 
         }
-        internal void run()
+        internal void Run()
         {
             int[] data = new int[64];
             EventWaitHandle canLaunch = new AutoResetEvent(true);
@@ -56,9 +56,10 @@ namespace SimulatorCLI
                     {
                         for (int i = 0; i < 64; i++)
                         {
-                            RT.ScalarRegisterFile[30] = 0 + RT.DataMemory.Mem.Length / 64 * i; // set Stack Pointer
+                            RT.ScalarRegisterFile[28] = 0 + RT.DataMemory.Mem.Length / 64 * i; // set Stack Pointer
+                            RT.ScalarRegisterFile[29] = RT.ScalarRegisterFile[28].i;
                             RT.ScalarRegisterFile[31] = 0; // set PC
-                            runRT(copyData[i]);
+                            RunRT(copyData[i]);
                         }
                         canLaunch.Set();
                     });
@@ -76,7 +77,7 @@ namespace SimulatorCLI
             lastRTTask?.Wait(); // wait the last launch to complete
         }
 
-        internal void runRT(int pixelID)
+        internal void RunRT(int pixelID)
         {
             while (true)
             {

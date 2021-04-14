@@ -12,7 +12,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[32] != 0)
             {
@@ -37,7 +37,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[32] == 2)
             {
@@ -62,7 +62,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[32] == 1)
             {
@@ -87,7 +87,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[32] == 2 || sRF[32] == 0)
             {
@@ -112,7 +112,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[32] == 1 || sRF[32] == 0)
             {

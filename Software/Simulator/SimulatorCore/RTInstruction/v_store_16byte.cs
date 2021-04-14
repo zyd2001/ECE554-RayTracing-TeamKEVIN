@@ -15,7 +15,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             mem.Write(sRF[r1].i + imm, BitConverter.GetBytes(vRF[r0].X));
             mem.Write(sRF[r1].i + imm + 4, BitConverter.GetBytes(vRF[r0].Y));
