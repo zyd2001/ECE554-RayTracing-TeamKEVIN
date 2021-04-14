@@ -19,10 +19,10 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     input [31:0] addr_MC; //
 
 
-    output rdy_RT[NUM_RT-1:0];
+    output reg rdy_RT[NUM_RT-1:0];
     output [127:0] data_RT_out[NUM_RT-1:0];
 
-    output rdy_MC;
+    output reg rdy_MC;
     output [127:0] data_MC_out;
 
     genvar i, j;
@@ -31,74 +31,87 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     logic fin_counter_RT_en [NUM_RT-1:0];
     logic [FIN_COUNTER_BIT-1:0] fin_counter_MC;
     logic fin_counter_MC_en;
-    // ready logic for RT
-    generate
-        for (i = 0; i < NUM_RT; i++) begin
-            assign rdy_RT[i] = fin_counter_RT[i] === CYCLE_TO_FINISH;
-            always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n) begin
-                    fin_counter_RT_en[i] <= 1'b0;
-                    fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
-                end
-                else if(rdy_RT[i]) begin
-                    fin_counter_RT_en[i] <= 1'b0;
-                    fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
-                end
-                else if(!fin_counter_RT_en[i]) begin
-                    fin_counter_RT_en[i] <= we_RT[i] | re_RT[i];
-                    fin_counter_RT[i] <= fin_counter_RT[i] + {{(FIN_COUNTER_BIT-1){1'b0}}, (we_RT[i] | re_RT[i])};
-                end
-                else begin
-                    fin_counter_RT_en[i] <= fin_counter_RT_en[i];
-                    fin_counter_RT[i] <= fin_counter_RT[i] + 1;
-                end
-            end
-        end
-    endgenerate
-    // ready logic for MC
-    assign rdy_MC = fin_counter_MC === CYCLE_TO_FINISH;
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n) begin
-            fin_counter_MC_en <= 1'b0;
-            fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
-        end
-        else if(rdy_MC) begin
-            fin_counter_MC_en <= 1'b0;
-            fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
-        end
-        else if(!fin_counter_MC_en) begin
-            fin_counter_MC_en <= re_MC;
-            fin_counter_MC <= fin_counter_MC + {{(FIN_COUNTER_BIT-1){1'b0}}, re_MC};
-        end
-        else begin
-            fin_counter_MC_en <= fin_counter_MC_en;
-            fin_counter_MC <= fin_counter_MC + 1;
-        end
-    end
+    // // ready logic for RT
+    // generate
+    //     for (i = 0; i < NUM_RT; i++) begin
+    //         assign rdy_RT[i] = fin_counter_RT[i] === CYCLE_TO_FINISH;
+    //         always_ff @(posedge clk, negedge rst_n) begin
+    //             if (!rst_n) begin
+    //                 fin_counter_RT_en[i] <= 1'b0;
+    //                 fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
+    //             end
+    //             else if(rdy_RT[i]) begin
+    //                 fin_counter_RT_en[i] <= 1'b0;
+    //                 fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
+    //             end
+    //             else if(!fin_counter_RT_en[i]) begin
+    //                 fin_counter_RT_en[i] <= we_RT[i] | re_RT[i];
+    //                 fin_counter_RT[i] <= fin_counter_RT[i] + {{(FIN_COUNTER_BIT-1){1'b0}}, (we_RT[i] | re_RT[i])};
+    //             end
+    //             else begin
+    //                 fin_counter_RT_en[i] <= fin_counter_RT_en[i];
+    //                 fin_counter_RT[i] <= fin_counter_RT[i] + 1;
+    //             end
+    //         end
+    //     end
+    // endgenerate
+    // // ready logic for MC
+    // assign rdy_MC = fin_counter_MC === CYCLE_TO_FINISH;
+    // always_ff @(posedge clk, negedge rst_n) begin
+    //     if (!rst_n) begin
+    //         fin_counter_MC_en <= 1'b0;
+    //         fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
+    //     end
+    //     else if(rdy_MC) begin
+    //         fin_counter_MC_en <= 1'b0;
+    //         fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
+    //     end
+    //     else if(!fin_counter_MC_en) begin
+    //         fin_counter_MC_en <= re_MC;
+    //         fin_counter_MC <= fin_counter_MC + {{(FIN_COUNTER_BIT-1){1'b0}}, re_MC};
+    //     end
+    //     else begin
+    //         fin_counter_MC_en <= fin_counter_MC_en;
+    //         fin_counter_MC <= fin_counter_MC + 1;
+    //     end
+    // end
 
 
     //Memory IO logic
+
+    //Write Enable (we) pipeline
+    //Cycle 0
     logic we_bank_0[NUM_THREAD-1:0];
+    generate
+        for (i = 0; i < NUM_THREAD; i = i + 1) begin
+            always_ff @(posedge clk, negedge rst_n) begin
+                if (!rst_n) 
+                    we_bank_0[i] <= 1'b0;
+                else begin
+                    we_bank_0[i] <= ((addr_RT[0][21:16] == i) && we_RT[0])
+                                 || ((addr_RT[1][21:16] == i) && we_RT[1])
+                                 || ((addr_RT[2][21:16] == i) && we_RT[2])
+                                 || ((addr_RT[3][21:16] == i) && we_RT[3]);
+                end
+            end
+        end
+    endgenerate 
+    //Cycle 1
     logic we_bank[NUM_THREAD-1:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n) begin
-                    we_bank_0[i] <= 1'b0;
+                if (!rst_n) 
                     we_bank[i] <= 1'b0;
-                end
-                else begin
-                    we_bank_0[i] <= ((addr_RT[0][21:16] == i) | we_RT[0])
-                                 || ((addr_RT[1][21:16] == i) | we_RT[1])
-                                 || ((addr_RT[2][21:16] == i) | we_RT[2])
-                                 || ((addr_RT[3][21:16] == i) | we_RT[3]);
-                    we_bank[i] = we_bank_0[i];
-                end
+                else 
+                    we_bank[i] <= we_bank_0[i];
             end
         end
     endgenerate
 
-    logic [13:0] addr_pre[NUM-RT-1:0][3:0];
+    //RAM Addr Calculate for each bank
+    //Cycle 0
+    logic [13:0] addr_pre[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             assign addr_pre[i][0] = addr_RT[i][15:2];
@@ -108,6 +121,8 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
         end
     endgenerate
 
+    //RAM Address Pipeline
+    //Cycle 0
     logic [11:0] addr_bank_0[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
@@ -117,7 +132,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                     addr_bank_0[i][1] <= 12'b0;
                     addr_bank_0[i][2] <= 12'b0;
                     addr_bank_0[i][3] <= 12'b0;
-					 end
+				end
                 else begin
                     addr_bank_0[i][0] <= addr_pre[i][0][1:0] == 2'h0 ? addr_pre[i][0][13:2]
                                         : addr_pre[i][1][1:0]  == 2'h0 ? addr_pre[i][1][13:2]
@@ -135,43 +150,11 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                         : addr_pre[i][1][1:0]  == 2'h3 ? addr_pre[i][1][13:2]
                                         : addr_pre[i][2][1:0]  == 2'h3 ? addr_pre[i][2][13:2]
                                         : addr_pre[i][3][13:2];
-					end
+				end
             end
         end
     endgenerate 
-
-    logic [32:0] data_bank_0[NUM_RT-1:0][3:0];
-    generate
-        for (i = 0; i < NUM_RT; i = i + 1) begin
-            always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n) begin
-                    data_bank_0[i][0] <= 32'b0;
-                    data_bank_0[i][1] <= 32'b0;
-                    data_bank_0[i][2] <= 32'b0;
-                    data_bank_0[i][3] <= 32'b0;
-					 end
-                else begin
-                    data_bank_0[i][0] <= addr_pre[i][0][1:0] == 2'h0 ? data_RT_in[i][31:0]
-                                        : addr_pre[i][1][1:0] == 2'h0 ? data_RT_in[i][63:32]
-                                        : addr_pre[i][2][1:0] == 2'h0 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
-                    data_bank_0[i][1] <= addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][31:0]
-                                        : addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][63:32]
-                                        : addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];      
-                    data_bank_0[i][2] <= addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][31:0]
-                                        : addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][63:32]
-                                        : addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
-                    data_bank_0[i][3] <= addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][31:0]
-                                        : addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][63:32]
-                                        : addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
-					end
-				end
-        end
-    endgenerate 
-
+    //Cycle 1
     logic [11:0] addr_bank[NUM_THREAD-1:0][3:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
@@ -186,14 +169,44 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                     : addr_bank_0[3][j];
                     end
                 end 
-//						assign addr_bank[i][j] = (i == addr_RT[0][21:16]) ? addr_bank_0[0][j]
-//                                    : (i == addr_RT[1][21:16]) ? addr_bank_0[1][j]
-//                                    : (i == addr_RT[2][21:16]) ? addr_bank_0[2][j] 
-//                                    : addr_bank_0[3][j];
             end
         end
     endgenerate
 
+    //RAM Data Pipeline
+    //Cycle 0
+    logic [32:0] data_bank_0[NUM_RT-1:0][3:0];
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            always_ff @(posedge clk, negedge rst_n) begin
+                if (!rst_n) begin
+                    data_bank_0[i][0] <= 32'b0;
+                    data_bank_0[i][1] <= 32'b0;
+                    data_bank_0[i][2] <= 32'b0;
+                    data_bank_0[i][3] <= 32'b0;
+				end
+                else begin
+                    data_bank_0[i][0] <= addr_pre[i][0][1:0] == 2'h0 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][1][1:0] == 2'h0 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][2][1:0] == 2'h0 ? data_RT_in[i][95:64]
+                                        : data_RT_in[i][127:96];
+                    data_bank_0[i][1] <= addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][1][1:0] == 2'h1 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][2][1:0] == 2'h1 ? data_RT_in[i][95:64]
+                                        : data_RT_in[i][127:96];      
+                    data_bank_0[i][2] <= addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][1][1:0] == 2'h2 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][2][1:0] == 2'h2 ? data_RT_in[i][95:64]
+                                        : data_RT_in[i][127:96];
+                    data_bank_0[i][3] <= addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][1][1:0] == 2'h3 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][2][1:0] == 2'h3 ? data_RT_in[i][95:64]
+                                        : data_RT_in[i][127:96];
+				end
+			end
+        end
+    endgenerate 
+    //Cycle 1
     logic [31:0] data_bank[NUM_THREAD-1:0][3:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
@@ -208,14 +221,12 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                                     : data_bank_0[3][j];
                     end
                 end
-//						assign data_bank[i][j] = (i == addr_RT[0][21:16]) ? data_bank_0[0][j]
-//                                    : (i == addr_RT[1][21:16]) ? data_bank_0[1][j]
-//                                    : (i == addr_RT[2][21:16]) ? data_bank_0[2][j] 
-//                                    : data_bank_0[3][j];
             end
         end
     endgenerate
 
+    //RAM
+    //Cycle 2
     logic [31:0] q_bank[NUM_THREAD-1:0][3:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
@@ -226,43 +237,188 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
         end
     endgenerate
 
+    //Read output pipeline
+    //Cycle 3
     logic [31:0] data_RT_out_0[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             for (j = 0; j < 4; j = j + 1) begin
-					always_ff @(posedge clk, negedge rst_n) begin
-						if (!rst_n) 
-                    data_RT_out_0[i][j] <= 32'b0;
-						else  
-                    data_RT_out_0[i][j] <= q_bank[addr_RT[i][21:16]][j];
-					end
+                always_ff @(posedge clk, negedge rst_n) begin
+                    if (!rst_n) 
+                        data_RT_out_0[i][j] <= 32'b0;
+                    else  
+                        data_RT_out_0[i][j] <= q_bank[addr_RT[i][21:16]][j];
+                end
             end   
         end
     endgenerate 
-
+    //Cycle 4
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            assign data_RT_out[i][31:0] = addr_RT[i][3:2] == 2'h0 ? data_RT_out_0[i][0]
-                                        : addr_RT[i][3:2] == 2'h1 ? data_RT_out_0[i][1]
-                                        : addr_RT[i][3:2] == 2'h2 ? data_RT_out_0[i][2]
+            assign data_RT_out[i][31:0] = addr_pre[i][0][1:0] == 2'h0 ? data_RT_out_0[i][0]
+                                        : addr_pre[i][0][1:0] == 2'h1 ? data_RT_out_0[i][1]
+                                        : addr_pre[i][0][1:0] == 2'h2 ? data_RT_out_0[i][2]
                                         : data_RT_out_0[i][3];
             
-            assign data_RT_out[i][63:32] = (addr_RT[i][3:2] + 2'h1) == 2'h0 ? data_RT_out_0[i][0]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h1 ? data_RT_out_0[i][1]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h2 ? data_RT_out_0[i][2]
+            assign data_RT_out[i][63:32] = addr_pre[i][1][1:0] == 2'h0 ? data_RT_out_0[i][0]
+                                        : addr_pre[i][1][1:0] == 2'h1 ? data_RT_out_0[i][1]
+                                        : addr_pre[i][1][1:0] == 2'h2 ? data_RT_out_0[i][2]
                                         : data_RT_out_0[i][3];
 
-            assign data_RT_out[i][95:64] = (addr_RT[i][3:2] + 2'h2) == 2'h0 ? data_RT_out_0[i][0]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h1 ? data_RT_out_0[i][1]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h2 ? data_RT_out_0[i][2]
+            assign data_RT_out[i][95:64] = addr_pre[i][2][1:0] == 2'h0 ? data_RT_out_0[i][0]
+                                        : addr_pre[i][2][1:0] == 2'h1 ? data_RT_out_0[i][1]
+                                        : addr_pre[i][2][1:0] == 2'h2 ? data_RT_out_0[i][2]
                                         : data_RT_out_0[i][3];
                                         
-            assign data_RT_out[i][127:96] = (addr_RT[i][3:2] + 2'h3) == 2'h0 ? data_RT_out_0[i][0]
-                                        : (addr_RT[i][3:2] + 2'h3) == 2'h1 ? data_RT_out_0[i][1]
-                                        : (addr_RT[i][3:2] + 2'h3) == 2'h2 ? data_RT_out_0[i][2]
+            assign data_RT_out[i][127:96] = addr_pre[i][3][1:0] == 2'h0 ? data_RT_out_0[i][0]
+                                        : addr_pre[i][3][1:0] == 2'h1 ? data_RT_out_0[i][1]
+                                        : addr_pre[i][3][1:0] == 2'h2 ? data_RT_out_0[i][2]
                                         : data_RT_out_0[i][3];
             
         end
     endgenerate
+
+
+    /*
+        Control Unit for RT Read and Write
+    */
+    // Read Counter for each RT
+    logic cnt_wr_clr[NUM_RT-1:0];
+    logic cnt_wr_inc[NUM_RT-1:0];
+    logic [1:0] cnt_wr[NUM_RT-1:0];
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            always_ff @( posedge clk, negedge rst_n ) begin
+                if (!rst_n)
+                    cnt_wr[i] <= 2'b0;
+                else if (cnt_wr_clr[i])
+                    cnt_wr[i] <= 2'b0;
+                else if (cnt_wr_inc[i])
+                    cnt_wr[i] <= cnt_wr[i] + 2'b1;
+            end
+        end
+    endgenerate
+    // Write Counter for each RT
+    logic cnt_rd_clr[NUM_RT-1:0];
+    logic cnt_rd_inc[NUM_RT-1:0];
+    logic [2:0] cnt_rd[NUM_RT-1:0];
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            always_ff @( posedge clk, negedge rst_n ) begin
+                if (!rst_n)
+                    cnt_rd[i] <= 3'b0;
+                else if (cnt_rd_clr[i])
+                    cnt_rd[i] <= 3'b0;
+                else if (cnt_rd_inc[i])
+                    cnt_rd[i] <= cnt_rd[i] + 3'b1;
+            end
+        end
+    endgenerate
+    
+    // State Machine for each RT
+    typedef enum reg [1:0] {IDLE, READ, WRITE} state_t;
+    state_t state[NUM_RT-1:0], nxt_state[NUM_RT-1:0];
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            always_ff @( posedge clk, negedge rst_n ) begin 
+                if (!rst_n)
+                    state[i] <= IDLE;
+                else 
+                    state[i] <= nxt_state[i];
+            end
+            always_comb begin 
+                nxt_state[i] = IDLE;
+                cnt_wr_clr[i] = 1'b0;
+                cnt_wr_inc[i] = 1'b0;
+                cnt_rd_clr[i] = 1'b0;
+                cnt_rd_inc[i] = 1'b0;
+                rdy_RT[i] = 1'b0;
+                case(state[i])
+                    IDLE: begin
+                        if (re_RT[i]) begin
+                            nxt_state[i] = READ;
+                            cnt_rd_inc[i] = 1'b1;
+                        end
+                        else if (we_RT[i]) begin
+                            nxt_state[i] = WRITE;
+                            cnt_wr_inc[i] = 1'b1;
+                        end
+                    end
+                    READ: begin
+                        if (cnt_rd[i] == 3'b100) begin
+                            cnt_rd_clr[i] = 1'b1;
+                            rdy_RT[i] = 1'b1;
+                        end
+                        else begin
+                            nxt_state[i] = READ;
+                            cnt_rd_inc[i] = 1'b1;
+                        end
+                    end
+                    default: begin
+                        if (cnt_wr[i] == 2'b11) begin
+                            cnt_wr_clr[i] = 1'b1;
+                            rdy_RT[i] = 1'b1;
+                        end
+                        else begin
+                           nxt_state[i] = WRITE;
+                           cnt_wr_inc[i] = 1'b1; 
+                        end
+                    end
+                endcase
+            end
+        end
+    endgenerate 
+
+
+    /*
+        Control Unit for MC Read
+    */
+    // MC Counter
+    logic cnt_mc_inc;
+    logic cnt_mc_clr;
+    logic [6:0] cnt_mc; 
+    always_ff @( posedge clk, negedge rst_n ) begin
+        if (!rst_n)
+            cnt_mc <= 7'b0;
+        else if (cnt_mc_clr)
+            cnt_mc <= 7'b0;
+        else if (cnt_mc_inc)
+            cnt_mc <= cnt_mc + 7'h1;
+    end
+
+    // State Machine for MC read
+    typedef enum reg {INI, RD} state_mc_t;
+    state_mc_t state_mc, nxt_state_mc;
+    always_ff @( posedge clk, negedge rst_n ) begin 
+        if (!rst_n)
+            state_mc <= INI;
+        else 
+            state_mc <= nxt_state_mc;
+    end
+    always_comb begin 
+        nxt_state_mc = INI;
+        cnt_mc_inc = 1'b0;
+        cnt_mc_clr = 1'b0;
+        rdy_MC = 1'b0;
+        case(state_mc)
+            INI: begin
+                if (re_MC) begin
+                    nxt_state_mc = RD;
+                    cnt_mc_inc = 1'b1;
+                end
+            end
+            default: begin
+                if (cnt_mc[6] == 1'b1) begin
+                    cnt_mc_clr = 1'b1;
+                    rdy_MC = 1'b1;
+                end
+                else begin
+                    nxt_state_mc = RD;
+                    cnt_mc_inc = 1'b1;
+                end
+                    
+            end
+        endcase
+    end
 
 endmodule 
