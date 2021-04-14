@@ -4,7 +4,7 @@ module mem_main_tb();
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
     localparam TESTS = 1;
-    localparam TEST_CYCLE = 50;
+    localparam TEST_CYCLE = 1000;
     
     logic clk;
     logic rst_n;
