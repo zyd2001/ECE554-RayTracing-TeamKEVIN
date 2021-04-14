@@ -14,8 +14,11 @@ namespace SimulatorCLI
         CommandProcessor CP;
         RayTracing RT;
         bool disableTrace;
+        TextWriter RTOutputFile;
+        TextWriter CPOutputFile;
         internal Simulator(FileInfo CPFile, FileInfo RTFile, bool disableTrace,
-            int CPMemorySize, int RTMemorySize, FileInfo triangleFile)
+            int CPMemorySize, int RTMemorySize, FileInfo triangleFile,
+            FileInfo CPOutputFile, FileInfo RTOutputFile)
         {
             CPMem = new Memory(CPMemorySize);
             traingleMem = new Memory(triangleFile == null ? 0 : (int)triangleFile.Length);
@@ -29,6 +32,9 @@ namespace SimulatorCLI
             CP = new CommandProcessor(CPMem);
             RT = new RayTracing(RTMem, traingleMem, new Memory(RTMemorySize));
             this.disableTrace = disableTrace;
+            this.RTOutputFile = RTOutputFile?.CreateText() ?? Console.Out;
+            this.CPOutputFile = CPOutputFile?.CreateText() ?? Console.Out;
+
         }
         internal void run()
         {
@@ -61,10 +67,10 @@ namespace SimulatorCLI
                 if (!disableTrace)
                 {
                     foreach (var trace in CP.RegisterFile.TraceLog)
-                        Console.Write("R{0} {1} => {2}; ", trace.id, trace.before, trace.after);
+                        CPOutputFile.Write("R{0} {1} => {2}; ", trace.id, trace.before, trace.after);
                     foreach (var trace in CP.Memory.TraceLog)
-                        Console.Write("{0} {1} => {2}; ", trace.address, trace.before, trace.after);
-                    Console.WriteLine();
+                        CPOutputFile.Write("{0} {1} => {2}; ", trace.address, trace.before, trace.after);
+                    CPOutputFile.WriteLine();
                 }
             }
             lastRTTask?.Wait(); // wait the last launch to complete
@@ -80,14 +86,14 @@ namespace SimulatorCLI
                 RT.EndTrace();
                 if (!disableTrace)
                 {
-                    Console.Write($"P{pixelID}: ");
+                    RTOutputFile.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
-                        Console.Write("S{0} {1} => {2}; ", trace.id, trace.before.i, trace.after.i);
+                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.i, trace.after.i);
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
-                        Console.Write("V{0} {1} => {2}; ", trace.id, trace.before, trace.after);
+                        RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, trace.before, trace.after);
                     foreach (var trace in RT.DataMemory.TraceLog)
-                        Console.Write("{0} {1} => {2}; ", trace.address, trace.before, trace.after);
-                    Console.WriteLine();
+                        RTOutputFile.Write("{0} {1} => {2}; ", trace.address, trace.before, trace.after);
+                    RTOutputFile.WriteLine();
                 }
             }
         }
