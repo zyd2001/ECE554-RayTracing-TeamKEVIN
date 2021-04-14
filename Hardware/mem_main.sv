@@ -6,7 +6,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     parameter NUM_BANK_PTHREAD = 4;
     localparam NUM_BANK = NUM_THREAD * NUM_BANK_PTHREAD;
     localparam CYCLE_TO_FINISH = 4;
-    localparam FIN_COUNTER_BIT = $clog2(CYCLE_TO_FINISH);
+    localparam FIN_COUNTER_BIT = $clog2(CYCLE_TO_FINISH+1);
 
     input clk, rst_n;
 
@@ -78,17 +78,21 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
 
 
     //Memory IO logic
+    logic we_bank_0[NUM_THREAD-1:0];
     logic we_bank[NUM_THREAD-1:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
+                if (!rst_n) begin
+                    we_bank_0[i] <= 1'b0;
                     we_bank[i] <= 1'b0;
+                end
                 else begin
-                    we_bank[i] <= (addr_RT[0][21:16] == i) 
-                               || (addr_RT[1][21:16] == i) 
-                               || (addr_RT[2][21:16] == i) 
-                               || (addr_RT[3][21:16] == i); 
+                    we_bank_0[i] <= ((addr_RT[0][21:16] == i) | we_RT[0])
+                                 || ((addr_RT[1][21:16] == i) | we_RT[1])
+                                 || ((addr_RT[2][21:16] == i) | we_RT[2])
+                                 || ((addr_RT[3][21:16] == i) | we_RT[3]);
+                    we_bank[i] = we_bank_0[i];
                 end
             end
         end

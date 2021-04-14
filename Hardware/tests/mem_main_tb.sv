@@ -3,8 +3,8 @@ module mem_main_tb();
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
-    localparam TESTS=10;
-    localparam TEST_CYCLE = 1000;
+    localparam TESTS=1;
+    localparam TEST_CYCLE = 50;
     
     logic clk;
     logic rst_n;
@@ -32,11 +32,12 @@ module mem_main_tb();
     mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                   data_RT_out, rdy_RT, data_MC_out, rdy_MC);
     
-    logic [127:0] data_RT_copy[NUM_RT-1:0];
-    logic [31:0] addr_RT_copy[NUM_RT-1:0];
+    logic [127:0] data_RT_copy[NUM_RT:0];
+    logic [31:0] addr_RT_copy[NUM_RT:0];
     int error = 0;
+    int test_count = 0;
     initial begin
-        clk = 0;
+        clk = 1;
         rst_n = 1;
         we_RT = '{NUM_RT{1'b0}};
         re_RT = '{NUM_RT{1'b0}};
@@ -57,43 +58,59 @@ module mem_main_tb();
         for(int test = 0; test < TESTS; test++) begin
             for(int k = 0; k < TEST_CYCLE; k++) begin
                 // test foreach core
-                for(int i = 0; i < NUM_RT; i++) begin
+                for(int i = NUM_RT-1; i >= 0; i--) begin
                     if(!we_RT[i] & !re_RT[i]) begin
-                        we_RT[i] = $random;
-                        data_RT_in[i] = $random;
+                        we_RT[i] = 1'b1;//$random;
+                        data_RT_in[i] = {$random,$random,$random,$random};
                         addr_RT_rand[i] = $random;
                         addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
+                        // avoid conflict
+                        for(int j = 0; j < NUM_RT; j++) begin
+                            while(addr_RT[i][21:16] === data_RT_copy[j][21:16]) begin
+                                addr_RT_rand[i] = $random;
+                                addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
+                            end
+                        end
                     end
                     if(we_RT[i] & !re_RT[i]) begin
-                        data_RT_copy[i] = data_RT_in[i];
-                        addr_RT_copy[i] = addr_RT[i];
+                        data_RT_copy[i+1] = data_RT_in[i];
+                        addr_RT_copy[i+1] = addr_RT[i];
+                        if(i == 0) begin
+                            data_RT_copy[0] = data_RT_copy[NUM_RT];
+                            addr_RT_copy[0] = addr_RT_copy[NUM_RT];
+                        end
                     end
                 end
                 @(posedge clk);
+                @(negedge clk);
+                // test read
                 for(int j = 0; j < NUM_RT; j++)begin
                     if(rdy_RT[j]) begin
                         if(we_RT[j]) begin
                             re_RT[j] = we_RT[j];
                             we_RT[j] = 0;
+                            addr_RT[j] = addr_RT_copy[j];
                         end
                         else if(re_RT[j]) begin
+                            test_count ++;
                             if(data_RT_copy[j] !== data_RT_out[j]) begin
+                                $display("Error! At cycle: %d, Failed R at address: 0x%h, port %d, data expecting: 0x%h, data got: 0x%h", 
+                                        k, addr_RT_copy[j], j, data_RT_copy[j], data_RT_out[j]); 
                                 error ++;
-                                $display("Error! Failed W/R at address: 0x%h, port %d, data expecting: 0x%h, data got: 0x%h", 
-                                     addr_RT_copy[j], j, data_RT_copy[j], data_RT_out[j]); 
+                                //$stop();
                             end
-                            re_RT[j] = 0;
+                            //re_RT[j] = 0;
                         end
                     end
-                end    
-                @(negedge clk);
+                end
             end
         end
         if(error == 0) begin
-            $display("All test passed!!!"); 
+            $display("All <%d> tests passed!!!", test_count); 
         end
         else begin
-            $display("No! there are %d errors", error);
+            $display("In all <%d> tests, there are <%d> errors", test_count, error);
         end
+        $stop();
     end
 endmodule
