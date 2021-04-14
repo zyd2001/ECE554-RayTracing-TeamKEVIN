@@ -98,6 +98,16 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
         end
     endgenerate
 
+    logic [13:0] addr_pre[NUM-RT-1:0][3:0];
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            assign addr_pre[i][0] = addr_RT[i][15:2];
+            assign addr_pre[i][1] = addr_RT[i][15:2] + 14'h1;
+            assign addr_pre[i][2] = addr_RT[i][15:2] + 14'h2;
+            assign addr_pre[i][3] = addr_RT[i][15:2] + 14'h3;
+        end
+    endgenerate
+
     logic [11:0] addr_bank_0[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
@@ -109,22 +119,22 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                     addr_bank_0[i][3] <= 12'b0;
 					 end
                 else begin
-                    addr_bank_0[i][0] <= addr_RT[i][3:2] == 2'h0 ? addr_RT[i][13:2]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h0 ? (addr_RT[i][13:2] + 12'h1)
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h0 ? (addr_RT[i][13:2] + 12'h2)
-                                        : (addr_RT[i][13:2] + 12'h3);
-                    addr_bank_0[i][1] <= addr_RT[i][3:2] == 2'h1 ? addr_RT[i][13:2]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h1 ? (addr_RT[i][13:2] + 12'h1)
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h1 ? (addr_RT[i][13:2] + 12'h2)
-                                        : (addr_RT[i][13:2] + 12'h3);      
-                    addr_bank_0[i][2] <= addr_RT[i][3:2] == 2'h2 ? addr_RT[i][13:2]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h2 ? (addr_RT[i][13:2] + 12'h1)
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h2 ? (addr_RT[i][13:2] + 12'h2)
-                                        : (addr_RT[i][13:2] + 12'h3);
-                    addr_bank_0[i][3] <= addr_RT[i][3:2] == 2'h3 ? addr_RT[i][13:2]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h3 ? (addr_RT[i][13:2] + 12'h1)
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h3 ? (addr_RT[i][13:2] + 12'h2)
-                                        : (addr_RT[i][13:2] + 12'h3);
+                    addr_bank_0[i][0] <= addr_pre[i][0][1:0] == 2'h0 ? addr_pre[i][0][13:2]
+                                        : addr_pre[i][1][1:0]  == 2'h0 ? addr_pre[i][1][13:2]
+                                        : addr_pre[i][2][1:0]  == 2'h0 ? addr_pre[i][2][13:2]
+                                        : addr_pre[i][3][13:2];
+                    addr_bank_0[i][1] <= addr_pre[i][0][1:0] == 2'h1 ? addr_pre[i][0][13:2]
+                                        : addr_pre[i][1][1:0]  == 2'h1 ? addr_pre[i][1][13:2]
+                                        : addr_pre[i][2][1:0]  == 2'h1 ? addr_pre[i][2][13:2]
+                                        : addr_pre[i][3][13:2];      
+                    addr_bank_0[i][2] <= addr_pre[i][0][1:0] == 2'h2 ? addr_pre[i][0][13:2]
+                                        : addr_pre[i][1][1:0]  == 2'h2 ? addr_pre[i][1][13:2]
+                                        : addr_pre[i][2][1:0]  == 2'h2 ? addr_pre[i][2][13:2]
+                                        : addr_pre[i][3][13:2];
+                    addr_bank_0[i][3] <= addr_pre[i][0][1:0] == 2'h3 ? addr_pre[i][0][13:2]
+                                        : addr_pre[i][1][1:0]  == 2'h3 ? addr_pre[i][1][13:2]
+                                        : addr_pre[i][2][1:0]  == 2'h3 ? addr_pre[i][2][13:2]
+                                        : addr_pre[i][3][13:2];
 					end
             end
         end
@@ -141,21 +151,21 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                     data_bank_0[i][3] <= 32'b0;
 					 end
                 else begin
-                    data_bank_0[i][0] <= addr_RT[i][3:2] == 2'h0 ? data_RT_in[i][31:0]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h0 ? data_RT_in[i][63:32]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h0 ? data_RT_in[i][95:64]
+                    data_bank_0[i][0] <= addr_pre[i][0][1:0] == 2'h0 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][1][1:0] == 2'h0 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][2][1:0] == 2'h0 ? data_RT_in[i][95:64]
                                         : data_RT_in[i][127:96];
-                    data_bank_0[i][1] <= addr_RT[i][3:2] == 2'h1 ? data_RT_in[i][31:0]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h1 ? data_RT_in[i][63:32]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h1 ? data_RT_in[i][95:64]
+                    data_bank_0[i][1] <= addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][0][1:0] == 2'h1 ? data_RT_in[i][95:64]
                                         : data_RT_in[i][127:96];      
-                    data_bank_0[i][2] <= addr_RT[i][3:2] == 2'h2 ? data_RT_in[i][31:0]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h2 ? data_RT_in[i][63:32]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h2 ? data_RT_in[i][95:64]
+                    data_bank_0[i][2] <= addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][0][1:0] == 2'h2 ? data_RT_in[i][95:64]
                                         : data_RT_in[i][127:96];
-                    data_bank_0[i][3] <= addr_RT[i][3:2] == 2'h3 ? data_RT_in[i][31:0]
-                                        : (addr_RT[i][3:2] + 2'h1) == 2'h3 ? data_RT_in[i][63:32]
-                                        : (addr_RT[i][3:2] + 2'h2) == 2'h3 ? data_RT_in[i][95:64]
+                    data_bank_0[i][3] <= addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][31:0]
+                                        : addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][63:32]
+                                        : addr_pre[i][0][1:0] == 2'h3 ? data_RT_in[i][95:64]
                                         : data_RT_in[i][127:96];
 					end
 				end
