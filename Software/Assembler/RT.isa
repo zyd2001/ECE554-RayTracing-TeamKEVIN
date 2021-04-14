@@ -2,17 +2,17 @@ s_load_4byte r r i
 101100 5 5 16
 s_store_4byte r r i
 111100 5 5 16
-s_write_high r x i
+s_write_high r x ui
 100000 5 5 16
-s_write_low r x i
+s_write_low r x ui
 100001 5 5 16
-s_get_from_v r x r x index
+s_get_from_v r x r x ui
 100101 5 1 4 14 2
 v_load_16byte x r r i
 101111 1 4 5 16
-v_store_16byte x r r i
+v_store_16byte x r r ui
 111111 1 4 5 16
-v_get_from_s r x r x index
+v_get_from_s r x r x ui
 100111 5 1 4 14 2
 vv_add x r x r x r x
 000000 1 4 1 4 1 4 11
@@ -50,13 +50,13 @@ ff_mul r r r x
 010010 5 5 5 11
 ff_div r r r x
 010011 5 5 5 11
-ii_addi r r x
+ii_addi r r i
 101000 5 5 16
-ii_subi r r x
+ii_subi r r i
 101001 5 5 16
-ii_muli r r x
+ii_muli r r i
 101010 5 5 16
-ii_divi r r x
+ii_divi r r i
 101011 5 5 16
 not r r x
 001100 5 5 16
@@ -88,24 +88,16 @@ bge x l
 110011 10 16
 ble x l
 110100 10 16
-jmp x l
-110101 10 16
-jmp_link x l
+real_jmp x i
 110110 10 16
 ret x
 110111 26
 fin x
 111011 26
-s_load_label r l
-# s_load_4byte $r0 R31 $l
-v_load_label r l
-# v_load_16byte $r0 R31 $l
-s_store_label r l
-# s_store_4byte $r0 R31 $l
-v_store_label r l
-# v_store_16byte $r0 R31 $l
-load_addr r l
-# ii_addi $r0 R31 $l
+jmp l
+# real_jmp $l
+jmp_link l
+# ii_addi R30 R31 4, real_jmp $l
 ii_mod r r r
 # ii_div $r0 $r1 $r2, ii_mul $r0 $r0 $r2, ii_sub $r0 $r1 $r0
 ii_modi r r i

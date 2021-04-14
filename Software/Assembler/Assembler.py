@@ -12,7 +12,7 @@ parser.add_argument('-p', help='print the output in binary', action='store_true'
 args = parser.parse_args()
     
 # TODO: add some debug info in output
-
+# TODO: add comment support
 # Parse the ISA structure
 def parseISA(file):
     f = open(file)
@@ -35,7 +35,15 @@ def error(msg):
     print(msg)
     quit()
 
-def binary(num, bits):
+def binary(num, bits, unsigned=False):
+    if unsigned:
+        if num < 0:
+            return ''
+        if num >= (1 << bits):
+            return ''
+    else:
+        if abs(num) >= (1 << (bits-1)):
+            return ''
     if num >= 0:
         s = bin(num)[2:]
         if len(s) < bits:
@@ -72,6 +80,7 @@ class Assembler:
         if not genLabeled and 'l' in entry['args']:
             rets.append((len(entry['pseudo']), self.lineCounter, tokens, tokens[0]))
             return rets
+        line = 0
         for rule in entry['pseudo']:
             trans = rule.split()
             retTokens = []
@@ -86,7 +95,7 @@ class Assembler:
                 elif args[i] == 'l':
                     if tokens[i + 1] in self.labels:
                         target = self.labels[tokens[i + 1]]
-                        offset = target - self.PCCounter - 4
+                        offset = target - (self.PCCounter + line * 4) - 4
                         l = str(offset)
                 elif args[i] == 'i':
                     imm = tokens[i + 1]
@@ -105,6 +114,7 @@ class Assembler:
                 else:
                     retTokens.append(i)
             rets.append((retTokens, retIns))
+            line += 1
         return rets
 
     def genCode(self, tokens, ins, genLabeled=False):
@@ -131,25 +141,34 @@ class Assembler:
                     t = tokens[i - skip + 1].lower()
                     if arg[0] == 'r':
                         if t[0] != 'r':
-                            self.err('syntax error')
+                            self.err('syntax error, expect register. Got: ' + t)
                         reg = int(t[1:])
-                        if reg >= 2**arg[1]:
-                            self.err('syntax error')
-                        code += binary(reg, arg[1])
+                        reg = binary(reg, arg[1], True)
+                        if not reg:
+                            self.err('register out of range: ' + t)
+                        code += reg
                     elif arg[0] == 'i':
                         imm = int(t)
-                        if imm >= 2**arg[1]:
-                            self.err('too large immediate')
-                        code += binary(imm, arg[1])
+                        imm = binary(imm, arg[1])
+                        if not imm:
+                            self.err('too large immediate: ' + t)
+                        code += imm
+                    elif arg[0] == 'ui':
+                        imm = int(t)
+                        imm = binary(imm, arg[1], True)
+                        if not imm:
+                            self.err('too large unsigned immediate: ' + t)
+                        code += imm
                     elif arg[0] == 'l':
                         if genLabeled:
                             l = tokens[i - skip + 1] # case-sensitive
                             if l in self.labels:
                                 target = self.labels[l]
                                 offset = target - self.PCCounter - 4
-                                if offset >= 2**arg[1]:
-                                    self.err('cannot reach the label')
-                                code += binary(offset, arg[1])
+                                offset = binary(offset, arg[1])
+                                if not offset:
+                                    self.err('cannot reach the label ' + l)
+                                code += offset
                         else:
                             self.linesWaiting.append((self.PCCounter, self.lineCounter, tokens, ins))
                             # still return a string for placeholder
