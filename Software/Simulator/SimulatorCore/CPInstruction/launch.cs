@@ -9,7 +9,7 @@ namespace SimulatorCore
             this.r0 = r0;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
 
         }

@@ -22,7 +22,7 @@ namespace SimulatorTest
 
             m.Write(15, BitConverter.GetBytes(2500));
             s_load_4byte ld = new s_load_4byte(0, 1, 15);
-            ld.process(vRF, sRF, m, ic);
+            ld.Process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(2500, sRF[0].i);
         }
 
@@ -40,8 +40,8 @@ namespace SimulatorTest
             s_store_4byte st = new s_store_4byte(0, 1, 15);
 
             s_load_4byte ld = new s_load_4byte(1, 5, 15);
-            st.process(vRF, sRF, m, ic);
-            ld.process(vRF, sRF, m, ic);
+            st.Process(vRF, sRF, m, ic);
+            ld.Process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(51, sRF[1].i);
         }
 
@@ -59,7 +59,7 @@ namespace SimulatorTest
 
 
             s_write_high swh = new s_write_high(0, 43724);
-            swh.process(vRF, sRF, m, ic);
+            swh.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(-1429471232, sRF[0].i);
 
@@ -79,7 +79,7 @@ namespace SimulatorTest
 
 
             s_write_low swl = new s_write_low(0, 43724);
-            swl.process(vRF, sRF, m, ic);
+            swl.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(43724, sRF[0].i);
 
@@ -99,7 +99,7 @@ namespace SimulatorTest
             vRF[0] = new Vector4(5, 6, 7, 8);
             s_get_from_v g = new s_get_from_v(0, 0, 1);
 
-            g.process(vRF, sRF, m, ic);
+            g.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(6, sRF[0].i);
 
@@ -122,8 +122,8 @@ namespace SimulatorTest
 
             v_load_16byte vl = new v_load_16byte(0, 1, 15);
 
-            vs.process(vRF, sRF, m, ic);
-            vl.process(vRF, sRF, m, ic);
+            vs.Process(vRF, sRF, m, ic);
+            vl.Process(vRF, sRF, m, ic);
             //Console.Write(MemoryMarshal.Read<int>(m.read(1)));
             //Console.Write(MemoryMarshal.Read<float>(BitConverter.GetBytes((float)5)));
             Console.Write(vRF[0]);
@@ -149,7 +149,7 @@ namespace SimulatorTest
 
             Vector4 ans = new Vector4(6, 8, 10, 12);
 
-            va.process(vRF, sRF, m, ic);
+            va.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>(ans.X, vRF[0].X);
             Assert.AreEqual<float>(ans.Y, vRF[0].Y);
@@ -176,7 +176,7 @@ namespace SimulatorTest
 
             Vector4 ans = new Vector4(-4, -4, -4, -4);
 
-            vs.process(vRF, sRF, m, ic);
+            vs.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>(ans.X, vRF[0].X);
             Assert.AreEqual<float>(ans.Y, vRF[0].Y);
@@ -203,7 +203,7 @@ namespace SimulatorTest
 
             Vector4 ans = new Vector4(5, 12, 21, 32);
 
-            vs.process(vRF, sRF, m, ic);
+            vs.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>(ans.X, vRF[0].X);
             Assert.AreEqual<float>(ans.Y, vRF[0].Y);
@@ -230,7 +230,7 @@ namespace SimulatorTest
 
             Vector4 ans = new Vector4((float)1 / 5, (float)1 / 3, (float)3 / 7, (float)4 / 8);
 
-            vd.process(vRF, sRF, m, ic);
+            vd.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>(ans.X, vRF[0].X);
             Assert.AreEqual<float>(ans.Y, vRF[0].Y);
@@ -257,7 +257,7 @@ namespace SimulatorTest
 
 
 
-            dot.process(vRF, sRF, m, ic);
+            dot.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>(70, sRF[0].f);
 
@@ -281,7 +281,7 @@ namespace SimulatorTest
 
 
 
-            mn.process(vRF, sRF, m, ic);
+            mn.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>((float)Math.Sqrt(Math.Pow(1, 2) + Math.Pow(2, 2) + Math.Pow(3, 2)), sRF[0].f);
 
@@ -306,7 +306,7 @@ namespace SimulatorTest
 
 
 
-            vs.process(vRF, sRF, m, ic);
+            vs.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>((float)5, vRF[0].Z);
 
@@ -332,7 +332,7 @@ namespace SimulatorTest
 
 
 
-            n.process(vRF, sRF, m, ic);
+            n.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(-11, sRF[0].i);
 
@@ -359,7 +359,7 @@ namespace SimulatorTest
 
 
 
-            a.process(vRF, sRF, m, ic);
+            a.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(8, sRF[0].i);
 
@@ -386,7 +386,7 @@ namespace SimulatorTest
 
 
 
-            o.process(vRF, sRF, m, ic);
+            o.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(11, sRF[0].i);
 
@@ -413,7 +413,7 @@ namespace SimulatorTest
 
 
 
-            x.process(vRF, sRF, m, ic);
+            x.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(3, sRF[0].i);
 
@@ -440,7 +440,7 @@ namespace SimulatorTest
 
 
 
-            it.process(vRF, sRF, m, ic);
+            it.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<float>((float)10, sRF[0].f);
 
@@ -467,7 +467,7 @@ namespace SimulatorTest
 
 
 
-            ft.process(vRF, sRF, m, ic);
+            ft.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>((int)10, sRF[0].i);
 
@@ -493,12 +493,12 @@ namespace SimulatorTest
 
             cmp_v c = new cmp_v(1, 2);
 
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(3, sRF[32].i);
 
             vRF[2] = new Vector4(1, 2, 3, 4);
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(0, sRF[32].i);
         }
@@ -522,20 +522,20 @@ namespace SimulatorTest
 
             sRF[1] = 1;
             sRF[2] = 1;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(0, sRF[32].i);
 
             sRF[1] = 1;
             sRF[2] = 2;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(1, sRF[32].i);
 
 
             sRF[1] = 2;
             sRF[2] = 1;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(2, sRF[32].i);
 
@@ -561,20 +561,20 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(0, sRF[32].i);
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)2;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(1, sRF[32].i);
 
 
             sRF[1] = (float)2.5;
             sRF[2] = (float)1;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(2, sRF[32].i);
 
@@ -601,17 +601,17 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(0, sRF[31].i);
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)2;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(5, sRF[31].i);
 
@@ -640,17 +640,17 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(0, sRF[31].i);
 
             sRF[1] = (float)2;
             sRF[2] = (float)1;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(5, sRF[31].i);
 
@@ -679,17 +679,17 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(0, sRF[31].i);
 
             sRF[1] = (float)1;
             sRF[2] = (float)2;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(5, sRF[31].i);
 
@@ -718,17 +718,17 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(5, sRF[31].i);
 
             sRF[1] = (float)2;
             sRF[2] = (float)1;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(10, sRF[31].i);
 
@@ -757,17 +757,17 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(5, sRF[31].i);
 
             sRF[1] = (float)1;
             sRF[2] = (float)2;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(10, sRF[31].i);
 
@@ -796,17 +796,17 @@ namespace SimulatorTest
 
             sRF[1] = (float)1.5;
             sRF[2] = (float)1.5;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(5, sRF[31].i);
 
             sRF[1] = (float)2;
             sRF[2] = (float)1;
-            c.process(vRF, sRF, m, ic);
+            c.Process(vRF, sRF, m, ic);
 
-            b.process(vRF, sRF, m, ic);
+            b.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual<int>(10, sRF[31].i);
 
@@ -833,7 +833,7 @@ namespace SimulatorTest
             jmp j = new jmp(10);
 
 
-            j.process(vRF, sRF, m, ic);
+            j.Process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(10, sRF[31].i);
 
 
@@ -859,12 +859,12 @@ namespace SimulatorTest
 
             sRF[31] = 1;
 
-            j.process(vRF, sRF, m, ic);
+            j.Process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(1, sRF[30].i);
             Assert.AreEqual<int>(11, sRF[31].i);
 
             ret r = new ret();
-            r.process(vRF, sRF, m, ic);
+            r.Process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(1, sRF[31]);
 
         }
@@ -887,8 +887,8 @@ namespace SimulatorTest
             s_push pu = new s_push(0);
             s_pop po = new s_pop(0);
 
-            pu.process(vRF, sRF, m, ic);
-            po.process(vRF, sRF, m, ic);
+            pu.Process(vRF, sRF, m, ic);
+            po.Process(vRF, sRF, m, ic);
             Assert.AreEqual<int>(15, sRF[0].i);
 
 
@@ -911,8 +911,8 @@ namespace SimulatorTest
 
             v_pop vl = new v_pop(0);
 
-            vs.process(vRF, sRF, m, ic);
-            vl.process(vRF, sRF, m, ic);
+            vs.Process(vRF, sRF, m, ic);
+            vl.Process(vRF, sRF, m, ic);
             //Console.Write(MemoryMarshal.Read<int>(m.read(1)));
             //Console.Write(MemoryMarshal.Read<float>(BitConverter.GetBytes((float)5)));
             Console.Write(vRF[0]);
@@ -1050,7 +1050,7 @@ namespace SimulatorTest
 
             sRF[1] = (float)16.0;
             s_sqrt sq = new s_sqrt(0, 1);
-            sq.process(vRF, sRF, m, ic);
+            sq.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual(4.0, sRF[0].f);
 
@@ -1068,7 +1068,7 @@ namespace SimulatorTest
 
             vRF[0] = new Vector4(1, 2, 3, 4);
             v_reduce vr = new v_reduce(0, 0);
-            vr.process(vRF, sRF, m, ic);
+            vr.Process(vRF, sRF, m, ic);
 
             Assert.AreEqual(10, sRF[0].f);
 

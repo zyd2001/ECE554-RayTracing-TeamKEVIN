@@ -11,7 +11,7 @@ namespace SimulatorCore
             this.r2 = r2;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             RF[r0] = RF[r1] - RF[r2];
         }
@@ -33,7 +33,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             RF[r0] = RF[r1] - imm;
         }

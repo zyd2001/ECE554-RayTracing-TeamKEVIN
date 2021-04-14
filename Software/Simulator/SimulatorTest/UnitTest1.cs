@@ -21,7 +21,7 @@ namespace SimulatorTest
             RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             addi a = new addi(0, 1, 15);
-            a.process(iRF, m);
+            a.Process(iRF, m);
             Assert.AreEqual<int>(15, iRF[0]);
         }
 
@@ -33,7 +33,7 @@ namespace SimulatorTest
             RegisterFile<int> iRF = new RegisterFile<int>(16);
             Memory m = new Memory(5000);
             subi a = new subi(0, 1, 15);
-            a.process(iRF, m);
+            a.Process(iRF, m);
             Assert.AreEqual<int>(-15, iRF[0]);
 
         }
@@ -46,8 +46,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             addi a = new addi(0, 1, 2);
             muli mu = new muli(0, 0, 2);
-            a.process(iRF, m);
-            mu.process(iRF, m);
+            a.Process(iRF, m);
+            mu.Process(iRF, m);
             Assert.AreEqual<int>(4, iRF[0]);
         }
 
@@ -59,7 +59,7 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             bz b = new bz(2, 10);
 
-            b.process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(10, iRF[15]);
         }
 
@@ -71,8 +71,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             bz b = new bz(2, 10);
-            a.process(iRF, m);
-            b.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(0, iRF[15]);
         }
 
@@ -85,8 +85,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             bnz b = new bnz(2, 10);
-            a.process(iRF, m);
-            b.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(10, iRF[15]);
         }
 
@@ -98,7 +98,7 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             bnz b = new bnz(2, 10);
 
-            b.process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(0, iRF[15]);
         }
 
@@ -110,7 +110,7 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             bge b = new bge(2, 10);
 
-            b.process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(10, iRF[15]);
         }
 
@@ -122,8 +122,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             bge b = new bge(2, 10);
-            a.process(iRF, m);
-            b.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(10, iRF[15]);
         }
 
@@ -135,8 +135,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             subi a = new subi(2, 0, 1);
             bge b = new bge(2, 10);
-            a.process(iRF, m);
-            b.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(0, iRF[15]);
         }
 
@@ -148,7 +148,7 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             ble b = new ble(2, 10);
 
-            b.process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(10, iRF[15]);
         }
 
@@ -160,8 +160,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             addi a = new addi(2, 0, 1);
             ble b = new ble(2, 10);
-            a.process(iRF, m);
-            b.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(0, iRF[15]);
         }
 
@@ -173,8 +173,8 @@ namespace SimulatorTest
             Memory m = new Memory(5000);
             subi a = new subi(2, 0, 1);
             ble b = new ble(2, 10);
-            a.process(iRF, m);
-            b.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
             Assert.AreEqual<int>(10, iRF[15]);
         }
 
@@ -189,7 +189,7 @@ namespace SimulatorTest
             m.Write(15, val);
             ld l = new ld(0, 1, 15);
 
-            l.process(iRF, m);
+            l.Process(iRF, m);
 
             Assert.AreEqual(5, iRF[0]);
 
@@ -208,10 +208,10 @@ namespace SimulatorTest
             st s = new st(0, 1, 1);
             ld l = new ld(0, 1, 1);
 
-            a.process(iRF, m);
-            b.process(iRF, m);
-            s.process(iRF, m);
-            l.process(iRF, m);
+            a.Process(iRF, m);
+            b.Process(iRF, m);
+            s.Process(iRF, m);
+            l.Process(iRF, m);
 
             Assert.AreEqual(1, iRF[0]);
 

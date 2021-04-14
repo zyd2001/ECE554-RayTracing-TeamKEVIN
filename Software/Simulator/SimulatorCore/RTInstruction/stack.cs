@@ -14,7 +14,7 @@ namespace SimulatorCore
             this.r0 = r0;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[29] = sRF[29] + 4;
             var bytes = BitConverter.GetBytes(sRF[r0]);
@@ -39,7 +39,7 @@ namespace SimulatorCore
             this.r0 = r0;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[29] == 0)
             {
@@ -68,7 +68,7 @@ namespace SimulatorCore
             this.r0 = r0;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             sRF[29] = sRF[29] + 4;
             mem.Write(sRF[29] + sRF[28], BitConverter.GetBytes(vRF[r0].X));
@@ -98,7 +98,7 @@ namespace SimulatorCore
             this.r0 = r0;
         }
 
-        internal override void process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
             if (sRF[29] == 0)
             {

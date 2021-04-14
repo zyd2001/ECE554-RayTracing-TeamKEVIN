@@ -27,9 +27,9 @@ namespace SimulatorCLI
             }
             Simulator sim = new Simulator(CP, RT, DT, CPMSize, RTMSize, Triangle, CPO, RTO);
             if (CP != null)
-                sim.run();
+                sim.Run();
             else
-                sim.runRT(0);
+                sim.RunRT(0);
         }
 
     }

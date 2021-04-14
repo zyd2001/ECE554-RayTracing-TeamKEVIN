@@ -13,7 +13,7 @@ namespace SimulatorCore
             this.imm = imm;
         }
 
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
             RF[r0] = MemoryMarshal.Read<int>(mem.Read(RF[r1] + imm));
 

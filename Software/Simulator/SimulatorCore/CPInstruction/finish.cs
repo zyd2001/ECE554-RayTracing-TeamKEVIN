@@ -5,7 +5,7 @@ namespace SimulatorCore
         internal finish()
         {
         }
-        internal override void process(RegisterFile<int> RF, Memory mem)
+        internal override void Process(RegisterFile<int> RF, Memory mem)
         {
         }
         public override string ToString()
