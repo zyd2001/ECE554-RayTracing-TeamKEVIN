@@ -102,3 +102,11 @@ ii_mod r r r
 # ii_div $r0 $r1 $r2, ii_mul $r0 $r0 $r2, ii_sub $r0 $r1 $r0
 ii_modi r r i
 # ii_divi $r0 $r1 $i, ii_muli $r0 $r0 $i, ii_sub $r0 $r1 $r0
+s_pop r
+# ii_addi R29 R29 -4, s_load_4byte $r0 R29 0
+s_push r
+# s_store_4byte $r0 R29 0, ii_addi R29 R29 4
+v_pop r
+# ii_addi R29 R29 -16, v_load_16byte $r0 R29 0
+v_push r
+# v_store_4byte $r0 R29 0, ii_addi R29 R29 16
