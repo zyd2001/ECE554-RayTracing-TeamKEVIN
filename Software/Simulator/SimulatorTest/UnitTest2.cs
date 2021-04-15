@@ -818,7 +818,7 @@ namespace SimulatorTest
         [TestMethod]
         public void TestMethod29()
         {
-            // testing jmp
+            // testing real_jmp
 
             RegisterFile<Vector4> vRF = new RegisterFile<Vector4>(32);
             RegisterFile<Scalar> sRF = new RegisterFile<Scalar>(33);
@@ -830,7 +830,7 @@ namespace SimulatorTest
 
 
 
-            jmp j = new jmp(10);
+            real_jmp j = new real_jmp(10);
 
 
             j.Process(vRF, sRF, m, ic);
@@ -972,8 +972,8 @@ namespace SimulatorTest
             Assert.AreEqual("ii_divi r1 r2 3", ii_divi.ToString());
             itof itof = new itof(1, 2);
             Assert.AreEqual("itof r1 r2", itof.ToString());
-            jmp jmp = new jmp(1);
-            Assert.AreEqual("jmp 1", jmp.ToString());
+            real_jmp real_jmp = new real_jmp(1);
+            Assert.AreEqual("real_jmp 1", real_jmp.ToString());
             jmp_link jmp_link = new jmp_link(1);
             Assert.AreEqual("jmp_link 1", jmp_link.ToString());
             not not = new not(1, 2);
