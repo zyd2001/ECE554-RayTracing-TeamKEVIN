@@ -37,7 +37,7 @@ namespace SimulatorCore
             if (ins is fin)
                 return true;
             ScalarRegisterFile[31] += 4;
-            ins.process(VectorRegisterFile, ScalarRegisterFile, DataMemory, IC);
+            ins.Process(VectorRegisterFile, ScalarRegisterFile, DataMemory, IC);
             return false;
         }
 
