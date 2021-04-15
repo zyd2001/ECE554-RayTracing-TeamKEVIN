@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace SimulatorCore
 {
-    class jmp : RTInstruction
+    class real_jmp : RTInstruction
     {
         int imm;
 
-        internal jmp(int imm)
+        internal real_jmp(int imm)
         {
             this.imm = imm;
 

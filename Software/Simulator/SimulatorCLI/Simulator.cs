@@ -56,10 +56,12 @@ namespace SimulatorCLI
                     {
                         for (int i = 0; i < 64; i++)
                         {
+                            int pixelID = copyData[i];
                             RT.ScalarRegisterFile[28] = 0 + RT.DataMemory.Mem.Length / 64 * i; // set Stack Pointer
                             RT.ScalarRegisterFile[29] = RT.ScalarRegisterFile[28].i;
                             RT.ScalarRegisterFile[31] = 0; // set PC
-                            RunRT(copyData[i]);
+                            RT.ScalarRegisterFile[1] = pixelID;
+                            RunRT(pixelID);
                         }
                         canLaunch.Set();
                     });

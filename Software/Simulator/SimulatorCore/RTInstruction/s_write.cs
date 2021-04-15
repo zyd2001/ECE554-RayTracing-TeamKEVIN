@@ -17,9 +17,8 @@ namespace SimulatorCore
 
         internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            imm = imm << 16;
-            sRF[r0] = sRF[r0].i | imm;
-
+            uint shift = (uint)imm << 16;
+            sRF[r0] = (int)((uint)sRF[r0].i & 0x0000ffff | shift);
         }
 
         public override string ToString()
@@ -41,8 +40,7 @@ namespace SimulatorCore
 
         internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            sRF[r0] = sRF[r0].i | imm;
-
+            sRF[r0] = (int)(sRF[r0].i & 0xffff0000 | (uint)imm);
         }
 
         public override string ToString()
