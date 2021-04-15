@@ -22,10 +22,12 @@ ld r r i
 1010 4 4 20
 st r r i
 1011 4 4 20
-launch r r x
-1100 4 4 20
+launch r x
+1100 4 24
 loadt r x
 1101 4 24
+finish x 
+0100 28
 ldl r l
 # ld R15 $l
 stl r l
