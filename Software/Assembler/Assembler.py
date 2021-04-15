@@ -287,8 +287,10 @@ class Assembler:
         
         return output
 
+import sys, os
+
 if args.c:
-    CPISA = parseISA('CP.isa')
+    CPISA = parseISA(os.path.dirname(sys.argv[0]) + '/CP.isa')
     a = Assembler(CPISA)
     code = a.assemble(args.c)
     if args.p:
@@ -300,7 +302,7 @@ if args.c:
     else:
         a.output(code, args.c + '.out')
 if args.r:
-    RTISA = parseISA('RT.isa')
+    RTISA = parseISA(os.path.dirname(sys.argv[0]) + '/RT.isa')
     a = Assembler(RTISA)
     code = a.assemble(args.r)
     if args.p:
