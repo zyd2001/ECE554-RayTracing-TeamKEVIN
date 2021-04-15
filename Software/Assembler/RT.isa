@@ -10,7 +10,7 @@ s_get_from_v r x r x ui
 100101 5 1 4 14 2
 v_load_16byte x r r i
 101111 1 4 5 16
-v_store_16byte x r r ui
+v_store_16byte x r r i
 111111 1 4 5 16
 v_get_from_s r x r x ui
 100111 5 1 4 14 2
@@ -66,8 +66,8 @@ or r r r x
 001110 5 5 5 11
 xor r r r x
 001111 5 5 5 11
-trace x r x r x
-111000 1 4 1 4 16
+trace x
+111000 26
 s_itof r r x
 100010 5 5 16
 s_ftoi r r x
