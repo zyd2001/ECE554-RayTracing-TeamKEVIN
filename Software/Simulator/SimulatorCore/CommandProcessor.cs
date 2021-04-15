@@ -42,7 +42,7 @@ namespace SimulatorCore
             if (ins is finish)
                 return true;
             RegisterFile[15] += 4;
-            ins.process(RegisterFile, Memory);
+            ins.Process(RegisterFile, Memory);
             return false;
         }
 
@@ -70,7 +70,7 @@ namespace SimulatorCore
                 return true;
             }
             RegisterFile[15] += 4;
-            ins.process(RegisterFile, Memory);
+            ins.Process(RegisterFile, Memory);
             return false;
         }
 
