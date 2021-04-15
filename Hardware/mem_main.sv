@@ -5,8 +5,10 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
     localparam NUM_BANK = NUM_THREAD * NUM_BANK_PTHREAD;
-    localparam CYCLE_TO_FINISH = 4;
-    localparam FIN_COUNTER_BIT = $clog2(CYCLE_TO_FINISH+1);
+    localparam CYCLE_TO_FINISH_W = 1;
+    localparam CYCLE_TO_FINISH_R = 4;
+    localparam FIN_COUNTER_BIT_W = $clog2(CYCLE_TO_FINISH_W+1);
+    localparam FIN_COUNTER_BIT_R = $clog2(CYCLE_TO_FINISH_R+1);
 
     input clk, rst_n;
 
@@ -26,57 +28,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     output [127:0] data_MC_out;
 
     genvar i, j;
-    
-    logic [FIN_COUNTER_BIT-1:0] fin_counter_RT [NUM_RT-1:0];
-    logic fin_counter_RT_en [NUM_RT-1:0];
-    logic [FIN_COUNTER_BIT-1:0] fin_counter_MC;
-    logic fin_counter_MC_en;
-    // // ready logic for RT
-    // generate
-    //     for (i = 0; i < NUM_RT; i++) begin
-    //         assign rdy_RT[i] = fin_counter_RT[i] === CYCLE_TO_FINISH;
-    //         always_ff @(posedge clk, negedge rst_n) begin
-    //             if (!rst_n) begin
-    //                 fin_counter_RT_en[i] <= 1'b0;
-    //                 fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
-    //             end
-    //             else if(rdy_RT[i]) begin
-    //                 fin_counter_RT_en[i] <= 1'b0;
-    //                 fin_counter_RT[i] <= {FIN_COUNTER_BIT{1'b0}};
-    //             end
-    //             else if(!fin_counter_RT_en[i]) begin
-    //                 fin_counter_RT_en[i] <= we_RT[i] | re_RT[i];
-    //                 fin_counter_RT[i] <= fin_counter_RT[i] + {{(FIN_COUNTER_BIT-1){1'b0}}, (we_RT[i] | re_RT[i])};
-    //             end
-    //             else begin
-    //                 fin_counter_RT_en[i] <= fin_counter_RT_en[i];
-    //                 fin_counter_RT[i] <= fin_counter_RT[i] + 1;
-    //             end
-    //         end
-    //     end
-    // endgenerate
-    // // ready logic for MC
-    // assign rdy_MC = fin_counter_MC === CYCLE_TO_FINISH;
-    // always_ff @(posedge clk, negedge rst_n) begin
-    //     if (!rst_n) begin
-    //         fin_counter_MC_en <= 1'b0;
-    //         fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
-    //     end
-    //     else if(rdy_MC) begin
-    //         fin_counter_MC_en <= 1'b0;
-    //         fin_counter_MC <= {FIN_COUNTER_BIT{1'b0}};
-    //     end
-    //     else if(!fin_counter_MC_en) begin
-    //         fin_counter_MC_en <= re_MC;
-    //         fin_counter_MC <= fin_counter_MC + {{(FIN_COUNTER_BIT-1){1'b0}}, re_MC};
-    //     end
-    //     else begin
-    //         fin_counter_MC_en <= fin_counter_MC_en;
-    //         fin_counter_MC <= fin_counter_MC + 1;
-    //     end
-    // end
-
-
     //Memory IO logic
 
     //Write Enable (we) pipeline
@@ -158,7 +109,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     logic [11:0] addr_bank[NUM_THREAD-1:0][3:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
-            for (j = 0; j < 4; j = j + 1) begin
+            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
                 always_ff @(posedge clk, negedge rst_n) begin
                     if (!rst_n) 
                         addr_bank[i][j] <= 12'b0;
@@ -210,7 +161,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     logic [31:0] data_bank[NUM_THREAD-1:0][3:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
-            for (j = 0; j < 4; j = j + 1) begin
+            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
                 always_ff @(posedge clk, negedge rst_n) begin
                     if (!rst_n) 
                         data_bank[i][j] <= 32'b0;
@@ -230,7 +181,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     logic [31:0] q_bank[NUM_THREAD-1:0][3:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
-            for (j = 0; j < 4; j = j + 1) begin: main_memory_bank
+            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: main_memory_bank
                 single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank[i]),
                 .data(data_bank[i][j]),.addr(addr_bank[i][j]), .q(q_bank[i][j]));
             end
@@ -242,7 +193,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     logic [31:0] data_RT_out_0[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            for (j = 0; j < 4; j = j + 1) begin
+            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
                 always_ff @(posedge clk, negedge rst_n) begin
                     if (!rst_n) 
                         data_RT_out_0[i][j] <= 32'b0;
@@ -285,32 +236,32 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
     // Read Counter for each RT
     logic cnt_wr_clr[NUM_RT-1:0];
     logic cnt_wr_inc[NUM_RT-1:0];
-    logic [1:0] cnt_wr[NUM_RT-1:0];
+    logic [FIN_COUNTER_BIT_W-1:0] cnt_wr[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @( posedge clk, negedge rst_n ) begin
                 if (!rst_n)
-                    cnt_wr[i] <= 2'b0;
+                    cnt_wr[i] <= {(FIN_COUNTER_BIT_W){1'b0}};
                 else if (cnt_wr_clr[i])
-                    cnt_wr[i] <= 2'b0;
+                    cnt_wr[i] <= {(FIN_COUNTER_BIT_W){1'b0}};
                 else if (cnt_wr_inc[i])
-                    cnt_wr[i] <= cnt_wr[i] + 2'b1;
+                    cnt_wr[i] <= cnt_wr[i] + {{(FIN_COUNTER_BIT_W-1){1'b0}}, 1'b1};
             end
         end
     endgenerate
     // Write Counter for each RT
     logic cnt_rd_clr[NUM_RT-1:0];
     logic cnt_rd_inc[NUM_RT-1:0];
-    logic [2:0] cnt_rd[NUM_RT-1:0];
+    logic [FIN_COUNTER_BIT_R-1:0] cnt_rd[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @( posedge clk, negedge rst_n ) begin
                 if (!rst_n)
-                    cnt_rd[i] <= 3'b0;
+                    cnt_rd[i] <= {(FIN_COUNTER_BIT_R){1'b0}};
                 else if (cnt_rd_clr[i])
-                    cnt_rd[i] <= 3'b0;
+                    cnt_rd[i] <= {(FIN_COUNTER_BIT_R){1'b0}};
                 else if (cnt_rd_inc[i])
-                    cnt_rd[i] <= cnt_rd[i] + 3'b1;
+                    cnt_rd[i] <= cnt_rd[i] + {{(FIN_COUNTER_BIT_R-1){1'b0}}, 1'b1};
             end
         end
     endgenerate
@@ -345,7 +296,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                         end
                     end
                     READ: begin
-                        if (cnt_rd[i] == 3'b100) begin
+                        if (cnt_rd[i] == CYCLE_TO_FINISH_R) begin
                             cnt_rd_clr[i] = 1'b1;
                             rdy_RT[i] = 1'b1;
                         end
@@ -355,7 +306,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, addr_MC, re_MC,
                         end
                     end
                     default: begin
-                        if (cnt_wr[i] == 2'b11) begin
+                        if (cnt_wr[i] == CYCLE_TO_FINISH_W) begin
                             cnt_wr_clr[i] = 1'b1;
                             rdy_RT[i] = 1'b1;
                         end
