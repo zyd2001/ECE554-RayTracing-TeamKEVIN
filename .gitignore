@@ -1,5 +1,6 @@
 synth/
 .vscode/
+.venv/
 
 .venv/
 
@@ -33,4 +34,3 @@ work/
 
 *.mpf
 *.vcd
-Software/Simulator/SimulatorTest/rand_assembly.txt
