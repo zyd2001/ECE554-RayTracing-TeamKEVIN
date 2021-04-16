@@ -1,4 +1,4 @@
-module mem_main_j_tb();
+module mem_main_simple_tb();
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
