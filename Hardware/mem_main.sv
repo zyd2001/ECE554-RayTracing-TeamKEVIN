@@ -1,5 +1,5 @@
 module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                data_RT_out, rdy_RT, data_MC_out, rdy_MC);
+                data_RT_out, rd_rdy_RT, wr_rdy_RT, data_MC_out, rdy_MC);
 
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
@@ -22,7 +22,8 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
         Output
     */
     //RT
-    output rdy_RT[NUM_RT-1:0];
+    output reg rd_rdy_RT[NUM_RT-1:0];
+    output reg wr_rdy_RT[NUM_RT-1:0];
     output [127:0] data_RT_out[NUM_RT-1:0];
     //MC
     output reg rdy_MC;
@@ -34,26 +35,38 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
 
 
     //Read Ready per RT pipeline
-    //Pipeline 0-2
-    logic re_rdy_0[NUM_RT-1:0], re_rdy_1[NUM_RT-1:0], re_rdy_2[NUM_RT-1:0];
-    logic re_rdy_3[NUM_RT-1:0];
+    //Pipeline 0-3
+    logic rd_rdy_0[NUM_RT-1:0], rd_rdy_1[NUM_RT-1:0], rd_rdy_2[NUM_RT-1:0];
+    // logic rd_rdy_3[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
                 if (!rst_n) begin
-                    re_rdy_0[i] <= 1'b0;
-                    re_rdy_1[i] <= 1'b0;
-                    re_rdy_2[i] <= 1'b0;
-                    re_rdy_3[i] <= 1'b0;
+                    rd_rdy_0[i] <= 1'b0;
+                    rd_rdy_1[i] <= 1'b0;
+                    rd_rdy_2[i] <= 1'b0;
+                    rd_rdy_RT[i] <= 1'b0;
                 end
                 else begin
-                    re_rdy_0[i] <= re_RT[i];
-                    re_rdy_1[i] <= re_rdy_0[i];
-                    re_rdy_2[i] <= re_rdy_1[i];
-                    re_rdy_3[i] <= re_rdy_2[i];
+                    rd_rdy_0[i] <= re_RT[i];
+                    rd_rdy_1[i] <= rd_rdy_0[i];
+                    rd_rdy_2[i] <= rd_rdy_1[i];
+                    rd_rdy_RT[i] <= rd_rdy_2[i];
                 end
             end
-            assign rdy_RT[i] = re_rdy_3[i] | we_RT[i];
+        end
+    endgenerate
+
+    //Write Ready per RT pipeline
+    //Pipeline 0
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            always_ff @(posedge clk, negedge rst_n) begin
+                if (!rst_n)
+                    wr_rdy_RT[i] <= 1'b0;
+                else 
+                    wr_rdy_RT[i] <= we_RT[i];
+            end
         end
     endgenerate
 
