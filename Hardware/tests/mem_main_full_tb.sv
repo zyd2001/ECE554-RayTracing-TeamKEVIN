@@ -41,6 +41,7 @@ module mem_main_full_tb();
     int k = 0;
     initial begin
         for(int test = 0; test < TESTS; test++) begin
+            $display("Test %d starting... ", test);
             clk = 1;
             rst_n = 1;
             we_RT = '{NUM_RT{1'b0}};
@@ -71,7 +72,7 @@ module mem_main_full_tb();
                         data_RT_in[i] = {$random,$random,$random,$random};
                         addr_RT_rand[i] ++;
                         addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
-                        if(k % 4096 == 0) begin
+                        if(k % 16384 == 0) begin
                             $display("current address 0x%h", addr_RT[i]);
                         end
                     end
