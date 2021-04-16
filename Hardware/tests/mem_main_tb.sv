@@ -35,6 +35,7 @@ module mem_main_tb();
     logic [127:0] data_RT_copy[NUM_RT+1:0];
     logic [31:0] addr_RT_copy[NUM_RT+1:0];
     logic we_RT_copy[NUM_RT+1:0];
+    logic RT_busy[NUM_RT-1:0];
     int error = 0;
     int test_count = 0;
     initial begin
@@ -43,6 +44,7 @@ module mem_main_tb();
             rst_n = 1;
             we_RT = '{NUM_RT{1'b0}};
             re_RT = '{NUM_RT{1'b0}};
+            RT_busy = '{NUM_RT{1'b0}};
             for(int i=0;i<NUM_RT;++i) begin
                 addr_RT[i] = 32'b0;
                 data_RT_in[i] = 128'b0;
@@ -60,7 +62,8 @@ module mem_main_tb();
             for(int k = 0; k < TEST_CYCLE; k++) begin
                 // test foreach core
                 for(int i = NUM_RT-1; i >= 0; i--) begin
-                    if(!we_RT[i] & !re_RT[i]) begin
+                    if(!RT_busy[i]) begin
+                        RT_busy[i] = 1'b1;
                         we_RT[i] = 1'b1;
                         data_RT_in[i] = {$random,$random,$random,$random};
                         addr_RT_rand[i] = $random;
@@ -93,13 +96,16 @@ module mem_main_tb();
                 @(negedge clk);
                 // test read
                 for(int j = 0; j < NUM_RT; j++)begin
+                    if(re_RT[j]) begin
+                        re_RT[j] = 1'b0;
+                    end
                     if(rdy_RT[j]) begin
                         if(we_RT[j]) begin
                             re_RT[j] = we_RT_copy[j];
                             we_RT[j] = 0;
                             addr_RT[j] = addr_RT_copy[j];
                         end
-                        else if(re_RT[j]) begin
+                        else begin
                             test_count ++;
                             if(data_RT_copy[j] !== data_RT_out[j]) begin
                                 $display("Error! At cycle: %d, Failed R at address: 0x%h, port %d, data expecting: 0x%h, data got: 0x%h", 
@@ -107,7 +113,7 @@ module mem_main_tb();
                                 error ++;
                                 //$stop();
                             end
-                            re_RT[j] = 0;
+                            RT_busy[j] = 0;
                         end
                     end
                 end
