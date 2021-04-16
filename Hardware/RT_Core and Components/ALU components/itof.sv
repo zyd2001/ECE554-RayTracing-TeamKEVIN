@@ -1,6 +1,7 @@
 module itof (
-    in, out
-);
+    in, out, clk
+); 
+    input clk;
     input signed [31:0] in;
     output [31:0] out; 
 

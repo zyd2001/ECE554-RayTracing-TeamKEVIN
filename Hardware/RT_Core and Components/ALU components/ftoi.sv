@@ -1,6 +1,7 @@
 module ftoi (
-    in, out
+    in, out, clk
 );
+    input clk;
     input [31:0] in;
     output signed [31:0] out; 
 
