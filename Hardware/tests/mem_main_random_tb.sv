@@ -1,10 +1,10 @@
-module mem_main_tb();
+module mem_main_random_tb();
     
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
-    localparam TESTS = 1;
-    localparam TEST_CYCLE = 1000;
+    localparam TESTS = 4;
+    localparam TEST_CYCLE = 100000;
     
     logic clk;
     logic rst_n;
@@ -38,8 +38,10 @@ module mem_main_tb();
     logic RT_busy[NUM_RT-1:0];
     int error = 0;
     int test_count = 0;
+    logic retry = 1'b0;
     initial begin
         for(int test = 0; test < TESTS; test++) begin
+            $display("Test %d starting... ", test);
             clk = 1;
             rst_n = 1;
             we_RT = '{NUM_RT{1'b0}};
@@ -60,6 +62,9 @@ module mem_main_tb();
             @(posedge clk) begin end
             // test on RT
             for(int k = 0; k < TEST_CYCLE; k++) begin
+                if(k%(TEST_CYCLE/10)==0)begin
+                    $display("Current test cycle: %d", k);
+                end
                 // test foreach core
                 for(int i = NUM_RT-1; i >= 0; i--) begin
                     if(!RT_busy[i]) begin
@@ -69,10 +74,16 @@ module mem_main_tb();
                         addr_RT_rand[i] = $random;
                         addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
                         // avoid conflict
-                        for(int j = 0; j < NUM_RT; j++) begin
-                            while(addr_RT[i][21:16] === data_RT_copy[j][21:16]) begin
-                                addr_RT_rand[i] = $random;
-                                addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
+                        retry = 1'b1;
+                        while(retry) begin
+                            retry = 1'b0;
+                            for(int j = NUM_RT-1; j > i; j--) begin
+                                if(addr_RT[i][21:16] == addr_RT[j][21:16]) begin
+                                    addr_RT_rand[i] = $random;
+                                    addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
+                                    retry = 1'b1;
+                                    break;
+                                end
                             end
                         end
                     end
