@@ -12,20 +12,19 @@ module mem_main_full_tb();
     logic we_RT[NUM_RT-1:0];
     logic re_RT[NUM_RT-1:0];
     logic [31:0] addr_RT[NUM_RT-1:0];
-    logic [ADDRESS_BIT-1:0] addr_RT_rand[NUM_RT-1:0];
+    logic [ADDRESS_BIT-1:0] addr_RT_base[NUM_RT-1:0];
     
 
     logic [127:0] data_RT_in[NUM_RT-1:0];
 
     logic re_MC;
-    logic [31:0] addr_MC;//
 
 
     logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
 
-    logic rdy_MC;//
-    logic [127:0] data_MC_out;//
+    logic rdy_MC;
+    logic [127:0] data_MC_out;
 
     always #1 clk = ~clk;
 
@@ -39,7 +38,7 @@ module mem_main_full_tb();
     logic RT_busy[NUM_RT-1:0];
     int error = 0;
     int test_count = 0;
-    logic end_test = 1'b0;
+    logic [1:0] end_test;
     int k = 0;
     initial begin
         for(int test = 0; test < TESTS; test++) begin
@@ -49,14 +48,13 @@ module mem_main_full_tb();
             we_RT = '{NUM_RT{1'b0}};
             re_RT = '{NUM_RT{1'b0}};
             RT_busy = '{NUM_RT{1'b0}};
-            end_test = 1'b0;
+            end_test = 2'b0;
             for(int i=0;i<NUM_RT;++i) begin
                 addr_RT[i] = 32'b0;
-                addr_RT_rand[i] = i << 18;
+                addr_RT_base[i] = i << (ADDRESS_BIT-2);
                 data_RT_in[i] = 128'b0;
             end
             re_MC = 1'b0;
-            addr_MC = 32'b0;;
 
             // reset
             @(posedge clk) begin end
@@ -65,7 +63,7 @@ module mem_main_full_tb();
             rst_n = 1'b1; // reset finished
             @(posedge clk) begin end
             // test on RT
-            while(!end_test) begin
+            while(!end_test[1]) begin
                 k++;
                 // test foreach core
                 for(int i = NUM_RT-1; i >= 0; i--) begin
@@ -73,8 +71,11 @@ module mem_main_full_tb();
                         RT_busy[i] = 1'b1;
                         we_RT[i] = 1'b1;
                         data_RT_in[i] = {$random,$random,$random,$random};
-                        addr_RT_rand[i] ++;
-                        addr_RT[i] = {{(30-ADDRESS_BIT){1'b0}}, addr_RT_rand[i], 2'b0};
+                        addr_RT[i] = {{(30-ADDRESS_BIT){1'b0}}, addr_RT_base[i], 2'b0};
+                        if(&addr_RT_base[i]) begin
+                            end_test = 2'b01;
+                        end
+                        addr_RT_base[i] ++;
                         if(k % 16384 == 0) begin
                             $display("current address 0x%h", addr_RT[i]);
                         end
@@ -116,9 +117,9 @@ module mem_main_full_tb();
                             $stop();
                         end
                         RT_busy[j] = 0;
-                    end
-                    if(&addr_RT_rand[j]) begin
-                        end_test = 1'b1;
+                        if(end_test[0])begin
+                            end_test = 2'b10;
+                        end
                     end
                 end
             end
