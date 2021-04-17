@@ -5,6 +5,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
     localparam NUM_BANK = NUM_THREAD * NUM_BANK_PTHREAD;
+    localparam BIT_THREAD = $clog2(NUM_THREAD);
 
     /*
         Input
@@ -65,10 +66,10 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
                 if (!rst_n)
                     we_bank_0[i] <= 1'b0;
                 else begin
-                    we_bank_0[i] <= ((addr_RT[0][21:16] == i) && we_RT[0])
-                                 || ((addr_RT[1][21:16] == i) && we_RT[1])
-                                 || ((addr_RT[2][21:16] == i) && we_RT[2])
-                                 || ((addr_RT[3][21:16] == i) && we_RT[3]);
+                    we_bank_0[i] <= ((addr_RT[0][BIT_THREAD+15:16] == i) && we_RT[0])
+                                 || ((addr_RT[1][BIT_THREAD+15:16] == i) && we_RT[1])
+                                 || ((addr_RT[2][BIT_THREAD+15:16] == i) && we_RT[2])
+                                 || ((addr_RT[3][BIT_THREAD+15:16] == i) && we_RT[3]);
                 end
             end
         end
@@ -95,7 +96,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     logic [11:0] addr_pre[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            assign thread_id_pre[i] = addr_RT[i][21:16];
+            assign thread_id_pre[i] = addr_RT[i][BIT_THREAD+15:16];
 
             assign addr_RT_pre[i][0] = addr_RT[i][15:2];
             assign addr_RT_pre[i][1] = addr_RT[i][15:2] + 14'h1;
@@ -110,7 +111,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
 
     //Thread ID
     //Pipeline 0-2
-    logic [5:0] thread_id_0[NUM_RT-1:0], thread_id_1[NUM_RT-1:0], thread_id_2[NUM_RT-1:0];
+    logic [BIT_THREAD-1:0] thread_id_0[NUM_RT-1:0], thread_id_1[NUM_RT-1:0], thread_id_2[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
@@ -260,11 +261,12 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     //RAM
     //Pipeline 2
     logic [31:0] q_bank_2[NUM_THREAD-1:0][3:0];
+    logic re_MC_reg;
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: main_memory_bank
                 single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank_1[i]),
-                .data(data_bank_1[i][j]),.addr(addr_bank_1[i][j]), .q(q_bank_2[i][j]));
+                .data(data_bank_1[i][j]),.addr(re_MC_reg ? 12'hFFF : addr_bank_1[i][j]), .q(q_bank_2[i][j]));
             end
         end
     endgenerate
@@ -311,52 +313,58 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     endgenerate
 
     /*
-        Control Unit for MC Read
+        Memory Controller Read Output
     */
+
     // MC Counter
-    logic cnt_mc_inc;
-    logic cnt_mc_clr;
-    logic [6:0] cnt_mc;
+    logic addr_mc_inc;
+    logic addr_mc_clr;
+    logic [BIT_THREAD:0] addr_MC;
     always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n)
-            cnt_mc <= 7'b0;
-        else if (cnt_mc_clr)
-            cnt_mc <= 7'b0;
-        else if (cnt_mc_inc)
-            cnt_mc <= cnt_mc + 7'h1;
+        if (!rst_n) 
+            addr_MC <= '0;
+        else if (addr_mc_clr) 
+            addr_MC <= '0;
+        else if (addr_mc_inc) 
+            addr_MC <= addr_MC + {{BIT_THREAD{1'b0}}, {1'b1}};
     end
 
+    assign data_MC_out = {q_bank_2[addr_MC][3], q_bank_2[addr_MC][2],
+                         q_bank_2[addr_MC][1], q_bank_2[addr_MC][0]};
+
     // State Machine for MC read
-    typedef enum reg {INI, RD} state_mc_t;
-    state_mc_t state_mc, nxt_state_mc;
+    typedef enum reg {IDLE, READ} state_t;
+    state_t state, nxt_state;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
-            state_mc <= INI;
+            state <= IDLE;
         else
-            state_mc <= nxt_state_mc;
+            state <= nxt_state;
     end
     always_comb begin
-        nxt_state_mc = INI;
-        cnt_mc_inc = 1'b0;
-        cnt_mc_clr = 1'b0;
+        nxt_state = IDLE;
+        addr_mc_inc = 1'b0;
+        addr_mc_clr = 1'b0;
+        re_MC_reg = 1'b0;
         rdy_MC = 1'b0;
-        case(state_mc)
-            INI: begin
+        
+        case(state)
+            IDLE: begin
                 if (re_MC) begin
-                    nxt_state_mc = RD;
-                    cnt_mc_inc = 1'b1;
+                    nxt_state = READ;
+                    addr_mc_inc = 1'b1;
+                    re_MC_reg = 1'b1;
                 end
             end
             default: begin
-                if (cnt_mc[6] == 1'b1) begin
-                    cnt_mc_clr = 1'b1;
-                    rdy_MC = 1'b1;
-                end
+                re_MC_reg = 1'b1;
+                rdy_MC = 1'b1;
+                if (addr_MC[BIT_THREAD] == 1'b1)
+                    addr_mc_clr = 1'b1;
                 else begin
-                    nxt_state_mc = RD;
-                    cnt_mc_inc = 1'b1;
+                    nxt_state = READ;
+                    addr_mc_inc = 1'b1;
                 end
-
             end
         endcase
     end
