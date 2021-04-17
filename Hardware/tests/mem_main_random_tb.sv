@@ -20,7 +20,7 @@ module mem_main_random_tb();
     logic [31:0] addr_MC;//
 
 
-    logic rdy_RT[NUM_RT-1:0];
+    logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
 
     logic rdy_MC;//
@@ -30,7 +30,7 @@ module mem_main_random_tb();
 
 
     mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                  data_RT_out, rdy_RT, data_MC_out, rdy_MC);
+                  data_RT_out, rd_rdy_RT, data_MC_out, rdy_MC);
     
     logic [127:0] data_RT_copy[NUM_RT+1:0];
     logic [31:0] addr_RT_copy[NUM_RT+1:0];
@@ -110,22 +110,20 @@ module mem_main_random_tb();
                     if(re_RT[j]) begin
                         re_RT[j] = 1'b0;
                     end
-                    if(rdy_RT[j]) begin
-                        if(we_RT[j]) begin
-                            re_RT[j] = we_RT_copy[j];
-                            we_RT[j] = 0;
-                            addr_RT[j] = addr_RT_copy[j];
+                    else if(we_RT[j]) begin
+                        re_RT[j] = we_RT_copy[j];
+                        we_RT[j] = 0;
+                        addr_RT[j] = addr_RT_copy[j];
+                    end
+                    if(rd_rdy_RT[j]) begin
+                        test_count ++;
+                        if(data_RT_copy[j] !== data_RT_out[j]) begin
+                            $display("Error! At cycle: %d, Failed R at address: 0x%h, port %d, data expecting: 0x%h, data got: 0x%h", 
+                                    k, addr_RT_copy[j], j, data_RT_copy[j], data_RT_out[j]); 
+                            error ++;
+                            $stop();
                         end
-                        else begin
-                            test_count ++;
-                            if(data_RT_copy[j] !== data_RT_out[j]) begin
-                                $display("Error! At cycle: %d, Failed R at address: 0x%h, port %d, data expecting: 0x%h, data got: 0x%h", 
-                                        k, addr_RT_copy[j], j, data_RT_copy[j], data_RT_out[j]); 
-                                error ++;
-                                //$stop();
-                            end
-                            RT_busy[j] = 0;
-                        end
+                        RT_busy[j] = 0;
                     end
                 end
             end
