@@ -262,6 +262,16 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     //Pipeline 2
     logic [31:0] q_bank_2[NUM_THREAD-1:0][3:0];
     logic re_MC_reg;
+    logic re_MC_clr;
+    logic re_MC_en;
+    always_ff @( posedge clk, negedge rst_n ) begin
+        if (!rst_n) 
+            re_MC_reg <=1'b0;
+        else if (re_MC_clr)
+            re_MC_reg <= 1'b0;
+        else if (re_MC_en)
+            re_MC_reg <= 1'b1;
+    end
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: main_memory_bank
@@ -347,7 +357,8 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
         nxt_state = IDLE;
         addr_mc_inc = 1'b0;
         addr_mc_clr = 1'b0;
-        re_MC_reg = 1'b0;
+        re_MC_clr = 1'b0;
+        re_MC_en = 1'b1;
         rdy_MC = 1'b0;
         
         case(state)
@@ -357,17 +368,17 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
             end
             WAIT_1: begin
                 nxt_state = WAIT_2;
+                re_MC_en = 1'b1;
             end
             WAIT_2: begin
-                nxt_state = READ;
-                // addr_mc_inc = 1'b1;
-                re_MC_reg = 1'b1;
+                nxt_state = READ; 
             end
             default: begin
-                re_MC_reg = 1'b1;
                 rdy_MC = 1'b1;
-                if (addr_MC[BIT_THREAD] == 1'b1)
+                if (addr_MC[BIT_THREAD] == 1'b1) begin
                     addr_mc_clr = 1'b1;
+                    re_MC_clr = 1'b1;
+                end
                 else begin
                     nxt_state = READ;
                     addr_mc_inc = 1'b1;
