@@ -333,7 +333,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
                          q_bank_2[addr_MC[BIT_THREAD-1:0]][1], q_bank_2[addr_MC[BIT_THREAD-1:0]][0]};
 
     // State Machine for MC read
-    typedef enum reg {IDLE, READ} state_t;
+    typedef enum reg [1:0] {IDLE, WAIT_1, WAIT_2, READ} state_t;
     state_t state, nxt_state;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
@@ -350,11 +350,16 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
         
         case(state)
             IDLE: begin
-                if (re_MC) begin
-                    nxt_state = READ;
-                    addr_mc_inc = 1'b1;
-                    re_MC_reg = 1'b1;
-                end
+                if (re_MC) 
+                    nxt_state = WAIT_1;
+            end
+            WAIT_1: begin
+                nxt_state = WAIT_2;
+            end
+            WAIT_2: begin
+                nxt_state = READ;
+                addr_mc_inc = 1'b1;
+                re_MC_reg = 1'b1;
             end
             default: begin
                 re_MC_reg = 1'b1;
