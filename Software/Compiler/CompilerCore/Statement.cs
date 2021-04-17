@@ -6,7 +6,7 @@ namespace CompilerCore
 
     enum Type
     {
-        INT, FLOAT, VECTOR
+        INT, FLOAT, VECTOR, VOID
     }
     class ExpressionStatement : Statement
     {

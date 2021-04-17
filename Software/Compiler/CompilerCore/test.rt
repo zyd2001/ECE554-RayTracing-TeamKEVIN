@@ -1,0 +1,5 @@
+int a = 0;
+void main()
+{
+    int b = c;
+}
