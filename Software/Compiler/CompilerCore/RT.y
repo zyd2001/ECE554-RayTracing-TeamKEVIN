@@ -73,11 +73,7 @@ statement_list: statement
     }
     ;   
 
-statement: expression ';'
-    {
-        $$ = new ExpressionStatement($1);
-    }
-    | if_statement
+statement: if_statement
     | loop_statement
     | return_statement
     | assignment_statement ';'
