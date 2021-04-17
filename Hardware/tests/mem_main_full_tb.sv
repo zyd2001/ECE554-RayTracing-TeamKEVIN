@@ -124,7 +124,10 @@ module mem_main_full_tb();
                 end
             end
         end
-        if(error == 0) begin
+        if(test_count == 0) begin
+            $display("Error! <%d> test has been run", test_count);
+        end 
+        else if(error == 0) begin
             $display("All <%d> tests passed!!!", test_count); 
         end
         else begin
