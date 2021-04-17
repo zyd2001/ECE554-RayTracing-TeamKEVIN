@@ -1,5 +1,5 @@
 module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                data_RT_out, rd_rdy_RT, wr_rdy_RT, data_MC_out, rdy_MC);
+                data_RT_out, rd_rdy_RT, data_MC_out, rdy_MC);
 
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
@@ -23,7 +23,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     */
     //RT
     output reg rd_rdy_RT[NUM_RT-1:0];
-    output reg wr_rdy_RT[NUM_RT-1:0];
     output [127:0] data_RT_out[NUM_RT-1:0];
     //MC
     output reg rdy_MC;
@@ -53,19 +52,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
                     rd_rdy_2[i] <= rd_rdy_1[i];
                     rd_rdy_RT[i] <= rd_rdy_2[i];
                 end
-            end
-        end
-    endgenerate
-
-    //Write Ready per RT pipeline
-    //Pipeline 0
-    generate
-        for (i = 0; i < NUM_RT; i = i + 1) begin
-            always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
-                    wr_rdy_RT[i] <= 1'b0;
-                else 
-                    wr_rdy_RT[i] <= we_RT[i];
             end
         end
     endgenerate
