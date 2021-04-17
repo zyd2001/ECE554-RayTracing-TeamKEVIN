@@ -1,6 +1,7 @@
 %{
     public override void yyerror(string format, params object[] args)
     {
+        Console.Error.Write("{0}:{1}:",yyline, yycol);
         Console.Error.WriteLine(format, args);
     }
 %}

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 namespace CompilerCore
 {
@@ -7,14 +8,6 @@ namespace CompilerCore
     enum Type
     {
         INT, FLOAT, VECTOR, VOID
-    }
-    class ExpressionStatement : Statement
-    {
-        Expression expression;
-        internal ExpressionStatement(Expression exp)
-        {
-            expression = exp;
-        }
     }
 
     class ReturnStatement : Statement
@@ -147,5 +140,10 @@ namespace CompilerCore
             parameterList = parameters;
             statementList = statements;
         }
+        // internal override void StaticCheck(bool topLevel)
+        // {
+        //     if (!topLevel)
+        //         ;
+        // }
     }
 }

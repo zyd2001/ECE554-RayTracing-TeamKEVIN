@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  LAPTOP-KDKHEG7R
-//  DateTime: 2021/4/17 15:08:56
+//  DateTime: 2021/4/17 22:39:36
 //  UserName: zyd20
-//  GPLEX input file <CompilerCore/RT.l - 2021/4/17 15:06:55>
+//  GPLEX input file <CompilerCore/RT.l - 2021/4/17 22:37:32>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: parser, minimize
@@ -133,6 +133,7 @@ namespace CompilerCore
 #region user code
 public override void yyerror(string format, params object[] args)
     {
+        Console.Error.Write("{0}:{1}:",yyline, yycol);
         Console.Error.WriteLine(format, args);
     }
 #endregion user code
