@@ -4,13 +4,15 @@ module mem_main_full_tb();
     parameter NUM_THREAD = 64;
     parameter NUM_BANK_PTHREAD = 4;
     localparam TESTS = 2;
+    localparam ADDRESS_DEPTH_PBANK = 12;
+    localparam ADDRESS_BIT = $clog2(NUM_THREAD)+ADDRESS_DEPTH_PBANK+2;
     
     logic clk;
     logic rst_n;
     logic we_RT[NUM_RT-1:0];
     logic re_RT[NUM_RT-1:0];
     logic [31:0] addr_RT[NUM_RT-1:0];
-    logic [19:0] addr_RT_rand[NUM_RT-1:0];
+    logic [ADDRESS_BIT-1:0] addr_RT_rand[NUM_RT-1:0];
     
 
     logic [127:0] data_RT_in[NUM_RT-1:0];
@@ -72,7 +74,7 @@ module mem_main_full_tb();
                         we_RT[i] = 1'b1;
                         data_RT_in[i] = {$random,$random,$random,$random};
                         addr_RT_rand[i] ++;
-                        addr_RT[i] = {10'b0, addr_RT_rand[i], 2'b0};
+                        addr_RT[i] = {{(30-ADDRESS_BIT){1'b0}}, addr_RT_rand[i], 2'b0};
                         if(k % 16384 == 0) begin
                             $display("current address 0x%h", addr_RT[i]);
                         end
