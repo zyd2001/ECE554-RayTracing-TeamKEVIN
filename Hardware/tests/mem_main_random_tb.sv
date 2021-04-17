@@ -19,14 +19,13 @@ module mem_main_random_tb();
     logic [127:0] data_RT_in[NUM_RT-1:0];
 
     logic re_MC;
-    logic [31:0] addr_MC;//
 
 
     logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
 
-    logic rdy_MC;//
-    logic [127:0] data_MC_out;//
+    logic rdy_MC;
+    logic [127:0] data_MC_out;
 
     always #1 clk = ~clk;
 
@@ -54,7 +53,6 @@ module mem_main_random_tb();
                 data_RT_in[i] = 128'b0;
             end
             re_MC = 1'b0;
-            addr_MC = 32'b0;;
 
             // reset
             @(posedge clk) begin end
