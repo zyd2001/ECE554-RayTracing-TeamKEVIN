@@ -79,13 +79,7 @@ module mem_main_mc_read_tb();
             for(int i = NUM_RT-1; i >= 0; i--) begin
                 we_RT[i] = 1'b0;
             end
-            // wait for write to finish
-            @(posedge clk);
-            @(posedge clk);
-            @(posedge clk);
-            @(posedge clk);
-            @(posedge clk);
-            @(posedge clk);
+            @(negedge clk);
             addr_RT_thread[0] = 0;
             // test pipe read from mc
             while(!end_test) begin
