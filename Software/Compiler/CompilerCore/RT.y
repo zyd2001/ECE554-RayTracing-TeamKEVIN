@@ -1,7 +1,11 @@
+%{
+    internal List<Statement> AST;
+%}
+
 %namespace CompilerCore
 %visibility internal
 
-%start statement_list
+%start program
 
 %union 
 { 
@@ -29,22 +33,34 @@
 %token<FloatLiteral> FLOAT_LITERAL 
 %token<VectorLiteral> VECTOR_LITERAL
 %token<Identifier> IDENTIFIER
-%token INT FLOAT VECTOR IF ELSE ELSEIF FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
+%token INT FLOAT VECTOR VOID IF ELSE ELSEIF FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
     EQ NE GT GE LT LE INCREMENT DECREMENT
 
 %type<Type> value_type
 %type<Statement> statement  loop_statement return_statement assignment_statement function_definition_statement
-    declaration_statement for_special_statement block_statement
+    declaration_statement for_special_statement block_statement toplevel_statement
 %type<IfStatement> if_statement
 %type<DeclaraionItem> declaration_item
 %type<DeclarationList> declaration_list
-%type<StatementList> statement_list optional_statement_list
+%type<StatementList> statement_list optional_statement_list program
 %type<ExpressionList> expression_list
 %type<Expression> expression binary_expression unary_expression literal_expression index_expression possible_array_expression
     optional_expression assignment_lval_expression identifier_expression function_call_expression
 %type<ParameterList> parameter_list
 
 %%
+program: toplevel_statement
+    {
+        AST = new List<Statement>{$1};
+    }
+    | program toplevel_statement
+    {
+        AST.Add($2);
+    }
+    ;
+toplevel_statement: declaration_statement ';'
+    | function_definition_statement
+    ;
 
 statement_list: statement
     {
@@ -75,7 +91,6 @@ statement: expression ';'
         $$ = new ControlStatement(ControlStatement.Type.BREAK);
     }
     | block_statement
-    | function_definition_statement
     ;
 return_statement: RETURN ';'
     {
@@ -126,7 +141,11 @@ optional_statement_list: /* empty */
     }
     | statement_list
     ;
-parameter_list: value_type IDENTIFIER
+parameter_list: /* empty */
+    {
+        $$ = new List<FunctionDefinitionStatement.Parameter>();
+    }
+    | value_type IDENTIFIER
     {
         $$ = new List<FunctionDefinitionStatement.Parameter>{new FunctionDefinitionStatement.Parameter($1, $2)};
     }
@@ -139,6 +158,7 @@ parameter_list: value_type IDENTIFIER
 value_type: INT {$$ = Type.INT;}
     | FLOAT {$$ = Type.FLOAT;} 
     | VECTOR {$$ = Type.VECTOR;}
+    | VOID {$$ = Type.VOID;}
     ;
 
 expression: '(' expression ')'

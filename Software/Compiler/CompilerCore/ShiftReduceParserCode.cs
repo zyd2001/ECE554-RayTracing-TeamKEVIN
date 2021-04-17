@@ -52,7 +52,7 @@ namespace QUT.Gppg
         // These fields are of the generic parameter types, and are
         // frequently instantiated as struct types in derived classes.
         // Semantic actions are defined in the derived classes and refer
-        // to instance fields of these structs.  Is such cases the code
+        // to instance fields of these structs.  In such cases the code
         // "get_CurrentSemanticValue().myField = blah;" will fail since
         // the getter pushes the value of the field, not the reference.
         // So, in the presence of properties, gppg would need to encode
@@ -260,22 +260,24 @@ namespace QUT.Gppg
                         if (action == -1)	// accept
                             return true;
                     }
-                    catch (Exception x)
+                    catch (AbortException)
                     {
-                        if (x is AbortException)
-                            return false;
-                        else if (x is AcceptException)
-                            return true;
-                        else if (x is ErrorException && !ErrorRecovery())
+                        return false;
+                    }
+                    catch (AcceptException)
+                    {
+                        return true;
+                    }
+                    catch (ErrorException)
+                    {
+                        if (!ErrorRecovery())
                             return false;
                         else
                             throw;  // Rethrow x, preserving information.
-
                     }
                 }
-                else if (action == 0)   // error
-                    if (!ErrorRecovery())
-                        return false;
+                else if (action == 0 && !ErrorRecovery()) // error
+                    return false;
             }
         }
 
@@ -309,39 +311,37 @@ namespace QUT.Gppg
 				DisplayRule(ruleNumber);
 #endif
             Rule rule = rules[ruleNumber];
+            int rhLen = rule.RightHandSide.Length;
             //
             //  Default actions for unit productions.
             //
-            if (rule.RightHandSide.Length == 1)
+            if (rhLen == 1)
             {
-                CurrentSemanticValue = valueStack.TopElement();    // Default action: $$ = $1;
+                CurrentSemanticValue = valueStack.TopElement();   // Default action: $$ = $1;
                 CurrentLocationSpan = LocationStack.TopElement(); // Default action "@$ = @1;
+            }
+            else if (rhLen == 0)
+            {
+                // Create a new blank value.
+                // Explicit semantic action may mutate this value
+                CurrentSemanticValue = default(TValue);
+                // The location span for an empty production will start with the
+                // beginning of the next lexeme, and end with the finish of the
+                // previous lexeme.  This gives the correct behaviour when this
+                // nonsense value is used in later Merge operations.
+                CurrentLocationSpan = (scanner.yylloc != null && LastSpan != null ?
+                    scanner.yylloc.Merge(LastSpan) :
+                    default(TSpan));
             }
             else
             {
-                if (rule.RightHandSide.Length == 0)
-                {
-                    // Create a new blank value.
-                    // Explicit semantic action may mutate this value
-                    CurrentSemanticValue = default(TValue);
-                    // The location span for an empty production will start with the
-                    // beginning of the next lexeme, and end with the finish of the
-                    // previous lexeme.  This gives the correct behaviour when this
-                    // nonsense value is used in later Merge operations.
-                    CurrentLocationSpan = (scanner.yylloc != null && LastSpan != null ?
-                        scanner.yylloc.Merge(LastSpan) :
-                        default(TSpan));
-                }
-                else
-                {
-                    // Default action: $$ = $1;
-                    CurrentSemanticValue = valueStack.TopElement();
-                    //  Default action "@$ = @1.Merge(@N)" for location info.
-                    TSpan at1 = LocationStack[LocationStack.Depth - rule.RightHandSide.Length];
-                    TSpan atN = LocationStack[LocationStack.Depth - 1];
-                    CurrentLocationSpan =
-                        ((at1 != null && atN != null) ? at1.Merge(atN) : default(TSpan));
-                }
+                // Default action: $$ = $1;
+                CurrentSemanticValue = valueStack[LocationStack.Depth - rhLen];
+                //  Default action "@$ = @1.Merge(@N)" for location info.
+                TSpan at1 = LocationStack[LocationStack.Depth - rhLen];
+                TSpan atN = LocationStack[LocationStack.Depth - 1];
+                CurrentLocationSpan =
+                    ((at1 != null && atN != null) ? at1.Merge(atN) : default(TSpan));
             }
 
             DoAction(ruleNumber);
@@ -470,10 +470,9 @@ namespace QUT.Gppg
                     {
 #if TRACE_ACTIONS
                             Console.Error.Write("Reading a token: ");
-#endif                       
+#endif
                         NextToken = scanner.yylex();
                     }
-
 #if TRACE_ACTIONS
                         Console.Error.WriteLine("Next token is {0}", TerminalToString(NextToken));
 #endif
@@ -520,7 +519,6 @@ namespace QUT.Gppg
             }
             else
                 return true;
-
         }
 
         /// <summary>
@@ -539,10 +537,7 @@ namespace QUT.Gppg
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "yyerrok")]
         // Reason for FxCop message suppression -
         // This is a traditional name for YACC-like functionality
-        protected void yyerrok()
-        {
-            recovering = false;
-        }
+        protected void yyerrok() { recovering = false; }
 
         /// <summary>
         /// OBSOLETE FOR VERSION 1.4.0
@@ -689,8 +684,7 @@ namespace QUT.Gppg
         /// <summary>
         /// Default no-arg constructor.
         /// </summary>
-        public LexLocation()
-        { }
+        public LexLocation() { }
 
         /// <summary>
         /// Constructor for text-span with given start and end.
@@ -699,8 +693,7 @@ namespace QUT.Gppg
         /// <param name="sc">start column</param>
         /// <param name="el">end line </param>
         /// <param name="ec">end column</param>
-        public LexLocation(int sl, int sc, int el, int ec)
-        { startLine = sl; startColumn = sc; endLine = el; endColumn = ec; }
+        public LexLocation(int sl, int sc, int el, int ec) { startLine = sl; startColumn = sc; endLine = el; endColumn = ec; }
 
         /// <summary>
         /// Create a text location which spans from the 
@@ -708,8 +701,7 @@ namespace QUT.Gppg
         /// </summary>
         /// <param name="last">The last location in the result span</param>
         /// <returns>The merged span</returns>
-        public LexLocation Merge(LexLocation last)
-        { return new LexLocation(this.startLine, this.startColumn, last.endLine, last.endColumn); }
+        public LexLocation Merge(LexLocation last) { return new LexLocation(this.startLine, this.startColumn, last.endLine, last.endColumn); }
     }
 
     /// <summary>
@@ -723,7 +715,7 @@ namespace QUT.Gppg
 #else
     internal abstract class AbstractScanner<TValue, TSpan>
 #endif
-        where TSpan : IMerge<TSpan>
+ where TSpan : IMerge<TSpan>
     {
         /// <summary>
         /// Lexical value optionally set by the scanner. The value
@@ -738,7 +730,9 @@ namespace QUT.Gppg
         // since it may be instantiated by a value struct.  If it were 
         // implemented as a property, machine generated code in derived
         // types would not be able to select on the returned value.
+#pragma warning disable 649
         public TValue yylval;                     // Lexical value: set by scanner
+#pragma warning restore 649
 
         /// <summary>
         /// Current scanner location property. The value is of the
@@ -793,7 +787,7 @@ namespace QUT.Gppg
     internal class State
     {
         /// <summary>
-        /// The number of states in the automaton.
+        /// The index of this state in the states array.
         /// </summary>
         internal int number;
 #endif

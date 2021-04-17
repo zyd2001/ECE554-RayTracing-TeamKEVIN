@@ -1,8 +1,14 @@
+%{
+    public override void yyerror(string format, params object[] args)
+    {
+        Console.Error.WriteLine(format, args);
+    }
+%}
+
 %namespace CompilerCore
 %visibility internal
 %option summary
 
-alpha [a-zA-Z]
 identifier [a-zA-Z_][a-zA-Z_0-9]*
 digits [0-9]+
 
@@ -10,6 +16,7 @@ digits [0-9]+
 "int"           return (int)Tokens.INT;
 "vector"        return (int)Tokens.VECTOR;
 "float"         return (int)Tokens.FLOAT;
+"void"          return (int)Tokens.VOID;
 "if"            return (int)Tokens.IF;
 "else"          return (int)Tokens.ELSE;
 "esle if"       return (int)Tokens.ELSEIF;
@@ -30,19 +37,34 @@ digits [0-9]+
 "<="            return (int)Tokens.LE;
 "++"            return (int)Tokens.INCREMENT;
 "--"            return (int)Tokens.DECREMENT;
-identifier {
+"{"             |
+"}"             |
+"["             |
+"]"             |
+"("             |
+")"             |
+","             |
+";"             |
+"!"             |
+"+"             |
+"-"             |
+"*"             |
+"/"             |
+"%"             |
+"="             return yytext[0];
+{identifier} {
     yylval.Identifier = yytext;
     return (int)Tokens.IDENTIFIER;
 }
-digits* {
+{digits}* {
     yylval.IntLiteral = int.Parse(yytext);
     return (int)Tokens.INT_LITERAL;
 }
-[\+\-]?(digits*[\.])?digits+ {
+[\+\-]?({digits}*[\.])?{digits}+ {
     yylval.FloatLiteral = float.Parse(yytext);
     return (int)Tokens.FLOAT_LITERAL;
 }
-\[[\+\-]?(digits*[\.])?digits+\,[\+\-]?(digits*[\.])?digits+\,[\+\-]?(digits*[\.])?digits+\,[\+\-]?(digits*[\.])?digits+\] {
+\[[\+\-]?({digits}*[\.])?{digits}+\,[\+\-]?({digits}*[\.])?{digits}+\,[\+\-]?({digits}*[\.])?{digits}+\,[\+\-]?({digits}*[\.])?{digits}+\] {
     yylval.VectorLiteral = yytext;
     return (int)Tokens.VECTOR_LITERAL;
 }

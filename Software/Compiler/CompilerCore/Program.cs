@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace CompilerCore
 {
@@ -6,7 +7,10 @@ namespace CompilerCore
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("123");
+            Scanner scanner = new Scanner(new FileStream("CompilerCore/test.rt", FileMode.Open));
+            Parser parser = new Parser(scanner);
+
+            Console.WriteLine(parser.Parse());
         }
     }
 }
