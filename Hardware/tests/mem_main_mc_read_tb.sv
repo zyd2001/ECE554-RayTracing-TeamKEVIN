@@ -36,7 +36,7 @@ module mem_main_mc_read_tb();
     
     logic [127:0] datastore [NUM_THREAD-1:0];
     logic RT_busy[NUM_RT-1:0];
-    logic [1:0] end_test;
+    logic end_test;
     int error = 0;
     initial begin
         for(int test = 0; test < TESTS; test++) begin
@@ -60,32 +60,35 @@ module mem_main_mc_read_tb();
             rst_n = 1'b1; // reset finished
             @(posedge clk) begin end
             // write output from RT
-            while(!end_test[1]) begin
+            while(!end_test) begin
                 // test foreach core
                 for(int i = NUM_RT-1; i >= 0; i--) begin
                     we_RT[i] = 1'b1;
                     data_RT_in[i] = {$random,$random,$random,$random};
                     datastore[addr_RT_thread[i]] = data_RT_in[i];
                     addr_RT[i] = {addr_RT_thread[i], addr_RT_base, 4'b0};
+                    if(&addr_RT_thread[i]) begin
+                        end_test = 1;
+                    end
                     addr_RT_thread[i] = addr_RT_thread[i] + 4;
                     $display("current writing address 0x%h", addr_RT[i]);
                 end
                 @(posedge clk);
-                for(int i = NUM_RT-1; i >= 0; i--) begin
-                    if(end_test[0])begin
-                        end_test = 2'b10;
-                    end 
-                    else if(&addr_RT_thread[j]) begin
-                        end_test = 2'b01;
-                    end
-                end
             end
-            end_test = 2'b0;
-            we_RT[i] = 1'b0;
+            end_test = 0;
+            for(int i = NUM_RT-1; i >= 0; i--) begin
+                we_RT[i] = 1'b0;
+            end
+            // wait for write to finish
+            @(posedge clk);
+            @(posedge clk);
+            @(posedge clk);
+            @(posedge clk);
+            @(posedge clk);
             @(posedge clk);
             addr_RT_thread[0] = 0;
             // test pipe read from mc
-            while(!end_test[1]) begin
+            while(!end_test) begin
                 re_MC = 1'b1;
                 @(posedge clk);
                 if(rdy_MC) begin
@@ -95,13 +98,10 @@ module mem_main_mc_read_tb();
                         error ++;
                         //$stop();
                     end
-                    addr_RT_thread[0]++;
-                    if(end_test[0])begin
-                        end_test = 2'b10;
-                    end 
-                    else if(&addr_RT_thread[0]) begin
-                        end_test = 2'b01;
+                    if(&addr_RT_thread[0]) begin
+                        end_test = 1;
                     end
+                    addr_RT_thread[0]++;
                 end
             end
 
