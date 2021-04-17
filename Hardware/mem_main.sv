@@ -329,8 +329,8 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
             addr_MC <= addr_MC + {{BIT_THREAD{1'b0}}, {1'b1}};
     end
 
-    assign data_MC_out = {q_bank_2[addr_MC][3], q_bank_2[addr_MC][2],
-                         q_bank_2[addr_MC][1], q_bank_2[addr_MC][0]};
+    assign data_MC_out = {q_bank_2[addr_MC[BIT_THREAD-1:0]][3], q_bank_2[addr_MC[BIT_THREAD-1:0]][2],
+                         q_bank_2[addr_MC[BIT_THREAD-1:0]][1], q_bank_2[addr_MC[BIT_THREAD-1:0]][0]};
 
     // State Machine for MC read
     typedef enum reg {IDLE, READ} state_t;
