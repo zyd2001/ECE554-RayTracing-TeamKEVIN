@@ -19,8 +19,6 @@ module mem_main_mc_read_tb();
 
     logic [127:0] data_RT_in[NUM_RT-1:0];
 
-    logic re_MC;
-
 
     logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
@@ -28,11 +26,10 @@ module mem_main_mc_read_tb();
     always #1 clk = ~clk;
 
 
-    mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
+    mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
                   data_RT_out, rd_rdy_RT);
     
     logic [127:0] datastore [NUM_THREAD-1:0];
-    logic RT_busy[NUM_RT-1:0];
     logic end_test;
     int error = 0;
     int test_count = 0;
@@ -49,7 +46,6 @@ module mem_main_mc_read_tb();
                 data_RT_in[i] = 128'b0;
                 addr_RT_thread[i] = i;
             end
-            re_MC = 1'b0;
             end_test = 0;
 
             // reset
@@ -79,25 +75,29 @@ module mem_main_mc_read_tb();
                 we_RT[i] = 1'b0;
             end
             @(negedge clk);
+            // 0 for addr input
             addr_RT_thread[0] = 0;
+            // 1 for refrence
+            addr_RT_thread[1] = 0;
             // test pipe read from mc
             while(!end_test) begin
-                re_MC = 1'b1;
+                re_RT[0] = 1'b1;
                 addr_RT[0] = {addr_RT_thread[0], addr_RT_base, 4'b0};
                 @(posedge clk);
+                if(&addr_RT_thread[1]) begin
+                    end_test = 1;
+                end
                 if(rd_rdy_RT[0]) begin
                     test_count++;
-                    if(data_RT_out[0] !== datastore[addr_RT_thread[0]]) begin
+                    if(data_RT_out[0] !== datastore[addr_RT_thread[1]]) begin
                         $display("Error! At thread: %d, data expecting: 0x%h, data got: 0x%h", 
-                                addr_RT_thread[0], datastore[addr_RT_thread[0]], data_RT_out[0]); 
+                                addr_RT_thread[1], datastore[addr_RT_thread[1]], data_RT_out[0]); 
                         error ++;
                         //$stop();
                     end
-                    if(&addr_RT_thread[0]) begin
-                        end_test = 1;
-                    end
-                    addr_RT_thread[0]++;
+                    addr_RT_thread[1]++;
                 end
+                addr_RT_thread[0]++;
             end
         end
         if(test_count == 0) begin
