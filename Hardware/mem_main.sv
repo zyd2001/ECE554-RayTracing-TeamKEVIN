@@ -36,7 +36,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
 
     //Read Ready per RT pipeline
     //Pipeline 0-3
-    logic rd_rdy_0[NUM_RT-1:0], rd_rdy_1[NUM_RT-1:0], rd_rdy_2[NUM_RT-1:0];
+    logic rd_rdy_0[NUM_RT-1:0], rd_rdy_1[NUM_RT-1:0], rd_rdy_2[NUM_RT-1:0], rd_rdy_3[NUM_RT-1:0];
     // logic rd_rdy_3[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
@@ -45,13 +45,15 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
                     rd_rdy_0[i] <= 1'b0;
                     rd_rdy_1[i] <= 1'b0;
                     rd_rdy_2[i] <= 1'b0;
+                    rd_rdy_3[i] <= 1'b0;
                     rd_rdy_RT[i] <= 1'b0;
                 end
                 else begin
                     rd_rdy_0[i] <= re_RT[i];
                     rd_rdy_1[i] <= rd_rdy_0[i];
                     rd_rdy_2[i] <= rd_rdy_1[i];
-                    rd_rdy_RT[i] <= rd_rdy_2[i];
+                    rd_rdy_3[i] <= rd_rdy_2[i];
+                    rd_rdy_RT[i] <= rd_rdy_3[i];
                 end
             end
         end
@@ -111,19 +113,22 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
 
     //Thread ID
     //Pipeline 0-2
-    logic [BIT_THREAD-1:0] thread_id_0[NUM_RT-1:0], thread_id_1[NUM_RT-1:0], thread_id_2[NUM_RT-1:0];
+    logic [BIT_THREAD-1:0] thread_id_0[NUM_RT-1:0], thread_id_1[NUM_RT-1:0]
+                        , thread_id_2[NUM_RT-1:0], thread_id_3[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             always_ff @(posedge clk, negedge rst_n) begin
                 if (!rst_n) begin
-                    thread_id_0[i] <= 6'h0;
-                    thread_id_1[i] <= 6'h0;
-                    thread_id_2[i] <= 6'h0;
+                    thread_id_0[i] <= '0;
+                    thread_id_1[i] <= '0;
+                    thread_id_2[i] <= '0;
+                    thread_id_3[i] <= '0;
                 end
                 else begin
                     thread_id_0[i] <= thread_id_pre[i];
                     thread_id_1[i] <= thread_id_0[i];
                     thread_id_2[i] <= thread_id_1[i];
+                    thread_id_3[i] <= thread_id_2[i];
                 end
             end
         end
@@ -132,7 +137,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     //Bank ID
     //Pipeline 0-3
     logic [1:0] bank_id_0[NUM_RT-1:0][3:0], bank_id_1[NUM_RT-1:0][3:0]
-            , bank_id_2[NUM_RT-1:0][3:0], bank_id_3[NUM_RT-1:0][3:0];
+            , bank_id_2[NUM_RT-1:0][3:0], bank_id_3[NUM_RT-1:0][3:0], bank_id_4[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             for (j = 0; j < 4; j = j + 1) begin
@@ -142,12 +147,14 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
                         bank_id_1[i][j] <= 2'b0;
                         bank_id_2[i][j] <= 2'b0;
                         bank_id_3[i][j] <= 2'b0;
+                        bank_id_4[i][j] <= 2'b0;
                     end
                     else begin
                         bank_id_0[i][j] <= bank_id_pre[i][j];
                         bank_id_1[i][j] <= bank_id_0[i][j];
                         bank_id_2[i][j] <= bank_id_1[i][j];
                         bank_id_3[i][j] <= bank_id_2[i][j];
+                        bank_id_4[i][j] <= bank_id_3[i][j];
                     end
                 end
             end
@@ -276,48 +283,103 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: main_memory_bank
                 single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank_1[i]),
-                .data(data_bank_1[i][j]),.addr(re_MC_reg ? 12'hFFF : addr_bank_1[i][j]), .q(q_bank_2[i][j]));
+                .data(data_bank_1[i][j]),.addr(addr_bank_1[i][j]), .q(q_bank_2[i][j]));
             end
         end
     endgenerate
 
+
+    logic [127:0] q_compact_2[NUM_THREAD-1:0];
+    logic [127:0] q_mux_2[7:0][3:0];
+    generate
+        for (i = 0; i < NUM_THREAD; i = i + 1) begin
+            assign q_compact_2[i] = {q_bank_2[i][3],q_bank_2[i][2],q_bank_2[i][1],q_bank_2[i][0]};
+        end
+        for (j = 0; j < 8; j = j + 1) begin
+            assign q_mux_2[j] = {q_compact_2[j*4+3], q_compact_2[j*4+2], q_compact_2[j*4+1], q_compact_2[j*4]};
+        end
+    endgenerate 
+
+
     //Read output pipeline
     //Pipeline 3
-    logic [31:0] data_RT_out_3[NUM_RT-1:0][3:0];
+    logic [127:0] data_out_3[NUM_RT-1:0][7:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
-                always_ff @(posedge clk, negedge rst_n) begin
-                    if (!rst_n)
-                        data_RT_out_3[i][j] <= 32'b0;
-                    else
-                        data_RT_out_3[i][j] <= q_bank_2[thread_id_2[i]][j];
+            always_ff @( posedge clk, negedge rst_n ) begin 
+                if (!rst_n) begin
+                    data_out_3[i][0] <= 128'h0;    
+                    data_out_3[i][1] <= 128'h0;
+                    data_out_3[i][2] <= 128'h0;
+                    data_out_3[i][3] <= 128'h0;
+                    data_out_3[i][4] <= 128'h0;
+                    data_out_3[i][5] <= 128'h0;
+                    data_out_3[i][6] <= 128'h0;
+                    data_out_3[i][7] <= 128'h0;
+                end
+                else begin
+                    data_out_3[i][0] <= q_mux_2[0][thread_id_2[i][1:0]];
+                    data_out_3[i][1] <= q_mux_2[1][thread_id_2[i][1:0]];
+                    data_out_3[i][2] <= q_mux_2[2][thread_id_2[i][1:0]];
+                    data_out_3[i][3] <= q_mux_2[3][thread_id_2[i][1:0]];
+                    data_out_3[i][4] <= q_mux_2[4][thread_id_2[i][1:0]];
+                    data_out_3[i][5] <= q_mux_2[5][thread_id_2[i][1:0]];
+                    data_out_3[i][6] <= q_mux_2[6][thread_id_2[i][1:0]];
+                    data_out_3[i][7] <= q_mux_2[7][thread_id_2[i][1:0]];
                 end
             end
         end
     endgenerate
+
+    // logic [31:0] data_RT_out_3[NUM_RT-1:0][3:0];
+    // generate
+        // for (i = 0; i < NUM_RT; i = i + 1) begin
+        //     for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
+        //         always_ff @(posedge clk, negedge rst_n) begin
+        //             if (!rst_n)
+        //                 data_RT_out_3[i][j] <= 32'b0;
+        //             else
+        //                 data_RT_out_3[i][j] <= q_bank_2[thread_id_2[i]][j];
+        //         end
+        //     end
+        // end
+    // endgenerate
+
     //Pipeline 4
+    logic [127:0] data_out_4[NUM_RT-1:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            assign data_RT_out[i][31:0] = bank_id_3[i][0] == 2'h0 ? data_RT_out_3[i][0]
-                                        : bank_id_3[i][0] == 2'h1 ? data_RT_out_3[i][1]
-                                        : bank_id_3[i][0] == 2'h2 ? data_RT_out_3[i][2]
-                                        : data_RT_out_3[i][3];
+            always_ff @( posedge clk, negedge rst_n ) begin
+                if (!rst_n)
+                    data_out_4[i] <= 128'h0;
+                else
+                    data_out_4[i] <= data_out_3[i][thread_id_3[i][4:2]];
+            end
+        end
+    endgenerate    
 
-            assign data_RT_out[i][63:32] = bank_id_3[i][1] == 2'h0 ? data_RT_out_3[i][0]
-                                        : bank_id_3[i][1] == 2'h1 ? data_RT_out_3[i][1]
-                                        : bank_id_3[i][1] == 2'h2 ? data_RT_out_3[i][2]
-                                        : data_RT_out_3[i][3];
+    //Pipeline 5
+    generate
+        for (i = 0; i < NUM_RT; i = i + 1) begin
+            assign data_RT_out[i][31:0] = bank_id_4[i][0] == 2'h0 ? data_out_4[i][31:0]
+                                        : bank_id_4[i][0] == 2'h1 ? data_out_4[i][63:32]
+                                        : bank_id_4[i][0] == 2'h2 ? data_out_4[i][95:64]
+                                        : data_out_4[i][127:96];
 
-            assign data_RT_out[i][95:64] = bank_id_3[i][2] == 2'h0 ? data_RT_out_3[i][0]
-                                        : bank_id_3[i][2] == 2'h1 ? data_RT_out_3[i][1]
-                                        : bank_id_3[i][2] == 2'h2 ? data_RT_out_3[i][2]
-                                        : data_RT_out_3[i][3];
+            assign data_RT_out[i][63:32] = bank_id_4[i][1] == 2'h0 ? data_out_4[i][31:0]
+                                        : bank_id_4[i][1] == 2'h1 ? data_out_4[i][63:32]
+                                        : bank_id_4[i][1] == 2'h2 ? data_out_4[i][95:64]
+                                        : data_out_4[i][127:96];
 
-            assign data_RT_out[i][127:96] = bank_id_3[i][3] == 2'h0 ? data_RT_out_3[i][0]
-                                        : bank_id_3[i][3] == 2'h1 ? data_RT_out_3[i][1]
-                                        : bank_id_3[i][3] == 2'h2 ? data_RT_out_3[i][2]
-                                        : data_RT_out_3[i][3];
+            assign data_RT_out[i][95:64] = bank_id_4[i][2] == 2'h0 ? data_out_4[i][31:0]
+                                        : bank_id_4[i][2] == 2'h1 ? data_out_4[i][63:32]
+                                        : bank_id_4[i][2] == 2'h2 ? data_out_4[i][95:64]
+                                        : data_out_4[i][127:96];
+
+            assign data_RT_out[i][127:96] = bank_id_4[i][3] == 2'h0 ? data_out_4[i][31:0]
+                                        : bank_id_4[i][3] == 2'h1 ? data_out_4[i][63:32]
+                                        : bank_id_4[i][3] == 2'h2 ? data_out_4[i][95:64]
+                                        : data_out_4[i][127:96];
 
         end
     endgenerate
@@ -327,64 +389,64 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     */
 
     // MC Counter
-    logic addr_mc_inc;
-    logic addr_mc_clr;
-    logic [BIT_THREAD:0] addr_MC;
-    always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n) 
-            addr_MC <= '0;
-        else if (addr_mc_clr) 
-            addr_MC <= '0;
-        else if (addr_mc_inc) 
-            addr_MC <= addr_MC + {{BIT_THREAD{1'b0}}, {1'b1}};
-    end
+    // logic addr_mc_inc;
+    // logic addr_mc_clr;
+    // logic [BIT_THREAD:0] addr_MC;
+    // always_ff @( posedge clk, negedge rst_n ) begin
+    //     if (!rst_n) 
+    //         addr_MC <= '0;
+    //     else if (addr_mc_clr) 
+    //         addr_MC <= '0;
+    //     else if (addr_mc_inc) 
+    //         addr_MC <= addr_MC + {{BIT_THREAD{1'b0}}, {1'b1}};
+    // end
 
-    assign data_MC_out[127:96] = q_bank_2[addr_MC[BIT_THREAD-1:0]][3];
-    assign data_MC_out[95:64] = q_bank_2[addr_MC[BIT_THREAD-1:0]][2];
-    assign data_MC_out[63:32] = q_bank_2[addr_MC[BIT_THREAD-1:0]][1];
-    assign data_MC_out[31:0] = q_bank_2[addr_MC[BIT_THREAD-1:0]][0];
+    // assign data_MC_out[127:96] = q_bank_2[addr_MC[BIT_THREAD-1:0]][3];
+    // assign data_MC_out[95:64] = q_bank_2[addr_MC[BIT_THREAD-1:0]][2];
+    // assign data_MC_out[63:32] = q_bank_2[addr_MC[BIT_THREAD-1:0]][1];
+    // assign data_MC_out[31:0] = q_bank_2[addr_MC[BIT_THREAD-1:0]][0];
 
-    // State Machine for MC read
-    typedef enum reg [1:0] {IDLE, WAIT_1, WAIT_2, READ} state_t;
-    state_t state, nxt_state;
-    always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n)
-            state <= IDLE;
-        else
-            state <= nxt_state;
-    end
-    always_comb begin
-        nxt_state = IDLE;
-        addr_mc_inc = 1'b0;
-        addr_mc_clr = 1'b0;
-        re_MC_clr = 1'b0;
-        re_MC_en = 1'b1;
-        rdy_MC = 1'b0;
+    // // State Machine for MC read
+    // typedef enum reg [1:0] {IDLE, WAIT_1, WAIT_2, READ} state_t;
+    // state_t state, nxt_state;
+    // always_ff @( posedge clk, negedge rst_n ) begin
+    //     if (!rst_n)
+    //         state <= IDLE;
+    //     else
+    //         state <= nxt_state;
+    // end
+    // always_comb begin
+    //     nxt_state = IDLE;
+    //     addr_mc_inc = 1'b0;
+    //     addr_mc_clr = 1'b0;
+    //     re_MC_clr = 1'b0;
+    //     re_MC_en = 1'b1;
+    //     rdy_MC = 1'b0;
         
-        case(state)
-            IDLE: begin
-                if (re_MC) 
-                    nxt_state = WAIT_1;
-            end
-            WAIT_1: begin
-                nxt_state = WAIT_2;
-                re_MC_en = 1'b1;
-            end
-            WAIT_2: begin
-                nxt_state = READ; 
-            end
-            default: begin
-                rdy_MC = 1'b1;
-                if (addr_MC[BIT_THREAD] == 1'b1) begin
-                    addr_mc_clr = 1'b1;
-                    re_MC_clr = 1'b1;
-                end
-                else begin
-                    nxt_state = READ;
-                    addr_mc_inc = 1'b1;
-                end
-            end
-        endcase
-    end
+    //     case(state)
+    //         IDLE: begin
+    //             if (re_MC) 
+    //                 nxt_state = WAIT_1;
+    //         end
+    //         WAIT_1: begin
+    //             nxt_state = WAIT_2;
+    //             re_MC_en = 1'b1;
+    //         end
+    //         WAIT_2: begin
+    //             nxt_state = READ; 
+    //         end
+    //         default: begin
+    //             rdy_MC = 1'b1;
+    //             if (addr_MC[BIT_THREAD] == 1'b1) begin
+    //                 addr_mc_clr = 1'b1;
+    //                 re_MC_clr = 1'b1;
+    //             end
+    //             else begin
+    //                 nxt_state = READ;
+    //                 addr_mc_inc = 1'b1;
+    //             end
+    //         end
+    //     endcase
+    // end
 
 endmodule
