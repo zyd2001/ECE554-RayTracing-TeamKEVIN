@@ -1,36 +1,36 @@
 using System.Collections.Generic;
 using System.Numerics;
+using QUT.Gppg;
 
 namespace CompilerCore
 {
     using ExpressionList = List<Expression>;
-    abstract class Expression : ASTNode { }
+    abstract class Expression : ASTNode
+    {
+        internal Expression(LexLocation location) : base(location) { }
+    }
 
-    abstract class ArithmeticExpression : Expression { }
-
-    abstract class LiteralExpression : Expression { }
-
-    class IntLiteralExpression : LiteralExpression
+    class IntLiteralExpression : Expression
     {
         int i;
-        internal IntLiteralExpression(int i)
+        internal IntLiteralExpression(LexLocation location, int i) : base(location)
         {
             this.i = i;
         }
     }
-    class FloatLiteralExpression : LiteralExpression
+    class FloatLiteralExpression : Expression
     {
         float f;
-        internal FloatLiteralExpression(float f)
+        internal FloatLiteralExpression(LexLocation location, float f) : base(location)
         {
             this.f = f;
         }
     }
 
-    class VectorLiteralExpression : LiteralExpression
+    class VectorLiteralExpression : Expression
     {
         Vector4 vector;
-        internal VectorLiteralExpression(string text)
+        internal VectorLiteralExpression(LexLocation location, string text) : base(location)
         {
             var splits = text[1..^1].Split(",");
             float[] floats = new float[4];
@@ -39,7 +39,7 @@ namespace CompilerCore
             vector = new Vector4(floats[0], floats[1], floats[2], floats[3]);
         }
     }
-    class BinaryExpression : ArithmeticExpression
+    class BinaryExpression : Expression
     {
         Type type;
         Expression exp1;
@@ -50,7 +50,7 @@ namespace CompilerCore
             EQ, NE, GT, GE, LT, LE,
             AND, OR
         }
-        internal BinaryExpression(Type type, Expression e1, Expression e2)
+        internal BinaryExpression(LexLocation location, Type type, Expression e1, Expression e2) : base(location)
         {
             this.type = type;
             exp1 = e1;
@@ -58,7 +58,7 @@ namespace CompilerCore
         }
     }
 
-    class UnaryExpression : ArithmeticExpression
+    class UnaryExpression : Expression
     {
         Type type;
         Expression exp;
@@ -66,7 +66,7 @@ namespace CompilerCore
         {
             NOT, NEGATE
         }
-        internal UnaryExpression(Type type, Expression e1)
+        internal UnaryExpression(LexLocation location, Type type, Expression e1) : base(location)
         {
             this.type = type;
             exp = e1;
@@ -77,7 +77,7 @@ namespace CompilerCore
     {
         Expression expression;
         Expression indexExpression;
-        internal IndexExpression(Expression exp, Expression index)
+        internal IndexExpression(LexLocation location, Expression exp, Expression index) : base(location)
         {
             expression = exp;
             indexExpression = index;
@@ -88,7 +88,7 @@ namespace CompilerCore
     {
         string identifier;
         ExpressionList expressionList;
-        internal FunctionCallExpression(string id, ExpressionList expList)
+        internal FunctionCallExpression(LexLocation location, string id, ExpressionList expList) : base(location)
         {
             identifier = id;
             expressionList = expList;
@@ -98,7 +98,7 @@ namespace CompilerCore
     class IdentifierExpression : Expression
     {
         string identifier;
-        internal IdentifierExpression(string id)
+        internal IdentifierExpression(LexLocation location, string id) : base(location)
         {
             identifier = id;
         }

@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  LAPTOP-KDKHEG7R
-// DateTime: 2021/4/17 21:35:31
+// DateTime: 2021/4/18 12:22:20
 // UserName: zyd20
-// Input file <CompilerCore/RT.y - 2021/4/17 21:34:27>
+// Input file <CompilerCore/RT.y - 2021/4/18 12:22:21>
 
 // options: no-lines diagnose & report gplex
 
@@ -65,9 +65,9 @@ internal class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 internal class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from CompilerCore/RT.y - 2021/4/17 21:34:27
+  // Verbatim content from CompilerCore/RT.y - 2021/4/18 12:22:21
     internal List<Statement> AST;
-  // End verbatim content from CompilerCore/RT.y - 2021/4/17 21:34:27
+  // End verbatim content from CompilerCore/RT.y - 2021/4/18 12:22:21
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -361,43 +361,43 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 13: // statement -> CONTINUE, ';'
 {
-        CurrentSemanticValue.Statement = new ControlStatement(ControlStatement.Type.CONTINUE);
+        CurrentSemanticValue.Statement = new ControlStatement(CurrentLocationSpan, ControlStatement.Type.CONTINUE);
     }
         break;
       case 14: // statement -> BREAK, ';'
 {
-        CurrentSemanticValue.Statement = new ControlStatement(ControlStatement.Type.BREAK);
+        CurrentSemanticValue.Statement = new ControlStatement(CurrentLocationSpan, ControlStatement.Type.BREAK);
     }
         break;
       case 16: // return_statement -> RETURN, ';'
 {
-        CurrentSemanticValue.Statement = new ReturnStatement();
+        CurrentSemanticValue.Statement = new ReturnStatement(CurrentLocationSpan);
     }
         break;
       case 17: // return_statement -> RETURN, expression, ';'
 {
-        CurrentSemanticValue.Statement = new ReturnStatement(ValueStack[ValueStack.Depth-2].Expression);
+        CurrentSemanticValue.Statement = new ReturnStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Expression);
     }
         break;
       case 18: // block_statement -> '{', optional_statement_list, '}'
 {
-        CurrentSemanticValue.Statement = new BlockStatement(ValueStack[ValueStack.Depth-2].StatementList);
+        CurrentSemanticValue.Statement = new BlockStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].StatementList);
     }
         break;
       case 19: // loop_statement -> FOR, '(', for_special_statement, ';', optional_expression, 
                //                   ';', for_special_statement, ')', statement
 {
-        CurrentSemanticValue.Statement = new LoopStatement(ValueStack[ValueStack.Depth-7].Statement, ValueStack[ValueStack.Depth-5].Expression, ValueStack[ValueStack.Depth-3].Statement, ValueStack[ValueStack.Depth-1].Statement);
+        CurrentSemanticValue.Statement = new LoopStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-7].Statement, ValueStack[ValueStack.Depth-5].Expression, ValueStack[ValueStack.Depth-3].Statement, ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
       case 20: // loop_statement -> WHILE, '(', expression, ')', statement
 {
-        CurrentSemanticValue.Statement = new LoopStatement(ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Statement);
+        CurrentSemanticValue.Statement = new LoopStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
       case 25: // if_statement -> IF, '(', expression, ')', statement
 {
-        CurrentSemanticValue.IfStatement = new IfStatement(ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Statement);
+        CurrentSemanticValue.IfStatement = new IfStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
       case 26: // if_statement -> if_statement, ELSE, statement
@@ -408,7 +408,7 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
       case 27: // function_definition_statement -> value_type, IDENTIFIER, '(', parameter_list, 
                //                                  ')', '{', optional_statement_list, '}'
 {
-        CurrentSemanticValue.Statement = new FunctionDefinitionStatement(ValueStack[ValueStack.Depth-8].Type, ValueStack[ValueStack.Depth-7].Identifier, ValueStack[ValueStack.Depth-5].ParameterList, ValueStack[ValueStack.Depth-2].StatementList);
+        CurrentSemanticValue.Statement = new FunctionDefinitionStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-8].Type, ValueStack[ValueStack.Depth-7].Identifier, ValueStack[ValueStack.Depth-5].ParameterList, ValueStack[ValueStack.Depth-2].StatementList);
     }
         break;
       case 28: // optional_statement_list -> /* empty */
@@ -423,12 +423,12 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 31: // parameter_list -> value_type, IDENTIFIER
 {
-        CurrentSemanticValue.ParameterList = new List<FunctionDefinitionStatement.Parameter>{new FunctionDefinitionStatement.Parameter(ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier)};
+        CurrentSemanticValue.ParameterList = new List<FunctionDefinitionStatement.Parameter>{new FunctionDefinitionStatement.Parameter(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier)};
     }
         break;
       case 32: // parameter_list -> parameter_list, ',', value_type, IDENTIFIER
 {
-        ValueStack[ValueStack.Depth-4].ParameterList.Add(new FunctionDefinitionStatement.Parameter(ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier));
+        ValueStack[ValueStack.Depth-4].ParameterList.Add(new FunctionDefinitionStatement.Parameter(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier));
         CurrentSemanticValue.ParameterList = ValueStack[ValueStack.Depth-4].ParameterList;
     }
         break;
@@ -451,12 +451,12 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 41: // declaration_statement -> value_type, declaration_list
 {
-        CurrentSemanticValue.Statement = new DeclarationStatement(ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].DeclarationList);
+        CurrentSemanticValue.Statement = new DeclarationStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].DeclarationList);
     }
         break;
       case 42: // declaration_statement -> CONST, value_type, declaration_list
 {
-        CurrentSemanticValue.Statement = new DeclarationStatement(ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].DeclarationList, true);
+        CurrentSemanticValue.Statement = new DeclarationStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].DeclarationList, true);
     }
         break;
       case 43: // declaration_list -> declaration_item
@@ -472,139 +472,139 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 45: // declaration_item -> IDENTIFIER
 {
-        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(ValueStack[ValueStack.Depth-1].Identifier);
+        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Identifier);
     }
         break;
       case 46: // declaration_item -> IDENTIFIER, '=', expression
 {
-        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(ValueStack[ValueStack.Depth-3].Identifier, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Identifier, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 47: // declaration_item -> IDENTIFIER, '[', INT_LITERAL, ']'
 {
-        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(ValueStack[ValueStack.Depth-4].Identifier, null, ValueStack[ValueStack.Depth-2].IntLiteral);
+        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-4].Identifier, null, ValueStack[ValueStack.Depth-2].IntLiteral);
     }
         break;
       case 48: // assignment_statement -> assignment_lval_expression, '=', expression
 {
-        CurrentSemanticValue.Statement = new AssignmentStatement(ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Statement = new AssignmentStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 49: // assignment_statement -> assignment_lval_expression, INCREMENT
 {
-        var one = new IntLiteralExpression(1);
-        CurrentSemanticValue.Statement = new AssignmentStatement(ValueStack[ValueStack.Depth-2].Expression, new BinaryExpression(BinaryExpression.Type.ADD, ValueStack[ValueStack.Depth-2].Expression, one));
+        var one = new IntLiteralExpression(CurrentLocationSpan, 1);
+        CurrentSemanticValue.Statement = new AssignmentStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Expression, new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.ADD, ValueStack[ValueStack.Depth-2].Expression, one));
     }
         break;
       case 50: // assignment_statement -> assignment_lval_expression, DECREMENT
 {
-        var one = new IntLiteralExpression(1);
-        CurrentSemanticValue.Statement = new AssignmentStatement(ValueStack[ValueStack.Depth-2].Expression, new BinaryExpression(BinaryExpression.Type.SUB, ValueStack[ValueStack.Depth-2].Expression, one));
+        var one = new IntLiteralExpression(CurrentLocationSpan, 1);
+        CurrentSemanticValue.Statement = new AssignmentStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Expression, new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.SUB, ValueStack[ValueStack.Depth-2].Expression, one));
     }
         break;
       case 53: // binary_expression -> expression, '+', expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.ADD, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.ADD, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 54: // binary_expression -> expression, '-', expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.SUB, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.SUB, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
     }
         break;
       case 55: // binary_expression -> expression, '*', expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.MUL, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.MUL, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
     }
         break;
       case 56: // binary_expression -> expression, '/', expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.DIV, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.DIV, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
     }
         break;
       case 57: // binary_expression -> expression, '%', expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.MOD, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.MOD, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);            
     }
         break;
       case 58: // binary_expression -> expression, "==", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.EQ, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.EQ, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 59: // binary_expression -> expression, "!=", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.NE, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.NE, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 60: // binary_expression -> expression, ">", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.GT, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.GT, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 61: // binary_expression -> expression, ">=", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.GE, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.GE, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 62: // binary_expression -> expression, "<", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.LT, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.LT, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 63: // binary_expression -> expression, "<=", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.LE, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.LE, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 64: // binary_expression -> expression, "&&", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.AND, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.AND, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 65: // binary_expression -> expression, "||", expression
 {
-        CurrentSemanticValue.Expression = new BinaryExpression(BinaryExpression.Type.OR, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new BinaryExpression(CurrentLocationSpan, BinaryExpression.Type.OR, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 66: // unary_expression -> '-', expression
 {
-        CurrentSemanticValue.Expression = new UnaryExpression(UnaryExpression.Type.NEGATE, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new UnaryExpression(CurrentLocationSpan, UnaryExpression.Type.NEGATE, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 67: // unary_expression -> '!', expression
 {
-        CurrentSemanticValue.Expression = new UnaryExpression(UnaryExpression.Type.NOT, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.Expression = new UnaryExpression(CurrentLocationSpan, UnaryExpression.Type.NOT, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 68: // identifier_expression -> IDENTIFIER
 {
-        CurrentSemanticValue.Expression = new IdentifierExpression(ValueStack[ValueStack.Depth-1].Identifier);
+        CurrentSemanticValue.Expression = new IdentifierExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Identifier);
     }
         break;
       case 73: // index_expression -> possible_array_expression, '[', expression, ']'
 {
-        CurrentSemanticValue.Expression = new IndexExpression(ValueStack[ValueStack.Depth-4].Expression, ValueStack[ValueStack.Depth-2].Expression);
+        CurrentSemanticValue.Expression = new IndexExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-4].Expression, ValueStack[ValueStack.Depth-2].Expression);
     }
         break;
       case 74: // literal_expression -> INT_LITERAL
 {
-        CurrentSemanticValue.Expression = new IntLiteralExpression(ValueStack[ValueStack.Depth-1].IntLiteral);
+        CurrentSemanticValue.Expression = new IntLiteralExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].IntLiteral);
     }
         break;
       case 75: // literal_expression -> FLOAT_LITERAL
 {
-        CurrentSemanticValue.Expression = new FloatLiteralExpression(ValueStack[ValueStack.Depth-1].FloatLiteral);
+        CurrentSemanticValue.Expression = new FloatLiteralExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].FloatLiteral);
     }
         break;
       case 76: // literal_expression -> VECTOR_LITERAL
 {
-        CurrentSemanticValue.Expression = new VectorLiteralExpression(ValueStack[ValueStack.Depth-1].VectorLiteral);
+        CurrentSemanticValue.Expression = new VectorLiteralExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].VectorLiteral);
     }
         break;
       case 77: // function_call_expression -> IDENTIFIER, '(', expression_list, ')'
 {
-        CurrentSemanticValue.Expression = new FunctionCallExpression(ValueStack[ValueStack.Depth-4].Identifier, ValueStack[ValueStack.Depth-2].ExpressionList);
+        CurrentSemanticValue.Expression = new FunctionCallExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-4].Identifier, ValueStack[ValueStack.Depth-2].ExpressionList);
     }
         break;
       case 79: // expression_list -> expression
