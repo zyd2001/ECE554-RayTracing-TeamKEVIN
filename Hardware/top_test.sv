@@ -12,16 +12,20 @@ module top_test(clk, rst, rx, tx);
     reg we_RT[3:0], re_RT[3:0];
     reg re_MC;
     reg [31:0] addr_RT[3:0], addr_MC;
+	 wire [31:0] addr_RT_bank[3:0];
     wire rdy_RT[3:0], rdy_MC;
     wire [127:0] data_RT_out[3:0], data_MC_out;
 
     reg [127:0] data_RT_in[3:0];
 	logic [127:0] data_MC_out;
 	logic [127:0] data_MC_reg;
-    mem_main #(.NUM_THREAD(32)) mem_main(.clk(clk), .rst_n(rst_n), .re_RT(re_RT), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
+    mem_main #(.NUM_THREAD(32)) mem_main(.clk(clk), .rst_n(rst_n), .re_RT(re_RT), .we_RT(we_RT), .addr_RT(addr_RT_bank), .data_RT_in(data_RT_in)
     , .re_MC(re_MC), .data_RT_out(data_RT_out), .rd_rdy_RT(rdy_RT), .data_MC_out()
     , .rdy_MC());
-	
+	assign addr_RT_bank[0] = re_MC ? addr_MC : addr_RT[0];
+	assign addr_RT_bank[1] = addr_RT[1];
+	assign addr_RT_bank[2] = addr_RT[2];
+	assign addr_RT_bank[3] = addr_RT[3];
     reg [63:0] data_out_0[3:0];
     reg [63:0] data_out_1[1:0];
     reg [63:0] data_out_2;
@@ -66,14 +70,14 @@ module top_test(clk, rst, rx, tx);
             addr_RT[1] <= 32'h00100000;
             addr_RT[2] <= 32'h00200000;
             addr_RT[3] <= 32'h00300000;
-            addr_MC <= 32'b0;
+//            addr_MC <= 32'b0;
         end
         else begin
              addr_RT[0] <= rx.c0.data[127:0];
              addr_RT[1] <= rx.c0.data[255:128];
              addr_RT[2] <= rx.c0.data[383:256];
              addr_RT[3] <= rx.c0.data[511:384];
-             addr_MC <= rx.c0.data[255:128];
+//             addr_MC <= rx.c0.data[255:128];
         end
     end
 
@@ -121,6 +125,15 @@ re_RT[0] <= rx.c0.data[0];
         end
         else begin
             re_MC <= rx.c0.data[6];
+        end
+    end
+	 
+	 always_ff @( posedge clk, negedge rst_n ) begin
+        if (!rst_n) begin 
+            addr_MC <= 32'b0;
+        end
+        else begin
+            addr_MC <= rx.c0.data[31:0];
         end
     end
    
