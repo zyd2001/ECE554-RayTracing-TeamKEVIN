@@ -18,16 +18,9 @@ module top_test(clk, rst, rx, tx);
     reg [127:0] data_RT_in[3:0];
 	logic [127:0] data_MC_out;
 	logic [127:0] data_MC_reg;
-    mem_main #(.NUM_THREAD(16)) mem_main(.clk(clk), .rst_n(rst_n), .re_RT(re_RT), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
-    , .re_MC(re_MC), .data_RT_out(data_RT_out), .rd_rdy_RT(rdy_RT), .data_MC_out(data_MC_out)
+    mem_main #(.NUM_THREAD(32)) mem_main(.clk(clk), .rst_n(rst_n), .re_RT(re_RT), .we_RT(we_RT), .addr_RT(addr_RT), .data_RT_in(data_RT_in)
+    , .re_MC(re_MC), .data_RT_out(data_RT_out), .rd_rdy_RT(rdy_RT), .data_MC_out()
     , .rdy_MC());
-
-	always_ff @(posedge clk, negedge rst_n) begin
-		if (!rst_n)
-			data_MC_reg <= 128'b0;
-		else 
-			data_MC_reg <= data_MC_out;
-	end
 	
     reg [63:0] data_out_0[3:0];
     reg [63:0] data_out_1[1:0];
@@ -65,8 +58,7 @@ module top_test(clk, rst, rx, tx);
             data_out_2 <= data_out_1[0] & data_out_1[1];
     end
 
-   assign tx.c2.data = data_out_2 & data_MC_reg[127:64] & data_MC_reg[63:0];
-	//assign tx.c2.data = data_out_2;
+	assign tx.c2.data = data_out_2;
 
      always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin 
