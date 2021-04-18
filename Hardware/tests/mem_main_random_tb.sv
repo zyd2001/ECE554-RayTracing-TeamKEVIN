@@ -1,7 +1,7 @@
 module mem_main_random_tb();
     
     parameter NUM_RT = 4;
-    parameter NUM_THREAD = 64;
+    parameter NUM_THREAD = 32;
     parameter NUM_BANK_PTHREAD = 4;
     localparam TESTS = 4;
     localparam TEST_CYCLE = 100000;
@@ -24,14 +24,11 @@ module mem_main_random_tb();
     logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
 
-    logic rdy_MC;
-    logic [127:0] data_MC_out;
-
     always #1 clk = ~clk;
 
 
     mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                  data_RT_out, rd_rdy_RT, data_MC_out, rdy_MC);
+                  data_RT_out, rd_rdy_RT);
     
     logic [127:0] data_RT_copy[NUM_RT+1:0];
     logic [31:0] addr_RT_copy[NUM_RT+1:0];
