@@ -1,9 +1,13 @@
 using System.Collections.Generic;
 using System;
+using QUT.Gppg;
 
 namespace CompilerCore
 {
-    abstract class Statement : ASTNode { }
+    abstract class Statement : ASTNode
+    {
+        internal Statement(LexLocation location) : base(location) { }
+    }
 
     enum Type
     {
@@ -13,8 +17,8 @@ namespace CompilerCore
     class ReturnStatement : Statement
     {
         Expression expression = null;
-        internal ReturnStatement() { }
-        internal ReturnStatement(Expression exp)
+        internal ReturnStatement(LexLocation location) : base(location) { }
+        internal ReturnStatement(LexLocation location, Expression exp) : base(location)
         {
             expression = exp;
         }
@@ -27,7 +31,7 @@ namespace CompilerCore
             CONTINUE, BREAK
         }
         Type type;
-        internal ControlStatement(Type type)
+        internal ControlStatement(LexLocation location, Type type) : base(location)
         {
             this.type = type;
         }
@@ -39,13 +43,14 @@ namespace CompilerCore
         Expression condition;
         Statement iterateStatement = null;
         Statement loopBody;
-        internal LoopStatement(Expression exp, Statement body)
+        internal LoopStatement(LexLocation location, Expression exp, Statement body) : base(location)
         {
             condition = exp;
             loopBody = body;
         }
 
-        internal LoopStatement(Statement initial, Expression exp, Statement iterate, Statement body)
+        internal LoopStatement(LexLocation location, Statement initial, Expression exp,
+            Statement iterate, Statement body) : base(location)
         {
             initialStatement = initial;
             condition = exp;
@@ -59,7 +64,7 @@ namespace CompilerCore
         Expression condition;
         Statement statement;
         Statement elseStatement = null;
-        internal IfStatement(Expression exp, Statement statement)
+        internal IfStatement(LexLocation location, Expression exp, Statement statement) : base(location)
         {
             condition = exp;
             this.statement = statement;
@@ -75,7 +80,7 @@ namespace CompilerCore
     class BlockStatement : Statement
     {
         List<Statement> statementList;
-        internal BlockStatement(List<Statement> list)
+        internal BlockStatement(LexLocation location, List<Statement> list) : base(location)
         {
             statementList = list;
         }
@@ -85,7 +90,7 @@ namespace CompilerCore
     {
         Expression left;
         Expression right;
-        internal AssignmentStatement(Expression l, Expression r)
+        internal AssignmentStatement(LexLocation location, Expression l, Expression r) : base(location)
         {
             left = l;
             right = r;
@@ -94,12 +99,13 @@ namespace CompilerCore
 
     class DeclarationStatement : Statement
     {
-        internal class DeclarationItem
+        internal class DeclarationItem : ASTNode
         {
             string identifier;
             Expression initializer;
             int arraySize;
-            internal DeclarationItem(string id, Expression init = null, int size = 1)
+            internal DeclarationItem(LexLocation location, string id, Expression init = null,
+                int size = 1) : base(location)
             {
                 identifier = id;
                 initializer = init;
@@ -109,7 +115,8 @@ namespace CompilerCore
         Type type;
         bool constant;
         List<DeclarationItem> declarationList;
-        internal DeclarationStatement(Type type, List<DeclarationItem> list, bool c = false)
+        internal DeclarationStatement(LexLocation location, Type type, List<DeclarationItem> list,
+            bool c = false) : base(location)
         {
             this.type = type;
             declarationList = list;
@@ -119,11 +126,11 @@ namespace CompilerCore
 
     class FunctionDefinitionStatement : Statement
     {
-        internal class Parameter
+        internal class Parameter : ASTNode
         {
             Type type;
             string identifier;
-            internal Parameter(Type type, string id)
+            internal Parameter(LexLocation location, Type type, string id) : base(location)
             {
                 this.type = type;
                 identifier = id;
@@ -133,17 +140,18 @@ namespace CompilerCore
         string functionName;
         List<Parameter> parameterList;
         List<Statement> statementList;
-        internal FunctionDefinitionStatement(Type type, string name, List<Parameter> parameters, List<Statement> statements)
+        internal FunctionDefinitionStatement(LexLocation location, Type type, string name,
+            List<Parameter> parameters, List<Statement> statements) : base(location)
         {
             returnType = type;
             functionName = name;
             parameterList = parameters;
             statementList = statements;
         }
-        // internal override void StaticCheck(bool topLevel)
-        // {
-        //     if (!topLevel)
-        //         ;
-        // }
+        internal void StaticCheck(bool topLevel)
+        {
+            if (!topLevel)
+                Error("sble");
+        }
     }
 }

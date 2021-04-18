@@ -9,6 +9,7 @@
 %namespace CompilerCore
 %visibility internal
 %option summary
+%using QUT.Gppg;
 
 identifier [a-zA-Z_][a-zA-Z_0-9]*
 digits [0-9]+
@@ -70,4 +71,8 @@ digits [0-9]+
     return (int)Tokens.VECTOR_LITERAL;
 }
 "//".* ;
+
+%{
+    yylloc = new LexLocation(tokLin,tokCol,tokELin,tokECol);
+%}
 %%

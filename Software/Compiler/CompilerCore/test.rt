@@ -1,5 +1,30 @@
+// #define vector double
+
 int a = 0;
+float c = 1.2;
 void main()
 {
-    int b = c;
+    int b = a + a * (b - c) + (b - c) * c;
+}
+
+int func() { return a / c; }
+
+vector test(int v, float c, vector b)
+{
+    int array[13];
+    for (int i = 0; i < 100; i++)
+    {
+        if (a)
+        {
+            return a;
+        }
+        else if (b)
+        {
+            return b;
+        }
+        else
+        {
+            return func();
+        }
+    }
 }

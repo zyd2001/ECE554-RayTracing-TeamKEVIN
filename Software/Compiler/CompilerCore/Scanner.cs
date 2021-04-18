@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  LAPTOP-KDKHEG7R
-//  DateTime: 2021/4/17 22:39:36
+//  DateTime: 2021/4/17 23:09:53
 //  UserName: zyd20
-//  GPLEX input file <CompilerCore/RT.l - 2021/4/17 22:37:32>
+//  GPLEX input file <CompilerCore/RT.l - 2021/4/17 23:08:17>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: parser, minimize
@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
 
+using QUT.Gppg;
 
 namespace CompilerCore
 {   
@@ -989,6 +990,7 @@ int NextState() {
         // ============== The main tokenizer code =================
 
         int Scan() {
+            try {
                 for (; ; ) {
                     int next;              // next state to enter
 #if LEFTANCHORS
@@ -1198,6 +1200,12 @@ return (int)Tokens.NE;
 #endregion
                     }
                 }
+            } // end try
+            finally {
+// User-specified epilog to scan()
+yylloc = new LexLocation(tokLin,tokCol,tokELin,tokECol);
+// End, user-specified epilog
+            } // end finally
         }
 
 #if BACKUP
