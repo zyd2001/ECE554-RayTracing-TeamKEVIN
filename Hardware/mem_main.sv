@@ -1,5 +1,5 @@
 module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                data_RT_out, rd_rdy_RT, data_MC_out, rdy_MC);
+                data_RT_out, rd_rdy_RT);
 
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 64;
@@ -18,6 +18,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     input [127:0] data_RT_in[NUM_RT-1:0];
     //MC
     input re_MC;
+    //MC read is using the first port
 
     /*
         Output
@@ -25,14 +26,9 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
     //RT
     output reg rd_rdy_RT[NUM_RT-1:0];
     output [127:0] data_RT_out[NUM_RT-1:0];
-    //MC
-    output reg rdy_MC;
-    output [127:0] data_MC_out;
-
 
     // Generate variable
     genvar i, j;
-
 
     //Read Ready per RT pipeline
     //Pipeline 0-3
@@ -89,7 +85,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
         end
     endgenerate
 
-
     //RAM Addr Calculate for each bank
     //Pipeline 0
     logic [5:0] thread_id_pre[NUM_RT-1:0];
@@ -136,8 +131,8 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
 
     //Bank ID
     //Pipeline 0-3
-    logic [1:0] bank_id_0[NUM_RT-1:0][3:0], bank_id_1[NUM_RT-1:0][3:0]
-            , bank_id_2[NUM_RT-1:0][3:0], bank_id_3[NUM_RT-1:0][3:0], bank_id_4[NUM_RT-1:0][3:0];
+    logic [1:0] bank_id_0[NUM_RT-1:0][3:0], bank_id_1[NUM_RT-1:0][3:0], 
+            bank_id_2[NUM_RT-1:0][3:0], bank_id_3[NUM_RT-1:0][3:0], bank_id_4[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
             for (j = 0; j < 4; j = j + 1) begin
@@ -242,10 +237,11 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
                                         : bank_id_pre[i][1] == 2'h3 ? data_RT_in[i][63:32]
                                         : bank_id_pre[i][2] == 2'h3 ? data_RT_in[i][95:64]
                                         : data_RT_in[i][127:96];
-				end
-			end
+                end
+            end
         end
     endgenerate
+
     //Pipeline 1
     logic [31:0] data_bank_1[NUM_THREAD-1:0][3:0];
     generate
@@ -288,7 +284,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
         end
     endgenerate
 
-
     logic [127:0] q_compact_2[NUM_THREAD-1:0];
     logic [127:0] q_mux_2[7:0][3:0];
     generate
@@ -299,7 +294,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
             assign q_mux_2[j] = {q_compact_2[j*4+3], q_compact_2[j*4+2], q_compact_2[j*4+1], q_compact_2[j*4]};
         end
     endgenerate 
-
 
     //Read output pipeline
     //Pipeline 3
@@ -330,20 +324,6 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
             end
         end
     endgenerate
-
-    // logic [31:0] data_RT_out_3[NUM_RT-1:0][3:0];
-    // generate
-        // for (i = 0; i < NUM_RT; i = i + 1) begin
-        //     for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
-        //         always_ff @(posedge clk, negedge rst_n) begin
-        //             if (!rst_n)
-        //                 data_RT_out_3[i][j] <= 32'b0;
-        //             else
-        //                 data_RT_out_3[i][j] <= q_bank_2[thread_id_2[i]][j];
-        //         end
-        //     end
-        // end
-    // endgenerate
 
     //Pipeline 4
     logic [127:0] data_out_4[NUM_RT-1:0];
@@ -383,70 +363,4 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
 
         end
     endgenerate
-
-    /*
-        Memory Controller Read Output
-    */
-
-    // MC Counter
-    // logic addr_mc_inc;
-    // logic addr_mc_clr;
-    // logic [BIT_THREAD:0] addr_MC;
-    // always_ff @( posedge clk, negedge rst_n ) begin
-    //     if (!rst_n) 
-    //         addr_MC <= '0;
-    //     else if (addr_mc_clr) 
-    //         addr_MC <= '0;
-    //     else if (addr_mc_inc) 
-    //         addr_MC <= addr_MC + {{BIT_THREAD{1'b0}}, {1'b1}};
-    // end
-
-    // assign data_MC_out[127:96] = q_bank_2[addr_MC[BIT_THREAD-1:0]][3];
-    // assign data_MC_out[95:64] = q_bank_2[addr_MC[BIT_THREAD-1:0]][2];
-    // assign data_MC_out[63:32] = q_bank_2[addr_MC[BIT_THREAD-1:0]][1];
-    // assign data_MC_out[31:0] = q_bank_2[addr_MC[BIT_THREAD-1:0]][0];
-
-    // // State Machine for MC read
-    // typedef enum reg [1:0] {IDLE, WAIT_1, WAIT_2, READ} state_t;
-    // state_t state, nxt_state;
-    // always_ff @( posedge clk, negedge rst_n ) begin
-    //     if (!rst_n)
-    //         state <= IDLE;
-    //     else
-    //         state <= nxt_state;
-    // end
-    // always_comb begin
-    //     nxt_state = IDLE;
-    //     addr_mc_inc = 1'b0;
-    //     addr_mc_clr = 1'b0;
-    //     re_MC_clr = 1'b0;
-    //     re_MC_en = 1'b1;
-    //     rdy_MC = 1'b0;
-        
-    //     case(state)
-    //         IDLE: begin
-    //             if (re_MC) 
-    //                 nxt_state = WAIT_1;
-    //         end
-    //         WAIT_1: begin
-    //             nxt_state = WAIT_2;
-    //             re_MC_en = 1'b1;
-    //         end
-    //         WAIT_2: begin
-    //             nxt_state = READ; 
-    //         end
-    //         default: begin
-    //             rdy_MC = 1'b1;
-    //             if (addr_MC[BIT_THREAD] == 1'b1) begin
-    //                 addr_mc_clr = 1'b1;
-    //                 re_MC_clr = 1'b1;
-    //             end
-    //             else begin
-    //                 nxt_state = READ;
-    //                 addr_mc_inc = 1'b1;
-    //             end
-    //         end
-    //     endcase
-    // end
-
 endmodule

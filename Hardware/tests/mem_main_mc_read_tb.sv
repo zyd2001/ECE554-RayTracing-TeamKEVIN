@@ -1,7 +1,7 @@
 module mem_main_mc_read_tb();
     
     parameter NUM_RT = 4;
-    parameter NUM_THREAD = 64;
+    parameter NUM_THREAD = 32;
     parameter NUM_BANK_PTHREAD = 4;
     localparam TESTS = 1000;
     localparam ADDRESS_DEPTH_PBANK = 12;
@@ -25,14 +25,11 @@ module mem_main_mc_read_tb();
     logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
 
-    logic rdy_MC;
-    logic [127:0] data_MC_out;
-
     always #1 clk = ~clk;
 
 
     mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                  data_RT_out, rd_rdy_RT, data_MC_out, rdy_MC);
+                  data_RT_out, rd_rdy_RT);
     
     logic [127:0] datastore [NUM_THREAD-1:0];
     logic RT_busy[NUM_RT-1:0];
@@ -86,12 +83,13 @@ module mem_main_mc_read_tb();
             // test pipe read from mc
             while(!end_test) begin
                 re_MC = 1'b1;
+                addr_RT[0] = {addr_RT_thread[0], addr_RT_base, 4'b0};
                 @(posedge clk);
-                if(rdy_MC) begin
+                if(rd_rdy_RT[0]) begin
                     test_count++;
-                    if(data_MC_out !== datastore[addr_RT_thread[0]]) begin
+                    if(data_RT_out[0] !== datastore[addr_RT_thread[0]]) begin
                         $display("Error! At thread: %d, data expecting: 0x%h, data got: 0x%h", 
-                                addr_RT_thread[0], datastore[addr_RT_thread[0]], data_MC_out); 
+                                addr_RT_thread[0], datastore[addr_RT_thread[0]], data_RT_out[0]); 
                         error ++;
                         //$stop();
                     end

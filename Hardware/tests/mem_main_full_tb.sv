@@ -1,7 +1,7 @@
 module mem_main_full_tb();
     
     parameter NUM_RT = 4;
-    parameter NUM_THREAD = 64;
+    parameter NUM_THREAD = 32;
     parameter NUM_BANK_PTHREAD = 4;
     localparam TESTS = 2;
     localparam ADDRESS_DEPTH_PBANK = 12;
@@ -23,14 +23,11 @@ module mem_main_full_tb();
     logic rd_rdy_RT[NUM_RT-1:0];
     logic [127:0] data_RT_out[NUM_RT-1:0];
 
-    logic rdy_MC;
-    logic [127:0] data_MC_out;
-
     always #1 clk = ~clk;
 
 
     mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in, re_MC,
-                  data_RT_out, rd_rdy_RT, data_MC_out, rdy_MC);
+                  data_RT_out, rd_rdy_RT);
     
     logic [127:0] data_RT_copy[NUM_RT+1:0];
     logic [31:0] addr_RT_copy[NUM_RT+1:0];
@@ -40,6 +37,8 @@ module mem_main_full_tb();
     int test_count = 0;
     logic [1:0] end_test;
     int k = 0;
+    int prevk = 0;
+    int cycleperprint = 1 << 15;
     initial begin
         for(int test = 0; test < TESTS; test++) begin
             $display("Test %d starting... ", test);
@@ -76,8 +75,8 @@ module mem_main_full_tb();
                             end_test = 2'b01;
                         end
                         addr_RT_base[i] ++;
-                        if(k % 16384 == 0) begin
-                            $display("current address 0x%h", addr_RT[i]);
+                        if(k % cycleperprint < prevk) begin
+                            $display("cycle %d, current address 0x%h at port %d", k, addr_RT[i], i);
                         end
                     end
                     if(we_RT[i] & !re_RT[i]) begin
@@ -95,6 +94,9 @@ module mem_main_full_tb();
                             we_RT_copy[0] = we_RT_copy[NUM_RT];
                         end
                     end
+                end
+                if(we_RT[0] & !re_RT[0]) begin
+                   prevk = k % cycleperprint;
                 end
                 @(posedge clk);
                 @(negedge clk);
