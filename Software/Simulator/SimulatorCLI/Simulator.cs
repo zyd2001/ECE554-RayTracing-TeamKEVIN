@@ -91,7 +91,7 @@ namespace SimulatorCLI
                 {
                     RTOutputFile.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
-                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.i, trace.after.i);
+                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.Hex(), trace.after.Hex());
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
                         RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, trace.before, trace.after);
                     foreach (var trace in RT.DataMemory.TraceLog)
