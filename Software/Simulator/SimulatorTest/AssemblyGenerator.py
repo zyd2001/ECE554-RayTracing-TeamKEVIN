@@ -47,7 +47,7 @@ def generate_rt(num_instrs):
     instr_list = []
     bits_list = []
     f = open(os.path.join( os.getcwd(), '..', 'RT.isa' ))
-    out_file = open('rand_assembly.txt', 'w')
+    out_file = open('rand_assembly.asm', 'w')
     lines = f.readlines()
     lindex = len(lines)
     for line in lines:
@@ -78,5 +78,5 @@ def generate_rt(num_instrs):
     out_file.writelines(instrs)
     return
 
-generate_rt(5)
+generate_rt(50)
 #print(gen_rand_from_bits(2))
