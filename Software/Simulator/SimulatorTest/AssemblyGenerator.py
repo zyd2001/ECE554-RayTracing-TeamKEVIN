@@ -25,9 +25,8 @@ def generate_cp(num_instrs):
     
     instrs = []
     for i in range(0, num_instrs):
-        instr = ""
+        instr = "\t"
         instr_index = random.randint(0, len(instr_list) - 6) # for now does not support pseudo instruction
-
         instr += instr_list[instr_index][0]
         for j in range(1, len(instr_list[instr_index])):
             if instr_list[instr_index][j] == 'r':
@@ -61,7 +60,7 @@ def generate_rt(num_instrs):
     
     instrs = []
     for i in range(0, num_instrs):
-        instr = ""
+        instr = "\t"
         instr_index = random.randint(0, len(instr_list) - 8) # for now does not support pseudo instruction
 
         instr += instr_list[instr_index][0]
@@ -78,5 +77,5 @@ def generate_rt(num_instrs):
     out_file.writelines(instrs)
     return
 
-generate_rt(50)
+generate_rt(5)
 #print(gen_rand_from_bits(2))
