@@ -34,3 +34,6 @@ work/
 
 *.mpf
 *.vcd
+Software/Assembler/rand_assembly.asm
+Software/Simulator/SimulatorTest/rand_assembly.asm
+Software/Assembler/rand_assembly.asm.out

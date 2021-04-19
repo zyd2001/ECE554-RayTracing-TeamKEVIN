@@ -25,9 +25,8 @@ def generate_cp(num_instrs):
     
     instrs = []
     for i in range(0, num_instrs):
-        instr = ""
+        instr = "\t"
         instr_index = random.randint(0, len(instr_list) - 6) # for now does not support pseudo instruction
-
         instr += instr_list[instr_index][0]
         for j in range(1, len(instr_list[instr_index])):
             if instr_list[instr_index][j] == 'r':
@@ -47,7 +46,7 @@ def generate_rt(num_instrs):
     instr_list = []
     bits_list = []
     f = open(os.path.join( os.getcwd(), '..', 'RT.isa' ))
-    out_file = open('rand_assembly.txt', 'w')
+    out_file = open('rand_assembly.asm', 'w')
     lines = f.readlines()
     lindex = len(lines)
     for line in lines:
@@ -61,7 +60,7 @@ def generate_rt(num_instrs):
     
     instrs = []
     for i in range(0, num_instrs):
-        instr = ""
+        instr = "\t"
         instr_index = random.randint(0, len(instr_list) - 8) # for now does not support pseudo instruction
 
         instr += instr_list[instr_index][0]
