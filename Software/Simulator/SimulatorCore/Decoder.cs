@@ -58,6 +58,7 @@ namespace SimulatorCore
                             newDef.realSize++;
                             break;
                         case "i":
+                        case "ui":
                         case "l":
                             newDef.section[i - 1] = OperandType.Immediate;
                             newDef.realSize++;
