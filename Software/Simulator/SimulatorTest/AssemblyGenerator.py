@@ -10,7 +10,7 @@ def generate_cp(num_instrs):
     # list of possible instructions generated
     instr_list = []
     bits_list = []
-    f = open(os.path.join( os.getcwd(), '..', 'CP.isa' ))
+    f = open(os.path.join( os.getcwd(), '..', '..','Assembler', 'CP.isa' ))
     out_file = open('rand_assembly.txt', 'w')
     lines = f.readlines()
     lindex = len(lines)
@@ -45,7 +45,7 @@ def generate_rt(num_instrs):
     # list of possible instructions generated
     instr_list = []
     bits_list = []
-    f = open(os.path.join( os.getcwd(), '..', 'RT.isa' ))
+    f = open(os.path.join( os.getcwd(), '..', '..','Assembler', 'RT.isa' ))
     out_file = open('rand_assembly.asm', 'w')
     lines = f.readlines()
     lindex = len(lines)
