@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2021.04.19.09:20:54"
+ outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Natives/Native_Fixed_Add/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="Stratix 10"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="1SX280HN2F43E2VG"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="2"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK0_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK0_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK0_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK1_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK1_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK1_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK2_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK2_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK2_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="ay" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="ay" direction="input" role="ay" width="18" />
+  </interface>
+  <interface name="by" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="by" direction="input" role="by" width="18" />
+  </interface>
+  <interface name="ax" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="ax" direction="input" role="ax" width="18" />
+  </interface>
+  <interface name="bx" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="bx" direction="input" role="bx" width="18" />
+  </interface>
+  <interface name="resulta" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="resulta" direction="output" role="resulta" width="37" />
+  </interface>
+  <interface name="clk0" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clk0" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="clk1" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clk1" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="clk2" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clk2" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="ena" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="ena" direction="input" role="ena" width="3" />
+  </interface>
+ </perimeter>
+ <entity kind="Native_Fixed_Add" version="1.0" name="Native_Fixed_Add">
+  <parameter name="AUTO_CLK0_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK2_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_CLK0_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK2_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK2_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_GENERATION_ID" value="0" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Stratix 10" />
+  <parameter name="AUTO_CLK1_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK1_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="2" />
+  <parameter name="AUTO_CLK1_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_DEVICE" value="1SX280HN2F43E2VG" />
+  <parameter name="AUTO_CLK0_CLOCK_RATE" value="-1" />
+  <generatedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Natives/Native_Fixed_Add/synth/Native_Fixed_Add.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Natives/Native_Fixed_Add/synth/Native_Fixed_Add.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Natives/Native_Fixed_Add.ip" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/native_mac/s10/fourteennm_mac_native_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Info" culprit="Native_Fixed_Add">"Generating: Native_Fixed_Add"</message>
+   <message level="Info" culprit="Native_Fixed_Add">"Generating: Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i"</message>
+  </messages>
+ </entity>
+ <entity
+   kind="altera_s10_native_fixed_point_dsp"
+   version="19.1"
+   name="Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i">
+  <parameter name="by_width" value="18" />
+  <parameter name="bx_clock" value="0" />
+  <parameter name="ax_clock" value="0" />
+  <parameter name="checklist_current_mode_support_oprstr_B" value="" />
+  <parameter name="input_systolic_clock_derived" value="none" />
+  <parameter name="enable_clkena0" value="false" />
+  <parameter name="enable_clkena1" value="false" />
+  <parameter name="load_const_clock_derived" value="none" />
+  <parameter name="result_a_width" value="37" />
+  <parameter name="ay_use_scan_in" value="false" />
+  <parameter name="negate_clock" value="0" />
+  <parameter name="by_use_scan_in" value="false" />
+  <parameter name="coef_sel_a_clock_derived" value="none" />
+  <parameter
+     name="checklist_all_parameter"
+     value="operation_mode,operand_source_max,operand_source_may,operand_source_mbx,operand_source_mby,preadder_subtract_a,preadder_subtract_b,ay_use_scan_in,by_use_scan_in,delay_scan_out_ay,delay_scan_out_by,enable_chainin,enable_double_accum,chainout_enable,enable_scanout,enable_accumulate,enable_sub,enable_negate,enable_loadconst,enable_clr0,enable_clr1,enable_clkena0,enable_clkena1,enable_clkena2,accumulate_clock,load_const_clock,negate_clock,sub_clock,ay_scan_in_clock,az_clock,ax_clock,coef_sel_a_clock,by_clock,bx_clock,bz_clock,coef_sel_b_clock,input_systolic_clock,input_pipeline_clock,second_pipeline_clock,accum_pipeline_clock,accum_2nd_pipeline_clock,load_const_pipeline_clock,load_const_2nd_pipeline_clock,output_clock" />
+  <parameter name="operand_source_max" value="input" />
+  <parameter name="az_clock" value="0" />
+  <parameter name="operand_source_may" value="input" />
+  <parameter name="input_systolic_clock" value="0" />
+  <parameter name="checklist_feature_sub_all_register_list" value="sub_clock" />
+  <parameter
+     name="checklist_feature_negate_all_register_list"
+     value="negate_clock" />
+  <parameter name="clock2_show" value="false" />
+  <parameter name="ay_scan_in_clock" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_preadder_may_support_register"
+     value="" />
+  <parameter name="enable_sub" value="false" />
+  <parameter name="enable_negate" value="false" />
+  <parameter name="signed_max" value="Signed" />
+  <parameter name="enable_clkena2" value="false" />
+  <parameter name="az_clock_derived" value="none" />
+  <parameter name="checklist_current_mode_feature_coef_support_register" value="" />
+  <parameter name="signed_may" value="Signed" />
+  <parameter name="ax_clock_derived" value="0" />
+  <parameter
+     name="checklist_all_register_list"
+     value="ay_scan_in_clock,output_clock,by_clock,input_pipeline_clock,second_pipeline_clock,input_systolic_clock" />
+  <parameter
+     name="checklist_current_mode_support_register"
+     value="ay_scan_in_clock,output_clock,by_clock,input_pipeline_clock,second_pipeline_clock" />
+  <parameter name="coef_b_7" value="0" />
+  <parameter name="bx_width" value="18" />
+  <parameter name="second_pipeline_clock" value="0" />
+  <parameter name="coef_b_2" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_input_mbx_support_register"
+     value="bx_clock" />
+  <parameter name="coef_b_1" value="0" />
+  <parameter name="coef_b_0" value="0" />
+  <parameter name="coef_b_6" value="0" />
+  <parameter name="coef_b_5" value="0" />
+  <parameter name="coef_b_4" value="0" />
+  <parameter name="coef_b_3" value="0" />
+  <parameter name="sub_clock_derived" value="none" />
+  <parameter name="checklist_current_mode_support_oprstr" value="" />
+  <parameter name="ay_scan_in_width" value="18" />
+  <parameter name="load_const_value" value="0" />
+  <parameter name="checklist_feature_input_max_all_register_list" value="ax_clock" />
+  <parameter name="checklist_feature_input_mbx_all_register_list" value="bx_clock" />
+  <parameter name="signed_mby" value="Signed" />
+  <parameter name="signed_mbx" value="Signed" />
+  <parameter
+     name="checklist_feature_coef_all_register_list"
+     value="coef_sel_a_clock" />
+  <parameter name="delay_scan_out_by" value="false" />
+  <parameter name="accum_2nd_pipeline_clock" value="0" />
+  <parameter name="bz_clock_derived" value="none" />
+  <parameter name="accumulate_clock" value="0" />
+  <parameter name="negate_clock_derived" value="none" />
+  <parameter name="output_clock" value="0" />
+  <parameter name="coef_sel_b_clock_derived" value="none" />
+  <parameter name="delay_scan_out_ay" value="false" />
+  <parameter name="az_width" value="0" />
+  <parameter name="operand_source_mby" value="input" />
+  <parameter name="ax_width" value="18" />
+  <parameter name="operand_source_mbx" value="input" />
+  <parameter name="checklist_all_operation_b" value="preadder_subtract_b" />
+  <parameter name="coef_a_3" value="0" />
+  <parameter name="coef_a_2" value="0" />
+  <parameter
+     name="checklist_feature_preadder_may_all_register_list"
+     value="az_clock" />
+  <parameter name="coef_a_1" value="0" />
+  <parameter name="enable_clr1" value="false" />
+  <parameter name="coef_a_0" value="0" />
+  <parameter name="coef_a_7" value="0" />
+  <parameter name="coef_a_6" value="0" />
+  <parameter name="enable_accumulate" value="false" />
+  <parameter name="enable_clr0" value="false" />
+  <parameter name="load_const_pipeline_clock_derived" value="none" />
+  <parameter name="coef_a_5" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_loadconst_support_register"
+     value="" />
+  <parameter name="coef_a_4" value="0" />
+  <parameter name="clock1_show" value="false" />
+  <parameter name="ay_scan_in_clock_derived" value="0" />
+  <parameter name="enable_double_accum" value="false" />
+  <parameter
+     name="checklist_feature_preadder_mby_all_register_list"
+     value="bz_clock" />
+  <parameter name="scan_out_width" value="0" />
+  <parameter name="load_const_pipeline_clock" value="0" />
+  <parameter name="clear_type" value="none" />
+  <parameter name="accum_pipeline_clock" value="0" />
+  <parameter name="sub_clock" value="0" />
+  <parameter name="load_const_2nd_pipeline_clock_derived" value="none" />
+  <parameter name="load_const_2nd_pipeline_clock" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_accumulate_support_register"
+     value="" />
+  <parameter name="coef_sel_a_clock" value="0" />
+  <parameter name="bz_clock" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_coef_mbx_support_register"
+     value="" />
+  <parameter name="preadder_subtract_b" value="+" />
+  <parameter name="preadder_subtract_a" value="+" />
+  <parameter name="input_pipeline_clock_derived" value="0" />
+  <parameter name="result_b_width" value="0" />
+  <parameter name="bx_clock_derived" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_negate_support_register"
+     value="" />
+  <parameter name="enable_chainin" value="false" />
+  <parameter name="bz_width" value="0" />
+  <parameter name="output_clock_derived" value="0" />
+  <parameter name="by_clock" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_preadder_mby_support_register"
+     value="" />
+  <parameter name="checklist_current_mode_feature_sub_support_register" value="" />
+  <parameter
+     name="checklist_feature_coef_mbx_all_register_list"
+     value="coef_sel_b_clock" />
+  <parameter name="load_const_clock" value="0" />
+  <parameter name="operation_mode" value="m18x18_sumof2" />
+  <parameter name="accum_pipeline_clock_derived" value="none" />
+  <parameter name="accum_2nd_pipeline_clock_derived" value="none" />
+  <parameter name="coef_sel_b_clock" value="0" />
+  <parameter name="accumulate_clock_derived" value="none" />
+  <parameter name="enable_scanout" value="false" />
+  <parameter name="second_pipeline_clock_derived" value="0" />
+  <parameter
+     name="checklist_current_mode_feature_input_max_support_register"
+     value="ax_clock" />
+  <parameter name="chainout_enable" value="false" />
+  <parameter name="input_pipeline_clock" value="0" />
+  <parameter name="by_clock_derived" value="0" />
+  <parameter
+     name="checklist_feature_loadconst_all_register_list"
+     value="load_const_clock,load_const_pipeline_clock,load_const_2nd_pipeline_clock" />
+  <parameter name="clock0_show" value="true" />
+  <parameter name="enable_loadconst" value="false" />
+  <parameter name="checklist_all_operation" value="preadder_subtract_a" />
+  <parameter
+     name="checklist_feature_accumulate_all_register_list"
+     value="accumulate_clock,accum_pipeline_clock,accum_2nd_pipeline_clock" />
+  <generatedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Natives/Native_Fixed_Add/altera_s10_native_fixed_point_dsp_191/synth/Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i.sv"
+       attributes="TOP_LEVEL_FILE" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/Natives/Native_Fixed_Add/altera_s10_native_fixed_point_dsp_191/synth/Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i.sv"
+       attributes="TOP_LEVEL_FILE" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/native_mac/s10/fourteennm_mac_native_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="Native_Fixed_Add" as="s10_native_fixed_point_dsp_0" />
+  <messages>
+   <message level="Info" culprit="Native_Fixed_Add">"Generating: Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i"</message>
+  </messages>
+ </entity>
+</deploy>

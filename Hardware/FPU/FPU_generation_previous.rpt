@@ -61,9 +61,6 @@ Info: FPU: "Generating: fpoint2_multi"
 Info: FPU: Done "FPU" with 2 modules, 15 files
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
-Info: Starting: IP-XACT
-Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FPU.ip --synthesis=VERILOG --ipxact --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FPU --family="Stratix 10" --part=1SX280HN2F43E2VG
-Info: Finished: IP-XACT
 Info: Starting: Generate IP Core Documentation
 Info: No documentation filesets were found for components in FPU. No files generated.
 Info: Finished: Generate IP Core Documentation

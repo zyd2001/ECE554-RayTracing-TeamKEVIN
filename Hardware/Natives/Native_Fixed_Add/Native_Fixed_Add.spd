@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="altera_s10_native_fixed_point_dsp_191/sim/Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i.v"
+   type="SYSTEM_VERILOG"
+   library="altera_s10_native_fixed_point_dsp_191" />
+ <file
+   path="sim/Native_Fixed_Add.v"
+   type="VERILOG"
+   library="Native_Fixed_Add"
+   hasInlineConfiguration="true" />
+ <topLevel name="Native_Fixed_Add.Native_Fixed_Add" />
+ <deviceFamily name="stratix10" />
+</simPackage>

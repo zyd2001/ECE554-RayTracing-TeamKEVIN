@@ -12,7 +12,7 @@
 # or its authorized distributors. Please refer to the applicable 
 # agreement for further details.
 
-# ACDS 19.2 57 linux 2021.04.19.09:22:43
+# ACDS 19.2 57 linux 2021.04.19.09:20:52
 
 # ----------------------------------------
 # xcelium - auto-generated simulation script
@@ -20,7 +20,7 @@
 # ----------------------------------------
 # This script provides commands to simulate the following IP detected in
 # your Quartus project:
-#     FPU
+#     Native_Fixed_Add
 # 
 # Intel recommends that you source this Quartus-generated IP simulation
 # script from your own customized top-level script, and avoid editing this
@@ -96,7 +96,7 @@
 # 
 # IP SIMULATION SCRIPT
 # ----------------------------------------
-# If FPU is one of several IP cores in your
+# If Native_Fixed_Add is one of several IP cores in your
 # Quartus project, you can generate a simulation script
 # suitable for inclusion in your top-level simulation
 # script by running the following command line:
@@ -107,10 +107,10 @@
 # within the Quartus project, and generate a unified
 # script which supports all the Intel IP within the design.
 # ----------------------------------------
-# ACDS 19.2 57 linux 2021.04.19.09:22:43
+# ACDS 19.2 57 linux 2021.04.19.09:20:52
 # ----------------------------------------
 # initialize variables
-TOP_LEVEL_NAME="FPU.FPU"
+TOP_LEVEL_NAME="Native_Fixed_Add.Native_Fixed_Add"
 QSYS_SIMDIR="./../"
 QUARTUS_INSTALL_DIR="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/"
 SKIP_FILE_COPY=0
@@ -156,17 +156,17 @@ set QSYS_SIMDIR [lindex $argv 1]
 set SIMULATOR_TOOL_BITNESS [lindex $argv 2]
 source $QSYS_SIMDIR/common/xcelium_files.tcl
 set LD_LIBRARY_PATH [dict create]
-set LD_LIBRARY_PATH [dict merge $LD_LIBRARY_PATH [dict get [FPU::get_env_variables $SIMULATOR_TOOL_BITNESS] "LD_LIBRARY_PATH"]]
+set LD_LIBRARY_PATH [dict merge $LD_LIBRARY_PATH [dict get [Native_Fixed_Add::get_env_variables $SIMULATOR_TOOL_BITNESS] "LD_LIBRARY_PATH"]]
 if {[dict size $LD_LIBRARY_PATH] !=0 } {
   set LD_LIBRARY_PATH [join [dict keys $LD_LIBRARY_PATH] ":"]
   puts "LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\""
 }
 
 set ELAB_OPTIONS ""
-append ELAB_OPTIONS [FPU::get_elab_options $SIMULATOR_TOOL_BITNESS]
+append ELAB_OPTIONS [Native_Fixed_Add::get_elab_options $SIMULATOR_TOOL_BITNESS]
 puts "ELAB_OPTIONS+=\"$ELAB_OPTIONS\""
 set SIM_OPTIONS ""
-append SIM_OPTIONS [FPU::get_sim_options $SIMULATOR_TOOL_BITNESS]
+append SIM_OPTIONS [Native_Fixed_Add::get_sim_options $SIMULATOR_TOOL_BITNESS]
 puts "SIM_OPTIONS+=\"$SIM_OPTIONS\""
 exit 0
 '
@@ -182,7 +182,7 @@ TCLSCRIPT='
 set QSYS_SIMDIR [lindex $argv 1]
 set libraries [dict create]
 source $QSYS_SIMDIR/common/xcelium_files.tcl
-set libraries [dict merge $libraries [FPU::get_design_libraries]]
+set libraries [dict merge $libraries [Native_Fixed_Add::get_design_libraries]]
 set design_libraries [dict keys $libraries]
 foreach file $design_libraries { puts "$file" }
 exit 0
@@ -202,15 +202,9 @@ mkdir -p ./libraries/altera_ver/
 mkdir -p ./libraries/lpm_ver/
 mkdir -p ./libraries/sgate_ver/
 mkdir -p ./libraries/altera_mf_ver/
+mkdir -p ./libraries/altera_lnsim_ver/
 mkdir -p ./libraries/fourteennm_ver/
 mkdir -p ./libraries/fourteennm_ct1_ver/
-mkdir -p ./libraries/altera/
-mkdir -p ./libraries/lpm/
-mkdir -p ./libraries/sgate/
-mkdir -p ./libraries/altera_mf/
-mkdir -p ./libraries/altera_lnsim/
-mkdir -p ./libraries/fourteennm/
-mkdir -p ./libraries/fourteennm_ct1/
 for library in $design_libraries
 do
   mkdir -p ./libraries/$library
@@ -222,7 +216,7 @@ TCLSCRIPT='
 set QSYS_SIMDIR [lindex $argv 1]
 set memory_files [list]
 source $QSYS_SIMDIR/common/xcelium_files.tcl
-set memory_files [concat $memory_files [FPU::get_memory_files "$QSYS_SIMDIR"]]
+set memory_files [concat $memory_files [Native_Fixed_Add::get_memory_files "$QSYS_SIMDIR"]]
 foreach file $memory_files { puts "$file" }
 exit 0
 '
@@ -247,33 +241,14 @@ if [ $SKIP_DEV_COM -eq 0 ]; then
   xmvlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/220model.v"                            -work lpm_ver           
   xmvlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate.v"                               -work sgate_ver         
   xmvlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf.v"                           -work altera_mf_ver     
+  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim.sv"                       -work altera_lnsim_ver  
   xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/fourteennm_atoms.sv"                   -work fourteennm_ver    
+  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/fourteennm_atoms_ncrypt.sv"    -work fourteennm_ver    
   xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/ct1_hssi_atoms.sv"                     -work fourteennm_ct1_ver
+  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/ct1_hssi_atoms_ncrypt.sv"      -work fourteennm_ct1_ver
+  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/cr3v0_serdes_models_ncrypt.sv" -work fourteennm_ct1_ver
   xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/ct1_hip_atoms.sv"                      -work fourteennm_ct1_ver
   xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/ct1_hip_atoms_ncrypt.sv"       -work fourteennm_ct1_ver
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_syn_attributes.vhd"             -work altera            
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_standard_functions.vhd"         -work altera            
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/alt_dspbuilder_package.vhd"            -work altera            
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_europa_support_lib.vhd"         -work altera            
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_primitives_components.vhd"      -work altera            
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_primitives.vhd"                 -work altera            
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/220pack.vhd"                           -work lpm               
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/220model.vhd"                          -work lpm               
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate_pack.vhd"                        -work sgate             
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate.vhd"                             -work sgate             
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf_components.vhd"              -work altera_mf         
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf.vhd"                         -work altera_mf         
-  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim.sv"                       -work altera_lnsim      
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim_components.vhd"           -work altera_lnsim      
-  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/fourteennm_atoms_ncrypt.sv"    -work fourteennm        
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/fourteennm_atoms.vhd"                  -work fourteennm        
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/fourteennm_components.vhd"             -work fourteennm        
-  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/ct1_hssi_atoms_ncrypt.sv"      -work fourteennm_ct1    
-  xmvlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/cadence/cr3v0_serdes_models_ncrypt.sv" -work fourteennm_ct1    
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/ct1_hssi_components.vhd"               -work fourteennm_ct1    
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/ct1_hssi_atoms.vhd"                    -work fourteennm_ct1    
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/ct1_hip_components.vhd"                -work fourteennm_ct1    
-  xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS   "$QUARTUS_INSTALL_DIR/eda/sim_lib/ct1_hip_atoms.vhd"                     -work fourteennm_ct1    
 fi
 
 # ----------------------------------------
@@ -285,7 +260,7 @@ set USER_DEFINED_VHDL_COMPILE_OPTIONS [lindex $argv 3]
 set QSYS_SIMDIR [lindex $argv 4]
 set design_files [dict create]
 source $QSYS_SIMDIR/common/xcelium_files.tcl
-set design_files [dict merge $design_files [FPU::get_common_design_files $USER_DEFINED_COMPILE_OPTIONS $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_VHDL_COMPILE_OPTIONS "$QSYS_SIMDIR"]]
+set design_files [dict merge $design_files [Native_Fixed_Add::get_common_design_files $USER_DEFINED_COMPILE_OPTIONS $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_VHDL_COMPILE_OPTIONS "$QSYS_SIMDIR"]]
 set common_design_files [dict values $design_files]
 foreach file $common_design_files { puts "$file" }
 exit 0
@@ -307,7 +282,7 @@ set USER_DEFINED_VHDL_COMPILE_OPTIONS [lindex $argv 3]
 set QSYS_SIMDIR [lindex $argv 4]
 set files [list]
 source $QSYS_SIMDIR/common/xcelium_files.tcl
-set files [concat $files [FPU::get_design_files $USER_DEFINED_COMPILE_OPTIONS $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_VHDL_COMPILE_OPTIONS "$QSYS_SIMDIR"]]
+set files [concat $files [Native_Fixed_Add::get_design_files $USER_DEFINED_COMPILE_OPTIONS $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_VHDL_COMPILE_OPTIONS "$QSYS_SIMDIR"]]
 set design_files $files
 foreach file $design_files { puts "$file" }
 exit 0
