@@ -8,4 +8,3 @@ module Float_Add (
 		input  wire [31:0] ay      //     ay.ay
 	);
 endmodule
-
