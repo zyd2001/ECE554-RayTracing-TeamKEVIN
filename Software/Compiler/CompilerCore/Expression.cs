@@ -4,10 +4,20 @@ using QUT.Gppg;
 
 namespace CompilerCore
 {
-    using ExpressionList = List<Expression>;
     abstract class Expression : ASTNode
     {
         internal Expression(LexLocation location) : base(location) { }
+    }
+
+    class ExpressionList : ASTNodeList<Expression, ExpressionList>
+    {
+        internal ExpressionList(LexLocation location) : base(location) { }
+        internal ExpressionList(LexLocation location, Expression node) : base(location, node) { }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     class IntLiteralExpression : Expression
@@ -17,6 +27,11 @@ namespace CompilerCore
         {
             this.i = i;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
     }
     class FloatLiteralExpression : Expression
     {
@@ -24,6 +39,11 @@ namespace CompilerCore
         internal FloatLiteralExpression(LexLocation location, float f) : base(location)
         {
             this.f = f;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
         }
     }
 
@@ -37,6 +57,11 @@ namespace CompilerCore
             for (int i = 0; i < 4; i++)
                 floats[i] = float.Parse(splits[i]);
             vector = new Vector4(floats[0], floats[1], floats[2], floats[3]);
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
         }
     }
     class BinaryExpression : Expression
@@ -56,6 +81,11 @@ namespace CompilerCore
             exp1 = e1;
             exp2 = e2;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     class UnaryExpression : Expression
@@ -71,6 +101,11 @@ namespace CompilerCore
             this.type = type;
             exp = e1;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     class IndexExpression : Expression
@@ -81,6 +116,11 @@ namespace CompilerCore
         {
             expression = exp;
             indexExpression = index;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
         }
     }
 
@@ -93,6 +133,11 @@ namespace CompilerCore
             identifier = id;
             expressionList = expList;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     class IdentifierExpression : Expression
@@ -101,6 +146,11 @@ namespace CompilerCore
         internal IdentifierExpression(LexLocation location, string id) : base(location)
         {
             identifier = id;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
