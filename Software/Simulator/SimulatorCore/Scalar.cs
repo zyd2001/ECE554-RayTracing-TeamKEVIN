@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace SimulatorCore
@@ -27,6 +28,11 @@ namespace SimulatorCore
         public Scalar(float f) : this()
         {
             this.f = f;
+        }
+
+        public string Hex()
+        {
+            return Convert.ToHexString(BitConverter.GetBytes(i));
         }
     }
 }
