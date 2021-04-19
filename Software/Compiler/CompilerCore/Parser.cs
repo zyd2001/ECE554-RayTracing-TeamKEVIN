@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  LAPTOP-KDKHEG7R
-// DateTime: 2021/4/18 12:22:20
+// DateTime: 2021/4/18 15:10:59
 // UserName: zyd20
-// Input file <CompilerCore/RT.y - 2021/4/18 12:22:21>
+// Input file <CompilerCore/RT.y - 2021/4/18 15:10:42>
 
 // options: no-lines diagnose & report gplex
 
@@ -31,17 +31,17 @@ internal struct ValueType
 { 
     internal Expression Expression;
     internal Statement Statement;
-    internal List<Expression> ExpressionList;
-    internal List<Statement> StatementList;
+    internal ExpressionList ExpressionList;
+    internal StatementList StatementList;
     internal string Identifier;
-    internal DeclarationStatement.DeclarationItem DeclaraionItem;
-    internal List<DeclarationStatement.DeclarationItem> DeclarationList;
+    internal DeclarationItem DeclaraionItem;
+    internal DeclarationList DeclarationList;
     internal int IntLiteral;
     internal float FloatLiteral;
     internal string VectorLiteral;
     internal IfStatement IfStatement;
     internal Type Type;
-    internal List<FunctionDefinitionStatement.Parameter> ParameterList;
+    internal ParameterList ParameterList;
 }
 // Abstract base class for GPLEX scanners
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
@@ -65,9 +65,9 @@ internal class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 internal class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from CompilerCore/RT.y - 2021/4/18 12:22:21
-    internal List<Statement> AST;
-  // End verbatim content from CompilerCore/RT.y - 2021/4/18 12:22:21
+  // Verbatim content from CompilerCore/RT.y - 2021/4/18 15:10:42
+    internal StatementList AST;
+  // End verbatim content from CompilerCore/RT.y - 2021/4/18 15:10:42
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -340,7 +340,7 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
     {
       case 2: // program -> toplevel_statement
 {
-        AST = new List<Statement>{ValueStack[ValueStack.Depth-1].Statement};
+        AST = new StatementList(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
       case 3: // program -> program, toplevel_statement
@@ -350,13 +350,12 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 6: // statement_list -> statement
 {
-        CurrentSemanticValue.StatementList = new List<Statement>{ValueStack[ValueStack.Depth-1].Statement};
+        CurrentSemanticValue.StatementList = new StatementList(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
       case 7: // statement_list -> statement_list, statement
 {
-        ValueStack[ValueStack.Depth-2].StatementList.Add(ValueStack[ValueStack.Depth-1].Statement);
-        CurrentSemanticValue.StatementList = ValueStack[ValueStack.Depth-2].StatementList;
+        CurrentSemanticValue.StatementList = ValueStack[ValueStack.Depth-2].StatementList.Add(ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
       case 13: // statement -> CONTINUE, ';'
@@ -395,6 +394,11 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         CurrentSemanticValue.Statement = new LoopStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Statement);
     }
         break;
+      case 21: // optional_expression -> /* empty */
+{
+        CurrentSemanticValue.Expression = new IntLiteralExpression(CurrentLocationSpan, 1);
+    }
+        break;
       case 25: // if_statement -> IF, '(', expression, ')', statement
 {
         CurrentSemanticValue.IfStatement = new IfStatement(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Expression, ValueStack[ValueStack.Depth-1].Statement);
@@ -413,23 +417,22 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 28: // optional_statement_list -> /* empty */
 {
-        CurrentSemanticValue.StatementList = new List<Statement>();
+        CurrentSemanticValue.StatementList = new StatementList(CurrentLocationSpan);
     }
         break;
       case 30: // parameter_list -> /* empty */
 {
-        CurrentSemanticValue.ParameterList = new List<FunctionDefinitionStatement.Parameter>();
+        CurrentSemanticValue.ParameterList = new ParameterList(CurrentLocationSpan);
     }
         break;
       case 31: // parameter_list -> value_type, IDENTIFIER
 {
-        CurrentSemanticValue.ParameterList = new List<FunctionDefinitionStatement.Parameter>{new FunctionDefinitionStatement.Parameter(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier)};
+        CurrentSemanticValue.ParameterList = new ParameterList(CurrentLocationSpan, new Parameter(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier));
     }
         break;
       case 32: // parameter_list -> parameter_list, ',', value_type, IDENTIFIER
 {
-        ValueStack[ValueStack.Depth-4].ParameterList.Add(new FunctionDefinitionStatement.Parameter(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier));
-        CurrentSemanticValue.ParameterList = ValueStack[ValueStack.Depth-4].ParameterList;
+        CurrentSemanticValue.ParameterList = ValueStack[ValueStack.Depth-4].ParameterList.Add(new Parameter(CurrentLocationSpan, ValueStack[ValueStack.Depth-2].Type, ValueStack[ValueStack.Depth-1].Identifier));
     }
         break;
       case 33: // value_type -> INT
@@ -461,28 +464,27 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         break;
       case 43: // declaration_list -> declaration_item
 {
-        CurrentSemanticValue.DeclarationList = new List<DeclarationStatement.DeclarationItem>{ValueStack[ValueStack.Depth-1].DeclaraionItem};
+        CurrentSemanticValue.DeclarationList = new DeclarationList(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].DeclaraionItem);
     }
         break;
       case 44: // declaration_list -> declaration_list, ',', declaration_item
 {
-        ValueStack[ValueStack.Depth-3].DeclarationList.Add(ValueStack[ValueStack.Depth-1].DeclaraionItem);
-        CurrentSemanticValue.DeclarationList = ValueStack[ValueStack.Depth-3].DeclarationList;
+        CurrentSemanticValue.DeclarationList = ValueStack[ValueStack.Depth-3].DeclarationList.Add(ValueStack[ValueStack.Depth-1].DeclaraionItem);
     }
         break;
       case 45: // declaration_item -> IDENTIFIER
 {
-        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Identifier);
+        CurrentSemanticValue.DeclaraionItem = new DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Identifier);
     }
         break;
       case 46: // declaration_item -> IDENTIFIER, '=', expression
 {
-        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Identifier, ValueStack[ValueStack.Depth-1].Expression);
+        CurrentSemanticValue.DeclaraionItem = new DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-3].Identifier, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 47: // declaration_item -> IDENTIFIER, '[', INT_LITERAL, ']'
 {
-        CurrentSemanticValue.DeclaraionItem = new DeclarationStatement.DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-4].Identifier, null, ValueStack[ValueStack.Depth-2].IntLiteral);
+        CurrentSemanticValue.DeclaraionItem = new DeclarationItem(CurrentLocationSpan, ValueStack[ValueStack.Depth-4].Identifier, null, ValueStack[ValueStack.Depth-2].IntLiteral);
     }
         break;
       case 48: // assignment_statement -> assignment_lval_expression, '=', expression
@@ -607,15 +609,19 @@ internal class Parser: ShiftReduceParser<ValueType, LexLocation>
         CurrentSemanticValue.Expression = new FunctionCallExpression(CurrentLocationSpan, ValueStack[ValueStack.Depth-4].Identifier, ValueStack[ValueStack.Depth-2].ExpressionList);
     }
         break;
+      case 78: // expression_list -> /* empty */
+{
+        CurrentSemanticValue.ExpressionList = new ExpressionList(CurrentLocationSpan);
+    }
+        break;
       case 79: // expression_list -> expression
 {
-        CurrentSemanticValue.ExpressionList = new List<Expression>{ValueStack[ValueStack.Depth-1].Expression};
+        CurrentSemanticValue.ExpressionList = new ExpressionList(CurrentLocationSpan, ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
       case 80: // expression_list -> expression_list, ',', expression
 {
-        ValueStack[ValueStack.Depth-3].ExpressionList.Add(ValueStack[ValueStack.Depth-1].Expression);
-        CurrentSemanticValue.ExpressionList = ValueStack[ValueStack.Depth-3].ExpressionList;
+        CurrentSemanticValue.ExpressionList = ValueStack[ValueStack.Depth-3].ExpressionList.Add(ValueStack[ValueStack.Depth-1].Expression);
     }
         break;
     }

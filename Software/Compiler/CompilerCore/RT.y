@@ -1,5 +1,5 @@
 %{
-    internal List<Statement> AST;
+    internal StatementList AST;
 %}
 
 %namespace CompilerCore
@@ -11,17 +11,17 @@
 { 
     internal Expression Expression;
     internal Statement Statement;
-    internal List<Expression> ExpressionList;
-    internal List<Statement> StatementList;
+    internal ExpressionList ExpressionList;
+    internal StatementList StatementList;
     internal string Identifier;
-    internal DeclarationStatement.DeclarationItem DeclaraionItem;
-    internal List<DeclarationStatement.DeclarationItem> DeclarationList;
+    internal DeclarationItem DeclaraionItem;
+    internal DeclarationList DeclarationList;
     internal int IntLiteral;
     internal float FloatLiteral;
     internal string VectorLiteral;
     internal IfStatement IfStatement;
     internal Type Type;
-    internal List<FunctionDefinitionStatement.Parameter> ParameterList;
+    internal ParameterList ParameterList;
 }
 
 %left AND "&&" OR "||"
@@ -51,7 +51,7 @@
 %%
 program: toplevel_statement
     {
-        AST = new List<Statement>{$1};
+        AST = new StatementList(@$, $1);
     }
     | program toplevel_statement
     {
@@ -64,12 +64,11 @@ toplevel_statement: declaration_statement ';'
 
 statement_list: statement
     {
-        $$ = new List<Statement>{$1};
+        $$ = new StatementList(@$, $1);
     }
     | statement_list statement
     {
-        $1.Add($2);
-        $$ = $1;
+        $$ = $1.Add($2);
     }
     ;   
 
@@ -112,6 +111,9 @@ loop_statement: FOR '(' for_special_statement ';' optional_expression ';' for_sp
     }
     ;
 optional_expression: /* empty */
+    {
+        $$ = new IntLiteralExpression(@$, 1);
+    }
     | expression
     ;
 for_special_statement: declaration_statement
@@ -133,22 +135,21 @@ function_definition_statement: value_type IDENTIFIER '(' parameter_list ')' '{' 
     ;
 optional_statement_list: /* empty */
     {
-        $$ = new List<Statement>();
+        $$ = new StatementList(@$);
     }
     | statement_list
     ;
 parameter_list: /* empty */
     {
-        $$ = new List<FunctionDefinitionStatement.Parameter>();
+        $$ = new ParameterList(@$);
     }
     | value_type IDENTIFIER
     {
-        $$ = new List<FunctionDefinitionStatement.Parameter>{new FunctionDefinitionStatement.Parameter(@$, $1, $2)};
+        $$ = new ParameterList(@$, new Parameter(@$, $1, $2));
     }
     | parameter_list ',' value_type IDENTIFIER
     {
-        $1.Add(new FunctionDefinitionStatement.Parameter(@$, $3, $4));
-        $$ = $1;
+        $$ = $1.Add(new Parameter(@$, $3, $4));
     }
     ;
 value_type: INT {$$ = Type.INT;}
@@ -176,25 +177,24 @@ declaration_statement: value_type declaration_list
     ;
 declaration_list: declaration_item
     {
-        $$ = new List<DeclarationStatement.DeclarationItem>{$1};
+        $$ = new DeclarationList(@$, $1);
     }
     | declaration_list ',' declaration_item
     {
-        $1.Add($3);
-        $$ = $1;
+        $$ = $1.Add($3);
     }
     ;
 declaration_item: IDENTIFIER
     {
-        $$ = new DeclarationStatement.DeclarationItem(@$, $1);
+        $$ = new DeclarationItem(@$, $1);
     }
     | IDENTIFIER '=' expression
     {
-        $$ = new DeclarationStatement.DeclarationItem(@$, $1, $3);
+        $$ = new DeclarationItem(@$, $1, $3);
     }
     | IDENTIFIER '[' INT_LITERAL ']'
     {
-        $$ = new DeclarationStatement.DeclarationItem(@$, $1, null, $3);
+        $$ = new DeclarationItem(@$, $1, null, $3);
     }
     ;
 assignment_statement: assignment_lval_expression '=' expression
@@ -311,14 +311,16 @@ function_call_expression: IDENTIFIER '(' expression_list ')'
     }
     ;
 expression_list: /* empty */
+    {
+        $$ = new ExpressionList(@$);
+    }
     | expression
     {
-        $$ = new List<Expression>{$1};
+        $$ = new ExpressionList(@$, $1);
     }
     | expression_list ',' expression
     {
-        $1.Add($3);
-        $$ = $1;
+        $$ = $1.Add($3);
     }
     ;
 %%

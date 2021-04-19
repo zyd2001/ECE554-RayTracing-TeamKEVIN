@@ -9,6 +9,17 @@ namespace CompilerCore
         internal Statement(LexLocation location) : base(location) { }
     }
 
+    class StatementList : ASTNodeList<Statement, StatementList>
+    {
+        internal StatementList(LexLocation location) : base(location) { }
+        internal StatementList(LexLocation location, Statement node) : base(location, node) { }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
     enum Type
     {
         INT, FLOAT, VECTOR, VOID
@@ -22,6 +33,11 @@ namespace CompilerCore
         {
             expression = exp;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class ControlStatement : Statement
@@ -34,6 +50,11 @@ namespace CompilerCore
         internal ControlStatement(LexLocation location, Type type) : base(location)
         {
             this.type = type;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -57,6 +78,11 @@ namespace CompilerCore
             iterateStatement = iterate;
             loopBody = body;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class IfStatement : Statement
@@ -75,14 +101,24 @@ namespace CompilerCore
             elseStatement = statement;
             return this;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class BlockStatement : Statement
     {
-        List<Statement> statementList;
-        internal BlockStatement(LexLocation location, List<Statement> list) : base(location)
+        StatementList statementList;
+        internal BlockStatement(LexLocation location, StatementList list) : base(location)
         {
             statementList = list;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -95,63 +131,105 @@ namespace CompilerCore
             left = l;
             right = r;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class DeclarationStatement : Statement
     {
-        internal class DeclarationItem : ASTNode
-        {
-            string identifier;
-            Expression initializer;
-            int arraySize;
-            internal DeclarationItem(LexLocation location, string id, Expression init = null,
-                int size = 1) : base(location)
-            {
-                identifier = id;
-                initializer = init;
-                arraySize = size;
-            }
-        }
         Type type;
         bool constant;
-        List<DeclarationItem> declarationList;
-        internal DeclarationStatement(LexLocation location, Type type, List<DeclarationItem> list,
+        DeclarationList declarationList;
+        internal DeclarationStatement(LexLocation location, Type type, DeclarationList list,
             bool c = false) : base(location)
         {
             this.type = type;
             declarationList = list;
             constant = c;
         }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
+        }
     }
 
+    class DeclarationList : ASTNodeList<DeclarationItem, DeclarationList>
+    {
+        internal DeclarationList(LexLocation location) : base(location) { }
+        internal DeclarationList(LexLocation location, DeclarationItem node) : base(location, node) { }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    internal class DeclarationItem : ASTNode
+    {
+        string identifier;
+        Expression initializer;
+        int arraySize;
+        internal DeclarationItem(LexLocation location, string id, Expression init = null,
+            int size = 1) : base(location)
+        {
+            identifier = id;
+            initializer = init;
+            arraySize = size;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
+        }
+    }
     class FunctionDefinitionStatement : Statement
     {
-        internal class Parameter : ASTNode
-        {
-            Type type;
-            string identifier;
-            internal Parameter(LexLocation location, Type type, string id) : base(location)
-            {
-                this.type = type;
-                identifier = id;
-            }
-        }
         Type returnType;
         string functionName;
-        List<Parameter> parameterList;
-        List<Statement> statementList;
+        ParameterList parameterList;
+        StatementList statementList;
         internal FunctionDefinitionStatement(LexLocation location, Type type, string name,
-            List<Parameter> parameters, List<Statement> statements) : base(location)
+            ParameterList parameters, StatementList statements) : base(location)
         {
             returnType = type;
             functionName = name;
             parameterList = parameters;
             statementList = statements;
         }
-        internal void StaticCheck(bool topLevel)
+        internal override void StaticCheck(bool topLevel)
         {
             if (!topLevel)
                 Error("sble");
+        }
+    }
+
+    class ParameterList : ASTNodeList<Parameter, ParameterList>
+    {
+        internal ParameterList(LexLocation location) : base(location) { }
+        internal ParameterList(LexLocation location, Parameter node) : base(location, node) { }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+    internal class Parameter : ASTNode
+    {
+        Type type;
+        string identifier;
+        internal Parameter(LexLocation location, Type type, string id) : base(location)
+        {
+            this.type = type;
+            identifier = id;
+        }
+
+        internal override void StaticCheck(bool topLevel)
+        {
+            throw new NotImplementedException();
         }
     }
 }
