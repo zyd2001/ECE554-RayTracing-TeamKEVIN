@@ -1,0 +1,31 @@
+# system info FPU on 2021.04.18.22:58:32
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for FPU on 2021.04.18.22:58:32
+files:
+filepath,kind,attributes,module,is_top
+sim/FPU.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,FPU,true
+altera_nios_custom_instr_floating_point_2_multi_191/sim/fpoint2_multi.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/fpoint2_multi_datapath.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/fpoint2_multi_dspba_library_package.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/fpoint2_multi_dspba_library.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPAddSub/FPAddSub.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPDiv/FPDiv.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPMult/FPMult.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/IntToFloat/IntToFloat.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FloatToInt/FloatToInt.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPSqrt/FPSqrt_safe_path.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPSqrt/FPSqrt.vhd,VHDL,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPSqrt/FPSqrt_memoryC0_uid59_sqrtTableGenerator_lutmem.hex,HEX,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPSqrt/FPSqrt_memoryC1_uid60_sqrtTableGenerator_lutmem.hex,HEX,,fpoint2_multi,false
+altera_nios_custom_instr_floating_point_2_multi_191/sim/FPSqrt/FPSqrt_memoryC2_uid61_sqrtTableGenerator_lutmem.hex,HEX,,fpoint2_multi,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+FPU.nios_custom_instr_floating_point_2_multi_0,fpoint2_multi
