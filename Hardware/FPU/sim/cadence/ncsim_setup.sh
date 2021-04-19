@@ -12,7 +12,7 @@
 # or its authorized distributors. Please refer to the applicable 
 # agreement for further details.
 
-# ACDS 19.2 57 linux 2021.04.18.22:58:34
+# ACDS 19.2 57 linux 2021.04.19.09:22:43
 
 # ----------------------------------------
 # ncsim - auto-generated simulation script
@@ -106,7 +106,7 @@
 # within the Quartus project, and generate a unified
 # script which supports all the Intel IP within the design.
 # ----------------------------------------
-# ACDS 19.2 57 linux 2021.04.18.22:58:34
+# ACDS 19.2 57 linux 2021.04.19.09:22:43
 # ----------------------------------------
 # initialize variables
 TOP_LEVEL_NAME="FPU.FPU"

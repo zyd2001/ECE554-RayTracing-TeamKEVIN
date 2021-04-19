@@ -1,0 +1,18 @@
+# system info Native_Fixed_Add on 2021.04.19.09:20:50
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Native_Fixed_Add on 2021.04.19.09:20:50
+files:
+filepath,kind,attributes,module,is_top
+sim/Native_Fixed_Add.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Native_Fixed_Add,true
+altera_s10_native_fixed_point_dsp_191/sim/Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i.v,SYSTEM_VERILOG,TOP_LEVEL_FILE,Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Native_Fixed_Add.s10_native_fixed_point_dsp_0,Native_Fixed_Add_altera_s10_native_fixed_point_dsp_191_cvqmw6i

@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
-  <title>datasheet for FPU</title>
+  <title>datasheet for Native_Fixed_Add</title>
   <style type="text/css">
 body { font-family:arial ;}
 a { text-decoration:underline ; color:#003000 ;}
@@ -58,7 +58,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
  <body>
   <table class="topTitle">
    <tr>
-    <td class="l">FPU</td>
+    <td class="l">Native_Fixed_Add</td>
     <td class="r">
      <br/>
      <br/>
@@ -67,7 +67,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
   </table>
   <table class="blueBar">
    <tr>
-    <td class="l">2021.04.19.09:22:44</td>
+    <td class="l">2021.04.19.09:20:54</td>
     <td class="r">Datasheet</td>
    </tr>
   </table>
@@ -92,10 +92,10 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
     <td class="empty" rowspan="2"></td>
    </tr>
   </table>
-  <a name="module_nios_custom_instr_floating_point_2_multi_0"> </a>
+  <a name="module_s10_native_fixed_point_dsp_0"> </a>
   <div>
    <hr/>
-   <h2>nios_custom_instr_floating_point_2_multi_0</h2>altera_nios_custom_instr_floating_point_2_multi v19.1
+   <h2>s10_native_fixed_point_dsp_0</h2>altera_s10_native_fixed_point_dsp v19.1
    <br/>
    <br/>
    <br/>
@@ -105,16 +105,136 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
       <h2>Parameters</h2>
       <table>
        <tr>
-        <td class="parametername">arithmetic_present</td>
-        <td class="parametervalue">1</td>
+        <td class="parametername">operation_mode</td>
+        <td class="parametervalue">m18x18_sumof2</td>
        </tr>
        <tr>
-        <td class="parametername">root_present</td>
-        <td class="parametervalue">1</td>
+        <td class="parametername">signed_max</td>
+        <td class="parametervalue">Signed</td>
        </tr>
        <tr>
-        <td class="parametername">conversion_present</td>
-        <td class="parametervalue">1</td>
+        <td class="parametername">signed_may</td>
+        <td class="parametervalue">Signed</td>
+       </tr>
+       <tr>
+        <td class="parametername">signed_mbx</td>
+        <td class="parametervalue">Signed</td>
+       </tr>
+       <tr>
+        <td class="parametername">signed_mby</td>
+        <td class="parametervalue">Signed</td>
+       </tr>
+       <tr>
+        <td class="parametername">clear_type</td>
+        <td class="parametervalue">none</td>
+       </tr>
+       <tr>
+        <td class="parametername">ax_width</td>
+        <td class="parametervalue">18</td>
+       </tr>
+       <tr>
+        <td class="parametername">bx_width</td>
+        <td class="parametervalue">18</td>
+       </tr>
+       <tr>
+        <td class="parametername">ay_scan_in_width</td>
+        <td class="parametervalue">18</td>
+       </tr>
+       <tr>
+        <td class="parametername">by_width</td>
+        <td class="parametervalue">18</td>
+       </tr>
+       <tr>
+        <td class="parametername">az_width</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">bz_width</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">result_a_width</td>
+        <td class="parametervalue">37</td>
+       </tr>
+       <tr>
+        <td class="parametername">result_b_width</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">scan_out_width</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">load_const_value</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_0</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_1</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_2</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_3</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_4</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_5</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_6</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_a_7</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_0</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_1</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_2</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_3</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_4</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_5</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_6</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">coef_b_7</td>
+        <td class="parametervalue">0</td>
+       </tr>
+       <tr>
+        <td class="parametername">deviceFamily</td>
+        <td class="parametervalue">UNKNOWN</td>
        </tr>
        <tr>
         <td class="parametername">generateLegacySim</td>
@@ -134,7 +254,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
   <table class="blueBar">
    <tr>
     <td class="l">generation took 0.00 seconds</td>
-    <td class="r">rendering took 0.00 seconds</td>
+    <td class="r">rendering took 0.01 seconds</td>
    </tr>
   </table>
  </body>
