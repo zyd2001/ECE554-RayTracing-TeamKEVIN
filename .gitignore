@@ -28,6 +28,7 @@ sc_dpiheader.h
 vsim.dbg
 
 work/
+.venv/
 
 *.mpf
 *.vcd
