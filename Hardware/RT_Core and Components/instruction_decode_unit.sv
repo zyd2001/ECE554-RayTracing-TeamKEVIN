@@ -41,7 +41,7 @@ module instruction_decode_unit (
     floatALU1_en, floatALU2_en,
     floatALU3_en, floatALU4_en,
     Scalar_out_select, memory_op,
-    vector_reduce_en, memory_wb_select
+    vector_reduce_en
 );
     input [5:0] opcode;
     input [1:0] immediate;
