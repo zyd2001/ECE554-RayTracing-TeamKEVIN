@@ -1,0 +1,20 @@
+# system info Fix_Add on 2021.04.19.21:14:14
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Fix_Add on 2021.04.19.21:14:14
+files:
+filepath,kind,attributes,module,is_top
+sim/Fix_Add.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Fix_Add,true
+altera_fxp_functions_191/sim/dspba_library_package.vhd,VHDL,,Fix_Add_altera_fxp_functions_191_i22v3ci,false
+altera_fxp_functions_191/sim/dspba_library.vhd,VHDL,,Fix_Add_altera_fxp_functions_191_i22v3ci,false
+altera_fxp_functions_191/sim/Fix_Add_altera_fxp_functions_191_i22v3ci.vhd,VHDL,,Fix_Add_altera_fxp_functions_191_i22v3ci,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Fix_Add.fxp_functions_0,Fix_Add_altera_fxp_functions_191_i22v3ci

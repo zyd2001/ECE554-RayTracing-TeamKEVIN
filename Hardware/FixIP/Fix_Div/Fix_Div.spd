@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC1_uid84_invTabGen_lutmem.hex"
+   type="HEX"
+   library="altera_fxp_functions_191" />
+ <file
+   path="altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC3_uid90_invTabGen_lutmem.hex"
+   type="HEX"
+   library="altera_fxp_functions_191" />
+ <file
+   path="altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC0_uid81_invTabGen_lutmem.hex"
+   type="HEX"
+   library="altera_fxp_functions_191" />
+ <file
+   path="altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC2_uid87_invTabGen_lutmem.hex"
+   type="HEX"
+   library="altera_fxp_functions_191" />
+ <file
+   path="altera_fxp_functions_191/sim/dspba_library_package.vhd"
+   type="VHDL"
+   library="altera_fxp_functions_191" />
+ <file
+   path="altera_fxp_functions_191/sim/dspba_library.vhd"
+   type="VHDL"
+   library="altera_fxp_functions_191" />
+ <file
+   path="altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi.vhd"
+   type="VHDL"
+   library="altera_fxp_functions_191" />
+ <file
+   path="sim/Fix_Div.v"
+   type="VERILOG"
+   library="Fix_Div"
+   hasInlineConfiguration="true" />
+ <topLevel name="Fix_Div.Fix_Div" />
+ <deviceFamily name="stratix10" />
+</simPackage>

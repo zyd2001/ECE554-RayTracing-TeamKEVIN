@@ -1,0 +1,20 @@
+# system info ItoF on 2021.04.19.21:42:49
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for ItoF on 2021.04.19.21:42:49
+files:
+filepath,kind,attributes,module,is_top
+sim/ItoF.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,ItoF,true
+altera_fp_functions_191/sim/dspba_library_package.vhd,VHDL,,ItoF_altera_fp_functions_191_n4azkbi,false
+altera_fp_functions_191/sim/dspba_library.vhd,VHDL,,ItoF_altera_fp_functions_191_n4azkbi,false
+altera_fp_functions_191/sim/ItoF_altera_fp_functions_191_n4azkbi.vhd,VHDL,,ItoF_altera_fp_functions_191_n4azkbi,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+ItoF.fp_functions_0,ItoF_altera_fp_functions_191_n4azkbi

@@ -1,0 +1,20 @@
+# system info Fix_Sqrt on 2021.04.19.21:22:14
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Fix_Sqrt on 2021.04.19.21:22:14
+files:
+filepath,kind,attributes,module,is_top
+sim/Fix_Sqrt.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Fix_Sqrt,true
+altera_fxp_functions_191/sim/dspba_library_package.vhd,VHDL,,Fix_Sqrt_altera_fxp_functions_191_pjm2y2i,false
+altera_fxp_functions_191/sim/dspba_library.vhd,VHDL,,Fix_Sqrt_altera_fxp_functions_191_pjm2y2i,false
+altera_fxp_functions_191/sim/Fix_Sqrt_altera_fxp_functions_191_pjm2y2i.vhd,VHDL,,Fix_Sqrt_altera_fxp_functions_191_pjm2y2i,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Fix_Sqrt.fxp_functions_0,Fix_Sqrt_altera_fxp_functions_191_pjm2y2i

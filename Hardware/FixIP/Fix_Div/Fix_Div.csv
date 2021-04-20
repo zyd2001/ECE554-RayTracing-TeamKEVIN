@@ -1,0 +1,24 @@
+# system info Fix_Div on 2021.04.19.21:20:44
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Fix_Div on 2021.04.19.21:20:44
+files:
+filepath,kind,attributes,module,is_top
+sim/Fix_Div.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Fix_Div,true
+altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC1_uid84_invTabGen_lutmem.hex,HEX,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC3_uid90_invTabGen_lutmem.hex,HEX,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC0_uid81_invTabGen_lutmem.hex,HEX,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC2_uid87_invTabGen_lutmem.hex,HEX,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+altera_fxp_functions_191/sim/dspba_library_package.vhd,VHDL,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+altera_fxp_functions_191/sim/dspba_library.vhd,VHDL,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi.vhd,VHDL,,Fix_Div_altera_fxp_functions_191_2oqd7oi,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Fix_Div.fxp_functions_0,Fix_Div_altera_fxp_functions_191_2oqd7oi
