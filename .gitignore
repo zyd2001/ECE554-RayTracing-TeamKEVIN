@@ -28,6 +28,13 @@ sc_dpiheader.h
 vsim.dbg
 
 work/
+.venv/
 
 *.mpf
 *.vcd
+Software/Assembler/rand_assembly.asm
+Software/Assembler/rand_assembly.asm.out
+Software/Assembler/test/1.asm.out
+Software/Simulator/SimulatorTest/rand_assembly.asm
+Software/Simulator/SimulatorTest/rand_assembly.txt
+Hardware/RT_Core and Components/rand_assembly.out
