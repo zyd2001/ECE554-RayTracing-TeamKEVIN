@@ -40,17 +40,17 @@ module RT_Core_single_tb;
 	// Flip all bits to fix this
 	always_comb foreach (not_MRTI[i]) MRTI[i] = ~not_MRTI[i];
 
-	RT_core_single rt_core(.clk(clk), .rst_n(rst_n),
-			.Kernel_mode(Kernel_mode), .End_program(End_program), .Context_switch(Context_switch),
-			.scalar_wen(scalar_wen), .scalar_wb_address(scalar_wb_address), .scalar_wb_data(scalar_wb_data),
-			.vector_wen(vector_wen), .vector_wb_address(vector_wb_address), .vector_wb_data(vector_wb_data),
-			.scalar_read_address1(scalar_read_address1), .scalar_read_address2(scalar_read_address2), 
-			.vector_read_address1(vector_read_address1), .vector_read_address2(vector_read_address2),
-			.scalar_read1(scalar_read1), .scalar_read2(scalar_read2),
-			.vector_read1(vector_read1), .vector_read2(vector_read2),
-			.MRTI_addr_rd(MRTI_addr_rd), .MRTI_data_rd(MRTI_data_rd)
+	//RT_core_single rt_core(.clk(clk), .rst_n(rst_n),
+	//		.Kernel_mode(Kernel_mode), .End_program(End_program), .Context_switch(Context_switch),
+	//		.scalar_wen(scalar_wen), .scalar_wb_address(scalar_wb_address), .scalar_wb_data(scalar_wb_data),
+	//		.vector_wen(vector_wen), .vector_wb_address(vector_wb_address), .vector_wb_data(vector_wb_data),
+	//		.scalar_read_address1(scalar_read_address1), .scalar_read_address2(scalar_read_address2), 
+	//		.vector_read_address1(vector_read_address1), .vector_read_address2(vector_read_address2),
+	//		.scalar_read1(scalar_read1), .scalar_read2(scalar_read2),
+	//		.vector_read1(vector_read1), .vector_read2(vector_read2),
+	//		.MRTI_addr_rd(MRTI_addr_rd), .MRTI_data_rd(MRTI_data_rd)
 
-		);
+	//	);
 
 	initial begin
 		// Initialize MRTI
@@ -59,7 +59,7 @@ module RT_Core_single_tb;
 		status = $fread(not_MRTI, file);
 
 		// Initialize Trace 
-		tracefilename = {getenv("PWD"), "trace.out"};
+		tracefilename = {getenv("PWD"), "/trace.out"};
 		tracefile = $fopen(tracefilename, "w+");
 
 
@@ -71,6 +71,15 @@ module RT_Core_single_tb;
 		rst_n = 1;
 		@(posedge clk)
 		started = 1;
+
+		// test trace log print
+		scalar_wen = 0;
+		MRTI_addr_rd = 200;
+		@(posedge clk)
+		scalar_wen = 1;
+		MRTI_addr_rd = 400;
+		@(posedge clk)
+		End_program = 1;
 
 		
 
@@ -89,7 +98,7 @@ module RT_Core_single_tb;
 	// Trace log sensitivities for change of outputs from RT core
 	always@(End_program) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "End_program <= "  + End_program + "\n");
+			$fwrite(tracefile, "End_program <= %b\n", End_program);
 			
 			// End test when thread is finished?
 			$fclose(tracefilename);
@@ -100,74 +109,74 @@ module RT_Core_single_tb;
 
 	always@(Context_switch) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "Context_switch <= "  + Context_switch + "\n");
+			$fwrite(tracefile, "Context_switch <= "  + Context_switch + "\n");
 		end
 	end
 
 	always@(scalar_wen) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "scalar_wen <= "  + scalar_wen + "\n");
+			$fwrite(tracefile, "scalar_wen <= %b\n", scalar_wen);
 		end
 	end
 
 	always@(vector_wen) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "vector_wen <= "  + vector_wen + "\n");
+			$fwrite(tracefile, "vector_wen <= "  + vector_wen + "\n");
 		end
 	end
 
 	always@(scalar_wb_address) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "scalar_wb_address <= "  + scalar_wb_address + "\n");
+			$fwrite(tracefile, "scalar_wb_address <= "  + scalar_wb_address + "\n");
 		end
 	end
 
 	always@(scalar_read_address1) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "scalar_read_address1 <= "  + scalar_read_address1 + "\n");
+			$fwrite(tracefile, "scalar_read_address1 <= "  + scalar_read_address1 + "\n");
 		end
 	end
 
 	always@(scalar_read_address2) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "scalar_read_address2 <= "  + scalar_read_address2 + "\n");
+			$fwrite(tracefile, "scalar_read_address2 <= "  + scalar_read_address2 + "\n");
 		end
 	end
 
 
 	always@(vector_read_address1) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "vector_read_address1 <= "  + vector_read_address1 + "\n");
+			$fwrite(tracefile, "vector_read_address1 <= "  + vector_read_address1 + "\n");
 		end
 	end
 
 	always@(vector_read_address2) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "vector_read_address2 <= "  + vector_read_address2 + "\n");
+			$fwrite(tracefile, "vector_read_address2 <= "  + vector_read_address2 + "\n");
 		end
 	end
 
 	always@(vector_wb_address) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "vector_wb_address <= "  + vector_wb_address + "\n");
+			$fwrite(tracefile, "vector_wb_address <= "  + vector_wb_address + "\n");
 		end
 	end
 
 	always@(scalar_wb_data) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "scalar_wb_data <= "  + scalar_wb_data + "\n");
+			$fwrite(tracefile, "scalar_wb_data <= "  + scalar_wb_data + "\n");
 		end
 	end
 
 	always@(vector_wb_data) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "vector_wb_data <= "  + vector_wb_data + "\n");
+			$fwrite(tracefile, "vector_wb_data <= "  + vector_wb_data + "\n");
 		end
 	end
 
 	always@(MRTI_addr_rd) begin
 		if(started == 1) begin
-			status = $fwrite(tracefile, "MRTI_addr_rd <= "  + MRTI_addr_rd + "\n");
+			$fwrite(tracefile, "MRTI_addr_rd <= %h\n", MRTI_addr_rd);
 		end
 	end
 	
