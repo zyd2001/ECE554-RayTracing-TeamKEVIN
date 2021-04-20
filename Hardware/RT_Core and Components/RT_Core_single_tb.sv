@@ -18,7 +18,7 @@ module RT_Core_single_tb;
 	logic [31:0] MRTI_data_rd;
 	logic [31:0] scalar_read1;
 	logic [31:0] scalar_read2;
-	logic [127:0] vector_read2;
+	logic [127:0] vector_read1;
 	logic [127:0] vector_read2;
 
 	// RT core outputs
@@ -86,36 +86,44 @@ module RT_Core_single_tb;
 
 	//end
 
+	// Trace log sensitivities for change of outputs from RT core
 	always@(End_program) begin
 		if(started == 1) begin
 			status = $fwrite(tracefile, "End_program <= "  + End_program);
+			$stop; // End test when thread is finished?
 		end
 	end
 
 	always@(Context_switch) begin
 		if(started == 1) begin
-
+			status = $fwrite(tracefile, "Context_switch <= "  + Context_switch);
 		end
 	end
 
 	always@(scalar_wen) begin
 		if(started == 1) begin
-
+			status = $fwrite(tracefile, "scalar_wen <= "  + scalar_wen);
 		end
 	end
 
 	always@(vector_wen) begin
 		if(started == 1) begin
-
+			status = $fwrite(tracefile, "vector_wen <= "  + vector_wen);
 		end
 	end
 
 	always@(scalar_wb_address) begin
 		if(started == 1) begin
+			status = $fwrite(tracefile, "scalar_wb_address <= "  + scalar_wb_address);
+		end
+	end
 
+	always@(scalar_read_address) begin
+		if(started == 1) begin
+			status = $fwrite(tracefile, "scalar_read_address <= "  + scalar_read_address);
 		end
 	end
 	
-	always #5 clk = ~clk
+	always #5 clk = ~clk;
 
 endmodule
