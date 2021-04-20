@@ -98,7 +98,7 @@ module RT_Core_single_tb;
 	// Trace log sensitivities for change of outputs from RT core
 	always@(End_program) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "End_program <= %b\n", End_program);
+			$fwrite(tracefile, "End_program <= %h\n", End_program);
 			
 			// End test when thread is finished?
 			$fclose(tracefilename);
@@ -109,68 +109,68 @@ module RT_Core_single_tb;
 
 	always@(Context_switch) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "Context_switch <= "  + Context_switch + "\n");
+			$fwrite(tracefile, "Context_switch <= %h\n", Context_switch);
 		end
 	end
 
 	always@(scalar_wen) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_wen <= %b\n", scalar_wen);
+			$fwrite(tracefile, "scalar_wen <= %h\n", scalar_wen);
 		end
 	end
 
 	always@(vector_wen) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_wen <= "  + vector_wen + "\n");
+			$fwrite(tracefile, "vector_wen <= %h\n", vector_wen);
 		end
 	end
 
 	always@(scalar_wb_address) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_wb_address <= "  + scalar_wb_address + "\n");
+			$fwrite(tracefile, "scalar_wb_address <= %h\n", scalar_wb_address);
 		end
 	end
 
 	always@(scalar_read_address1) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_read_address1 <= "  + scalar_read_address1 + "\n");
+			$fwrite(tracefile, "scalar_read_address1 <= %h\n", scalar_read_address1);
 		end
 	end
 
 	always@(scalar_read_address2) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_read_address2 <= "  + scalar_read_address2 + "\n");
+			$fwrite(tracefile, "scalar_read_address2 <= %h\n", scalar_read_address2);
 		end
 	end
 
 
 	always@(vector_read_address1) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_read_address1 <= "  + vector_read_address1 + "\n");
+			$fwrite(tracefile, "vector_read_address1 <= %h\n", vector_read_address1);
 		end
 	end
 
 	always@(vector_read_address2) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_read_address2 <= "  + vector_read_address2 + "\n");
+			$fwrite(tracefile, "vector_read_address2 <= %h\n", vector_read_address2);
 		end
 	end
 
 	always@(vector_wb_address) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_wb_address <= "  + vector_wb_address + "\n");
+			$fwrite(tracefile, "vector_wb_address <= %h\n", vector_wb_address);
 		end
 	end
 
 	always@(scalar_wb_data) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_wb_data <= "  + scalar_wb_data + "\n");
+			$fwrite(tracefile, "scalar_wb_data <= %h\n", scalar_wb_data);
 		end
 	end
 
 	always@(vector_wb_data) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_wb_data <= "  + vector_wb_data + "\n");
+			$fwrite(tracefile, "vector_wb_data <= %h\n", vector_wb_data);
 		end
 	end
 
