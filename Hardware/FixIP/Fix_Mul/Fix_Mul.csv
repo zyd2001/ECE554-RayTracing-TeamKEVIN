@@ -1,0 +1,20 @@
+# system info Fix_Mul on 2021.04.19.21:15:20
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Fix_Mul on 2021.04.19.21:15:20
+files:
+filepath,kind,attributes,module,is_top
+sim/Fix_Mul.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Fix_Mul,true
+altera_fxp_functions_191/sim/dspba_library_package.vhd,VHDL,,Fix_Mul_altera_fxp_functions_191_vsvne7a,false
+altera_fxp_functions_191/sim/dspba_library.vhd,VHDL,,Fix_Mul_altera_fxp_functions_191_vsvne7a,false
+altera_fxp_functions_191/sim/Fix_Mul_altera_fxp_functions_191_vsvne7a.vhd,VHDL,,Fix_Mul_altera_fxp_functions_191_vsvne7a,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Fix_Mul.fxp_functions_0,Fix_Mul_altera_fxp_functions_191_vsvne7a
