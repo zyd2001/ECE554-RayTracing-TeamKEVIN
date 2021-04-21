@@ -5,7 +5,7 @@ module Converter (
   done,
   data_out);
 
-  parameter F2I_LATENCY = 5;
+  parameter F2I_LATENCY = 5,
             I2F_LATENCY = 9;
 
   input clk, rst, en;
@@ -15,27 +15,27 @@ module Converter (
   output done;
   output [31:0] data_out;
 
-  logic FtoI_en, ItoF_en;
+  logic FtoI_en, ItoF_en, done_in, done_reg;
   
   logic [3:0] counter, counter_in;
   
-  logic [31:0] FtoI_out, ItoF_out, data_out_in;
+  logic [31:0] FtoI_out, ItoF_out, data_out_in, data_out_reg;
   
-  typedef enum [1:0] reg {F2I, I2F, IDLE} state_t;
+  typedef enum reg [1:0] {F2I, I2F, IDLE} state_t;
   state_t state, nxt_state;
   
   always_ff@(posedge clk or posedge rst) begin
     if (rst) begin
       counter <= '0;
       state <= IDLE;
-      done <= '0;
-      data_out <= '0;
+      done_reg <= '0;
+      data_out_reg <= '0;
     end
     else begin
       counter <= counter_in;
       state <= nxt_state;
-      done <= done_in;
-      data_out <= data_out_in;
+      done_reg <= done_in;
+      data_out_reg <= data_out_in;
     end
   end
 
@@ -85,7 +85,7 @@ module Converter (
     endcase
   end
   
-	FtoI F2I (
+	FtoI FtI (
 		.clk    (clk),          //   input,   width = 1,    clk.clk
 		.areset (rst),     //   input,   width = 1, areset.reset
 		.en     (FtoI_en),      //   input,   width = 1,     en.en
@@ -93,12 +93,15 @@ module Converter (
 		.q      (FtoI_out)      //  output,  width = 32,      q.q
 	);
 
-	ItoF I2F (
+	ItoF ItF (
 		.clk    (clk),          //   input,   width = 1,    clk.clk
 		.areset (rst),     //   input,   width = 1, areset.reset
 		.en     (ItoF_en),      //   input,   width = 1,     en.en
 		.a      (data_in),      //   input,  width = 32,      a.a
 		.q      (ItoF_out)      //  output,  width = 32,      q.q
 	);
+
+  assign done = done_reg;
+  assign data_out = data_out_reg;
 
 endmodule

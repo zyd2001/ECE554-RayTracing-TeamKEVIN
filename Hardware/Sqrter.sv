@@ -12,7 +12,7 @@ module Sqrter (
   output done;
   output [31:0] out;
   
-  logic done_in;
+  logic done_in, done_reg;
   logic [4:0] counter, counter_in;
   
   typedef enum reg {COUNT, IDLE} state_t;
@@ -22,12 +22,12 @@ module Sqrter (
     if (rst) begin
       counter <= '0;
       state <= IDLE;
-      done <= '0;
+      done_reg <= '0;
     end
     else begin
       counter <= counter_in;
       state <= nxt_state;
-      done <= done_in;
+      done_reg <= done_in;
     end
   end
   
@@ -60,4 +60,6 @@ module Sqrter (
 		.q      (out)          //  output,  width = 32,      q.q
 	);
 
+  assign done = done_reg;
+  
 endmodule 

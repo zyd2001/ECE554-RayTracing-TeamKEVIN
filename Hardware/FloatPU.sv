@@ -6,8 +6,8 @@ module FloatPU (
   done,
   result);
   
-  parameter ADD_LATENCY = 5;
-            MUL_LATENCY = 5;
+  parameter ADD_LATENCY = 5,
+            MUL_LATENCY = 5,
             DIV_LATENCY = 27;
   
   input clk, rst, en;
@@ -17,29 +17,29 @@ module FloatPU (
   output done;
   output [31:0] result;
   
-  logic done_in;
+  logic done_in, done_reg;
   
   logic Adder_en, Multiplier_en, Divider_en;
   
   logic [4:0] counter, counter_in;
   
-  logic [31:0] Divider_result, Adder_result, Multiplier_result, result_in;
+  logic [31:0] Divider_result, Adder_result, Multiplier_result, result_in, result_reg;
   
-  typedef enum [1:0] reg {ADDSUB, MUL, DIV, IDLE} state_t;
+  typedef enum reg [1:0] {ADDSUB, MUL, DIV, IDLE} state_t;
   state_t state, nxt_state;
   
   always_ff@(posedge clk or posedge rst) begin
     if (rst) begin
       counter <= '0;
       state <= IDLE;
-      done <= '0;
-      result <= '0;
+      done_reg <= '0;
+      result_reg <= '0;
     end
     else begin
       counter <= counter_in;
       state <= nxt_state;
-      done <= done_in;
-      result <= result_in;
+      done_reg <= done_in;
+      result_reg <= result_in;
     end
   end
   
@@ -134,4 +134,7 @@ module FloatPU (
 		.q      (Divider_result)       //  output,  width = 32,      q.q
 	);
 
+  assign done = done_reg;
+  assign result = result_reg;
+  
 endmodule

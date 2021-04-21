@@ -11,7 +11,7 @@ module ALU (
   input [1:0] Fix_mode, Float_mode;
   input [31:0] Fix_a, Fix_b, Float_a, Float_b, Converter_in, Sqrt_in;
   
-  output Fix_done, Float_done, Converter_done, Sqrt_out;
+  output Fix_done, Float_done, Converter_done, Sqrt_done;
   output [31:0] Float_result, Converter_out, Sqrt_out;
   output [63:0] Fix_result;
 
