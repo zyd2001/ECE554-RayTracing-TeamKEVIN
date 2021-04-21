@@ -20,29 +20,17 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         Output
     */
     // IC
-    output rdy_IC;
+    output logic rdy_IC;
     output [127:0] vertex1_IC, vertex2_IC, vertex0_IC;
     output [31:0] tid_IC;
     // MC
-    output rdy_MC;
+    output logic rdy_MC;
 
     // Generate variable
     genvar i, j;
 
     enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_tid, rd_done} state, next;
 
-    logic start_mc_write;
-    assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index));
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n) begin
-            state <= idle;
-            mc_addr_cnt_reg <= '0;
-        end
-        else begin
-            state <= start_mc_write ? mc_wr_index : next;
-            mc_addr_cnt_reg <= start_mc_write ? '0 : mc_addr_cnt;
-        end
-    end
     // input buffer signal for index wr
     logic [127:0] mc_data;
     logic [2:0] index_cnt_reg, index_cnt;
@@ -64,6 +52,19 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     logic is_prefetching_reg, is_prefetching;
     logic prefetch_match, out_prefetched_data;
     logic [BIT_TRIANGLE-1:0]prefetch_triangle_id_reg, prefetch_triangle_id;
+    // state machine
+    logic start_mc_write;
+    assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index));
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            mc_addr_cnt_reg <= '0;
+        end
+        else begin
+            state <= start_mc_write ? mc_wr_index : next;
+            mc_addr_cnt_reg <= start_mc_write ? '0 : mc_addr_cnt;
+        end
+    end
     always_comb begin
         next = idle;
         we_index = 1'b0;
@@ -259,7 +260,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     end
     // mem modules
     single_port_ram #(.ADDR_WIDTH(DATA_DEPTH), .DATA_WIDTH(32)) index (.clk(clk), .we(we_index),
-                    .data(index_data_in), .addr({index_addr_in, 2'b0}), .q(index_data_out);
+                    .data(index_data_in), .addr({index_addr_in, 2'b0}), .q(index_data_out));
     // i = 3: x, i = 2: y, i = 1: z
     generate
         for (i = 1; i < 4; i = i + 1) begin: triangle_memory_xyz
