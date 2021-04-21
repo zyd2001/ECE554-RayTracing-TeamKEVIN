@@ -7,6 +7,7 @@ namespace CompilerCore
     abstract class Statement : ASTNode
     {
         internal Statement(LexLocation location) : base(location) { }
+        abstract internal bool SyntaxCheck(bool topLevel, bool inLoop);
     }
 
     class StatementList : ASTNodeList<Statement, StatementList>
@@ -14,9 +15,29 @@ namespace CompilerCore
         internal StatementList(LexLocation location) : base(location) { }
         internal StatementList(LexLocation location, Statement node) : base(location, node) { }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        internal bool StaticCheck()
+        {
+            bool pass = true;
+            pass = pass && SyntaxCheck(true, false);
+            return pass;
+        }
+
+        internal bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            bool pass = true;
+            foreach (var item in list)
+                pass = pass && item.SyntaxCheck(topLevel, inLoop);
+            return pass;
+        }
+
+        internal override bool TypeCheck()
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -34,7 +55,22 @@ namespace CompilerCore
             expression = exp;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            if (topLevel)
+            {
+                Error("Return statement must be in a function");
+                return false;
+            }
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -51,8 +87,28 @@ namespace CompilerCore
         {
             this.type = type;
         }
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            var str = type == Type.CONTINUE ? "Continue" : "Break";
+            if (topLevel)
+            {
+                Error($"{str} statement must be in a loop");
+                return false;
+            }
+            if (!inLoop)
+            {
+                Error($"{str} statement must be in a loop");
+                return false;
+            }
+            return true;
+        }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool TypeCheck()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool NameAnalysis()
         {
             throw new NotImplementedException();
         }
@@ -79,7 +135,22 @@ namespace CompilerCore
             loopBody = body;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            if (topLevel)
+            {
+                Error("Loop must be in a function");
+                return false;
+            }
+            return loopBody.SyntaxCheck(topLevel, true);
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -102,7 +173,24 @@ namespace CompilerCore
             return this;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            if (topLevel)
+            {
+                Error("If statement must be in a function");
+                return false;
+            }
+            var result = statement.SyntaxCheck(topLevel, inLoop);
+            result = result && (elseStatement?.SyntaxCheck(topLevel, inLoop) ?? false);
+            return result;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -116,7 +204,22 @@ namespace CompilerCore
             statementList = list;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            if (topLevel)
+            {
+                Error("Block must be in a function");
+                return false;
+            }
+            return statementList.SyntaxCheck(topLevel, inLoop);
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -132,7 +235,22 @@ namespace CompilerCore
             right = r;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            if (topLevel)
+            {
+                Error("Assignment statement must be in a function");
+                return false;
+            }
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -151,7 +269,17 @@ namespace CompilerCore
             constant = c;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -162,9 +290,14 @@ namespace CompilerCore
         internal DeclarationList(LexLocation location) : base(location) { }
         internal DeclarationList(LexLocation location, DeclarationItem node) : base(location, node) { }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        internal override bool TypeCheck()
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -181,7 +314,12 @@ namespace CompilerCore
             arraySize = size;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }
@@ -200,10 +338,25 @@ namespace CompilerCore
             parameterList = parameters;
             statementList = statements;
         }
-        internal override void StaticCheck(bool topLevel)
+
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
         {
             if (!topLevel)
-                Error("sble");
+            {
+                Error("Function cannot be nested");
+                return false;
+            }
+            return statementList.SyntaxCheck(false, false);
+        }
+
+        internal override bool TypeCheck()
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -212,9 +365,14 @@ namespace CompilerCore
         internal ParameterList(LexLocation location) : base(location) { }
         internal ParameterList(LexLocation location, Parameter node) : base(location, node) { }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        internal override bool TypeCheck()
+        {
+            throw new NotImplementedException();
         }
     }
     internal class Parameter : ASTNode
@@ -227,7 +385,12 @@ namespace CompilerCore
             identifier = id;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override bool TypeCheck()
         {
             throw new NotImplementedException();
         }

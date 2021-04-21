@@ -11,7 +11,8 @@ namespace CompilerCore
         {
             this.location = location;
         }
-        abstract internal void StaticCheck(bool topLevel);
+        abstract internal bool TypeCheck();
+        abstract internal bool NameAnalysis();
         internal void Error(string str)
         {
             Console.Write($"{location.StartLine}:{location.StartColumn}: ");
@@ -21,7 +22,7 @@ namespace CompilerCore
 
     abstract class ASTNodeList<NodeType, T> : ASTNode where T : ASTNodeList<NodeType, T>
     {
-        List<NodeType> list = new List<NodeType>();
+        protected List<NodeType> list = new List<NodeType>();
         internal ASTNodeList(LexLocation location) : base(location) { }
         internal ASTNodeList(LexLocation location, NodeType node) : base(location)
         {
