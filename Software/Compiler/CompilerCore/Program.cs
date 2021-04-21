@@ -11,6 +11,7 @@ namespace CompilerCore
             Parser parser = new Parser(scanner);
 
             Console.WriteLine(parser.Parse());
+            parser.AST.StaticCheck();
         }
     }
 }
