@@ -12,7 +12,7 @@ namespace CompilerCore
             this.location = location;
         }
         abstract internal bool TypeCheck();
-        abstract internal bool NameAnalysis();
+        abstract internal bool NameAnalysis(SymbolTable table);
         internal void Error(string str)
         {
             Console.Write($"{location.StartLine}:{location.StartColumn}: ");
