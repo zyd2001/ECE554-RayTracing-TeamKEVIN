@@ -1,35 +1,110 @@
 module FloatPU (
-  clk, rst,
+  clk, rst, en,
   mode,
   a,
   b,
+  done,
   result);
   
-  input clk, rst;
-  input [2:0] mode;
+  parameter ADD_LATENCY = 5;
+            MUL_LATENCY = 5;
+            DIV_LATENCY = 27;
+  
+  input clk, rst, en;
+  input [1:0] mode;
   input [31:0] a, b;
   
+  output done;
   output [31:0] result;
   
-  logic Adder_en, Multiplier_en, Divider_en, Sqrter_en;
-  logic Adder_rst, Multiplier_rst, Divider_rst, Sqrter_rst;
-  logic [31:0] Divider_result, Sqrter_result;
-  logic [32:0] Adder_result;
-  logic [63:0] Multiplier_result;
+  logic done_in;
   
-  assign Adder_en = (mode[2:1] == 2'b00) ? 1'b1 : 1'b0;
-  assign Multiplier_en = (mode == 3'b010) ? 1'b1 : 1'b0;
-  assign Divider_en = (mode == 3'b011) ? 1'b1 : 1'b0;
-  assign Sqrter_en = (mode[2] == 1'b1) ? 1'b1 : 1'b0;
+  logic Adder_en, Multiplier_en, Divider_en;
   
-  assign Adder_rst = rst && Adder_en;
-  assign Multiplier_rst = rst && Multiplier_en;
-  assign Divider_rst = rst && Divider_en;
-  assign Sqrter_rst = rst && Sqrter_en;
+  logic [4:0] counter, counter_in;
   
-  assign result = (mode == 3'b010) ? Multiplier_result :
-                (mode == 3'b011) ? Divider_result :
-                (mode[2] == 1'b1) ? Sqrter_result : Adder_result;
+  logic [31:0] Divider_result, Adder_result, Multiplier_result, result_in;
+  
+  typedef enum [1:0] reg {ADDSUB, MUL, DIV, IDLE} state_t;
+  state_t state, nxt_state;
+  
+  always_ff@(posedge clk or posedge rst) begin
+    if (rst) begin
+      counter <= '0;
+      state <= IDLE;
+      done <= '0;
+      result <= '0;
+    end
+    else begin
+      counter <= counter_in;
+      state <= nxt_state;
+      done <= done_in;
+      result <= result_in;
+    end
+  end
+  
+  always_comb begin
+    Adder_en = 1'b0;
+    Multiplier_en = 1'b0;
+    Divider_en = 1'b0;
+    done_in = 1'b0;
+    counter_in = '0;
+    result_in = result;
+    nxt_state = IDLE;
+    case(state)
+      ADDSUB: 
+        begin
+          if (counter == ADD_LATENCY) begin
+            done_in = 1'b1;
+            result_in = Adder_result;
+          end
+          else begin
+            counter_in = counter + 1'b1;
+            Adder_en = 1'b1;
+            nxt_state = ADDSUB;
+          end
+        end
+      MUL: 
+        begin
+          if (counter == MUL_LATENCY) begin
+            done_in = 1'b1;
+            result_in = Multiplier_result;
+          end
+          else begin
+            counter_in = counter + 1'b1;
+            Multiplier_en = 1'b1;
+            nxt_state = MUL;
+          end
+        end
+      DIV: 
+        begin
+          if (counter == DIV_LATENCY) begin
+            done_in = 1'b1;
+            result_in = Divider_result;
+          end
+          else begin
+            counter_in = counter + 1'b1;
+            Divider_en = 1'b1;
+            nxt_state = DIV;
+          end
+        end
+      default: 
+          if (en) begin
+            if (mode[1] == 1'b0) begin
+              Adder_en = 1'b1;
+              nxt_state = ADDSUB;
+            end
+            else if (mode == 2'b10) begin
+              Multiplier_en = 1'b1;
+              nxt_state = MUL;
+            end
+            else begin
+              Divider_en = 1'b1;
+              nxt_state = DIV;
+            end
+          end
+    endcase
+  end
   
   Float_Add Adder (
 		.clk    (clk),               //   input,   width = 1,    clk.clk
@@ -43,7 +118,7 @@ module FloatPU (
 
 	Float_Mul Multiplier (
 		.clk    (clk),                    //   input,   width = 1,    clk.clk
-		.areset (Multiplier_rst),         //   input,   width = 1, areset.reset
+		.areset (rst),         //   input,   width = 1, areset.reset
 		.en     (Multiplier_en),          //   input,   width = 1,     en.en
 		.a      (a),                      //   input,  width = 32,      a.a
 		.b      (b),                      //   input,  width = 32,      b.b
@@ -52,19 +127,11 @@ module FloatPU (
 
 	Float_Div Divider (
 		.clk    (clk),                 //   input,   width = 1,    clk.clk
-		.areset (Divider_rst),         //   input,   width = 1, areset.reset
+		.areset (rst),         //   input,   width = 1, areset.reset
 		.en     (Divider_en),          //   input,   width = 1,     en.en
 		.a      (a),                   //   input,  width = 32,      a.a
 		.b      (b),                   //   input,  width = 32,      b.b
 		.q      (Divider_result)       //  output,  width = 32,      q.q
-	);
-
-	Float_Sqrt Sqrter (
-		.clk    (clk),                //   input,   width = 1,    clk.clk
-		.areset (Sqrter_rst),         //   input,   width = 1, areset.reset
-		.en     (Sqrter_en),          //   input,   width = 1,     en.en
-		.a      (a),                  //   input,  width = 32,      a.a
-		.q      (Sqrter_result)       //  output,  width = 32,      q.q
 	);
 
 endmodule
