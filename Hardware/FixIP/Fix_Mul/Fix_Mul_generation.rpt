@@ -5,10 +5,10 @@ Info: Fix_Mul: "Transforming system: Fix_Mul"
 Info: Fix_Mul: "Naming system components in system: Fix_Mul"
 Info: Fix_Mul: "Processing generation queue"
 Info: Fix_Mul: "Generating: Fix_Mul"
-Info: Fix_Mul: "Generating: Fix_Mul_altera_fxp_functions_191_vsvne7a"
-Info: fxp_functions_0: Latency on Stratix 10 is 5 cycles
+Info: Fix_Mul: "Generating: Fix_Mul_altera_fxp_functions_191_guxefki"
+Info: fxp_functions_0: Latency on Stratix 10 is 6 cycles
 Info: fxp_functions_0: DSP Blocks Used: 2
-Info: fxp_functions_0: LUTs Used: 65
+Info: fxp_functions_0: LUTs Used: 114
 Info: fxp_functions_0: Memory Bits Used: 0
 Info: fxp_functions_0: Memory Blocks Used: 0
 Info: Fix_Mul: Done "Fix_Mul" with 2 modules, 4 files
@@ -57,18 +57,20 @@ Info: qsys-generate succeeded.
 Info: Finished: Create block symbol file (.bsf)
 Info: 
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Mul.ip --synthesis=VERILOG --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Mul --family="Stratix 10" --part=1SX280HN2F43E2VG
+Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Mul.ip --synthesis=VERILOG --greybox --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Mul --family="Stratix 10" --part=1SX280HN2F43E2VG
 Info: Fix_Mul: "Transforming system: Fix_Mul"
 Info: Fix_Mul: "Naming system components in system: Fix_Mul"
 Info: Fix_Mul: "Processing generation queue"
 Info: Fix_Mul: "Generating: Fix_Mul"
-Info: Fix_Mul: "Generating: Fix_Mul_altera_fxp_functions_191_vsvne7a"
-Info: fxp_functions_0: Latency on Stratix 10 is 5 cycles
+Info: Fix_Mul: "Generating: Fix_Mul_altera_fxp_functions_191_guxefki"
+Info: fxp_functions_0: Latency on Stratix 10 is 6 cycles
 Info: fxp_functions_0: DSP Blocks Used: 2
-Info: fxp_functions_0: LUTs Used: 65
+Info: fxp_functions_0: LUTs Used: 114
 Info: fxp_functions_0: Memory Bits Used: 0
 Info: fxp_functions_0: Memory Blocks Used: 0
 Info: Fix_Mul: Done "Fix_Mul" with 2 modules, 4 files
+Info: Generating third-party timing and resource estimation model ...
+Info: Done generating third-party timing and resource estimation model.
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
 Info: Starting: IP-XACT

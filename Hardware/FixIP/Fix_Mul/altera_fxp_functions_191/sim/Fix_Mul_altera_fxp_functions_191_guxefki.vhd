@@ -15,8 +15,8 @@
 -- applicable agreement for further details.
 -- ---------------------------------------------------------------------------
 
--- VHDL created from Fix_Mul_altera_fxp_functions_191_vsvne7a
--- VHDL created on Mon Apr 19 21:15:20 2021
+-- VHDL created from Fix_Mul_altera_fxp_functions_191_guxefki
+-- VHDL created on Tue Apr 20 21:13:15 2021
 
 
 library IEEE;
@@ -35,7 +35,7 @@ library fourteennm;
 use fourteennm.fourteennm_components.fourteennm_mac;
 use fourteennm.fourteennm_components.fourteennm_fp_mac;
 
-entity Fix_Mul_altera_fxp_functions_191_vsvne7a is
+entity Fix_Mul_altera_fxp_functions_191_guxefki is
     port (
         a : in std_logic_vector(31 downto 0);  -- sfix32
         b : in std_logic_vector(31 downto 0);  -- sfix32
@@ -44,9 +44,9 @@ entity Fix_Mul_altera_fxp_functions_191_vsvne7a is
         clk : in std_logic;
         rst : in std_logic
     );
-end Fix_Mul_altera_fxp_functions_191_vsvne7a;
+end Fix_Mul_altera_fxp_functions_191_guxefki;
 
-architecture normal of Fix_Mul_altera_fxp_functions_191_vsvne7a is
+architecture normal of Fix_Mul_altera_fxp_functions_191_guxefki is
 
     attribute altera_attribute : string;
     attribute altera_attribute of normal : architecture is "-name AUTO_SHIFT_REGISTER_RECOGNITION OFF; -name MESSAGE_DISABLE 10036; -name MESSAGE_DISABLE 10037; -name MESSAGE_DISABLE 14130; -name MESSAGE_DISABLE 14320; -name MESSAGE_DISABLE 15400; -name MESSAGE_DISABLE 14130; -name MESSAGE_DISABLE 10036; -name MESSAGE_DISABLE 12020; -name MESSAGE_DISABLE 12030; -name MESSAGE_DISABLE 12010; -name MESSAGE_DISABLE 12110; -name MESSAGE_DISABLE 14320; -name MESSAGE_DISABLE 13410; -name MESSAGE_DISABLE 113007";
@@ -137,8 +137,8 @@ begin
     -- GND(CONSTANT,0)
     GND_q <= "0";
 
-    -- multiplier_ma3_cma(CHAINMULTADD,23)@0 + 4
-    -- out q@5
+    -- multiplier_ma3_cma(CHAINMULTADD,23)@0 + 5
+    -- out q@6
     multiplier_ma3_cma_reset <= rst;
     multiplier_ma3_cma_ena0 <= en(0) or multiplier_ma3_cma_reset;
     multiplier_ma3_cma_ena1 <= multiplier_ma3_cma_ena0;
@@ -200,19 +200,19 @@ begin
         resulta => multiplier_ma3_cma_s0
     );
     multiplier_ma3_cma_delay : dspba_delay
-    GENERIC MAP ( width => 33, depth => 0, reset_kind => "NONE", phase => 0, modulus => 1 )
+    GENERIC MAP ( width => 33, depth => 1, reset_kind => "NONE", phase => 0, modulus => 1 )
     PORT MAP ( xin => multiplier_ma3_cma_s0, xout => multiplier_ma3_cma_qq, ena => en(0), clk => clk, aclr => rst );
     multiplier_ma3_cma_q <= STD_LOGIC_VECTOR(multiplier_ma3_cma_qq(32 downto 0));
 
-    -- multiplier_sums_align_1(BITSHIFT,18)@5
+    -- multiplier_sums_align_1(BITSHIFT,18)@6
     multiplier_sums_align_1_qint <= multiplier_ma3_cma_q & "000000000000000000";
     multiplier_sums_align_1_q <= multiplier_sums_align_1_qint(50 downto 0);
 
     -- multiplier_bs1(BITSELECT,7)@0
     multiplier_bs1_b <= STD_LOGIC_VECTOR(a(31 downto 18));
 
-    -- multiplier_im0_cma(CHAINMULTADD,21)@0 + 4
-    -- out q@5
+    -- multiplier_im0_cma(CHAINMULTADD,21)@0 + 5
+    -- out q@6
     multiplier_im0_cma_reset <= rst;
     multiplier_im0_cma_ena0 <= en(0) or multiplier_im0_cma_reset;
     multiplier_im0_cma_ena1 <= multiplier_im0_cma_ena0;
@@ -264,7 +264,7 @@ begin
         resulta => multiplier_im0_cma_s0
     );
     multiplier_im0_cma_delay : dspba_delay
-    GENERIC MAP ( width => 28, depth => 0, reset_kind => "NONE", phase => 0, modulus => 1 )
+    GENERIC MAP ( width => 28, depth => 1, reset_kind => "NONE", phase => 0, modulus => 1 )
     PORT MAP ( xin => multiplier_im0_cma_s0, xout => multiplier_im0_cma_qq, ena => en(0), clk => clk, aclr => rst );
     multiplier_im0_cma_q <= STD_LOGIC_VECTOR(multiplier_im0_cma_qq(27 downto 0));
 
@@ -272,8 +272,8 @@ begin
     multiplier_bs10_in <= b(17 downto 0);
     multiplier_bs10_b <= multiplier_bs10_in(17 downto 0);
 
-    -- multiplier_im8_cma(CHAINMULTADD,22)@0 + 4
-    -- out q@5
+    -- multiplier_im8_cma(CHAINMULTADD,22)@0 + 5
+    -- out q@6
     multiplier_im8_cma_reset <= rst;
     multiplier_im8_cma_ena0 <= en(0) or multiplier_im8_cma_reset;
     multiplier_im8_cma_ena1 <= multiplier_im8_cma_ena0;
@@ -325,20 +325,20 @@ begin
         resulta => multiplier_im8_cma_s0
     );
     multiplier_im8_cma_delay : dspba_delay
-    GENERIC MAP ( width => 36, depth => 0, reset_kind => "NONE", phase => 0, modulus => 1 )
+    GENERIC MAP ( width => 36, depth => 1, reset_kind => "NONE", phase => 0, modulus => 1 )
     PORT MAP ( xin => multiplier_im8_cma_s0, xout => multiplier_im8_cma_qq, ena => en(0), clk => clk, aclr => rst );
     multiplier_im8_cma_q <= STD_LOGIC_VECTOR(multiplier_im8_cma_qq(35 downto 0));
 
-    -- multiplier_sums_join_0(BITJOIN,17)@5
+    -- multiplier_sums_join_0(BITJOIN,17)@6
     multiplier_sums_join_0_q <= multiplier_im0_cma_q & multiplier_im8_cma_q;
 
-    -- multiplier_sums_result_add_0_0(ADD,20)@5
+    -- multiplier_sums_result_add_0_0(ADD,20)@6
     multiplier_sums_result_add_0_0_a <= STD_LOGIC_VECTOR(STD_LOGIC_VECTOR((64 downto 64 => multiplier_sums_join_0_q(63)) & multiplier_sums_join_0_q));
     multiplier_sums_result_add_0_0_b <= STD_LOGIC_VECTOR(STD_LOGIC_VECTOR((64 downto 51 => multiplier_sums_align_1_q(50)) & multiplier_sums_align_1_q));
     multiplier_sums_result_add_0_0_o <= STD_LOGIC_VECTOR(SIGNED(multiplier_sums_result_add_0_0_a) + SIGNED(multiplier_sums_result_add_0_0_b));
     multiplier_sums_result_add_0_0_q <= multiplier_sums_result_add_0_0_o(64 downto 0);
 
-    -- out_rsrvd_fix(GPOUT,5)@5
+    -- out_rsrvd_fix(GPOUT,5)@6
     result <= multiplier_sums_result_add_0_0_q(63 downto 0);
 
 END normal;

@@ -18,7 +18,7 @@
         <parameters>
           <parameter>
             <name>ALL_function</name>
-            <value>INT_DIV</value>
+            <value>DIV</value>
           </parameter>
           <parameter>
             <name>FUNCTION_FAMILY</name>
@@ -154,7 +154,7 @@
           </parameter>
           <parameter>
             <name>derived_function</name>
-            <value>INT_DIV</value>
+            <value>DIV</value>
           </parameter>
           <parameter>
             <name>force_elaborate</name>
@@ -170,7 +170,7 @@
           </parameter>
           <parameter>
             <name>frequency_target</name>
-            <value>200</value>
+            <value>250</value>
           </parameter>
           <parameter>
             <name>gen_enable</name>
@@ -393,7 +393,7 @@
         <className>altera_fxp_functions</className>
         <version>19.1</version>
         <name>fxp_functions_0</name>
-        <uniqueName>Fix_Div_altera_fxp_functions_191_2oqd7oi</uniqueName>
+        <uniqueName>Fix_Div_altera_fxp_functions_191_fy4uury</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>Fix_Div.fxp_functions_0</path>

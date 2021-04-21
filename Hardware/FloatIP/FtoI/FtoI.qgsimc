@@ -142,7 +142,7 @@
           </parameter>
           <parameter>
             <name>frequency_target</name>
-            <value>200</value>
+            <value>250</value>
           </parameter>
           <parameter>
             <name>fxpt_fraction</name>
@@ -162,7 +162,7 @@
           </parameter>
           <parameter>
             <name>latency_feedback</name>
-            <value>2</value>
+            <value>3</value>
           </parameter>
           <parameter>
             <name>latency_target</name>
@@ -225,7 +225,7 @@
         <className>altera_fp_functions</className>
         <version>19.1</version>
         <name>fp_functions_0</name>
-        <uniqueName>FtoI_altera_fp_functions_191_dnjigdi</uniqueName>
+        <uniqueName>FtoI_altera_fp_functions_191_ces6fqa</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>FtoI.fp_functions_0</path>

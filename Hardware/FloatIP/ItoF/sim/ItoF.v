@@ -11,7 +11,7 @@ module ItoF (
 		output wire [31:0] q       //      q.q
 	);
 
-	ItoF_altera_fp_functions_191_n4azkbi fp_functions_0 (
+	ItoF_altera_fp_functions_191_xhttkoq fp_functions_0 (
 		.clk    (clk),    //   input,   width = 1,    clk.clk
 		.areset (areset), //   input,   width = 1, areset.reset
 		.en     (en),     //   input,   width = 1,     en.en

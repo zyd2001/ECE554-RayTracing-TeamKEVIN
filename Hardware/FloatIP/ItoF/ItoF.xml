@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2021.04.19.21:42:55"
+ date="2021.04.20.22:59:57"
  outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/">
  <perimeter>
   <parameter
@@ -110,11 +110,11 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="ItoF">"Generating: ItoF"</message>
-   <message level="Info" culprit="ItoF">"Generating: ItoF_altera_fp_functions_191_n4azkbi"</message>
-   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 200 -name ItoF_altera_fp_functions_191_n4azkbi -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FXPToFP 32 0 1 8 23</message>
-   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 5 cycles</message>
+   <message level="Info" culprit="ItoF">"Generating: ItoF_altera_fp_functions_191_xhttkoq"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 250 -name ItoF_altera_fp_functions_191_xhttkoq -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FXPToFP 32 0 1 8 23</message>
+   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 7 cycles</message>
    <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 0</message>
-   <message level="Info" culprit="fp_functions_0">LUTs Used: 356</message>
+   <message level="Info" culprit="fp_functions_0">LUTs Used: 362</message>
    <message level="Info" culprit="fp_functions_0">Memory Bits Used: 0</message>
    <message level="Info" culprit="fp_functions_0">Memory Blocks Used: 0</message>
   </messages>
@@ -122,7 +122,7 @@
  <entity
    kind="altera_fp_functions"
    version="19.1"
-   name="ItoF_altera_fp_functions_191_n4azkbi">
+   name="ItoF_altera_fp_functions_191_xhttkoq">
   <parameter name="fp_man" value="23" />
   <parameter name="gen_enable" value="true" />
   <parameter name="fp_exp_derived" value="8" />
@@ -136,7 +136,7 @@
   <parameter name="fp_format" value="single" />
   <parameter name="fp_out_man_derived" value="8" />
   <parameter name="latency_target" value="2" />
-  <parameter name="frequency_target" value="200" />
+  <parameter name="frequency_target" value="250" />
   <parameter name="number_of_inputs" value="2" />
   <parameter name="fp_in_format" value="single" />
   <parameter name="select_signal_enable" value="false" />
@@ -169,7 +169,7 @@
   <parameter name="selected_device_speedgrade" value="2" />
   <parameter name="CONVERT_function" value="FXP_FP" />
   <parameter name="report_resources_to_xml" value="false" />
-  <parameter name="latency_feedback" value="5" />
+  <parameter name="latency_feedback" value="7" />
   <parameter name="fp_in_exp_derived" value="8" />
   <parameter name="COMPARE_function" value="MIN" />
   <parameter name="FUNCTION_FAMILY" value="CONVERT" />
@@ -184,7 +184,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/altera_fp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/altera_fp_functions_191/synth/ItoF_altera_fp_functions_191_n4azkbi.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/altera_fp_functions_191/synth/ItoF_altera_fp_functions_191_xhttkoq.vhd"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
@@ -195,7 +195,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/altera_fp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/altera_fp_functions_191/synth/ItoF_altera_fp_functions_191_n4azkbi.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/ItoF/altera_fp_functions_191/synth/ItoF_altera_fp_functions_191_xhttkoq.vhd"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -205,11 +205,11 @@
   <childSourceFiles/>
   <instantiator instantiator="ItoF" as="fp_functions_0" />
   <messages>
-   <message level="Info" culprit="ItoF">"Generating: ItoF_altera_fp_functions_191_n4azkbi"</message>
-   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 200 -name ItoF_altera_fp_functions_191_n4azkbi -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FXPToFP 32 0 1 8 23</message>
-   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 5 cycles</message>
+   <message level="Info" culprit="ItoF">"Generating: ItoF_altera_fp_functions_191_xhttkoq"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 250 -name ItoF_altera_fp_functions_191_xhttkoq -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FXPToFP 32 0 1 8 23</message>
+   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 7 cycles</message>
    <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 0</message>
-   <message level="Info" culprit="fp_functions_0">LUTs Used: 356</message>
+   <message level="Info" culprit="fp_functions_0">LUTs Used: 362</message>
    <message level="Info" culprit="fp_functions_0">Memory Bits Used: 0</message>
    <message level="Info" culprit="fp_functions_0">Memory Blocks Used: 0</message>
   </messages>

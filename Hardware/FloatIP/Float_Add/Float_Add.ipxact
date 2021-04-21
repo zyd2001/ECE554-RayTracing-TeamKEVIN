@@ -412,7 +412,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fp_functions_191/synth/Float_Add_altera_fp_functions_191_w5j73ga.vhd</ipxact:name>
+                <ipxact:name>altera_fp_functions_191/synth/Float_Add_altera_fp_functions_191_2lixnxi.vhd</ipxact:name>
                 <ipxact:fileType>vhdlSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

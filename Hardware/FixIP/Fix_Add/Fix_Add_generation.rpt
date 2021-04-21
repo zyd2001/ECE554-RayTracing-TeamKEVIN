@@ -5,7 +5,7 @@ Info: Fix_Add: "Transforming system: Fix_Add"
 Info: Fix_Add: "Naming system components in system: Fix_Add"
 Info: Fix_Add: "Processing generation queue"
 Info: Fix_Add: "Generating: Fix_Add"
-Info: Fix_Add: "Generating: Fix_Add_altera_fxp_functions_191_i22v3ci"
+Info: Fix_Add: "Generating: Fix_Add_altera_fxp_functions_191_3l2g3ki"
 Info: fxp_functions_0: Latency on Stratix 10 is 1 cycle
 Info: fxp_functions_0: DSP Blocks Used: 0
 Info: fxp_functions_0: LUTs Used: 33
@@ -57,18 +57,20 @@ Info: qsys-generate succeeded.
 Info: Finished: Create block symbol file (.bsf)
 Info: 
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add.ip --synthesis=VERILOG --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add --family="Stratix 10" --part=1SX280HN2F43E2VG
+Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add.ip --synthesis=VERILOG --greybox --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add --family="Stratix 10" --part=1SX280HN2F43E2VG
 Info: Fix_Add: "Transforming system: Fix_Add"
 Info: Fix_Add: "Naming system components in system: Fix_Add"
 Info: Fix_Add: "Processing generation queue"
 Info: Fix_Add: "Generating: Fix_Add"
-Info: Fix_Add: "Generating: Fix_Add_altera_fxp_functions_191_i22v3ci"
+Info: Fix_Add: "Generating: Fix_Add_altera_fxp_functions_191_3l2g3ki"
 Info: fxp_functions_0: Latency on Stratix 10 is 1 cycle
 Info: fxp_functions_0: DSP Blocks Used: 0
 Info: fxp_functions_0: LUTs Used: 33
 Info: fxp_functions_0: Memory Bits Used: 0
 Info: fxp_functions_0: Memory Blocks Used: 0
 Info: Fix_Add: Done "Fix_Add" with 2 modules, 4 files
+Info: Generating third-party timing and resource estimation model ...
+Info: Done generating third-party timing and resource estimation model.
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
 Info: Starting: IP-XACT

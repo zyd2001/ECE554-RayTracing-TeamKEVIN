@@ -13,7 +13,7 @@ module Float_Add (
 		input  wire [0:0]  opSel   //  opSel.opSel
 	);
 
-	Float_Add_altera_fp_functions_191_w5j73ga fp_functions_0 (
+	Float_Add_altera_fp_functions_191_2lixnxi fp_functions_0 (
 		.clk    (clk),    //   input,   width = 1,    clk.clk
 		.areset (areset), //   input,   width = 1, areset.reset
 		.en     (en),     //   input,   width = 1,     en.en

@@ -11,7 +11,7 @@ module FtoI (
 		output wire [31:0] q       //      q.q
 	);
 
-	FtoI_altera_fp_functions_191_dnjigdi fp_functions_0 (
+	FtoI_altera_fp_functions_191_ces6fqa fp_functions_0 (
 		.clk    (clk),    //   input,   width = 1,    clk.clk
 		.areset (areset), //   input,   width = 1, areset.reset
 		.en     (en),     //   input,   width = 1,     en.en

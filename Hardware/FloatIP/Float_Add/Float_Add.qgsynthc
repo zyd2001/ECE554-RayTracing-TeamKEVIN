@@ -142,7 +142,7 @@
           </parameter>
           <parameter>
             <name>frequency_target</name>
-            <value>200</value>
+            <value>250</value>
           </parameter>
           <parameter>
             <name>fxpt_fraction</name>
@@ -225,7 +225,7 @@
         <className>altera_fp_functions</className>
         <version>19.1</version>
         <name>fp_functions_0</name>
-        <uniqueName>Float_Add_altera_fp_functions_191_w5j73ga</uniqueName>
+        <uniqueName>Float_Add_altera_fp_functions_191_2lixnxi</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>Float_Add.fp_functions_0</path>

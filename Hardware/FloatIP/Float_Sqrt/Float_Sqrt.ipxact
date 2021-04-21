@@ -292,7 +292,7 @@
         <ipxact:fileSet>
             <ipxact:name>QUARTUS_SYNTH</ipxact:name>
             <ipxact:file>
-                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC1_uid65_sqrtTables_lutmem.hex</ipxact:name>
+                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC2_uid68_sqrtTables_lutmem.hex</ipxact:name>
                 <ipxact:fileType user="HEX">user</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>
@@ -300,7 +300,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC0_uid62_sqrtTables_lutmem.hex</ipxact:name>
+                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC1_uid65_sqrtTables_lutmem.hex</ipxact:name>
                 <ipxact:fileType user="HEX">user</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>
@@ -308,7 +308,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC2_uid68_sqrtTables_lutmem.hex</ipxact:name>
+                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC0_uid62_sqrtTables_lutmem.hex</ipxact:name>
                 <ipxact:fileType user="HEX">user</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>
@@ -332,7 +332,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua.vhd</ipxact:name>
+                <ipxact:name>altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi.vhd</ipxact:name>
                 <ipxact:fileType>vhdlSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

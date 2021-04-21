@@ -12,7 +12,7 @@ module Fix_Div (
 		output wire [31:0] result       //      result.result
 	);
 
-	Fix_Div_altera_fxp_functions_191_2oqd7oi fxp_functions_0 (
+	Fix_Div_altera_fxp_functions_191_fy4uury fxp_functions_0 (
 		.clk         (clk),         //   input,   width = 1,         clk.clk
 		.rst         (rst),         //   input,   width = 1,         rst.reset
 		.en          (en),          //   input,   width = 1,          en.en

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2021.04.19.21:20:47"
+ date="2021.04.20.23:12:45"
  outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/">
  <perimeter>
   <parameter
@@ -116,10 +116,10 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="Fix_Div">"Generating: Fix_Div"</message>
-   <message level="Info" culprit="Fix_Div">"Generating: Fix_Div_altera_fxp_functions_191_2oqd7oi"</message>
-   <message level="Info" culprit="fxp_functions_0">Latency on Stratix 10 is 35 cycles</message>
-   <message level="Info" culprit="fxp_functions_0">DSP Blocks Used: 7</message>
-   <message level="Info" culprit="fxp_functions_0">LUTs Used: 1339</message>
+   <message level="Info" culprit="Fix_Div">"Generating: Fix_Div_altera_fxp_functions_191_fy4uury"</message>
+   <message level="Info" culprit="fxp_functions_0">Latency on Stratix 10 is 38 cycles</message>
+   <message level="Info" culprit="fxp_functions_0">DSP Blocks Used: 5</message>
+   <message level="Info" culprit="fxp_functions_0">LUTs Used: 1293</message>
    <message level="Info" culprit="fxp_functions_0">Memory Bits Used: 26112</message>
    <message level="Info" culprit="fxp_functions_0">Memory Blocks Used: 4</message>
   </messages>
@@ -127,7 +127,7 @@
  <entity
    kind="altera_fxp_functions"
    version="19.1"
-   name="Fix_Div_altera_fxp_functions_191_2oqd7oi">
+   name="Fix_Div_altera_fxp_functions_191_fy4uury">
   <parameter name="gen_enable" value="true" />
   <parameter name="start_fxp_in_fraction_derived" value="initialization default" />
   <parameter name="b_fxp_in_fraction_derived" value="initialization default" />
@@ -153,7 +153,7 @@
   <parameter name="force_mult_in_logic" value="false" />
   <parameter name="radical_fxp_in_width_derived" value="initialization default" />
   <parameter name="start_fxp_in_width_derived" value="initialization default" />
-  <parameter name="frequency_target" value="200" />
+  <parameter name="frequency_target" value="250" />
   <parameter name="complex_karatsuba" value="false" />
   <parameter name="a_in_derived_width_list" value="32,32" />
   <parameter name="result_fxp_out_fraction" value="0" />
@@ -166,7 +166,7 @@
   <parameter name="numerator_fxp_in_sign" value="1" />
   <parameter name="step_fxp_in_fraction" value="0" />
   <parameter name="a_fxp_in_sign_derived" value="initialization default" />
-  <parameter name="derived_function" value="INT_DIV" />
+  <parameter name="derived_function" value="DIV" />
   <parameter name="limit_fxp_in_width_derived" value="initialization default" />
   <parameter name="a_fxp_in_fraction_derived" value="initialization default" />
   <parameter name="a_in_width_list" value="32,32" />
@@ -191,7 +191,7 @@
   <parameter name="result_fxp_out_fraction_derived" value="0" />
   <parameter name="a_fxp_in_fraction" value="0" />
   <parameter name="a_in_fraction_list" value="0,0" />
-  <parameter name="ALL_function" value="INT_DIV" />
+  <parameter name="ALL_function" value="DIV" />
   <parameter name="common_sign" value="0" />
   <parameter name="limit_value" value="65536" />
   <parameter name="radical_fxp_in_sign" value="0" />
@@ -223,16 +223,16 @@
   <parameter name="limit_fxp_in_sign" value="0" />
   <generatedFiles>
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC1_uid84_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC1_uid77_invTabGen_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC3_uid90_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC0_uid74_invTabGen_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC0_uid81_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC2_uid80_invTabGen_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC2_uid87_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC3_uid83_invTabGen_lutmem.hex"
        attributes="" />
    <file
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/dspba_library_package.vhd"
@@ -241,21 +241,21 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury.vhd"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC1_uid84_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC1_uid77_invTabGen_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC3_uid90_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC0_uid74_invTabGen_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC0_uid81_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC2_uid80_invTabGen_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC2_uid87_invTabGen_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC3_uid83_invTabGen_lutmem.hex"
        attributes="" />
    <file
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/dspba_library_package.vhd"
@@ -264,7 +264,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_2oqd7oi.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div/altera_fxp_functions_191/synth/Fix_Div_altera_fxp_functions_191_fy4uury.vhd"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -274,10 +274,10 @@
   <childSourceFiles/>
   <instantiator instantiator="Fix_Div" as="fxp_functions_0" />
   <messages>
-   <message level="Info" culprit="Fix_Div">"Generating: Fix_Div_altera_fxp_functions_191_2oqd7oi"</message>
-   <message level="Info" culprit="fxp_functions_0">Latency on Stratix 10 is 35 cycles</message>
-   <message level="Info" culprit="fxp_functions_0">DSP Blocks Used: 7</message>
-   <message level="Info" culprit="fxp_functions_0">LUTs Used: 1339</message>
+   <message level="Info" culprit="Fix_Div">"Generating: Fix_Div_altera_fxp_functions_191_fy4uury"</message>
+   <message level="Info" culprit="fxp_functions_0">Latency on Stratix 10 is 38 cycles</message>
+   <message level="Info" culprit="fxp_functions_0">DSP Blocks Used: 5</message>
+   <message level="Info" culprit="fxp_functions_0">LUTs Used: 1293</message>
    <message level="Info" culprit="fxp_functions_0">Memory Bits Used: 26112</message>
    <message level="Info" culprit="fxp_functions_0">Memory Blocks Used: 4</message>
   </messages>

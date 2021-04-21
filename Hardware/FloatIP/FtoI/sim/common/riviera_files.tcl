@@ -21,7 +21,7 @@ namespace eval FtoI {
     set design_files [list]
     lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fp_functions_191/sim/dspba_library_package.vhd"]\"  -work altera_fp_functions_191"               
     lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fp_functions_191/sim/dspba_library.vhd"]\"  -work altera_fp_functions_191"                       
-    lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fp_functions_191/sim/FtoI_altera_fp_functions_191_dnjigdi.vhd"]\"  -work altera_fp_functions_191"
+    lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fp_functions_191/sim/FtoI_altera_fp_functions_191_ces6fqa.vhd"]\"  -work altera_fp_functions_191"
     lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/FtoI.v"]\"  -work FtoI"                                                                           
     return $design_files
   }

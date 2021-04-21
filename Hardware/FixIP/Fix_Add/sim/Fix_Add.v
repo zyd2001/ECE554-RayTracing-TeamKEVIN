@@ -12,7 +12,7 @@ module Fix_Add (
 		output wire [32:0] result  // result.result
 	);
 
-	Fix_Add_altera_fxp_functions_191_i22v3ci fxp_functions_0 (
+	Fix_Add_altera_fxp_functions_191_3l2g3ki fxp_functions_0 (
 		.clk    (clk),    //   input,   width = 1,    clk.clk
 		.rst    (rst),    //   input,   width = 1,    rst.reset
 		.en     (en),     //   input,   width = 1,     en.en

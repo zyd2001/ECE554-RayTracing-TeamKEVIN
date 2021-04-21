@@ -12,7 +12,7 @@ module Float_Div (
 		output wire [31:0] q       //      q.q
 	);
 
-	Float_Div_altera_fp_functions_191_psv3jda fp_functions_0 (
+	Float_Div_altera_fp_functions_191_j5x7yay fp_functions_0 (
 		.clk    (clk),    //   input,   width = 1,    clk.clk
 		.areset (areset), //   input,   width = 1, areset.reset
 		.en     (en),     //   input,   width = 1,     en.en

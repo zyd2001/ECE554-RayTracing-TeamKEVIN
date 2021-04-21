@@ -936,7 +936,7 @@
 															</entry>
 														</placeholder-map>
 													</leaf>
-													<leaf id="3" nodeId="1372710005745">
+													<leaf id="1" nodeId="1372710005745">
 														<placeholders>
 															<placeholder>dock.single.System\ Messages</placeholder>
 															<placeholder>dock.single.Generation\ Messages</placeholder>
@@ -1003,7 +1003,7 @@
 															</entry>
 														</placeholder-map>
 													</leaf>
-													<leaf id="1" nodeId="1372710005743">
+													<leaf id="3" nodeId="1372710005743">
 														<placeholders>
 															<placeholder>dock.single.Hierarchy</placeholder>
 															<placeholder>dock.single.Filter</placeholder>
@@ -1122,10 +1122,10 @@
 									</children>
 								</child>
 								<child>
-									<layout factory="predefined" placeholder="dock.single.Presets">
-										<replacement id="dockablesingle Presets"/>
+									<layout factory="predefined" placeholder="dock.single.System\ Messages">
+										<replacement id="dockablesingle System Messages"/>
 										<delegate id="delegate_ccontrol backup factory id">
-											<id>Presets</id>
+											<id>System Messages</id>
 											<area/>
 										</delegate>
 									</layout>
@@ -1142,10 +1142,10 @@
 									<children ignore="false"/>
 								</child>
 								<child>
-									<layout factory="predefined" placeholder="dock.single.System\ Messages">
-										<replacement id="dockablesingle System Messages"/>
+									<layout factory="predefined" placeholder="dock.single.Presets">
+										<replacement id="dockablesingle Presets"/>
 										<delegate id="delegate_ccontrol backup factory id">
-											<id>System Messages</id>
+											<id>Presets</id>
 											<area/>
 										</delegate>
 									</layout>

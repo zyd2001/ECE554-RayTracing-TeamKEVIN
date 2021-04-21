@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="Fix_Div" kind="Fix_Div" version="1.0" fabric="QSYS">
  <!-- Format version 19.2 57 (Future versions may contain additional information.) -->
- <!-- 2021.04.19.21:20:47 -->
+ <!-- 2021.04.20.23:12:45 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
@@ -120,7 +120,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="derived_function">
    <type>java.lang.String</type>
-   <value>INT_DIV</value>
+   <value>DIV</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -128,7 +128,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ALL_function">
    <type>java.lang.String</type>
-   <value>INT_DIV</value>
+   <value>DIV</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -136,7 +136,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="frequency_target">
    <type>int</type>
-   <value>200</value>
+   <value>250</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -171,7 +171,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>true</visible>
+   <visible>false</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="complex_format">
@@ -195,7 +195,7 @@ the requested settings for a module instance. -->
    <value>false</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="gen_enable">
@@ -331,7 +331,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="numerator_fxp_in_sign">
@@ -347,7 +347,7 @@ the requested settings for a module instance. -->
    <value>0</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="numerator_fxp_in_fraction_derived">
@@ -363,7 +363,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>true</derived>
    <enabled>false</enabled>
-   <visible>true</visible>
+   <visible>false</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="numerator_fxp_in_sign_derived">
@@ -379,7 +379,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="denominator_fxp_in_sign">
@@ -395,7 +395,7 @@ the requested settings for a module instance. -->
    <value>0</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="denominator_fxp_in_fraction_derived">
@@ -411,7 +411,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>true</derived>
    <enabled>false</enabled>
-   <visible>true</visible>
+   <visible>false</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="denominator_fxp_in_sign_derived">
@@ -475,7 +475,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>false</derived>
    <enabled>true</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="result_fxp_out_sign">
@@ -499,7 +499,7 @@ the requested settings for a module instance. -->
    <value>0</value>
    <derived>true</derived>
    <enabled>false</enabled>
-   <visible>false</visible>
+   <visible>true</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="result_fxp_out_width_derived">
@@ -507,7 +507,7 @@ the requested settings for a module instance. -->
    <value>32</value>
    <derived>true</derived>
    <enabled>false</enabled>
-   <visible>true</visible>
+   <visible>false</visible>
    <valid>true</valid>
   </parameter>
   <parameter name="result_fxp_out_sign_derived">

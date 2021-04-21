@@ -12,7 +12,7 @@ module Float_Mul (
 		output wire [31:0] q       //      q.q
 	);
 
-	Float_Mul_altera_fp_functions_191_ezmcb4q fp_functions_0 (
+	Float_Mul_altera_fp_functions_191_6bn3s7y fp_functions_0 (
 		.clk    (clk),    //   input,   width = 1,    clk.clk
 		.areset (areset), //   input,   width = 1, areset.reset
 		.en     (en),     //   input,   width = 1,     en.en

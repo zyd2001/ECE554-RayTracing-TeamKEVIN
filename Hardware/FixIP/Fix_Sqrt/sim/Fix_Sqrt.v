@@ -11,7 +11,7 @@ module Fix_Sqrt (
 		output wire [31:0] result   //  result.result
 	);
 
-	Fix_Sqrt_altera_fxp_functions_191_pjm2y2i fxp_functions_0 (
+	Fix_Sqrt_altera_fxp_functions_191_uiuenha fxp_functions_0 (
 		.clk     (clk),     //   input,   width = 1,     clk.clk
 		.rst     (rst),     //   input,   width = 1,     rst.reset
 		.en      (en),      //   input,   width = 1,      en.en
