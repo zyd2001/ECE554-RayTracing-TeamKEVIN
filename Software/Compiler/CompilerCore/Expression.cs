@@ -14,7 +14,15 @@ namespace CompilerCore
         internal ExpressionList(LexLocation location) : base(location) { }
         internal ExpressionList(LexLocation location, Expression node) : base(location, node) { }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            bool pass = true;
+            foreach (var item in list)
+                pass &= item.NameAnalysis(table);
+            return pass;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }
@@ -28,7 +36,12 @@ namespace CompilerCore
             this.i = i;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }
@@ -41,7 +54,12 @@ namespace CompilerCore
             this.f = f;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }
@@ -59,7 +77,12 @@ namespace CompilerCore
             vector = new Vector4(floats[0], floats[1], floats[2], floats[3]);
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }
@@ -82,9 +105,14 @@ namespace CompilerCore
             exp2 = e2;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return exp1.NameAnalysis(table) & exp2.NameAnalysis(table);
         }
     }
 
@@ -102,9 +130,14 @@ namespace CompilerCore
             exp = e1;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return exp.NameAnalysis(table);
         }
     }
 
@@ -118,7 +151,12 @@ namespace CompilerCore
             indexExpression = index;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return expression.NameAnalysis(table) & indexExpression.NameAnalysis(table);
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }
@@ -134,7 +172,18 @@ namespace CompilerCore
             expressionList = expList;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            Symbol func = table.GlobalSearch(identifier);
+            if (!func?.IsFunction ?? false)
+            {
+                Error($"Function {identifier} not found");
+                return false;
+            }
+            return expressionList.NameAnalysis(table);
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }
@@ -142,13 +191,27 @@ namespace CompilerCore
 
     class IdentifierExpression : Expression
     {
+        internal Symbol LinkedSymbol { get; set; }
         string identifier;
         internal IdentifierExpression(LexLocation location, string id) : base(location)
         {
             identifier = id;
+            LinkedSymbol = null;
         }
 
-        internal override void StaticCheck(bool topLevel)
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            Symbol symbol = table.GlobalSearch(identifier);
+            if (symbol is null)
+            {
+                Error($"Variable {identifier} not found");
+                return false;
+            }
+            LinkedSymbol = symbol;
+            return true;
+        }
+
+        internal override bool TypeCheck()
         {
             throw new System.NotImplementedException();
         }

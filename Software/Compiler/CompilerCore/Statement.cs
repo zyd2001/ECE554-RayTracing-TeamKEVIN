@@ -15,15 +15,20 @@ namespace CompilerCore
         internal StatementList(LexLocation location) : base(location) { }
         internal StatementList(LexLocation location, Statement node) : base(location, node) { }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            bool pass = true;
+            foreach (var item in list)
+                pass &= item.NameAnalysis(table);
+            return pass;
         }
 
         internal bool StaticCheck()
         {
             bool pass = true;
-            pass = pass && SyntaxCheck(true, false);
+            pass &= SyntaxCheck(true, false);
+            SymbolTable table = new SymbolTable();
+            pass &= NameAnalysis(table);
             return pass;
         }
 
@@ -31,7 +36,7 @@ namespace CompilerCore
         {
             bool pass = true;
             foreach (var item in list)
-                pass = pass && item.SyntaxCheck(topLevel, inLoop);
+                pass &= item.SyntaxCheck(topLevel, inLoop);
             return pass;
         }
 
@@ -55,9 +60,11 @@ namespace CompilerCore
             expression = exp;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            if (expression is not null)
+                return expression.NameAnalysis(table);
+            return true;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -108,9 +115,9 @@ namespace CompilerCore
             throw new NotImplementedException();
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
@@ -135,9 +142,13 @@ namespace CompilerCore
             loopBody = body;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            bool pass = true;
+            pass &= (initialStatement?.NameAnalysis(table) ?? true);
+            pass &= condition.NameAnalysis(table);
+            pass &= (iterateStatement?.NameAnalysis(table) ?? true);
+            return pass;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -173,9 +184,13 @@ namespace CompilerCore
             return this;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            bool pass = true;
+            pass &= condition.NameAnalysis(table);
+            pass &= statement.NameAnalysis(table);
+            pass &= (elseStatement?.NameAnalysis(table) ?? true);
+            return pass;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -186,7 +201,7 @@ namespace CompilerCore
                 return false;
             }
             var result = statement.SyntaxCheck(topLevel, inLoop);
-            result = result && (elseStatement?.SyntaxCheck(topLevel, inLoop) ?? false);
+            result = result & (elseStatement?.SyntaxCheck(topLevel, inLoop) ?? true);
             return result;
         }
 
@@ -204,9 +219,10 @@ namespace CompilerCore
             statementList = list;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            table.AddScope();
+            return statementList.NameAnalysis(table);
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -235,9 +251,9 @@ namespace CompilerCore
             right = r;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            return left.NameAnalysis(table) & right.NameAnalysis(table);
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -269,9 +285,9 @@ namespace CompilerCore
             constant = c;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            return declarationList.NameAnalysisType(table, type);
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -287,12 +303,21 @@ namespace CompilerCore
 
     class DeclarationList : ASTNodeList<DeclarationItem, DeclarationList>
     {
+        // TODO: top level declaration expression check
         internal DeclarationList(LexLocation location) : base(location) { }
         internal DeclarationList(LexLocation location, DeclarationItem node) : base(location, node) { }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
             throw new NotImplementedException();
+        }
+
+        internal bool NameAnalysisType(SymbolTable table, Type type)
+        {
+            bool pass = true;
+            foreach (var item in list)
+                pass &= item.NameAnalysisType(table, type);
+            return pass;
         }
 
         internal override bool TypeCheck()
@@ -314,9 +339,20 @@ namespace CompilerCore
             arraySize = size;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
             throw new NotImplementedException();
+        }
+
+        internal bool NameAnalysisType(SymbolTable table, Type type)
+        {
+            if (table.LocalSearch(identifier) is not null)
+            {
+                Error($"{identifier} is declared in the same scope");
+                return false;
+            }
+            table.AddSymbol(new Symbol(type, identifier));
+            return initializer.NameAnalysis(table);
         }
 
         internal override bool TypeCheck()
@@ -339,9 +375,17 @@ namespace CompilerCore
             statementList = statements;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            if (table.GlobalSearch(functionName) is not null)
+            {
+                Error($"{functionName} is declared in the same scope");
+                return false;
+            }
+            table.AddSymbol(new Symbol(returnType, functionName, true));
+            table.AddScope();
+            parameterList.NameAnalysis(table); // only add new symbol, no possible error
+            return statementList.NameAnalysis(table);
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -365,9 +409,11 @@ namespace CompilerCore
         internal ParameterList(LexLocation location) : base(location) { }
         internal ParameterList(LexLocation location, Parameter node) : base(location, node) { }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            foreach (var item in list)
+                item.NameAnalysis(table);
+            return true;
         }
 
         internal override bool TypeCheck()
@@ -385,9 +431,10 @@ namespace CompilerCore
             identifier = id;
         }
 
-        internal override bool NameAnalysis()
+        internal override bool NameAnalysis(SymbolTable table)
         {
-            throw new NotImplementedException();
+            table.AddSymbol(new Symbol(type, identifier));
+            return true;
         }
 
         internal override bool TypeCheck()
