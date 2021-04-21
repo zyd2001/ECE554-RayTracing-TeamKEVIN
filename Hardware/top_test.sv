@@ -14,7 +14,7 @@ module top_test(clk, rst, rx, tx);
     logic [31:0] Float_result, Converter_out, Sqrt_out;
     logic [63:0] Fix_result;
     
-    logic Fix_done_reg, Float_done_reg, Converter_done_reg， Sqrt_done_reg;
+    logic Fix_done_reg, Float_done_reg, Converter_done_reg, Sqrt_done_reg;
     logic [31:0] Float_result_reg, Converter_out_reg, Sqrt_out_reg;
     logic [63:0] Fix_result_reg;
     

@@ -6,8 +6,8 @@ module FixPU (
   done,
   result);
   
-  parameter ADD_LATENCY = 3;
-            MUL_LATENCY = 8;
+  parameter ADD_LATENCY = 3,
+            MUL_LATENCY = 8,
             DIV_LATENCY = 40;
             
   input clk, rst, en;
@@ -19,7 +19,7 @@ module FixPU (
   
   logic done_in;
   
-  logic Adder_en, Multiplier_en, Divider_en;
+  logic Adder_en, Multiplier_en, Divider_en, done_reg;
   
   logic [5:0] counter, counter_in;
   
@@ -28,11 +28,11 @@ module FixPU (
   logic [31:0] Divider_result_in;
   logic [32:0] Adder_result_in;
   logic [63:0] Multiplier_result_in;
-  logic [63:0] result_in;
+  logic [63:0] result_in, result_reg;
   
   logic [63:0] Adder_result, Multiplier_result, Divider_result;
   
-  typedef enum [1:0] reg {ADDSUB, MUL, DIV, IDLE} state_t;
+  typedef enum reg [1:0] {ADDSUB, MUL, DIV, IDLE} state_t;
   state_t state, nxt_state;
   
   assign Adder_b = mode[0] ? (~b + 1) : b;
@@ -54,14 +54,14 @@ module FixPU (
     if (rst) begin
       counter <= '0;
       state <= IDLE;
-      done <= '0;
-      result <= '0;
+      done_reg <= '0;
+      result_reg <= '0;
     end
     else begin
       counter <= counter_in;
       state <= nxt_state;
-      done <= done_in;
-      result <= result_in;
+      done_reg <= done_in;
+      result_reg <= result_in;
     end
   end
   
@@ -154,5 +154,8 @@ module FixPU (
 		.denominator (b),                   //   input,  width = 32, denominator.denominator
 		.result      (Divider_result_in)       //  output,  width = 32,      result.result
 	);
+  
+  assign done = done_reg;
+  assign result = result_reg;
   
 endmodule
