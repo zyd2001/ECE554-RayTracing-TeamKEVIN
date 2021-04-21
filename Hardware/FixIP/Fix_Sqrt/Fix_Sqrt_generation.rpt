@@ -5,8 +5,8 @@ Info: Fix_Sqrt: "Transforming system: Fix_Sqrt"
 Info: Fix_Sqrt: "Naming system components in system: Fix_Sqrt"
 Info: Fix_Sqrt: "Processing generation queue"
 Info: Fix_Sqrt: "Generating: Fix_Sqrt"
-Info: Fix_Sqrt: "Generating: Fix_Sqrt_altera_fxp_functions_191_pjm2y2i"
-Info: fxp_functions_0: Latency on Stratix 10 is 10 cycles
+Info: Fix_Sqrt: "Generating: Fix_Sqrt_altera_fxp_functions_191_uiuenha"
+Info: fxp_functions_0: Latency on Stratix 10 is 15 cycles
 Info: fxp_functions_0: DSP Blocks Used: 0
 Info: fxp_functions_0: LUTs Used: 449
 Info: fxp_functions_0: Memory Bits Used: 0
@@ -57,18 +57,20 @@ Info: qsys-generate succeeded.
 Info: Finished: Create block symbol file (.bsf)
 Info: 
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Sqrt.ip --synthesis=VERILOG --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Sqrt --family="Stratix 10" --part=1SX280HN2F43E2VG
+Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Sqrt.ip --synthesis=VERILOG --greybox --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Sqrt --family="Stratix 10" --part=1SX280HN2F43E2VG
 Info: Fix_Sqrt: "Transforming system: Fix_Sqrt"
 Info: Fix_Sqrt: "Naming system components in system: Fix_Sqrt"
 Info: Fix_Sqrt: "Processing generation queue"
 Info: Fix_Sqrt: "Generating: Fix_Sqrt"
-Info: Fix_Sqrt: "Generating: Fix_Sqrt_altera_fxp_functions_191_pjm2y2i"
-Info: fxp_functions_0: Latency on Stratix 10 is 10 cycles
+Info: Fix_Sqrt: "Generating: Fix_Sqrt_altera_fxp_functions_191_uiuenha"
+Info: fxp_functions_0: Latency on Stratix 10 is 15 cycles
 Info: fxp_functions_0: DSP Blocks Used: 0
 Info: fxp_functions_0: LUTs Used: 449
 Info: fxp_functions_0: Memory Bits Used: 0
 Info: fxp_functions_0: Memory Blocks Used: 0
 Info: Fix_Sqrt: Done "Fix_Sqrt" with 2 modules, 4 files
+Info: Generating third-party timing and resource estimation model ...
+Info: Done generating third-party timing and resource estimation model.
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
 Info: Starting: IP-XACT

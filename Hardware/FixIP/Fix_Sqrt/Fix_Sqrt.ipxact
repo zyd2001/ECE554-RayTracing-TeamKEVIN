@@ -308,7 +308,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fxp_functions_191/synth/Fix_Sqrt_altera_fxp_functions_191_pjm2y2i.vhd</ipxact:name>
+                <ipxact:name>altera_fxp_functions_191/synth/Fix_Sqrt_altera_fxp_functions_191_uiuenha.vhd</ipxact:name>
                 <ipxact:fileType>vhdlSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

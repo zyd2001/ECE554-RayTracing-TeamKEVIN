@@ -5,10 +5,10 @@ Info: Fix_Div: "Transforming system: Fix_Div"
 Info: Fix_Div: "Naming system components in system: Fix_Div"
 Info: Fix_Div: "Processing generation queue"
 Info: Fix_Div: "Generating: Fix_Div"
-Info: Fix_Div: "Generating: Fix_Div_altera_fxp_functions_191_2oqd7oi"
-Info: fxp_functions_0: Latency on Stratix 10 is 35 cycles
-Info: fxp_functions_0: DSP Blocks Used: 7
-Info: fxp_functions_0: LUTs Used: 1339
+Info: Fix_Div: "Generating: Fix_Div_altera_fxp_functions_191_fy4uury"
+Info: fxp_functions_0: Latency on Stratix 10 is 38 cycles
+Info: fxp_functions_0: DSP Blocks Used: 5
+Info: fxp_functions_0: LUTs Used: 1293
 Info: fxp_functions_0: Memory Bits Used: 26112
 Info: fxp_functions_0: Memory Blocks Used: 4
 Info: Fix_Div: Done "Fix_Div" with 2 modules, 8 files
@@ -57,18 +57,20 @@ Info: qsys-generate succeeded.
 Info: Finished: Create block symbol file (.bsf)
 Info: 
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div.ip --synthesis=VERILOG --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div --family="Stratix 10" --part=1SX280HN2F43E2VG
+Info: qsys-generate /home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div.ip --synthesis=VERILOG --greybox --output-directory=/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Div --family="Stratix 10" --part=1SX280HN2F43E2VG
 Info: Fix_Div: "Transforming system: Fix_Div"
 Info: Fix_Div: "Naming system components in system: Fix_Div"
 Info: Fix_Div: "Processing generation queue"
 Info: Fix_Div: "Generating: Fix_Div"
-Info: Fix_Div: "Generating: Fix_Div_altera_fxp_functions_191_2oqd7oi"
-Info: fxp_functions_0: Latency on Stratix 10 is 35 cycles
-Info: fxp_functions_0: DSP Blocks Used: 7
-Info: fxp_functions_0: LUTs Used: 1339
+Info: Fix_Div: "Generating: Fix_Div_altera_fxp_functions_191_fy4uury"
+Info: fxp_functions_0: Latency on Stratix 10 is 38 cycles
+Info: fxp_functions_0: DSP Blocks Used: 5
+Info: fxp_functions_0: LUTs Used: 1293
 Info: fxp_functions_0: Memory Bits Used: 26112
 Info: fxp_functions_0: Memory Blocks Used: 4
 Info: Fix_Div: Done "Fix_Div" with 2 modules, 8 files
+Info: Generating third-party timing and resource estimation model ...
+Info: Done generating third-party timing and resource estimation model.
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
 Info: Starting: IP-XACT

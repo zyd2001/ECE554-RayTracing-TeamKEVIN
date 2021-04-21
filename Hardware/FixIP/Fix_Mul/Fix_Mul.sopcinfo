@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="Fix_Mul" kind="Fix_Mul" version="1.0" fabric="QSYS">
  <!-- Format version 19.2 57 (Future versions may contain additional information.) -->
- <!-- 2021.04.19.21:15:23 -->
+ <!-- 2021.04.20.21:13:18 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
@@ -136,7 +136,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="frequency_target">
    <type>int</type>
-   <value>200</value>
+   <value>250</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -800,7 +800,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="latency_feedback">
    <type>int</type>
-   <value>5</value>
+   <value>6</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -859,7 +859,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="RES_LUT_param">
    <type>int</type>
-   <value>65</value>
+   <value>114</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>true</visible>

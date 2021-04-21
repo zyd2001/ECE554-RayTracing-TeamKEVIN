@@ -21,7 +21,7 @@ namespace eval Fix_Add {
     set design_files [list]
     lappend design_files "ncvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/dspba_library_package.vhd\"  -work altera_fxp_functions_191 -cdslib  ./cds_libs/altera_fxp_functions_191.cds.lib"                   
     lappend design_files "ncvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/dspba_library.vhd\"  -work altera_fxp_functions_191 -cdslib  ./cds_libs/altera_fxp_functions_191.cds.lib"                           
-    lappend design_files "ncvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Add_altera_fxp_functions_191_i22v3ci.vhd\"  -work altera_fxp_functions_191 -cdslib  ./cds_libs/altera_fxp_functions_191.cds.lib"
+    lappend design_files "ncvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Add_altera_fxp_functions_191_3l2g3ki.vhd\"  -work altera_fxp_functions_191 -cdslib  ./cds_libs/altera_fxp_functions_191.cds.lib"
     lappend design_files "ncvlog -compcnfg $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/Fix_Add.v\"  -work Fix_Add"                                                                                                                                 
     return $design_files
   }

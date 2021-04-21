@@ -170,7 +170,7 @@
           </parameter>
           <parameter>
             <name>frequency_target</name>
-            <value>200</value>
+            <value>250</value>
           </parameter>
           <parameter>
             <name>gen_enable</name>
@@ -178,7 +178,7 @@
           </parameter>
           <parameter>
             <name>latency_feedback</name>
-            <value>5</value>
+            <value>6</value>
           </parameter>
           <parameter>
             <name>latency_target</name>
@@ -393,7 +393,7 @@
         <className>altera_fxp_functions</className>
         <version>19.1</version>
         <name>fxp_functions_0</name>
-        <uniqueName>Fix_Mul_altera_fxp_functions_191_vsvne7a</uniqueName>
+        <uniqueName>Fix_Mul_altera_fxp_functions_191_guxefki</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>Fix_Mul.fxp_functions_0</path>

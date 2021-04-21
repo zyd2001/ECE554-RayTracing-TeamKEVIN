@@ -365,17 +365,17 @@
         <ipxact:parameter parameterId="derived_function" type="string">
           <ipxact:name>derived_function</ipxact:name>
           <ipxact:displayName>derived_function</ipxact:displayName>
-          <ipxact:value>INT_DIV</ipxact:value>
+          <ipxact:value>DIV</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="ALL_function" type="string">
           <ipxact:name>ALL_function</ipxact:name>
           <ipxact:displayName>Function</ipxact:displayName>
-          <ipxact:value>INT_DIV</ipxact:value>
+          <ipxact:value>DIV</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="frequency_target" type="int">
           <ipxact:name>frequency_target</ipxact:name>
           <ipxact:displayName>Target</ipxact:displayName>
-          <ipxact:value>200</ipxact:value>
+          <ipxact:value>250</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="latency_target" type="int">
           <ipxact:name>latency_target</ipxact:name>
@@ -785,12 +785,12 @@
         <ipxact:parameter parameterId="frequency_feedback" type="int">
           <ipxact:name>frequency_feedback</ipxact:name>
           <ipxact:displayName>frequency_feedback</ipxact:displayName>
-          <ipxact:value>200</ipxact:value>
+          <ipxact:value>250</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="latency_feedback" type="int">
           <ipxact:name>latency_feedback</ipxact:name>
           <ipxact:displayName>latency_feedback</ipxact:displayName>
-          <ipxact:value>35</ipxact:value>
+          <ipxact:value>38</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="force_elaborate" type="int">
           <ipxact:name>force_elaborate</ipxact:name>
@@ -820,12 +820,12 @@
         <ipxact:parameter parameterId="RES_DSP_param" type="int">
           <ipxact:name>RES_DSP_param</ipxact:name>
           <ipxact:displayName>DSP Blocks</ipxact:displayName>
-          <ipxact:value>7</ipxact:value>
+          <ipxact:value>5</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="RES_LUT_param" type="int">
           <ipxact:name>RES_LUT_param</ipxact:name>
           <ipxact:displayName>LUTs</ipxact:displayName>
-          <ipxact:value>1339</ipxact:value>
+          <ipxact:value>1293</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="RES_MBIT_param" type="int">
           <ipxact:name>RES_MBIT_param</ipxact:name>

@@ -15,8 +15,8 @@
 -- applicable agreement for further details.
 -- ---------------------------------------------------------------------------
 
--- VHDL created from Float_Add_altera_fp_functions_191_w5j73ga
--- VHDL created on Mon Apr 19 21:25:13 2021
+-- VHDL created from Float_Add_altera_fp_functions_191_2lixnxi
+-- VHDL created on Tue Apr 20 23:03:08 2021
 
 
 library IEEE;
@@ -35,7 +35,7 @@ library fourteennm;
 use fourteennm.fourteennm_components.fourteennm_mac;
 use fourteennm.fourteennm_components.fourteennm_fp_mac;
 
-entity Float_Add_altera_fp_functions_191_w5j73ga is
+entity Float_Add_altera_fp_functions_191_2lixnxi is
     port (
         a : in std_logic_vector(31 downto 0);  -- float32_m23
         b : in std_logic_vector(31 downto 0);  -- float32_m23
@@ -45,9 +45,9 @@ entity Float_Add_altera_fp_functions_191_w5j73ga is
         clk : in std_logic;
         areset : in std_logic
     );
-end Float_Add_altera_fp_functions_191_w5j73ga;
+end Float_Add_altera_fp_functions_191_2lixnxi;
 
-architecture normal of Float_Add_altera_fp_functions_191_w5j73ga is
+architecture normal of Float_Add_altera_fp_functions_191_2lixnxi is
 
     attribute altera_attribute : string;
     attribute altera_attribute of normal : architecture is "-name AUTO_SHIFT_REGISTER_RECOGNITION OFF; -name MESSAGE_DISABLE 10036; -name MESSAGE_DISABLE 10037; -name MESSAGE_DISABLE 14130; -name MESSAGE_DISABLE 14320; -name MESSAGE_DISABLE 15400; -name MESSAGE_DISABLE 14130; -name MESSAGE_DISABLE 10036; -name MESSAGE_DISABLE 12020; -name MESSAGE_DISABLE 12030; -name MESSAGE_DISABLE 12010; -name MESSAGE_DISABLE 12110; -name MESSAGE_DISABLE 14320; -name MESSAGE_DISABLE 13410; -name MESSAGE_DISABLE 113007";

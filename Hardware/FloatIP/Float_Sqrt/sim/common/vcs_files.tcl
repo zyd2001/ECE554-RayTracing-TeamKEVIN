@@ -2,9 +2,9 @@
 namespace eval Float_Sqrt {
   proc get_memory_files {QSYS_SIMDIR} {
     set memory_files [list]
-    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC1_uid65_sqrtTables_lutmem.hex"
-    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC0_uid62_sqrtTables_lutmem.hex"
-    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC2_uid68_sqrtTables_lutmem.hex"
+    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC2_uid68_sqrtTables_lutmem.hex"
+    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC1_uid65_sqrtTables_lutmem.hex"
+    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC0_uid62_sqrtTables_lutmem.hex"
     return $memory_files
   }
   

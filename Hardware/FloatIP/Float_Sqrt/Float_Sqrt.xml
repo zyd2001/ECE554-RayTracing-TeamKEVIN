@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2021.04.19.21:32:51"
+ date="2021.04.20.23:05:31"
  outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/">
  <perimeter>
   <parameter
@@ -110,11 +110,11 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="Float_Sqrt">"Generating: Float_Sqrt"</message>
-   <message level="Info" culprit="Float_Sqrt">"Generating: Float_Sqrt_altera_fp_functions_191_nxbwsua"</message>
-   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 200 -name Float_Sqrt_altera_fp_functions_191_nxbwsua -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FPSqrt 8 23</message>
-   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 12 cycles</message>
+   <message level="Info" culprit="Float_Sqrt">"Generating: Float_Sqrt_altera_fp_functions_191_wi5kdgi"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 250 -name Float_Sqrt_altera_fp_functions_191_wi5kdgi -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FPSqrt 8 23</message>
+   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 17 cycles</message>
    <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 3</message>
-   <message level="Info" culprit="fp_functions_0">LUTs Used: 246</message>
+   <message level="Info" culprit="fp_functions_0">LUTs Used: 349</message>
    <message level="Info" culprit="fp_functions_0">Memory Bits Used: 15872</message>
    <message level="Info" culprit="fp_functions_0">Memory Blocks Used: 3</message>
   </messages>
@@ -122,7 +122,7 @@
  <entity
    kind="altera_fp_functions"
    version="19.1"
-   name="Float_Sqrt_altera_fp_functions_191_nxbwsua">
+   name="Float_Sqrt_altera_fp_functions_191_wi5kdgi">
   <parameter name="fp_man" value="23" />
   <parameter name="gen_enable" value="true" />
   <parameter name="fp_exp_derived" value="8" />
@@ -136,7 +136,7 @@
   <parameter name="fp_format" value="single" />
   <parameter name="fp_out_man_derived" value="8" />
   <parameter name="latency_target" value="2" />
-  <parameter name="frequency_target" value="200" />
+  <parameter name="frequency_target" value="250" />
   <parameter name="number_of_inputs" value="2" />
   <parameter name="fp_in_format" value="single" />
   <parameter name="select_signal_enable" value="false" />
@@ -169,7 +169,7 @@
   <parameter name="selected_device_speedgrade" value="2" />
   <parameter name="CONVERT_function" value="FXP_FP" />
   <parameter name="report_resources_to_xml" value="false" />
-  <parameter name="latency_feedback" value="12" />
+  <parameter name="latency_feedback" value="17" />
   <parameter name="fp_in_exp_derived" value="8" />
   <parameter name="COMPARE_function" value="MIN" />
   <parameter name="FUNCTION_FAMILY" value="ROOTS" />
@@ -178,13 +178,13 @@
   <parameter name="exponent_width" value="23" />
   <generatedFiles>
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC1_uid65_sqrtTables_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC2_uid68_sqrtTables_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC0_uid62_sqrtTables_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC1_uid65_sqrtTables_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC2_uid68_sqrtTables_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC0_uid62_sqrtTables_lutmem.hex"
        attributes="" />
    <file
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/dspba_library_package.vhd"
@@ -193,18 +193,18 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi.vhd"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC1_uid65_sqrtTables_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC2_uid68_sqrtTables_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC0_uid62_sqrtTables_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC1_uid65_sqrtTables_lutmem.hex"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua_memoryC2_uid68_sqrtTables_lutmem.hex"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi_memoryC0_uid62_sqrtTables_lutmem.hex"
        attributes="" />
    <file
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/dspba_library_package.vhd"
@@ -213,7 +213,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_nxbwsua.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Sqrt/altera_fp_functions_191/synth/Float_Sqrt_altera_fp_functions_191_wi5kdgi.vhd"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -223,11 +223,11 @@
   <childSourceFiles/>
   <instantiator instantiator="Float_Sqrt" as="fp_functions_0" />
   <messages>
-   <message level="Info" culprit="Float_Sqrt">"Generating: Float_Sqrt_altera_fp_functions_191_nxbwsua"</message>
-   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 200 -name Float_Sqrt_altera_fp_functions_191_nxbwsua -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FPSqrt 8 23</message>
-   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 12 cycles</message>
+   <message level="Info" culprit="Float_Sqrt">"Generating: Float_Sqrt_altera_fp_functions_191_wi5kdgi"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 250 -name Float_Sqrt_altera_fp_functions_191_wi5kdgi -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FPSqrt 8 23</message>
+   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 17 cycles</message>
    <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 3</message>
-   <message level="Info" culprit="fp_functions_0">LUTs Used: 246</message>
+   <message level="Info" culprit="fp_functions_0">LUTs Used: 349</message>
    <message level="Info" culprit="fp_functions_0">Memory Bits Used: 15872</message>
    <message level="Info" culprit="fp_functions_0">Memory Blocks Used: 3</message>
   </messages>

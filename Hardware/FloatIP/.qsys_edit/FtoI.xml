@@ -838,7 +838,7 @@
 											</node>
 											<node nodeId="1375899667063" orientation="HORIZONTAL" divider="0.6950092421441774">
 												<node nodeId="1386283918535" orientation="VERTICAL" divider="0.75">
-													<leaf id="2" nodeId="1375899667061">
+													<leaf id="3" nodeId="1375899667061">
 														<placeholders>
 															<placeholder>dock.single.Exported\ Interfaces</placeholder>
 															<placeholder>dock.single.Connections</placeholder>
@@ -958,7 +958,7 @@
 													</leaf>
 												</node>
 												<node nodeId="1375899673461" orientation="VERTICAL" divider="0.49909584086799275">
-													<leaf id="3" nodeId="1372710005741">
+													<leaf id="2" nodeId="1372710005741">
 														<placeholders>
 															<placeholder>dock.single.Element\ Docs</placeholder>
 															<placeholder>dock.single.IP\ Catalog</placeholder>
@@ -1068,16 +1068,6 @@
 									<children ignore="false"/>
 								</child>
 								<child>
-									<layout factory="predefined" placeholder="dock.single.Parameters">
-										<replacement id="dockablesingle Parameters"/>
-										<delegate id="delegate_ccontrol backup factory id">
-											<id>Parameters</id>
-											<area/>
-										</delegate>
-									</layout>
-									<children ignore="false"/>
-								</child>
-								<child>
 									<layout factory="delegate_StackDockStationFactory">
 										<selected>0</selected>
 										<placeholders>
@@ -1150,6 +1140,16 @@
 											<children ignore="false"/>
 										</child>
 									</children>
+								</child>
+								<child>
+									<layout factory="predefined" placeholder="dock.single.Parameters">
+										<replacement id="dockablesingle Parameters"/>
+										<delegate id="delegate_ccontrol backup factory id">
+											<id>Parameters</id>
+											<area/>
+										</delegate>
+									</layout>
+									<children ignore="false"/>
 								</child>
 							</children>
 						</root>

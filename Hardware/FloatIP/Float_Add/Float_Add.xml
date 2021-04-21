@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2021.04.19.21:25:20"
+ date="2021.04.20.23:03:15"
  outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/">
  <perimeter>
   <parameter
@@ -122,8 +122,8 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="Float_Add">"Generating: Float_Add"</message>
-   <message level="Info" culprit="Float_Add">"Generating: Float_Add_altera_fp_functions_191_w5j73ga"</message>
-   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 200 -name Float_Add_altera_fp_functions_191_w5j73ga -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -faithfulRounding -speedgrade 2 FPAddSub 8 23</message>
+   <message level="Info" culprit="Float_Add">"Generating: Float_Add_altera_fp_functions_191_2lixnxi"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 250 -name Float_Add_altera_fp_functions_191_2lixnxi -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -faithfulRounding -speedgrade 2 FPAddSub 8 23</message>
    <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 3 cycles</message>
    <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 2</message>
    <message level="Info" culprit="fp_functions_0">LUTs Used: 1</message>
@@ -134,7 +134,7 @@
  <entity
    kind="altera_fp_functions"
    version="19.1"
-   name="Float_Add_altera_fp_functions_191_w5j73ga">
+   name="Float_Add_altera_fp_functions_191_2lixnxi">
   <parameter name="fp_man" value="23" />
   <parameter name="gen_enable" value="true" />
   <parameter name="fp_exp_derived" value="8" />
@@ -148,7 +148,7 @@
   <parameter name="fp_format" value="single" />
   <parameter name="fp_out_man_derived" value="8" />
   <parameter name="latency_target" value="2" />
-  <parameter name="frequency_target" value="200" />
+  <parameter name="frequency_target" value="250" />
   <parameter name="number_of_inputs" value="2" />
   <parameter name="fp_in_format" value="single" />
   <parameter name="select_signal_enable" value="true" />
@@ -196,7 +196,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/altera_fp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/altera_fp_functions_191/synth/Float_Add_altera_fp_functions_191_w5j73ga.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/altera_fp_functions_191/synth/Float_Add_altera_fp_functions_191_2lixnxi.vhd"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
@@ -207,7 +207,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/altera_fp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/altera_fp_functions_191/synth/Float_Add_altera_fp_functions_191_w5j73ga.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FloatIP/Float_Add/altera_fp_functions_191/synth/Float_Add_altera_fp_functions_191_2lixnxi.vhd"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -217,8 +217,8 @@
   <childSourceFiles/>
   <instantiator instantiator="Float_Add" as="fp_functions_0" />
   <messages>
-   <message level="Info" culprit="Float_Add">"Generating: Float_Add_altera_fp_functions_191_w5j73ga"</message>
-   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 200 -name Float_Add_altera_fp_functions_191_w5j73ga -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -faithfulRounding -speedgrade 2 FPAddSub 8 23</message>
+   <message level="Info" culprit="Float_Add">"Generating: Float_Add_altera_fp_functions_191_2lixnxi"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 250 -name Float_Add_altera_fp_functions_191_2lixnxi -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -faithfulRounding -speedgrade 2 FPAddSub 8 23</message>
    <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 3 cycles</message>
    <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 2</message>
    <message level="Info" culprit="fp_functions_0">LUTs Used: 1</message>

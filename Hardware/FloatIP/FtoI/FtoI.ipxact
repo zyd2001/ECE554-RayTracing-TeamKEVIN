@@ -308,7 +308,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fp_functions_191/synth/FtoI_altera_fp_functions_191_dnjigdi.vhd</ipxact:name>
+                <ipxact:name>altera_fp_functions_191/synth/FtoI_altera_fp_functions_191_ces6fqa.vhd</ipxact:name>
                 <ipxact:fileType>vhdlSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

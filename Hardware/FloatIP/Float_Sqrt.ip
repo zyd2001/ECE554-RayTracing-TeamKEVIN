@@ -375,7 +375,7 @@
         <ipxact:parameter parameterId="frequency_target" type="int">
           <ipxact:name>frequency_target</ipxact:name>
           <ipxact:displayName>Target</ipxact:displayName>
-          <ipxact:value>200</ipxact:value>
+          <ipxact:value>250</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="latency_target" type="int">
           <ipxact:name>latency_target</ipxact:name>
@@ -395,7 +395,7 @@
         <ipxact:parameter parameterId="rounding_mode_derived" type="string">
           <ipxact:name>rounding_mode_derived</ipxact:name>
           <ipxact:displayName>Mode</ipxact:displayName>
-          <ipxact:value>nearest with tie breaking to even</ipxact:value>
+          <ipxact:value>nearest with tie breaking away from zero</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="use_rounding_mode" type="bit">
           <ipxact:name>use_rounding_mode</ipxact:name>
@@ -465,7 +465,7 @@
         <ipxact:parameter parameterId="latency_feedback" type="int">
           <ipxact:name>latency_feedback</ipxact:name>
           <ipxact:displayName>latency_feedback</ipxact:displayName>
-          <ipxact:value>12</ipxact:value>
+          <ipxact:value>17</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="force_elaborate" type="int">
           <ipxact:name>force_elaborate</ipxact:name>
@@ -545,7 +545,7 @@
         <ipxact:parameter parameterId="RES_LUT_param" type="int">
           <ipxact:name>RES_LUT_param</ipxact:name>
           <ipxact:displayName>LUTs</ipxact:displayName>
-          <ipxact:value>246</ipxact:value>
+          <ipxact:value>349</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="RES_MBIT_param" type="int">
           <ipxact:name>RES_MBIT_param</ipxact:name>

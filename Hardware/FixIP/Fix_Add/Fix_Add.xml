@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2021.04.19.21:14:17"
+ date="2021.04.20.21:15:25"
  outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/">
  <perimeter>
   <parameter
@@ -116,7 +116,7 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="Fix_Add">"Generating: Fix_Add"</message>
-   <message level="Info" culprit="Fix_Add">"Generating: Fix_Add_altera_fxp_functions_191_i22v3ci"</message>
+   <message level="Info" culprit="Fix_Add">"Generating: Fix_Add_altera_fxp_functions_191_3l2g3ki"</message>
    <message level="Info" culprit="fxp_functions_0">Latency on Stratix 10 is 1 cycle</message>
    <message level="Info" culprit="fxp_functions_0">DSP Blocks Used: 0</message>
    <message level="Info" culprit="fxp_functions_0">LUTs Used: 33</message>
@@ -127,7 +127,7 @@
  <entity
    kind="altera_fxp_functions"
    version="19.1"
-   name="Fix_Add_altera_fxp_functions_191_i22v3ci">
+   name="Fix_Add_altera_fxp_functions_191_3l2g3ki">
   <parameter name="gen_enable" value="true" />
   <parameter name="start_fxp_in_fraction_derived" value="initialization default" />
   <parameter name="b_fxp_in_fraction_derived" value="initialization default" />
@@ -157,7 +157,7 @@
   <parameter name="force_mult_in_logic" value="false" />
   <parameter name="radical_fxp_in_width_derived" value="initialization default" />
   <parameter name="start_fxp_in_width_derived" value="initialization default" />
-  <parameter name="frequency_target" value="200" />
+  <parameter name="frequency_target" value="250" />
   <parameter name="complex_karatsuba" value="false" />
   <parameter name="a_in_derived_width_list" value="32,32" />
   <parameter name="result_fxp_out_fraction" value="0" />
@@ -235,7 +235,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/altera_fxp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/altera_fxp_functions_191/synth/Fix_Add_altera_fxp_functions_191_i22v3ci.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/altera_fxp_functions_191/synth/Fix_Add_altera_fxp_functions_191_3l2g3ki.vhd"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
@@ -246,7 +246,7 @@
        path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/altera_fxp_functions_191/synth/dspba_library.vhd"
        attributes="" />
    <file
-       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/altera_fxp_functions_191/synth/Fix_Add_altera_fxp_functions_191_i22v3ci.vhd"
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/FixIP/Fix_Add/altera_fxp_functions_191/synth/Fix_Add_altera_fxp_functions_191_3l2g3ki.vhd"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -256,7 +256,7 @@
   <childSourceFiles/>
   <instantiator instantiator="Fix_Add" as="fxp_functions_0" />
   <messages>
-   <message level="Info" culprit="Fix_Add">"Generating: Fix_Add_altera_fxp_functions_191_i22v3ci"</message>
+   <message level="Info" culprit="Fix_Add">"Generating: Fix_Add_altera_fxp_functions_191_3l2g3ki"</message>
    <message level="Info" culprit="fxp_functions_0">Latency on Stratix 10 is 1 cycle</message>
    <message level="Info" culprit="fxp_functions_0">DSP Blocks Used: 0</message>
    <message level="Info" culprit="fxp_functions_0">LUTs Used: 33</message>

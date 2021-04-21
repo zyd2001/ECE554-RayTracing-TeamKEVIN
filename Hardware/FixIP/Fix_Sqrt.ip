@@ -320,7 +320,7 @@
         <ipxact:parameter parameterId="frequency_target" type="int">
           <ipxact:name>frequency_target</ipxact:name>
           <ipxact:displayName>Target</ipxact:displayName>
-          <ipxact:value>200</ipxact:value>
+          <ipxact:value>250</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="latency_target" type="int">
           <ipxact:name>latency_target</ipxact:name>
@@ -730,17 +730,17 @@
         <ipxact:parameter parameterId="frequency_feedback" type="int">
           <ipxact:name>frequency_feedback</ipxact:name>
           <ipxact:displayName>frequency_feedback</ipxact:displayName>
-          <ipxact:value>200</ipxact:value>
+          <ipxact:value>250</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="latency_feedback" type="int">
           <ipxact:name>latency_feedback</ipxact:name>
           <ipxact:displayName>latency_feedback</ipxact:displayName>
-          <ipxact:value>10</ipxact:value>
+          <ipxact:value>15</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="force_elaborate" type="int">
           <ipxact:name>force_elaborate</ipxact:name>
           <ipxact:displayName>force_elaborate</ipxact:displayName>
-          <ipxact:value>1</ipxact:value>
+          <ipxact:value>0</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="selected_device_family" type="string">
           <ipxact:name>selected_device_family</ipxact:name>

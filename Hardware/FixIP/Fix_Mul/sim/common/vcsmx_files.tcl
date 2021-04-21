@@ -21,7 +21,7 @@ namespace eval Fix_Mul {
     set design_files [list]
     lappend design_files "vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/dspba_library_package.vhd\"  -work altera_fxp_functions_191"                   
     lappend design_files "vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/dspba_library.vhd\"  -work altera_fxp_functions_191"                           
-    lappend design_files "vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Mul_altera_fxp_functions_191_vsvne7a.vhd\"  -work altera_fxp_functions_191"
+    lappend design_files "vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Mul_altera_fxp_functions_191_guxefki.vhd\"  -work altera_fxp_functions_191"
     lappend design_files "vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/Fix_Mul.v\"  -work Fix_Mul"                                                                                  
     return $design_files
   }

@@ -170,7 +170,7 @@
           </parameter>
           <parameter>
             <name>frequency_target</name>
-            <value>200</value>
+            <value>250</value>
           </parameter>
           <parameter>
             <name>gen_enable</name>
@@ -393,7 +393,7 @@
         <className>altera_fxp_functions</className>
         <version>19.1</version>
         <name>fxp_functions_0</name>
-        <uniqueName>Fix_Sqrt_altera_fxp_functions_191_pjm2y2i</uniqueName>
+        <uniqueName>Fix_Sqrt_altera_fxp_functions_191_uiuenha</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>Fix_Sqrt.fxp_functions_0</path>

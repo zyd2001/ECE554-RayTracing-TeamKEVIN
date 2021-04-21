@@ -9,9 +9,9 @@ namespace eval Float_Div {
   
   proc get_memory_files {QSYS_SIMDIR} {
     set memory_files [list]
-    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda_memoryC0_uid112_invTables_lutmem.hex"
-    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda_memoryC1_uid115_invTables_lutmem.hex"
-    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda_memoryC2_uid118_invTables_lutmem.hex"
+    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_j5x7yay_memoryC0_uid112_invTables_lutmem.hex"
+    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_j5x7yay_memoryC1_uid115_invTables_lutmem.hex"
+    lappend memory_files "$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_j5x7yay_memoryC2_uid118_invTables_lutmem.hex"
     return $memory_files
   }
   
@@ -24,7 +24,7 @@ namespace eval Float_Div {
     set design_files [list]
     lappend design_files "xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fp_functions_191/sim/dspba_library_package.vhd\"  -work altera_fp_functions_191 -cdslib  ./cds_libs/altera_fp_functions_191.cds.lib"                    
     lappend design_files "xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fp_functions_191/sim/dspba_library.vhd\"  -work altera_fp_functions_191 -cdslib  ./cds_libs/altera_fp_functions_191.cds.lib"                            
-    lappend design_files "xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda.vhd\"  -work altera_fp_functions_191 -cdslib  ./cds_libs/altera_fp_functions_191.cds.lib"
+    lappend design_files "xmvhdl -v93 $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/../altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_j5x7yay.vhd\"  -work altera_fp_functions_191 -cdslib  ./cds_libs/altera_fp_functions_191.cds.lib"
     lappend design_files "xmvlog -compcnfg $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"$QSYS_SIMDIR/Float_Div.v\"  -work Float_Div"                                                                                                                           
     return $design_files
   }

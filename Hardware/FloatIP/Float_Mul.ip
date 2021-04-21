@@ -430,7 +430,7 @@
         <ipxact:parameter parameterId="frequency_target" type="int">
           <ipxact:name>frequency_target</ipxact:name>
           <ipxact:displayName>Target</ipxact:displayName>
-          <ipxact:value>200</ipxact:value>
+          <ipxact:value>250</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="latency_target" type="int">
           <ipxact:name>latency_target</ipxact:name>

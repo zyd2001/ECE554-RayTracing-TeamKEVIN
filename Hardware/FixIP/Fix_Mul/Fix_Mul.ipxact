@@ -363,7 +363,7 @@
                 </ipxact:vendorExtensions>
             </ipxact:file>
             <ipxact:file>
-                <ipxact:name>altera_fxp_functions_191/synth/Fix_Mul_altera_fxp_functions_191_vsvne7a.vhd</ipxact:name>
+                <ipxact:name>altera_fxp_functions_191/synth/Fix_Mul_altera_fxp_functions_191_guxefki.vhd</ipxact:name>
                 <ipxact:fileType>vhdlSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

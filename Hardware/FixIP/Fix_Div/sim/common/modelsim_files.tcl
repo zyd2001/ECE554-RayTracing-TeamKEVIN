@@ -9,10 +9,10 @@ namespace eval Fix_Div {
   
   proc get_memory_files {QSYS_SIMDIR} {
     set memory_files [list]
-    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC1_uid84_invTabGen_lutmem.hex"]"
-    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC3_uid90_invTabGen_lutmem.hex"]"
-    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC0_uid81_invTabGen_lutmem.hex"]"
-    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi_memoryC2_uid87_invTabGen_lutmem.hex"]"
+    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC1_uid77_invTabGen_lutmem.hex"]"
+    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC0_uid74_invTabGen_lutmem.hex"]"
+    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC2_uid80_invTabGen_lutmem.hex"]"
+    lappend memory_files "[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_fy4uury_memoryC3_uid83_invTabGen_lutmem.hex"]"
     return $memory_files
   }
   
@@ -25,7 +25,7 @@ namespace eval Fix_Div {
     set design_files [list]
     lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/dspba_library_package.vhd"]\"  -work altera_fxp_functions_191"                   
     lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/dspba_library.vhd"]\"  -work altera_fxp_functions_191"                           
-    lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_2oqd7oi.vhd"]\"  -work altera_fxp_functions_191"
+    lappend design_files "vcom $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../altera_fxp_functions_191/sim/Fix_Div_altera_fxp_functions_191_fy4uury.vhd"]\"  -work altera_fxp_functions_191"
     lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/Fix_Div.v"]\"  -work Fix_Div"                                                                                 
     return $design_files
   }
