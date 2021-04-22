@@ -4,7 +4,8 @@ int a = 0;
 float c = 1.2;
 void main()
 {
-    int b = a + a * (b - c) + (b - c) * c;
+    int b = 5;
+    int d = a + a * (b - c) + (b - c) * c;
 }
 
 int func() { return a / c; }

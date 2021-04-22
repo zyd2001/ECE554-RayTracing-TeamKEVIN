@@ -22,13 +22,40 @@ namespace CompilerCore
             return pass;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
             throw new System.NotImplementedException();
         }
+
+        internal bool TypeCheckArguments(List<Type> parametersType)
+        {
+            if (list.Count != parametersType.Count)
+            {
+                Error("Arguments number doesn't match");
+                return false;
+            }
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].TypeCheck(out Type type))
+                {
+                    if (type != parametersType[i])
+                    {
+                        Error($"Argument type {TypeString(type)} doesn't match with" +
+                            $" parameter type {TypeString(parametersType[i])}");
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 
-    class IntLiteralExpression : Expression
+    abstract class LiteralExpression : Expression
+    {
+        internal LiteralExpression(LexLocation location) : base(location) { }
+    }
+
+    class IntLiteralExpression : LiteralExpression
     {
         int i;
         internal IntLiteralExpression(LexLocation location, int i) : base(location)
@@ -41,12 +68,13 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new System.NotImplementedException();
+            type = Type.INT;
+            return true;
         }
     }
-    class FloatLiteralExpression : Expression
+    class FloatLiteralExpression : LiteralExpression
     {
         float f;
         internal FloatLiteralExpression(LexLocation location, float f) : base(location)
@@ -59,13 +87,14 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new System.NotImplementedException();
+            type = Type.FLOAT;
+            return true;
         }
     }
 
-    class VectorLiteralExpression : Expression
+    class VectorLiteralExpression : LiteralExpression
     {
         Vector4 vector;
         internal VectorLiteralExpression(LexLocation location, string text) : base(location)
@@ -82,9 +111,10 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new System.NotImplementedException();
+            type = Type.VECTOR;
+            return true;
         }
     }
     class BinaryExpression : Expression
@@ -105,9 +135,23 @@ namespace CompilerCore
             exp2 = e2;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out CompilerCore.Type resultType)
         {
-            throw new System.NotImplementedException();
+            if (exp1.TypeCheck(out CompilerCore.Type type1))
+                if (exp2.TypeCheck(out CompilerCore.Type type2))
+                {
+                    if (type1 != type2)
+                    {
+                        resultType = CompilerCore.Type.NULL;
+                        Error("Binary expression has unmatched operand type " +
+                            $"{TypeString(type1)} and {TypeString(type2)}");
+                        return false;
+                    }
+                    resultType = type1;
+                    return true;
+                }
+            resultType = CompilerCore.Type.NULL;
+            return false;
         }
 
         internal override bool NameAnalysis(SymbolTable table)
@@ -130,9 +174,22 @@ namespace CompilerCore
             exp = e1;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out CompilerCore.Type resultType)
         {
-            throw new System.NotImplementedException();
+            bool pass = exp.TypeCheck(out CompilerCore.Type expressionType);
+            if (pass)
+            {
+                if (type == Type.NOT && expressionType != CompilerCore.Type.INT)
+                {
+                    resultType = CompilerCore.Type.NULL;
+                    Error("! operator can only be used on integer or comparison expression");
+                    return false;
+                }
+                resultType = expressionType;
+                return true;
+            }
+            resultType = CompilerCore.Type.NULL;
+            return false;
         }
 
         internal override bool NameAnalysis(SymbolTable table)
@@ -156,9 +213,24 @@ namespace CompilerCore
             return expression.NameAnalysis(table) & indexExpression.NameAnalysis(table);
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new System.NotImplementedException();
+            if (indexExpression.TypeCheck(out Type indexType))
+            {
+                if (indexType != Type.INT)
+                {
+                    type = Type.NULL;
+                    Error("Index must be an integer expression");
+                    return false;
+                }
+                if (expression.TypeCheck(out Type valueType))
+                {
+                    type = valueType;
+                    return true;
+                }
+            }
+            type = Type.NULL;
+            return false;
         }
     }
 
@@ -166,6 +238,7 @@ namespace CompilerCore
     {
         string identifier;
         ExpressionList expressionList;
+        Symbol func = null;
         internal FunctionCallExpression(LexLocation location, string id, ExpressionList expList) : base(location)
         {
             identifier = id;
@@ -174,7 +247,7 @@ namespace CompilerCore
 
         internal override bool NameAnalysis(SymbolTable table)
         {
-            Symbol func = table.GlobalSearch(identifier);
+            func = table.GlobalSearch(identifier);
             if (!func?.IsFunction ?? false)
             {
                 Error($"Function {identifier} not found");
@@ -183,9 +256,15 @@ namespace CompilerCore
             return expressionList.NameAnalysis(table);
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new System.NotImplementedException();
+            if (expressionList.TypeCheckArguments(func.ParametersType))
+            {
+                type = func.Type;
+                return true;
+            }
+            type = Type.NULL;
+            return false;
         }
     }
 
@@ -211,9 +290,10 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new System.NotImplementedException();
+            type = LinkedSymbol.Type;
+            return true;
         }
     }
 }
