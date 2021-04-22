@@ -10,6 +10,30 @@ namespace CompilerCore
         abstract internal bool SyntaxCheck(bool topLevel, bool inLoop);
         internal static Type CurrentFunctionType = Type.NULL;
         internal static bool SecondPassAnalysis = false;
+        static internal bool AssignmentTypeHelper(Type rhsType, Type lhsType)
+        {
+            switch (rhsType)
+            {
+                case Type.INT:
+                case Type.VECTOR:
+                    return rhsType == lhsType;
+                case Type.FLOAT:
+                    switch (lhsType)
+                    {
+                        case Type.INT:
+                        case Type.FLOAT:
+                            return true;
+                        default:
+                            return false;
+                    }
+                case Type.INT_POINTER:
+                case Type.FLOAT_POINTER:
+                case Type.VECTOR_POINTER:
+                    return rhsType == lhsType || lhsType == Type.INT;
+                default:
+                    return false;
+            }
+        }
     }
 
     class StatementList : ASTNodeList<Statement, StatementList>
@@ -59,6 +83,7 @@ namespace CompilerCore
 
     enum Type
     {
+        INT_POINTER, FLOAT_POINTER, VECTOR_POINTER,
         INT, FLOAT, VECTOR, VOID, NULL
     }
 
@@ -170,10 +195,12 @@ namespace CompilerCore
         internal override bool NameAnalysis(SymbolTable table)
         {
             bool pass = true;
+            table.AddScope(); // possible nested two scope with block statement, but no real problem
             pass &= (initialStatement?.NameAnalysis(table) ?? true);
             pass &= condition.NameAnalysis(table);
             pass &= (iterateStatement?.NameAnalysis(table) ?? true);
             pass &= loopBody.NameAnalysis(table);
+            table.RemoveScope();
             return pass;
         }
 
@@ -322,7 +349,7 @@ namespace CompilerCore
             bool pass = true;
             pass &= left.TypeCheck(out Type rhsType);
             pass &= right.TypeCheck(out Type lhsType);
-            if (rhsType != lhsType)
+            if (!AssignmentTypeHelper(rhsType, lhsType))
             {
                 Error($"Assign {TypeString(lhsType)} to {TypeString(rhsType)}");
                 return false;
@@ -354,12 +381,22 @@ namespace CompilerCore
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
         {
+            if (constant && !topLevel)
+            {
+                Error("Only allow global constant variable");
+                return false;
+            }
             return true;
         }
 
         internal override bool TypeCheck(out Type type)
         {
             type = Type.NULL;
+            if (type == Type.VOID)
+            {
+                Error("Cannot declare void variable");
+                return false;
+            }
             return declarationList.TypeCheckType(this.type);
         }
     }
@@ -401,13 +438,20 @@ namespace CompilerCore
     {
         string identifier;
         Expression initializer;
-        int arraySize;
+        int arraySize; // -1 means normal type, 0 means pointer, > 0 means array
         internal DeclarationItem(LexLocation location, string id, Expression init = null,
-            int size = 1) : base(location)
+            int size = -1) : base(location)
         {
             identifier = id;
             initializer = init;
             arraySize = size;
+        }
+
+        internal DeclarationItem(LexLocation location, string id, bool placeholder) : base(location)
+        {
+            identifier = id;
+            initializer = null;
+            arraySize = 0;
         }
 
         internal override bool NameAnalysis(SymbolTable table)
@@ -424,6 +468,8 @@ namespace CompilerCore
             }
             // check the initializer first, prevent using declaring variable
             bool pass = initializer?.NameAnalysis(table) ?? true;
+            if (arraySize >= 0)
+                type -= 3; // make a pointer type
             table.AddSymbol(new Symbol(type, identifier));
             return pass;
         }
@@ -511,6 +557,7 @@ namespace CompilerCore
         internal override bool TypeCheck(out Type type)
         {
             type = Type.NULL;
+            parameterList.TypeCheck(out _); // check for void parameter
             CurrentFunctionType = this.returnType;
             bool pass = statementList.TypeCheck(out _);
             CurrentFunctionType = Type.NULL;
@@ -532,7 +579,11 @@ namespace CompilerCore
 
         internal override bool TypeCheck(out Type resultType)
         {
-            throw new NotImplementedException();
+            resultType = Type.NULL;
+            bool pass = true;
+            foreach (var item in list)
+                pass &= item.TypeCheck(out _);
+            return pass;
         }
 
         internal List<Type> Types()
@@ -553,6 +604,12 @@ namespace CompilerCore
             identifier = id;
         }
 
+        internal Parameter(LexLocation location, Type type, string id, bool placeholder) : base(location)
+        {
+            this.type = type - 3;
+            identifier = id;
+        }
+
         internal override bool NameAnalysis(SymbolTable table)
         {
             table.AddSymbol(new Symbol(type, identifier));
@@ -566,7 +623,13 @@ namespace CompilerCore
 
         internal override bool TypeCheck(out Type resultType)
         {
-            throw new NotImplementedException();
+            resultType = type;
+            if (type == CompilerCore.Type.NULL)
+            {
+                Error("Cannot declare void variable");
+                return false;
+            }
+            return true;
         }
     }
 }

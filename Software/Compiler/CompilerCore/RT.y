@@ -149,6 +149,14 @@ parameter_list: /* empty */
     {
         $$ = $1.Add(new Parameter(@$, $3, $4));
     }
+    | value_type '*' IDENTIFIER
+    {
+        $$ = new ParameterList(@$, new Parameter(@$, $1, $3, true));
+    }
+    | parameter_list ',' value_type '*' IDENTIFIER
+    {
+        $$ = $1.Add(new Parameter(@$, $3, $5, true));
+    }
     ;
 value_type: INT {$$ = Type.INT;}
     | FLOAT {$$ = Type.FLOAT;} 
@@ -191,6 +199,10 @@ declaration_item: IDENTIFIER
     | IDENTIFIER '=' expression
     {
         $$ = new DeclarationItem(@$, $1, $3);
+    }
+    | '*' IDENTIFIER
+    {
+        $$ = new DeclarationItem(@$, $2, true);
     }
     | IDENTIFIER '[' INT_LITERAL ']'
     {
@@ -284,6 +296,10 @@ identifier_expression: IDENTIFIER
     ;
 possible_array_expression: index_expression
     | identifier_expression
+    | '[' expression ',' expression ',' expression ',' expression ']'
+    {
+        $$ = new VectorConstructorExpression(@$, $2, $4, $6, $8);
+    }
     ;
 index_expression: possible_array_expression '[' expression ']'
     {

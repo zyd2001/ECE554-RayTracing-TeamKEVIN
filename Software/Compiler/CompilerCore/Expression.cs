@@ -38,7 +38,7 @@ namespace CompilerCore
             {
                 if (list[i].TypeCheck(out Type type))
                 {
-                    if (type != parametersType[i])
+                    if (Statement.AssignmentTypeHelper(parametersType[i], type))
                     {
                         Error($"Argument type {TypeString(type)} doesn't match with" +
                             $" parameter type {TypeString(parametersType[i])}");
@@ -135,19 +135,77 @@ namespace CompilerCore
             exp2 = e2;
         }
 
+        CompilerCore.Type typeHelper(CompilerCore.Type type1, CompilerCore.Type type2)
+        {
+            if (type1 <= CompilerCore.Type.VECTOR_POINTER)
+            {
+                if (type2 != type1)
+                {
+                    if (type2 != CompilerCore.Type.INT)
+                    {
+                        Error("Pointer can only add or subtract an integer");
+                        return CompilerCore.Type.NULL;
+                    }
+                }
+                if (type < Type.EQ || type > Type.LE)
+                {
+                    Error("Pointer can only do comparison with pointer");
+                    return CompilerCore.Type.NULL;
+                }
+                return type1;
+            }
+            else
+            {
+                if (type2 <= CompilerCore.Type.VECTOR_POINTER)
+                {
+                    Error("Pointer can only add or subtract an integer");
+                    return CompilerCore.Type.NULL;
+                }
+                if (type == Type.MOD)
+                {
+                    if (type1 != CompilerCore.Type.INT || type2 != CompilerCore.Type.INT)
+                    {
+                        Error("Mod with non-int type");
+                        return CompilerCore.Type.NULL;
+                    }
+                    else
+                        return CompilerCore.Type.INT;
+                }
+                if (type >= Type.EQ && type <= Type.LE)
+                {
+                    if (type1 != type2)
+                    {
+                        Error("Comparison with different types");
+                        return CompilerCore.Type.NULL;
+                    }
+                    else
+                        return CompilerCore.Type.INT;
+                }
+                if (type >= Type.AND)
+                {
+                    if (type1 != CompilerCore.Type.INT || type2 != CompilerCore.Type.INT)
+                    {
+                        Error("And or Or with non-int type");
+                        return CompilerCore.Type.NULL;
+                    }
+                    else
+                        return CompilerCore.Type.INT;
+                }
+                if (type <= Type.DIV)
+                    return (CompilerCore.Type)System.Math.Max((int)type1, (int)type2);
+                Error("Unexpected error, .....");
+                return CompilerCore.Type.NULL;
+            }
+        }
+
         internal override bool TypeCheck(out CompilerCore.Type resultType)
         {
             if (exp1.TypeCheck(out CompilerCore.Type type1))
                 if (exp2.TypeCheck(out CompilerCore.Type type2))
                 {
-                    if (type1 != type2)
-                    {
-                        resultType = CompilerCore.Type.NULL;
-                        Error("Binary expression has unmatched operand type " +
-                            $"{TypeString(type1)} and {TypeString(type2)}");
+                    resultType = typeHelper(type1, type2);
+                    if (resultType == CompilerCore.Type.NULL)
                         return false;
-                    }
-                    resultType = type1;
                     return true;
                 }
             resultType = CompilerCore.Type.NULL;
@@ -225,12 +283,61 @@ namespace CompilerCore
                 }
                 if (expression.TypeCheck(out Type valueType))
                 {
-                    type = valueType;
+                    if (valueType == Type.VECTOR)
+                        type = Type.FLOAT;
+                    else if (valueType <= Type.VECTOR_POINTER)
+                        type = valueType + 3; // become value type
+                    else
+                    {
+                        type = Type.NULL;
+                        Error($"Type {valueType} cannot use index");
+                        return false;
+                    }
                     return true;
                 }
             }
             type = Type.NULL;
             return false;
+        }
+    }
+
+    class VectorConstructorExpression : Expression
+    {
+        List<Expression> expressions;
+
+        internal VectorConstructorExpression(LexLocation location, Expression e1, Expression e2,
+            Expression e3, Expression e4) : base(location)
+        {
+            expressions = new List<Expression> { e1, e2, e3, e4 };
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            foreach (var item in expressions)
+                if (!item.NameAnalysis(table))
+                    return false;
+            return true;
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            foreach (var item in expressions)
+                if (!item.TypeCheck(out Type type))
+                {
+                    resultType = Type.NULL;
+                    return false;
+                }
+                else
+                {
+                    if (type >= Type.VECTOR || type <= Type.VECTOR_POINTER)
+                    {
+                        Error("Vector can only have integer or float elements");
+                        resultType = Type.NULL;
+                        return false;
+                    }
+                }
+            resultType = Type.VECTOR;
+            return true;
         }
     }
 

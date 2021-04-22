@@ -2,30 +2,32 @@
 
 int a = 0;
 float c = 1.2;
+int *pointer;
 void main()
 {
     int b = 5;
-    int d = a + a * (b - c) + (b - c) * c;
+    float d = a + a * (b - c) + (b - c) * c;
 }
 
-int func() { return a / c; }
+int func() { return a / a; }
 
 vector test(int v, float c, vector b)
 {
     int array[13];
+    pointer = array;
     for (int i = 0; i < 100; i++)
     {
         if (a)
         {
-            return a;
+            return [ 1, 2, 3, 4 ];
         }
-        else if (b)
+        else if (v)
         {
             return b;
         }
         else
         {
-            return func();
+            return [ 1.5, 3, 4, func() ];
         }
     }
 }
