@@ -29,7 +29,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     // Generate variable
     genvar i, j;
 
-    enum {idle, mc_wr_index, mc_wr_switch, mc_wr_vertex, rd_0, rd_1, rd_2, rd_tid, rd_done} state, next;
+    enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_tid, rd_done} state, next;
 
     // input buffer signal for index wr
     logic [127:0] mc_data;
@@ -66,9 +66,10 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         end
     end
     always_comb begin
-        next = idle;
+        next = state;
         we_index = 1'b0;
         we_vertex = 1'b0;
+        rdy_MC = 1'b0;
         rdy_IC = 1'b0;
         index_cnt = index_cnt_reg;
         mc_addr_cnt = mc_addr_cnt_reg;
@@ -86,12 +87,12 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         case (state)
             mc_wr_index: begin
                 // zero id: switch
-                if(~(|mc_data[127:96])) begin
+                if(~(|mc_data[31:0])) begin
                     mc_addr_cnt = '0;
-                    next = mc_wr_switch;
+                    next = mc_wr_vertex;
+                    rdy_MC = 1'b1;
                 end
                 else begin
-                    next = mc_wr_index;
                     index_cnt = index_cnt_reg + 1;
                     index_addr_in = mc_addr_cnt_reg;
                     if(index_cnt_reg == 0) begin
@@ -118,30 +119,15 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     end
                 end
             end
-            mc_wr_switch: begin
-                if(we_MC) begin
-                    // zero id: end
-                    if(~(|data_MC[127:96])) begin
-                        next = idle;
-                    end
-                    else begin
-                        vertex_addr_in = mc_addr_cnt_reg;
-                        mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        next = mc_wr_vertex;                    
-                        we_vertex = 1'b1;
-                    end
-                end
-            end
             mc_wr_vertex: begin 
                 if(we_MC) begin
                     // zero id: end
-                    if(~(|data_MC[127:96])) begin
+                    if(~(|data_MC[31:0])) begin
                         next = idle;
                     end
                     else begin
                         vertex_addr_in = mc_addr_cnt_reg;
-                        mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        next = mc_wr_vertex;                    
+                        mc_addr_cnt = mc_addr_cnt_reg + 1;                   
                         we_vertex = 1'b1;
                         rdy_MC = 1'b1;
                     end                    
