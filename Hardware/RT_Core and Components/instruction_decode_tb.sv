@@ -13,7 +13,7 @@ module instruction_decode_tb;
 
 
     int index;
-    int imm_index;
+    int imm_index, imm_start;
 
     logic clk;
 
@@ -102,9 +102,14 @@ module instruction_decode_tb;
 
             // if the op exists, test it
             if(array.exists($sformatf("%b", op))) begin
-                
-
-                for(imm_index = 0; imm_index < 4; imm_index++)begin
+                immediate = 2'b00;
+                if(op == 6'b100111 || op == 100101) begin
+                    imm_start = 0;
+                end
+                else begin
+                    imm_start = 3;
+                end
+                for(imm_index = imm_start; imm_index < 4; imm_index++)begin
                     @(posedge clk)
 
                     $fwrite(tracefile,"---------------------------------\n\n");
