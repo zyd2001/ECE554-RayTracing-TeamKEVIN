@@ -86,7 +86,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         case (state)
             mc_wr_index: begin
                 // zero id: switch
-                if(~(|data_MC[31:0])) begin
+                if(~(|data_MC[127:96])) begin
                     mc_addr_cnt = '0;
                     next = mc_wr_vertex;
                     rdy_MC = 1'b1;
@@ -97,31 +97,31 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     if(index_cnt_reg == 0) begin
                         we_index = 1'b1;
                         mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        index_data_in = mc_data[127:96];
+                        index_data_in = mc_data[31:0];
                     end 
                     else if (index_cnt_reg == 1) begin
                         we_index = 1'b1;
                         mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        index_data_in = mc_data[95:64];
+                        index_data_in = mc_data[63:32];
                     end 
                     else if (index_cnt_reg == 2) begin
                         we_index = 1'b1;
                         mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        index_data_in = mc_data[63:32];
+                        index_data_in = mc_data[95:64];
                     end 
                     else if (index_cnt_reg == 3) begin
                         mc_addr_cnt = mc_addr_cnt_reg + 1;
                         // en_MC should arrive this cycle and clear counter
                         rdy_MC = 1'b1;
                         we_index = 1'b1;
-                        index_data_in = mc_data[31:0];
+                        index_data_in = mc_data[127:96];
                     end
                 end
             end
             mc_wr_vertex: begin 
                 if(we_MC) begin
                     // zero id: end
-                    if(~(|data_MC[31:0])) begin
+                    if(~(|data_MC[127:96])) begin
                         next = idle;
                     end
                     else begin
