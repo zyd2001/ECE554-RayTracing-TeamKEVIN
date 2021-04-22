@@ -103,7 +103,7 @@ module instruction_decode_tb;
             // if the op exists, test it
             if(array.exists($sformatf("%b", op))) begin
                 immediate = 2'b00;
-                if(op == 6'b100111 || op == 100101) begin
+                if(op == 6'b100111 || op == 6'b100101) begin
                     imm_start = 0;
                 end
                 else begin
