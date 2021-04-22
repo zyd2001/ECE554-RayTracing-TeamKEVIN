@@ -7,11 +7,11 @@ namespace CompilerCore
     {
         public static void Main(string[] args)
         {
-            Scanner scanner = new Scanner(new FileStream("CompilerCore/test.rt", FileMode.Open));
+            Scanner scanner = new Scanner(new FileStream("test.rt", FileMode.Open));
             Parser parser = new Parser(scanner);
 
             Console.WriteLine(parser.Parse());
-            parser.AST.StaticCheck();
+            Console.WriteLine(parser.AST.StaticCheck());
         }
     }
 }

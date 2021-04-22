@@ -7,18 +7,19 @@ namespace CompilerCore
         internal Type Type { get; }
         internal string Identifier { get; }
         internal bool IsFunction { get; }
-        internal Symbol(Type type, string id, bool func = false)
+        internal List<Type> ParametersType { get; }
+        internal Symbol(Type type, string id, bool func = false, List<Type> types = null)
         {
             Type = type;
             Identifier = id;
             IsFunction = func;
+            ParametersType = types;
         }
     }
 
     class SymbolTable
     {
         List<Dictionary<string, Symbol>> scopes;
-
         internal SymbolTable()
         {
             scopes = new List<Dictionary<string, Symbol>> { new Dictionary<string, Symbol>() };

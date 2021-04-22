@@ -11,12 +11,29 @@ namespace CompilerCore
         {
             this.location = location;
         }
-        abstract internal bool TypeCheck();
+        abstract internal bool TypeCheck(out Type resultType);
         abstract internal bool NameAnalysis(SymbolTable table);
         internal void Error(string str)
         {
             Console.Write($"{location.StartLine}:{location.StartColumn}: ");
             Console.WriteLine(str);
+        }
+
+        internal static string TypeString(Type type)
+        {
+            switch (type)
+            {
+                case Type.INT:
+                    return "int";
+                case Type.FLOAT:
+                    return "float";
+                case Type.VECTOR:
+                    return "vector";
+                case Type.VOID:
+                    return "void";
+                default:
+                    return "NULL";
+            }
         }
     }
 

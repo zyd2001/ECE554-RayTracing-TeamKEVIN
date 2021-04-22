@@ -8,6 +8,8 @@ namespace CompilerCore
     {
         internal Statement(LexLocation location) : base(location) { }
         abstract internal bool SyntaxCheck(bool topLevel, bool inLoop);
+        internal static Type CurrentFunctionType = Type.NULL;
+        internal static bool SecondPassAnalysis = false;
     }
 
     class StatementList : ASTNodeList<Statement, StatementList>
@@ -25,11 +27,16 @@ namespace CompilerCore
 
         internal bool StaticCheck()
         {
-            bool pass = true;
-            pass &= SyntaxCheck(true, false);
-            SymbolTable table = new SymbolTable();
-            pass &= NameAnalysis(table);
-            return pass;
+            if (SyntaxCheck(true, false))
+            {
+                SymbolTable table = new SymbolTable();
+                NameAnalysis(table); // first pass for function definition
+                Statement.SecondPassAnalysis = true;
+                if (NameAnalysis(table)) // second pass for real analysis
+                    if (TypeCheck(out _))
+                        return true;
+            }
+            return false;
         }
 
         internal bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -40,15 +47,19 @@ namespace CompilerCore
             return pass;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            bool pass = true;
+            foreach (var item in list)
+                pass &= item.TypeCheck(out _);
+            return pass;
         }
     }
 
     enum Type
     {
-        INT, FLOAT, VECTOR, VOID
+        INT, FLOAT, VECTOR, VOID, NULL
     }
 
     class ReturnStatement : Statement
@@ -62,9 +73,7 @@ namespace CompilerCore
 
         internal override bool NameAnalysis(SymbolTable table)
         {
-            if (expression is not null)
-                return expression.NameAnalysis(table);
-            return true;
+            return expression?.NameAnalysis(table) ?? true;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -77,9 +86,29 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            if (expression is not null)
+            {
+                if (CurrentFunctionType == Type.VOID)
+                {
+                    Error("Return statement cannot have value in void function");
+                    return false;
+                }
+                if (expression.TypeCheck(out Type returnType))
+                {
+                    if (CurrentFunctionType != returnType)
+                    {
+                        Error($"Return type doens't match. Expect: {TypeString(CurrentFunctionType)}," +
+                            $" Got: {TypeString(returnType)}");
+                        return false;
+                    }
+                }
+                else
+                    return false;
+            }
+            return true;
         }
     }
 
@@ -97,12 +126,7 @@ namespace CompilerCore
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
         {
             var str = type == Type.CONTINUE ? "Continue" : "Break";
-            if (topLevel)
-            {
-                Error($"{str} statement must be in a loop");
-                return false;
-            }
-            if (!inLoop)
+            if (topLevel || !inLoop)
             {
                 Error($"{str} statement must be in a loop");
                 return false;
@@ -110,9 +134,10 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out CompilerCore.Type type)
         {
-            throw new NotImplementedException();
+            type = CompilerCore.Type.NULL;
+            return true;
         }
 
         internal override bool NameAnalysis(SymbolTable table)
@@ -148,6 +173,7 @@ namespace CompilerCore
             pass &= (initialStatement?.NameAnalysis(table) ?? true);
             pass &= condition.NameAnalysis(table);
             pass &= (iterateStatement?.NameAnalysis(table) ?? true);
+            pass &= loopBody.NameAnalysis(table);
             return pass;
         }
 
@@ -161,9 +187,20 @@ namespace CompilerCore
             return loopBody.SyntaxCheck(topLevel, true);
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            bool pass = true;
+            pass &= (initialStatement?.TypeCheck(out _) ?? true);
+            pass &= condition.TypeCheck(out Type conditionType);
+            if (conditionType != Type.INT)
+            {
+                Error("Loop condition must be an integer or comparison expression");
+                return false;
+            }
+            pass &= (iterateStatement?.TypeCheck(out _) ?? true);
+            pass &= loopBody.TypeCheck(out _);
+            return pass;
         }
     }
 
@@ -205,9 +242,19 @@ namespace CompilerCore
             return result;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            bool pass = true;
+            pass &= condition.TypeCheck(out Type conditionType);
+            if (conditionType != Type.INT)
+            {
+                Error("If condition must be an integer or comparison expression");
+                return false;
+            }
+            pass &= statement.TypeCheck(out _);
+            pass &= (elseStatement?.TypeCheck(out _) ?? true);
+            return pass;
         }
     }
 
@@ -222,7 +269,9 @@ namespace CompilerCore
         internal override bool NameAnalysis(SymbolTable table)
         {
             table.AddScope();
-            return statementList.NameAnalysis(table);
+            bool pass = statementList.NameAnalysis(table);
+            table.RemoveScope();
+            return pass;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -235,9 +284,10 @@ namespace CompilerCore
             return statementList.SyntaxCheck(topLevel, inLoop);
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            return statementList.TypeCheck(out _);
         }
     }
 
@@ -266,9 +316,18 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            bool pass = true;
+            pass &= left.TypeCheck(out Type rhsType);
+            pass &= right.TypeCheck(out Type lhsType);
+            if (rhsType != lhsType)
+            {
+                Error($"Assign {TypeString(lhsType)} to {TypeString(rhsType)}");
+                return false;
+            }
+            return pass;
         }
     }
 
@@ -287,7 +346,10 @@ namespace CompilerCore
 
         internal override bool NameAnalysis(SymbolTable table)
         {
-            return declarationList.NameAnalysisType(table, type);
+            if (SecondPassAnalysis)
+                return declarationList.NameAnalysisType(table, type);
+            else
+                return true;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -295,9 +357,10 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            return declarationList.TypeCheckType(this.type);
         }
     }
 
@@ -320,7 +383,15 @@ namespace CompilerCore
             return pass;
         }
 
-        internal override bool TypeCheck()
+        internal bool TypeCheckType(Type type)
+        {
+            bool pass = true;
+            foreach (var item in list)
+                pass &= item.TypeCheckType(type);
+            return pass;
+        }
+
+        internal override bool TypeCheck(out Type type)
         {
             throw new NotImplementedException();
         }
@@ -351,11 +422,39 @@ namespace CompilerCore
                 Error($"{identifier} is declared in the same scope");
                 return false;
             }
+            // check the initializer first, prevent using declaring variable
+            bool pass = initializer?.NameAnalysis(table) ?? true;
             table.AddSymbol(new Symbol(type, identifier));
-            return initializer.NameAnalysis(table);
+            return pass;
         }
 
-        internal override bool TypeCheck()
+        internal bool TypeCheckType(Type type)
+        {
+            if (initializer is not null)
+            {
+                if (Statement.CurrentFunctionType == Type.NULL) // global variable check
+                {
+                    if (initializer is not LiteralExpression)
+                    {
+                        Error("Global variable can only be initialized with literal");
+                        return false;
+                    }
+                }
+                if (initializer.TypeCheck(out Type resultType))
+                {
+                    if (type != resultType)
+                    {
+                        Error($"Declaraion type {TypeString(type)} doesn't match with" +
+                            $" initializer type {TypeString(resultType)}");
+                        return false;
+                    }
+                }
+                else return false;
+            }
+            return true;
+        }
+
+        internal override bool TypeCheck(out Type type)
         {
             throw new NotImplementedException();
         }
@@ -377,15 +476,26 @@ namespace CompilerCore
 
         internal override bool NameAnalysis(SymbolTable table)
         {
+            if (SecondPassAnalysis)
+            {
+                table.AddScope();
+                parameterList.NameAnalysis(table); // only add new symbol, no possible error
+                bool pass = statementList.NameAnalysis(table);
+                table.RemoveScope();
+                return pass;
+            }
+
+            // first pass for function definition
             if (table.GlobalSearch(functionName) is not null)
             {
                 Error($"{functionName} is declared in the same scope");
                 return false;
             }
-            table.AddSymbol(new Symbol(returnType, functionName, true));
-            table.AddScope();
-            parameterList.NameAnalysis(table); // only add new symbol, no possible error
-            return statementList.NameAnalysis(table);
+            List<Type> parameterType = new List<Type>();
+            table.AddSymbol(new Symbol(returnType, functionName, true, parameterType));
+            foreach (var type in parameterList.Types()) // must take care of parameter type before type checking
+                parameterType.Add(type);
+            return true;
         }
 
         internal override bool SyntaxCheck(bool topLevel, bool inLoop)
@@ -398,9 +508,13 @@ namespace CompilerCore
             return statementList.SyntaxCheck(false, false);
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type type)
         {
-            throw new NotImplementedException();
+            type = Type.NULL;
+            CurrentFunctionType = this.returnType;
+            bool pass = statementList.TypeCheck(out _);
+            CurrentFunctionType = Type.NULL;
+            return pass;
         }
     }
 
@@ -416,9 +530,17 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal override bool TypeCheck(out Type resultType)
         {
             throw new NotImplementedException();
+        }
+
+        internal List<Type> Types()
+        {
+            List<Type> types = new List<Type>(list.Count);
+            foreach (var item in list)
+                types.Add(item.Type());
+            return types;
         }
     }
     internal class Parameter : ASTNode
@@ -437,7 +559,12 @@ namespace CompilerCore
             return true;
         }
 
-        internal override bool TypeCheck()
+        internal Type Type()
+        {
+            return type;
+        }
+
+        internal override bool TypeCheck(out Type resultType)
         {
             throw new NotImplementedException();
         }

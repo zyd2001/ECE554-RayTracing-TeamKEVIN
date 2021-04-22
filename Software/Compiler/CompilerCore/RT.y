@@ -19,7 +19,6 @@
     internal int IntLiteral;
     internal float FloatLiteral;
     internal string VectorLiteral;
-    internal IfStatement IfStatement;
     internal Type Type;
     internal ParameterList ParameterList;
 }
@@ -33,13 +32,12 @@
 %token<FloatLiteral> FLOAT_LITERAL 
 %token<VectorLiteral> VECTOR_LITERAL
 %token<Identifier> IDENTIFIER
-%token INT FLOAT VECTOR VOID IF ELSE ELSEIF FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
+%token INT FLOAT VECTOR VOID IF ELSE FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
     EQ NE GT GE LT LE INCREMENT DECREMENT
 
 %type<Type> value_type
 %type<Statement> statement  loop_statement return_statement assignment_statement function_definition_statement
-    declaration_statement for_special_statement block_statement toplevel_statement
-%type<IfStatement> if_statement
+    declaration_statement for_special_statement block_statement toplevel_statement if_statement
 %type<DeclaraionItem> declaration_item
 %type<DeclarationList> declaration_list
 %type<StatementList> statement_list optional_statement_list program
@@ -125,7 +123,7 @@ if_statement: IF '(' expression ')' statement
     }
     | if_statement ELSE statement
     {
-        $$ = $1.AddElse($3);
+        $$ = ($1 as IfStatement).AddElse($3);
     }
     ;
 function_definition_statement: value_type IDENTIFIER '(' parameter_list ')' '{' optional_statement_list '}'
@@ -165,6 +163,8 @@ expression: '(' expression ')'
     | binary_expression
     | unary_expression
     | possible_array_expression
+    | function_call_expression
+    | literal_expression
     ;
 declaration_statement: value_type declaration_list
     {
@@ -282,9 +282,7 @@ identifier_expression: IDENTIFIER
         $$ = new IdentifierExpression(@$, $1);
     }
     ;
-possible_array_expression: literal_expression
-    | index_expression
-    | function_call_expression
+possible_array_expression: index_expression
     | identifier_expression
     ;
 index_expression: possible_array_expression '[' expression ']'

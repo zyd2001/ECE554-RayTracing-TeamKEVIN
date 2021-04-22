@@ -2,7 +2,7 @@
     public override void yyerror(string format, params object[] args)
     {
         Console.Error.Write("{0}:{1}:",yyline, yycol);
-        Console.Error.WriteLine(format, args);
+        Console.Error.WriteLine(format);
     }
 %}
 
@@ -21,7 +21,6 @@ digits [0-9]+
 "void"          return (int)Tokens.VOID;
 "if"            return (int)Tokens.IF;
 "else"          return (int)Tokens.ELSE;
-"esle if"       return (int)Tokens.ELSEIF;
 "for"           return (int)Tokens.FOR;
 "while"         return (int)Tokens.WHILE;
 "break"         return (int)Tokens.BREAK;
@@ -54,6 +53,7 @@ digits [0-9]+
 "/"             |
 "%"             |
 "="             return yytext[0];
+[\ \t] ;
 {identifier} {
     yylval.Identifier = yytext;
     return (int)Tokens.IDENTIFIER;
@@ -71,6 +71,7 @@ digits [0-9]+
     return (int)Tokens.VECTOR_LITERAL;
 }
 "//".* ;
+. return yytext[0];
 
 %{
     yylloc = new LexLocation(tokLin,tokCol,tokELin,tokECol);
