@@ -1,799 +1,2610 @@
-vv_add -> 000000, immediate = 00
 ---------------------------------
-intALU_op2_select: 1
+
+vv_add -> 000000, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
+---------------------------------
 
 vv_add -> 000000, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_add -> 000000, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_add -> 000000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vv_sub -> 000001, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_sub -> 000001, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_sub -> 000001, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_sub -> 000001, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vv_mul_ele -> 000010, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_mul_ele -> 000010, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_mul_ele -> 000010, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_mul_ele -> 000010, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vv_div -> 000011, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_div -> 000011, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_div -> 000011, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vv_div -> 000011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 cmp_v -> 000101, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 cmp_v -> 000101, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 cmp_v -> 000101, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 cmp_v -> 000101, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 00
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 0
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 00
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vf_add -> 001000, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_add -> 001000, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_add -> 001000, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_add -> 001000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vf_sub -> 001001, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_sub -> 001001, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_sub -> 001001, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_sub -> 001001, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vf_mul -> 001010, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_mul -> 001010, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_mul -> 001010, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_mul -> 001010, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 vf_div -> 001011, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_div -> 001011, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_div -> 001011, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 vf_div -> 001011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 0
+	floatALU1_op2_select: 01
+floatALU2_en: 1
+	floatALU2_op1_select: 0
+	floatALU2_op2_select: 1
+floatALU3_en: 1
+	floatALU3_op1_select: 0
+	floatALU3_op2_select: 01
+floatALU4_en: 1
+	floatALU4_op1_select: 0
+	floatALU4_op2_select: 1
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 not -> 001100, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 not -> 001100, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 not -> 001100, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 not -> 001100, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 and -> 001101, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 and -> 001101, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 and -> 001101, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 and -> 001101, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 or -> 001110, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 or -> 001110, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 or -> 001110, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 or -> 001110, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 xor -> 001111, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 xor -> 001111, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 xor -> 001111, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 xor -> 001111, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ff_add -> 010000, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_add -> 010000, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_add -> 010000, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_add -> 010000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ff_sub -> 010001, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_sub -> 010001, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_sub -> 010001, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_sub -> 010001, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ff_mul -> 010010, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_mul -> 010010, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_mul -> 010010, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_mul -> 010010, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ff_div -> 010011, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_div -> 010011, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_div -> 010011, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 ff_div -> 010011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 cmp_f -> 010101, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 cmp_f -> 010101, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 cmp_f -> 010101, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 cmp_f -> 010101, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 1
+	floatALU1_op1_select: 1
+	floatALU1_op2_select: 01
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_add -> 011000, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_add -> 011000, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_add -> 011000, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_add -> 011000, immediate = 11
----------------------------------
-intALU_op2_select: 0
 
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_sub -> 011001, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_sub -> 011001, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_sub -> 011001, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_sub -> 011001, immediate = 11
----------------------------------
-intALU_op2_select: 0
 
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_mul -> 011010, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_mul -> 011010, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_mul -> 011010, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_mul -> 011010, immediate = 11
----------------------------------
-intALU_op2_select: 0
 
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_div -> 011011, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_div -> 011011, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_div -> 011011, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 0
 
 ii_div -> 011011, immediate = 11
----------------------------------
-intALU_op2_select: 0
 
+intALU_en: 1
+	intALU_op2_select: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_write_high -> 100000, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_write_high -> 100000, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_write_high -> 100000, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_write_high -> 100000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_write_low -> 100001, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_write_low -> 100001, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_write_low -> 100001, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_write_low -> 100001, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_itof -> 100010, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_itof -> 100010, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_itof -> 100010, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_itof -> 100010, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_ftoi -> 100011, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_ftoi -> 100011, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_ftoi -> 100011, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_ftoi -> 100011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 v_reduce -> 100100, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 1
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_reduce -> 100100, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 1
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_reduce -> 100100, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 1
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_reduce -> 100100, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 1
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_get_from_v -> 100101, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_get_from_v -> 100101, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 101
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_get_from_v -> 100101, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 110
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_get_from_v -> 100101, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 111
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_sqrt -> 100110, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_sqrt -> 100110, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_sqrt -> 100110, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_sqrt -> 100110, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+Scalar_out_select: 100
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 v_get_from_s -> 100111, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_get_from_s -> 100111, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_get_from_s -> 100111, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_get_from_s -> 100111, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_addi -> 101000, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_addi -> 101000, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_addi -> 101000, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_addi -> 101000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_subi -> 101001, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_subi -> 101001, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_subi -> 101001, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_subi -> 101001, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_muli -> 101010, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_muli -> 101010, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_muli -> 101010, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_muli -> 101010, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ii_divi -> 101011, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_divi -> 101011, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_divi -> 101011, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ii_divi -> 101011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_load_4byte -> 101100, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_load_4byte -> 101100, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_load_4byte -> 101100, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 100
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_load_4byte -> 101100, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 100
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 v_load_16byte -> 101111, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 101
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_load_16byte -> 101111, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 101
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_load_16byte -> 101111, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 101
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_load_16byte -> 101111, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 101
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 bne -> 110000, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bne -> 110000, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bne -> 110000, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bne -> 110000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 bg -> 110001, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bg -> 110001, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bg -> 110001, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bg -> 110001, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 bl -> 110010, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bl -> 110010, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bl -> 110010, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bl -> 110010, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 bge -> 110011, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bge -> 110011, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bge -> 110011, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 bge -> 110011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ble -> 110100, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ble -> 110100, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ble -> 110100, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ble -> 110100, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 real_jmp -> 110110, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 real_jmp -> 110110, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 real_jmp -> 110110, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 real_jmp -> 110110, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 ret -> 110111, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ret -> 110111, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ret -> 110111, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 ret -> 110111, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 trace -> 111000, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 trace -> 111000, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 trace -> 111000, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 trace -> 111000, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 fin -> 111011, immediate = 00
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 fin -> 111011, immediate = 01
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 fin -> 111011, immediate = 10
+
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
 ---------------------------------
-intALU_op2_select: 1
 
 fin -> 111011, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 0
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 s_store_4byte -> 111100, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 110
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_store_4byte -> 111100, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 110
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_store_4byte -> 111100, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 110
+
 ---------------------------------
-intALU_op2_select: 1
 
 s_store_4byte -> 111100, immediate = 11
----------------------------------
-intALU_op2_select: 1
 
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 110
+
+---------------------------------
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+---------------------------------
 
 v_store_16byte -> 111111, immediate = 00
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 111
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_store_16byte -> 111111, immediate = 01
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 111
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_store_16byte -> 111111, immediate = 10
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 111
+
 ---------------------------------
-intALU_op2_select: 1
 
 v_store_16byte -> 111111, immediate = 11
+
+intALU_en: 1
+	intALU_op2_select: 1
+floatALU1_en: 0
+floatALU2_en: 0
+floatALU3_en: 0
+floatALU4_en: 0
+vector_reduce_en: 0
+memory_op: 111
+
 ---------------------------------
-intALU_op2_select: 1
-
-
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

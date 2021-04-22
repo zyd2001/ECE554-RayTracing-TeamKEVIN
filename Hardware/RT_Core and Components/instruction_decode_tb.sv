@@ -106,9 +106,11 @@ module instruction_decode_tb;
 
                 for(imm_index = 0; imm_index < 4; imm_index++)begin
                     @(posedge clk)
+
+                    $fwrite(tracefile,"---------------------------------\n\n");
                     
-                    $fwrite(tracefile,"%s -> %s, immediate = %s\n", array[$sformatf("%b", op)], $sformatf("%b", op), $sformatf("%b", immediate));
-                    $fwrite(tracefile,"---------------------------------\n");
+                    $fwrite(tracefile,"%s -> %s, immediate = %s\n\n", array[$sformatf("%b", op)], $sformatf("%b", op), $sformatf("%b", immediate));
+                    
                     
                     // int ALU:
                     $fwrite(tracefile, "intALU_en: %s\n", $sformatf("%b",intALU_en));
@@ -144,9 +146,11 @@ module instruction_decode_tb;
                         $fwrite(tracefile,"\tfloatALU4_op2_select: %s\n", $sformatf("%b",floatALU4_op2_select));
                     end
                     
-                    $fwrite(tracefile, "Scalar_out_select: %s\n", $sformatf("%b",Scalar_out_select));
-                    $fwrite(tracefile, "memory_op: %s\n", $sformatf("%b",memory_op));
                     $fwrite(tracefile, "vector_reduce_en: %s\n", $sformatf("%b",vector_reduce_en));
+
+                    if(Scalar_out_select !== 3'b000) $fwrite(tracefile, "Scalar_out_select: %s\n", $sformatf("%b",Scalar_out_select));
+                    if(memory_op !== 3'b000) $fwrite(tracefile, "memory_op: %s\n", $sformatf("%b",memory_op));
+                    
                     
                     
                     immediate = immediate + 1;
@@ -154,7 +158,8 @@ module instruction_decode_tb;
 
                 end
 
-                $fwrite(tracefile, "\n");
+                $fwrite(tracefile,"---------------------------------\n");
+                $fwrite(tracefile,"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n");
                 
             end
             op = op + 1;
