@@ -1,5 +1,5 @@
 module FloatPU (
-  clk, rst, en,
+  clk, rst, en, start,
   mode,
   a,
   b,
@@ -10,7 +10,7 @@ module FloatPU (
             MUL_LATENCY = 5,
             DIV_LATENCY = 27;
   
-  input clk, rst, en;
+  input clk, rst, en, start;
   input [1:0] mode;
   input [31:0] a, b;
   
@@ -49,7 +49,7 @@ module FloatPU (
     Divider_en = 1'b0;
     done_in = 1'b0;
     counter_in = '0;
-    result_in = result;
+    result_in = result_reg;
     nxt_state = IDLE;
     case(state)
       ADDSUB: 
@@ -89,7 +89,7 @@ module FloatPU (
           end
         end
       default: 
-          if (en) begin
+          if (en && start) begin
             if (mode[1] == 1'b0) begin
               Adder_en = 1'b1;
               nxt_state = ADDSUB;

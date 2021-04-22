@@ -1,5 +1,5 @@
 module Converter (
-  clk, rst, en,
+  clk, rst, en, start,
   mode,
   data_in,
   done,
@@ -8,7 +8,7 @@ module Converter (
   parameter F2I_LATENCY = 5,
             I2F_LATENCY = 9;
 
-  input clk, rst, en;
+  input clk, rst, en, start;
   input mode;
   input [31:0] data_in;
   
@@ -44,7 +44,7 @@ module Converter (
     ItoF_en = 1'b0;
     done_in = 1'b0;
     counter_in = '0;
-    data_out_in = data_out;
+    data_out_in = data_out_reg;
     nxt_state = IDLE;
     case(state)
       F2I: 
@@ -63,7 +63,7 @@ module Converter (
         begin
           if (counter == I2F_LATENCY) begin
             done_in = 1'b1;
-            data_out_in = I2F_LATENCY;
+            data_out_in = ItoF_out;
           end
           else begin
             counter_in = counter + 1'b1;
@@ -72,7 +72,7 @@ module Converter (
           end
         end
       default: 
-          if (en) begin
+          if (en && start) begin
             if (mode == 1'b0) begin
               FtoI_en = 1'b1;
               nxt_state = F2I;
