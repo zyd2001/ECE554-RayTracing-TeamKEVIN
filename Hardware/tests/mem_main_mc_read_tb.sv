@@ -38,7 +38,7 @@ module mem_main_mc_read_tb();
             $display("Test %d starting... ", test);
             clk = 1;
             rst_n = 1;
-            addr_RT_base = 12'hfff;//{(ADDRESS_BIT-1){1'b1}};
+            addr_RT_base = {ADDRESS_BIT{1'b1}};
             we_RT = '{NUM_RT{1'b0}};
             re_RT = '{NUM_RT{1'b0}};
             for(int i=0;i<NUM_RT;++i) begin

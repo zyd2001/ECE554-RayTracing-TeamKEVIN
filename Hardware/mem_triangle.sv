@@ -4,7 +4,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     parameter NUM_TRIANGLE = 512;
     localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
     localparam DATA_DEPTH = BIT_TRIANGLE + 4; // num*4 size, add 2 bits zero padding for 4 byte address
-    localparam ADDR_BIT = BIT_TRIANGLE + 2;
+    localparam BIT_ADDR = BIT_TRIANGLE + 2;
 
     /*
         Input
@@ -29,18 +29,18 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     // Generate variable
     genvar i, j;
 
-    enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_tid, rd_done} state, next;
+    enum {idle, mc_wr_index, mc_wr_switch, mc_wr_vertex, rd_0, rd_1, rd_2, rd_tid, rd_done} state, next;
 
     // input buffer signal for index wr
     logic [127:0] mc_data;
     logic [2:0] index_cnt_reg, index_cnt;
-    logic [ADDR_BIT-1:0] mc_addr_cnt_reg, mc_addr_cnt;
+    logic [BIT_ADDR-1:0] mc_addr_cnt_reg, mc_addr_cnt;
     // memory signal
     logic we_vertex, we_index;
     logic [31:0] index_data_in;
-    logic [ADDR_BIT-1:0] index_addr_in;
+    logic [BIT_ADDR-1:0] index_addr_in;
     logic [31:0] index_data_out;
-    logic [ADDR_BIT-1:0] vertex_addr_in;
+    logic [BIT_ADDR-1:0] vertex_addr_in;
     logic [31:0] vertex_data_out[2:0];
     // output buffer signal
     logic [127:0] vertices [2:0];
@@ -74,7 +74,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         mc_addr_cnt = mc_addr_cnt_reg;
         index_data_in = mc_data[31:0];
         index_addr_in = {triangle_id, 2'b0};
-        vertex_addr_in = index_data_out[ADDR_BIT-1:0];
+        vertex_addr_in = index_data_out[BIT_ADDR-1:0];
         is_prefetching = is_prefetching_reg;
         can_prefetch = can_prefetch_reg;
         prefetch_triangle_id = prefetch_triangle_id_reg;
@@ -88,7 +88,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 // zero id: switch
                 if(~(|mc_data[127:96])) begin
                     mc_addr_cnt = '0;
-                    next = mc_wr_vertex;
+                    next = mc_wr_switch;
                 end
                 else begin
                     next = mc_wr_index;
@@ -108,14 +108,27 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                         we_index = 1'b1;
                         mc_addr_cnt = mc_addr_cnt_reg + 1;
                         index_data_in = mc_data[63:32];
-                        // after rdy, next cycle en_MC
-                        rdy_MC = 1'b1;
                     end 
                     else if (index_cnt_reg == 3) begin
                         mc_addr_cnt = mc_addr_cnt_reg + 1;
                         // en_MC should arrive this cycle and clear counter
+                        rdy_MC = 1'b1;
                         we_index = 1'b1;
                         index_data_in = mc_data[31:0];
+                    end
+                end
+            end
+            mc_wr_switch: begin
+                if(we_MC) begin
+                    // zero id: end
+                    if(~(|data_MC[127:96])) begin
+                        next = idle;
+                    end
+                    else begin
+                        vertex_addr_in = mc_addr_cnt_reg;
+                        mc_addr_cnt = mc_addr_cnt_reg + 1;
+                        next = mc_wr_vertex;                    
+                        we_vertex = 1'b1;
                     end
                 end
             end
