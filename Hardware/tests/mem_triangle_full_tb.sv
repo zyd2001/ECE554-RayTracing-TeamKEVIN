@@ -2,8 +2,7 @@ module mem_triangle_full_tb();
 
     parameter NUM_TRIANGLE = 512;
     localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
-    localparam DATA_DEPTH = BIT_TRIANGLE + 4; // num*4 size, add 2 bits zero padding for 4 byte address
-    localparam BIT_ADDR = BIT_TRIANGLE + 2;
+    localparam DATA_DEPTH = BIT_TRIANGLE + 2; // num*4 size
     localparam TESTS = 1;
     /*
         Input
@@ -67,8 +66,8 @@ module mem_triangle_full_tb();
                     index_x = $urandom;
                     index_y = $urandom;
                     index_z = $urandom;
-                    data_MC = {{{(32-DATA_DEPTH){1'b0}}, index_x, 4'h0}, {{(32-DATA_DEPTH){1'b0}}, index_y, 4'h1}, 
-                                {{(32-DATA_DEPTH){1'b0}}, index_z, 4'h2}, {{(32-DATA_DEPTH){1'b0}}, triangle_id, 4'h3}};
+                    data_MC = {{{(32-DATA_DEPTH){1'b0}}, index_x, 2'h0}, {{(32-DATA_DEPTH){1'b0}}, index_y, 2'h1}, 
+                                {{(32-DATA_DEPTH){1'b0}}, index_z, 2'h2}, {{(32-DATA_DEPTH){1'b0}}, triangle_id, 2'h3}};
                     if(triangle_id % 64 == 0) begin
                         $display("Currently writing x: %h, y: %h, z: %h, id: %h, data: %h", index_x, index_y, index_z, triangle_id, data_MC);
                     end
@@ -90,7 +89,7 @@ module mem_triangle_full_tb();
             end
             // write mc vertex
             $display("Writing vertex from MC...");
-            for (int i = 0; i < 2048; i++) begin
+            for (int i = -1; i < 2048; i++) begin
                 if(!busy) begin
                     busy = 1;
                     data_MC = {(i << 4), (i << 4) + 1, (i << 4) + 2, (i << 4) + 3};
@@ -125,23 +124,23 @@ module mem_triangle_full_tb();
                 end
                 if(rdy_IC) begin
                     test_count++;
-                    vertex0 = indexstore[triangle_id][127:96] >> 4;
-                    vertex1 = indexstore[triangle_id][95:64] >> 4;
-                    vertex2 = indexstore[triangle_id][63:32] >> 4;
-                    tid = indexstore[triangle_id][31:0] >> 4;
-                    if(vertex0_IC !== {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}) begin
+                    vertex0 = indexstore[triangle_id][127:96];
+                    vertex1 = indexstore[triangle_id][95:64];
+                    vertex2 = indexstore[triangle_id][63:32];
+                    tid = indexstore[triangle_id][31:0];
+                    if(vertex0_IC !== {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}, vertex0_IC); 
+                                triangle_id, 0, {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}, vertex0_IC); 
                         error ++;
                     end
-                    if(vertex1_IC !== {(vertex1 << 4), (vertex1 << 4) + 1, (vertex1 << 4) + 2, (vertex1 << 4) + 3}) begin
+                    if(vertex1_IC !== {(vertex1), (vertex1) + 1, (vertex1) + 2, (vertex1) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex1 << 4), (vertex1 << 4) + 1, (vertex1 << 4) + 2, (vertex1 << 4) + 3}, vertex1_IC); 
+                                triangle_id, 0, {(vertex1), (vertex1) + 1, (vertex1) + 2, (vertex1) + 3}, vertex1_IC); 
                         error ++;
                     end
-                    if(vertex2_IC !== {(vertex2 << 4), (vertex2 << 4) + 1, (vertex2 << 4) + 2, (vertex2 << 4) + 3}) begin
+                    if(vertex2_IC !== {(vertex2), (vertex2) + 1, (vertex2) + 2, (vertex2) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}, vertex2_IC); 
+                                triangle_id, 0, {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}, vertex2_IC); 
                         error ++;
                     end
                     if(tid_IC !== tid) begin
@@ -168,23 +167,23 @@ module mem_triangle_full_tb();
                 end
                 if(rdy_IC) begin
                     test_count++;
-                    vertex0 = indexstore[triangle_id][127:96] >> 4;
-                    vertex1 = indexstore[triangle_id][95:64] >> 4;
-                    vertex2 = indexstore[triangle_id][63:32] >> 4;
-                    tid = indexstore[triangle_id][31:0] >> 4;
-                    if(vertex0_IC !== {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}) begin
+                    vertex0 = indexstore[triangle_id][127:96];
+                    vertex1 = indexstore[triangle_id][95:64];
+                    vertex2 = indexstore[triangle_id][63:32];
+                    tid = indexstore[triangle_id][31:0];
+                    if(vertex0_IC !== {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}, vertex0_IC); 
+                                triangle_id, 0, {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}, vertex0_IC); 
                         error ++;
                     end
-                    if(vertex1_IC !== {(vertex1 << 4), (vertex1 << 4) + 1, (vertex1 << 4) + 2, (vertex1 << 4) + 3}) begin
+                    if(vertex1_IC !== {(vertex1), (vertex1) + 1, (vertex1) + 2, (vertex1) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex1 << 4), (vertex1 << 4) + 1, (vertex1 << 4) + 2, (vertex1 << 4) + 3}, vertex1_IC); 
+                                triangle_id, 0, {(vertex1), (vertex1) + 1, (vertex1) + 2, (vertex1) + 3}, vertex1_IC); 
                         error ++;
                     end
-                    if(vertex2_IC !== {(vertex2 << 4), (vertex2 << 4) + 1, (vertex2 << 4) + 2, (vertex2 << 4) + 3}) begin
+                    if(vertex2_IC !== {(vertex2), (vertex2) + 1, (vertex2) + 2, (vertex2) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}, vertex2_IC); 
+                                triangle_id, 0, {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}, vertex2_IC); 
                         error ++;
                     end
                     if(tid_IC !== tid) begin
@@ -215,23 +214,23 @@ module mem_triangle_full_tb();
                 end
                 if(rdy_IC) begin
                     test_count++;
-                    vertex0 = indexstore[triangle_id][127:96] >> 4;
-                    vertex1 = indexstore[triangle_id][95:64] >> 4;
-                    vertex2 = indexstore[triangle_id][63:32] >> 4;
-                    tid = indexstore[triangle_id][31:0] >> 4;
-                    if(vertex0_IC !== {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}) begin
+                    vertex0 = indexstore[triangle_id][127:96];
+                    vertex1 = indexstore[triangle_id][95:64];
+                    vertex2 = indexstore[triangle_id][63:32];
+                    tid = indexstore[triangle_id][31:0];
+                    if(vertex0_IC !== {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}, vertex0_IC); 
+                                triangle_id, 0, {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}, vertex0_IC); 
                         error ++;
                     end
-                    if(vertex1_IC !== {(vertex1 << 4), (vertex1 << 4) + 1, (vertex1 << 4) + 2, (vertex1 << 4) + 3}) begin
+                    if(vertex1_IC !== {(vertex1), (vertex1) + 1, (vertex1) + 2, (vertex1) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex1 << 4), (vertex1 << 4) + 1, (vertex1 << 4) + 2, (vertex1 << 4) + 3}, vertex1_IC); 
+                                triangle_id, 0, {(vertex1), (vertex1) + 1, (vertex1) + 2, (vertex1) + 3}, vertex1_IC); 
                         error ++;
                     end
-                    if(vertex2_IC !== {(vertex2 << 4), (vertex2 << 4) + 1, (vertex2 << 4) + 2, (vertex2 << 4) + 3}) begin
+                    if(vertex2_IC !== {(vertex2), (vertex2) + 1, (vertex2) + 2, (vertex2) + 3}) begin
                         $display("Error! At triangle: %d, vertex: %d, data expecting: 0x%h, data got: 0x%h", 
-                                triangle_id, 0, {(vertex0 << 4), (vertex0 << 4) + 1, (vertex0 << 4) + 2, (vertex0 << 4) + 3}, vertex2_IC); 
+                                triangle_id, 0, {(vertex0), (vertex0) + 1, (vertex0) + 2, (vertex0) + 3}, vertex2_IC); 
                         error ++;
                     end
                     if(tid_IC !== tid) begin
