@@ -109,7 +109,46 @@ module instruction_decode_tb;
                     
                     $fwrite(tracefile,"%s -> %s, immediate = %s\n", array[$sformatf("%b", op)], $sformatf("%b", op), $sformatf("%b", immediate));
                     $fwrite(tracefile,"---------------------------------\n");
-                    $fwrite(tracefile,"intALU_op2_select: %s\n", $sformatf("%b",intALU_op2_select));
+                    
+                    // int ALU:
+                    $fwrite(tracefile, "intALU_en: %s\n", $sformatf("%b",intALU_en));
+                    if(intALU_en == 1)begin
+                        $fwrite(tracefile,"\tintALU_op2_select: %s\n", $sformatf("%b",intALU_op2_select));
+                    end
+
+                    // float ALU1
+                    $fwrite(tracefile, "floatALU1_en: %s\n", $sformatf("%b",floatALU1_en));
+                    if(floatALU1_en == 1)begin
+                        $fwrite(tracefile,"\tfloatALU1_op1_select: %s\n", $sformatf("%b",floatALU1_op1_select));
+                        $fwrite(tracefile,"\tfloatALU1_op2_select: %s\n", $sformatf("%b",floatALU1_op2_select));
+                    end
+
+                    // float ALU2
+                    $fwrite(tracefile, "floatALU2_en: %s\n", $sformatf("%b",floatALU2_en));
+                    if(floatALU2_en == 1)begin
+                        $fwrite(tracefile,"\tfloatALU2_op1_select: %s\n", $sformatf("%b",floatALU2_op1_select));
+                        $fwrite(tracefile,"\tfloatALU2_op2_select: %s\n", $sformatf("%b",floatALU2_op2_select));
+                    end
+
+                    // float ALU3
+                    $fwrite(tracefile, "floatALU3_en: %s\n", $sformatf("%b",floatALU3_en));
+                    if(floatALU3_en == 1)begin
+                        $fwrite(tracefile,"\tfloatALU3_op1_select: %s\n", $sformatf("%b",floatALU3_op1_select));
+                        $fwrite(tracefile,"\tfloatALU3_op2_select: %s\n", $sformatf("%b",floatALU3_op2_select));
+                    end
+
+                    // float ALU4
+                    $fwrite(tracefile, "floatALU4_en: %s\n", $sformatf("%b",floatALU4_en));
+                    if(floatALU4_en == 1)begin
+                        $fwrite(tracefile,"\tfloatALU4_op1_select: %s\n", $sformatf("%b",floatALU4_op1_select));
+                        $fwrite(tracefile,"\tfloatALU4_op2_select: %s\n", $sformatf("%b",floatALU4_op2_select));
+                    end
+                    
+                    $fwrite(tracefile, "Scalar_out_select: %s\n", $sformatf("%b",Scalar_out_select));
+                    $fwrite(tracefile, "memory_op: %s\n", $sformatf("%b",memory_op));
+                    $fwrite(tracefile, "vector_reduce_en: %s\n", $sformatf("%b",vector_reduce_en));
+                    
+                    
                     immediate = immediate + 1;
                     $fwrite(tracefile,"\n");
 
