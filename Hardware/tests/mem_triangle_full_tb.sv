@@ -31,7 +31,7 @@ module mem_triangle_full_tb();
     always #1 clk = ~clk;
 
     logic [127:0] indexstore [BIT_TRIANGLE-1:0];
-    logic busy;
+    int busy;
     int error = 0;
     int test_count = 0;
     int vertex0 = 0;
@@ -60,13 +60,18 @@ module mem_triangle_full_tb();
             @(posedge clk) begin end
             
             // write mc index
+            $display("Writing index from MC...");
             for (triangle_id = 0; triangle_id < 512; triangle_id++) begin
                 if(!busy) begin
                     busy = 1;
                     index_x = $urandom;
                     index_y = $urandom;
                     index_z = $urandom;
-                    data_MC = {{index_x, 4'h0}, {index_y, 4'h1}, {index_z, 4'h2}, {triangle_id, 4'h3}};
+                    data_MC = {{{(32-DATA_DEPTH){1'b0}}, index_x, 4'h0}, {{(32-DATA_DEPTH){1'b0}}, index_y, 4'h1}, 
+                                {{(32-DATA_DEPTH){1'b0}}, index_z, 4'h2}, {{(32-DATA_DEPTH){1'b0}}, triangle_id, 4'h3}};
+                    if(triangle_id % 64 == 0) begin
+                        $display("Currently writing x: %h, y: %h, z: %h, id: %h, data: %h", index_x, index_y, index_z, triangle_id, data_MC);
+                    end
                     indexstore[triangle_id] = data_MC;
                     we_MC = 1;
                 end
@@ -74,19 +79,24 @@ module mem_triangle_full_tb();
                 if(we_MC) begin
                     we_MC = 0;
                 end
-                if(rdy_MC) begin
-                    busy = 0;
+                @(posedge rdy_MC);
+                busy = 0;
+                if(&triangle_id) begin
+                    data_MC = 0;
+                    we_MC = 1;
+                    busy = 1;
+                    break;
                 end
             end
-            data_MC = 0;
-            we_MC = 1;
-            @(posedge clk);
-            we_MC = 0;
             // write mc vertex
+            $display("Writing vertex from MC...");
             for (int i = 0; i < 2048; i++) begin
                 if(!busy) begin
                     busy = 1;
                     data_MC = {(i << 4), (i << 4) + 1, (i << 4) + 2, (i << 4) + 3};
+                    if(i % 256 == 0) begin
+                        $display("Currently writing vertex: %h, data: %h", i, data_MC);
+                    end
                     we_MC = 1;
                 end
                 @(posedge clk);
@@ -103,12 +113,16 @@ module mem_triangle_full_tb();
             we_MC = 0;
             busy = 0;
             // ic speed read
+            $display("Start IC speed read...");
             for(triangle_id = 0; triangle_id < 200; triangle_id++) begin
                 if(!busy) begin
                     busy = 1;
                     re_IC = 1;
                 end
                 @(posedge clk);
+                if(re_IC) begin
+                    re_IC = 0;
+                end
                 if(rdy_IC) begin
                     test_count++;
                     vertex0 = indexstore[triangle_id][127:96] >> 4;
@@ -142,12 +156,16 @@ module mem_triangle_full_tb();
                 end
             end
             // ic mid read
+            $display("Start IC mid read...");
             for(triangle_id = 150; triangle_id < 350; triangle_id++) begin
                 if(!busy) begin
                     busy = 1;
                     re_IC = 1;
                 end
                 @(posedge clk);
+                if(re_IC) begin
+                    re_IC = 0;
+                end
                 if(rdy_IC) begin
                     test_count++;
                     vertex0 = indexstore[triangle_id][127:96] >> 4;
@@ -185,12 +203,16 @@ module mem_triangle_full_tb();
                 end
             end
             // ic slow read
+            $display("Start IC slow read...");
             for(triangle_id = 300; triangle_id < 512; triangle_id++) begin
                 if(!busy) begin
                     busy = 1;
                     re_IC = 1;
                 end
                 @(posedge clk);
+                if(re_IC) begin
+                    re_IC = 0;
+                end
                 if(rdy_IC) begin
                     test_count++;
                     vertex0 = indexstore[triangle_id][127:96] >> 4;
@@ -221,6 +243,9 @@ module mem_triangle_full_tb();
                         $stop();
                     end
                     busy = 0;
+                    if(&triangle_id) begin
+                        break;
+                    end
                     @(posedge clk);
                     @(posedge clk);
                     @(posedge clk);
