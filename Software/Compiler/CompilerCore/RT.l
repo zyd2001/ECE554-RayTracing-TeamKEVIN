@@ -52,6 +52,7 @@ digits [0-9]+
 "*"             |
 "/"             |
 "%"             |
+"&"             |
 "="             return yytext[0];
 [\ \t] ;
 {identifier} {
@@ -66,7 +67,7 @@ digits [0-9]+
     yylval.FloatLiteral = float.Parse(yytext);
     return (int)Tokens.FLOAT_LITERAL;
 }
-\[[\+\-]?({digits}*[\.])?{digits}+\,[\+\-]?({digits}*[\.])?{digits}+\,[\+\-]?({digits}*[\.])?{digits}+\,[\+\-]?({digits}*[\.])?{digits}+\] {
+\[[\ ]*[\+\-]?({digits}*[\.])?{digits}+[\ ]*\,[\ ]*[\+\-]?({digits}*[\.])?{digits}+[\ ]*\,[\ ]*[\+\-]?({digits}*[\.])?{digits}+[\ ]*\,[\ ]*[\+\-]?({digits}*[\.])?{digits}+[\ ]*\] {
     yylval.VectorLiteral = yytext;
     return (int)Tokens.VECTOR_LITERAL;
 }

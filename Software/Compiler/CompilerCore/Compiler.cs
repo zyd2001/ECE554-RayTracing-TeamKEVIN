@@ -31,6 +31,12 @@ namespace CompilerCore
                     return "vector";
                 case Type.VOID:
                     return "void";
+                case Type.INT_POINTER:
+                    return "int*";
+                case Type.FLOAT_POINTER:
+                    return "float*";
+                case Type.VECTOR_POINTER:
+                    return "vector*";
                 default:
                     return "NULL";
             }
