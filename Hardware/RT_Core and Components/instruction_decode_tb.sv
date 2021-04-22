@@ -13,8 +13,32 @@ module instruction_decode_tb;
 
 
     int index;
+    int imm_index;
+
+    logic clk;
+
+    // DUT stuff
+    instruction_decode_unit DUT(.opcode(opcode), .immediate(immediate),
+        .intALU_op2_select(intALU_op2_select), .intALU_en(intALU_en),
+        .floatALU1_op1_select(floatALU1_op1_select), .floatALU2_op1_select(floatALU2_op1_select),
+        .floatALU3_op1_select(floatALU3_op1_select), .floatALU4_op1_select(floatALU4_op1_select),
+        .floatALU1_op2_select(floatALU1_op2_select), .floatALU2_op2_select(floatALU2_op2_select),
+        .floatALU3_op2_select(floatALU3_op2_select), .floatALU4_op2_select(floatALU4_op2_select),
+        .floatALU1_en(floatALU1_en), .floatALU2_en(floatALU2_en),
+        .floatALU3_en(floatALU3_en), .floatALU4_en(floatALU4_en),
+        .Scalar_out_select(Scalar_out_select), .memory_op(memory_op),
+        .vector_reduce_en(vector_reduce_en));
+
+    logic [5:0] opcode;
+    logic [1:0] immediate;
+    logic intALU_op2_select, floatALU1_op1_select, floatALU2_op1_select,
+        floatALU3_op1_select, floatALU4_op1_select,floatALU2_op2_select, floatALU4_op2_select;
+    logic [1:0] floatALU1_op2_select, floatALU3_op2_select;
+    logic intALU_en, floatALU1_en, floatALU2_en, floatALU3_en, floatALU4_en, vector_reduce_en;
+    logic [2:0] Scalar_out_select, memory_op;
 
     initial begin
+        clk = 0;
         op = 6'b000000;
         array = '{ "101100" : "s_load_4byte",
                 "111100" : "s_store_4byte",
@@ -67,14 +91,28 @@ module instruction_decode_tb;
         };
 
         for(index = 0; index < 64; index++) begin
-            //$display("%b", $sformatf("%b", op));
+
+            // if the op exists, test it
             if(array.exists($sformatf("%b", op))) begin
-                $display("%s", array[$sformatf("%b", op)]);
+                
+
+                for(imm_index = 0; imm_index < 4; index++)begin
+                    @(posedge clk)
+                    
+                    $display("%s -> %s, immediate = %s", array[$sformatf("%b", op)], $sformatf("%b", op), $sformatf("%b", immediate));
+                    $display("intALU_op2_select: %s", $sformatf(intALU_op2_select));
+                    immediate = immediate + 1;
+
+                end
+                
             end
             op = op + 1;
         end
 
 
+
     end
+
+    always #5 clk = ~clk;
 
 endmodule
