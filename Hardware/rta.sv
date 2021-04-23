@@ -66,7 +66,7 @@
 // dma  : DMA interface. See dma_if.vh and description above.
 //===================================================================
 
-`include "cci_mpf_if.vh"
+// `include "cci_mpf_if.vh"
 
 module rta 
   (
@@ -76,6 +76,19 @@ module rta
 	 dma_if.peripheral dma
    );
 
+   wire rst_n;
+   assign rst_n = ~rst;
+
+   mem_main(.clk(clk), .rst_n(rst_n), we_RT, re_RT, addr_RT, data_RT_in,
+                data_RT_out, rd_rdy_RT);
+
+  
+  
+  
+  
+  
+  
+  
    localparam int CL_ADDR_WIDTH = $size(t_ccip_clAddr);
       
    // I want to just use dma.count_t, but apparently
