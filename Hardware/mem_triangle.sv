@@ -1,5 +1,5 @@
 module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
-                rdy_IC, vertex0_IC, vertex1_IC, vertex2_IC, tid_IC);
+                rdy_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
 
     parameter NUM_TRIANGLE = 512;
     localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
@@ -13,7 +13,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     input re_IC;
     input [BIT_TRIANGLE-1:0] triangle_id;
     // MC
-    input [127:0] data_MC; // (vertex0, vertex1, vertex2, tid) or (x, y, z, flag)
+    input [127:0] data_MC; // (sid vertex2 vertex1 vertex0) or (flag z y x)
     input we_MC;
     /*
         Output
@@ -21,14 +21,14 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     // IC
     output logic rdy_IC;
     output [95:0] vertex1_IC, vertex2_IC, vertex0_IC;
-    output [31:0] tid_IC;
+    output [31:0] sid_IC;
     // MC
     output logic rdy_MC;
 
     // Generate variable
     genvar i, j;
 
-    enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_tid, rd_done} state, next;
+    enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_sid, rd_done} state, next;
 
     // input buffer signal for index wr
     logic [127:0] mc_data;
@@ -43,9 +43,9 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     logic [31:0] vertex_data_out[2:0];
     // output buffer signal
     logic [95:0] vertices [2:0];
-    logic [31:0] tid;
+    logic [31:0] sid;
     logic vertices_buff_en[2:0];
-    logic tid_buff_en;
+    logic sid_buff_en;
     logic rdy_ic_reg, rdy_ic;
     // prefetch logic
     logic can_prefetch_reg, can_prefetch;
@@ -86,7 +86,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         vertices_buff_en[0] = 1'b0;
         vertices_buff_en[1] = 1'b0;
         vertices_buff_en[2] = 1'b0;
-        tid_buff_en = 1'b0;
+        sid_buff_en = 1'b0;
         out_prefetched_data = 1'b0;
         case (state)
             mc_wr_index: begin
@@ -168,19 +168,19 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 end
                 // else read 2
                 else begin
-                    next = rd_tid;
+                    next = rd_sid;
                     index_addr_in = {prefetch_triangle_id_reg, 2'b10};
                     // write 0 to buffer
                     vertices_buff_en[0] = 1'b1;
                 end
             end
-            rd_tid: begin
+            rd_sid: begin
                 // if prefetching a wrong triangle, restart
                 if(re_IC && is_prefetching_reg && !prefetch_match) begin
                     next = rd_0;
                     prefetch_triangle_id = triangle_id;
                 end
-                // else read tid
+                // else read sid
                 else begin
                     index_addr_in = {prefetch_triangle_id_reg, 2'b11};
                     // write 1 to buffer
@@ -202,8 +202,8 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 end
                 else begin
                     next = idle;
-                    // write tid to buffer
-                    tid_buff_en = 1'b1;
+                    // write sid to buffer
+                    sid_buff_en = 1'b1;
                     // write 2 to buffer
                     vertices_buff_en[2] = 1'b1;
                     if(is_prefetching_reg) begin
@@ -291,18 +291,18 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     endgenerate
     always_ff @(posedge clk, negedge rst_n) begin
         if(!rst_n) begin
-            tid <= '0;
+            sid <= '0;
         end
-        else if(tid_buff_en)begin
-            tid <= index_data_out;
+        else if(sid_buff_en)begin
+            sid <= index_data_out;
         end
         else begin
-            tid <= tid;
+            sid <= sid;
         end
     end
     assign rdy_IC = rdy_ic_reg;
     assign vertex0_IC = vertices[0];
     assign vertex1_IC = vertices[1];
     assign vertex2_IC = out_prefetched_data_reg ? vertices[2] : {vertex_data_out[2], vertex_data_out[1], vertex_data_out[0]};
-    assign tid_IC = out_prefetched_data_reg ? tid : index_data_out;
+    assign sid_IC = out_prefetched_data_reg ? sid : index_data_out;
 endmodule
