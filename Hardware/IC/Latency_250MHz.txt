@@ -1,0 +1,4 @@
+Add - 3 cycles
+Mul - 3 cycles
+MulAdd - 4 cycles
+Inv - 17 cycles
