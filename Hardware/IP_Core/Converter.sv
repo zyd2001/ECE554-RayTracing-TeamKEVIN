@@ -72,6 +72,7 @@ module Converter (
           end
         end
       default: 
+        begin
           if (en && start) begin
             if (mode == 1'b0) begin
               FtoI_en = 1'b1;
@@ -82,6 +83,7 @@ module Converter (
               nxt_state = I2F;
             end
           end
+        end
     endcase
   end
   

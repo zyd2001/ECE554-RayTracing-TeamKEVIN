@@ -88,7 +88,8 @@ module FloatPU (
             nxt_state = DIV;
           end
         end
-      default: 
+      default:
+        begin
           if (en && start) begin
             if (mode[1] == 1'b0) begin
               Adder_en = 1'b1;
@@ -103,6 +104,7 @@ module FloatPU (
               nxt_state = DIV;
             end
           end
+        end
     endcase
   end
   

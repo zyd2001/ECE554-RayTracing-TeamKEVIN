@@ -52,10 +52,12 @@ module PreProcess(
           end
         end
       default: 
+        begin
           if (start) begin
             en = 1'b1;
             nxt_state = COUNT;
           end
+        end
     endcase
   end
   // v0v1

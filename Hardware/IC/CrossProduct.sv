@@ -55,12 +55,14 @@ module CrossProduct(
             nxt_state = COUNT;
           end
         end
-      default: 
+      default:
+        begin
           if (start) begin
             Mul_en = 1'b1;
             Add_en = 1'b1;
             nxt_state = COUNT;
           end
+        end
     endcase
   end
 
