@@ -20,7 +20,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     */
     // IC
     output logic rdy_IC;
-    output [127:0] vertex1_IC, vertex2_IC, vertex0_IC;
+    output [95:0] vertex1_IC, vertex2_IC, vertex0_IC;
     output [31:0] tid_IC;
     // MC
     output logic rdy_MC;
@@ -42,14 +42,15 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     logic [DATA_DEPTH-1:0] vertex_addr_in;
     logic [31:0] vertex_data_out[2:0];
     // output buffer signal
-    logic [127:0] vertices [2:0];
+    logic [95:0] vertices [2:0];
     logic [31:0] tid;
     logic vertices_buff_en[2:0];
     logic tid_buff_en;
+    logic rdy_ic_reg, rdy_ic;
     // prefetch logic
     logic can_prefetch_reg, can_prefetch;
     logic is_prefetching_reg, is_prefetching;
-    logic prefetch_match, out_prefetched_data;
+    logic prefetch_match, out_prefetched_data, out_prefetched_data_reg;
     logic [BIT_TRIANGLE-1:0]prefetch_triangle_id_reg, prefetch_triangle_id;
     // state machine
     logic start_mc_write;
@@ -58,10 +59,14 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         if (!rst_n) begin
             state <= idle;
             mc_addr_cnt_reg <= '0;
+            rdy_ic_reg <= 1'b0;
+            out_prefetched_data_reg <= 1'b0;
         end
         else begin
             state <= start_mc_write ? mc_wr_index : next;
             mc_addr_cnt_reg <= start_mc_write ? '0 : mc_addr_cnt;
+            out_prefetched_data_reg <= out_prefetched_data;
+            rdy_ic_reg <= rdy_ic;
         end
     end
     always_comb begin
@@ -69,7 +74,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         we_index = 1'b0;
         we_vertex = 1'b0;
         rdy_MC = 1'b0;
-        rdy_IC = 1'b0;
+        rdy_ic = 1'b0;
         index_cnt = index_cnt_reg;
         mc_addr_cnt = mc_addr_cnt_reg;
         index_data_in = mc_data[31:0];
@@ -85,36 +90,33 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         out_prefetched_data = 1'b0;
         case (state)
             mc_wr_index: begin
-                // zero id: switch
-                if(~(|data_MC[127:96])) begin
-                    mc_addr_cnt = '0;
-                    next = mc_wr_vertex;
+                index_cnt = index_cnt_reg + 1;
+                index_addr_in = mc_addr_cnt_reg;
+                if(index_cnt_reg == 0) begin
+                    we_index = 1'b1;
+                    mc_addr_cnt = mc_addr_cnt_reg + 1;
+                    index_data_in = mc_data[31:0];
+                end 
+                else if (index_cnt_reg == 1) begin
+                    we_index = 1'b1;
+                    mc_addr_cnt = mc_addr_cnt_reg + 1;
+                    index_data_in = mc_data[63:32];
+                end 
+                else if (index_cnt_reg == 2) begin
+                    we_index = 1'b1;
+                    mc_addr_cnt = mc_addr_cnt_reg + 1;
+                    index_data_in = mc_data[95:64];
+                end 
+                else if (index_cnt_reg == 3) begin
+                    mc_addr_cnt = mc_addr_cnt_reg + 1;
+                    // en_MC should arrive this cycle and clear counter
                     rdy_MC = 1'b1;
-                end
-                else begin
-                    index_cnt = index_cnt_reg + 1;
-                    index_addr_in = mc_addr_cnt_reg;
-                    if(index_cnt_reg == 0) begin
-                        we_index = 1'b1;
-                        mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        index_data_in = mc_data[31:0];
-                    end 
-                    else if (index_cnt_reg == 1) begin
-                        we_index = 1'b1;
-                        mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        index_data_in = mc_data[63:32];
-                    end 
-                    else if (index_cnt_reg == 2) begin
-                        we_index = 1'b1;
-                        mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        index_data_in = mc_data[95:64];
-                    end 
-                    else if (index_cnt_reg == 3) begin
-                        mc_addr_cnt = mc_addr_cnt_reg + 1;
-                        // en_MC should arrive this cycle and clear counter
-                        rdy_MC = 1'b1;
-                        we_index = 1'b1;
-                        index_data_in = mc_data[127:96];
+                    we_index = 1'b1;
+                    index_data_in = mc_data[127:96];
+                    // zero id: switch
+                    if(~(|data_MC[127:96])) begin
+                        mc_addr_cnt = '0;
+                        next = mc_wr_vertex;
                     end
                 end
             end
@@ -123,6 +125,8 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     // zero id: end
                     if(~(|data_MC[127:96])) begin
                         next = idle;
+                        prefetch_triangle_id = -1;
+                        rdy_MC = 1'b1;
                     end
                     else begin
                         vertex_addr_in = mc_addr_cnt_reg;
@@ -178,10 +182,16 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 end
                 // else read tid
                 else begin
-                    next = rd_done;
                     index_addr_in = {prefetch_triangle_id_reg, 2'b11};
                     // write 1 to buffer
                     vertices_buff_en[1] = 1'b1;
+                    if(is_prefetching_reg) begin
+                        next = rd_done;
+                    end
+                    else begin
+                        next = idle;
+                        rdy_ic = 1'b1;
+                    end
                 end
             end
             rd_done: begin
@@ -200,15 +210,12 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                         can_prefetch = 1'b0;
                         is_prefetching = 1'b0;
                     end
-                    else begin
-                        rdy_IC = 1'b1;
-                    end
                 end
             end
             default: begin
                 // prefetched, output right away and start prefetching
                 if(re_IC && prefetch_match && !can_prefetch_reg) begin
-                    rdy_IC = 1'b1;
+                    rdy_ic = 1'b1;
                     out_prefetched_data = 1'b1;
                     is_prefetching = 1'b1;
                     prefetch_triangle_id = prefetch_triangle_id_reg + 1;
@@ -246,7 +253,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     assign prefetch_match = prefetch_triangle_id_reg == triangle_id;
     always_ff @(posedge clk, negedge rst_n) begin
         if(!rst_n) begin
-            can_prefetch_reg <= '0;
+            can_prefetch_reg <= 1'b1;
             is_prefetching_reg <= '0;
             prefetch_triangle_id_reg <= '0;
         end
@@ -259,11 +266,11 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     // mem modules
     single_port_ram #(.ADDR_WIDTH(DATA_DEPTH), .DATA_WIDTH(32)) index (.clk(clk), .we(we_index),
                     .data(index_data_in), .addr(index_addr_in), .q(index_data_out));
-    // i = 3: x, i = 2: y, i = 1: z
+    // i = 0: x, i = 1: y, i = 2: z
     generate
-        for (i = 1; i < 4; i = i + 1) begin: triangle_memory_xyz
+        for (i = 0; i < 3; i = i + 1) begin: triangle_memory_xyz
             single_port_ram #(.ADDR_WIDTH(DATA_DEPTH), .DATA_WIDTH(32)) data (.clk(clk), .we(we_vertex),
-                            .data(data_MC[31+i*32:i*32]), .addr(vertex_addr_in), .q(vertex_data_out[i-1]));
+                            .data(data_MC[31+i*32:i*32]), .addr(vertex_addr_in), .q(vertex_data_out[i]));
         end
     endgenerate
     // output logic
@@ -293,8 +300,9 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
             tid <= tid;
         end
     end
+    assign rdy_IC = rdy_ic_reg;
     assign vertex0_IC = vertices[0];
     assign vertex1_IC = vertices[1];
-    assign vertex2_IC = out_prefetched_data ? vertices[2] : {vertex_data_out[2], vertex_data_out[1], vertex_data_out[0]};
-    assign tid_IC = out_prefetched_data ? tid : index_data_out;
+    assign vertex2_IC = out_prefetched_data_reg ? vertices[2] : {vertex_data_out[2], vertex_data_out[1], vertex_data_out[0]};
+    assign tid_IC = out_prefetched_data_reg ? tid : index_data_out;
 endmodule
