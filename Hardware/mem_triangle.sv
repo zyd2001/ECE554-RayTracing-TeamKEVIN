@@ -1,5 +1,5 @@
 module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
-                rdy_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
+                rdy_IC, not_valid_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
 
     parameter NUM_TRIANGLE = 512;
     localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
@@ -11,7 +11,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     input clk, rst_n;
     // IC
     input re_IC;
-    input [BIT_TRIANGLE-1:0] triangle_id;
+    input unsigned [BIT_TRIANGLE-1:0] triangle_id;
     // MC
     input [127:0] data_MC; // (sid vertex2 vertex1 vertex0) or (flag z y x)
     input we_MC;
@@ -22,6 +22,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     output logic rdy_IC;
     output [95:0] vertex1_IC, vertex2_IC, vertex0_IC;
     output [31:0] sid_IC;
+    output logic not_valid_IC;
     // MC
     output logic rdy_MC;
 
@@ -47,13 +48,16 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     logic vertices_buff_en[2:0];
     logic sid_buff_en;
     logic rdy_ic_reg, rdy_ic;
+    logic not_valid_IC_in;
     // prefetch logic
     logic can_prefetch_reg, can_prefetch;
     logic is_prefetching_reg, is_prefetching;
     logic prefetch_match, out_prefetched_data, out_prefetched_data_reg;
-    logic [BIT_TRIANGLE-1:0]prefetch_triangle_id_reg, prefetch_triangle_id;
+    logic unsigned [BIT_TRIANGLE-1:0] prefetch_triangle_id_reg, prefetch_triangle_id;
+    logic unsigned [BIT_TRIANGLE-1:0] valid_triangle_max_reg, valid_triangle_max;
     // state machine
     logic start_mc_write;
+    assign not_valid_IC_in = (triangle_id > valid_triangle_max_reg) && re_IC;
     assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index));
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
@@ -61,12 +65,16 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
             mc_addr_cnt_reg <= '0;
             rdy_ic_reg <= 1'b0;
             out_prefetched_data_reg <= 1'b0;
+            valid_triangle_max_reg <= 1'b0;
+            not_valid_IC <= 1'b0;
         end
         else begin
-            state <= start_mc_write ? mc_wr_index : next;
+            state <= start_mc_write ? mc_wr_index : not_valid_IC_in ? idle : next;
             mc_addr_cnt_reg <= start_mc_write ? '0 : mc_addr_cnt;
             out_prefetched_data_reg <= out_prefetched_data;
-            rdy_ic_reg <= rdy_ic;
+            rdy_ic_reg <= not_valid_IC_in ? '0 : rdy_ic;
+            valid_triangle_max_reg <= valid_triangle_max;
+            not_valid_IC <= not_valid_IC_in;
         end
     end
     always_comb begin
@@ -83,6 +91,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         is_prefetching = is_prefetching_reg;
         can_prefetch = can_prefetch_reg;
         prefetch_triangle_id = prefetch_triangle_id_reg;
+        valid_triangle_max = valid_triangle_max_reg;
         vertices_buff_en[0] = 1'b0;
         vertices_buff_en[1] = 1'b0;
         vertices_buff_en[2] = 1'b0;
@@ -92,30 +101,35 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
             mc_wr_index: begin
                 index_cnt = index_cnt_reg + 1;
                 index_addr_in = mc_addr_cnt_reg;
+                // wirte index 0
                 if(index_cnt_reg == 0) begin
                     we_index = 1'b1;
                     mc_addr_cnt = mc_addr_cnt_reg + 1;
                     index_data_in = mc_data[31:0];
                 end 
+                // wirte index 1
                 else if (index_cnt_reg == 1) begin
                     we_index = 1'b1;
                     mc_addr_cnt = mc_addr_cnt_reg + 1;
                     index_data_in = mc_data[63:32];
                 end 
+                // wirte index 2
                 else if (index_cnt_reg == 2) begin
                     we_index = 1'b1;
                     mc_addr_cnt = mc_addr_cnt_reg + 1;
                     index_data_in = mc_data[95:64];
                 end 
+                // wirte sid
                 else if (index_cnt_reg == 3) begin
                     mc_addr_cnt = mc_addr_cnt_reg + 1;
                     // en_MC should arrive this cycle and clear counter
                     rdy_MC = 1'b1;
                     we_index = 1'b1;
                     index_data_in = mc_data[127:96];
-                    // zero id: switch
+                    // zero income id: switch
                     if(~(|data_MC[127:96])) begin
                         mc_addr_cnt = '0;
+                        valid_triangle_max = mc_addr_cnt_reg >> 2;
                         next = mc_wr_vertex;
                     end
                 end
@@ -258,9 +272,9 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
             prefetch_triangle_id_reg <= '0;
         end
         else begin
-            can_prefetch_reg <= can_prefetch;
-            is_prefetching_reg <= (re_IC && is_prefetching_reg) ? 1'b0 : is_prefetching;
-            prefetch_triangle_id_reg <= prefetch_triangle_id;
+            can_prefetch_reg <= not_valid_IC_in ? 1'b1 : can_prefetch;
+            is_prefetching_reg <= not_valid_IC_in ? 1'b0 : (re_IC && is_prefetching_reg) ? 1'b0 : is_prefetching;
+            prefetch_triangle_id_reg <= not_valid_IC_in ? -1 : prefetch_triangle_id;
         end
     end
     // mem modules
