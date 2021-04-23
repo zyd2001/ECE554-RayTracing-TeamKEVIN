@@ -2,7 +2,7 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
                 data_RT_out, rd_rdy_RT);
 
     parameter NUM_RT = 4;
-    parameter NUM_THREAD = 64;
+    parameter NUM_THREAD = 32;
     parameter NUM_BANK_PTHREAD = 4;
     localparam NUM_BANK = NUM_THREAD * NUM_BANK_PTHREAD;
     localparam BIT_THREAD = $clog2(NUM_THREAD);
