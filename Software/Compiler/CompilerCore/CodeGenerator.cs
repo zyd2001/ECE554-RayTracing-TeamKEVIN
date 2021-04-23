@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using Set = System.Collections.Immutable.ImmutableHashSet<string>;
 
 namespace CompilerCore
 {
@@ -7,34 +9,40 @@ namespace CompilerCore
     {
         internal string OPCode { get; }
         internal List<string> Operands { get; }
-        internal HashSet<string> Use { get; } = new HashSet<string>();
-        internal HashSet<string> Def { get; } = new HashSet<string>();
+        internal Set Use { get; set; } = Set.Empty;
+        internal Set Def { get; set; } = Set.Empty;
         internal string UsedLabel { get; set; } = null;
         internal HashSet<int> Predecessor { get; } = new HashSet<int>();
         internal HashSet<int> Successor { get; } = new HashSet<int>();
+        internal Set In { get; set; } = Set.Empty;
+        internal Set Out { get; set; } = Set.Empty;
 
         internal Assembly(string opcode, List<string> operands)
         {
             OPCode = opcode;
             Operands = operands;
+            var use = ImmutableHashSet.CreateBuilder<string>();
+            var def = ImmutableHashSet.CreateBuilder<string>();
             if (operands.Count > 0)
             {
                 if (withVariable(opcode))
                 {
-                    if (opcode == "s_store_4byte" || opcode == "v_store_4byte")
+                    if (opcode[0] == 'c' || opcode == "s_store_4byte" || opcode == "v_store_4byte")
                     {
-                        Use.Add(operands[0]);
-                        Use.Add(operands[1]);
+                        use.Add(operands[0]);
+                        use.Add(operands[1]);
                     }
                     else
                     {
-                        Def.Add(operands[0]);
+                        def.Add(operands[0]);
                         for (int i = 1; i < operands.Count; i++)
                         {
                             if (operands[i][0] == '.')
-                                Use.Add(operands[i]);
+                                use.Add(operands[i]);
                         }
                     }
+                    Use = use.ToImmutable();
+                    Def = def.ToImmutable();
                 }
             }
         }
@@ -107,6 +115,7 @@ namespace CompilerCore
             for (int i = 0; i < List.Count; i++)
             {
                 Assembly ins = List[i];
+                ins.Predecessor.Add(i - 1);
                 if (ins.UsedLabel == null)
                     ins.Successor.Add(i + 1);
                 else // is branch
@@ -117,6 +126,44 @@ namespace CompilerCore
                     ins.Successor.Add(index);
                     List[index].Predecessor.Add(i);
                 }
+            }
+        }
+
+        internal void CalculateLiveSpan()
+        {
+            List<Set> oldIns = new List<Set>(new Set[List.Count]);
+            List<Set> oldOuts = new List<Set>(new Set[List.Count]);
+            while (true)
+            {
+                for (int i = List.Count - 1; i >= 0; i--)
+                {
+                    Assembly ins = List[i];
+                    oldIns[i] = ins.In;
+                    oldOuts[i] = ins.Out;
+                    ins.In = ins.Use.Union(ins.Out.Except(ins.Def));
+                    HashSet<string> tempIn = new HashSet<string>();
+                    foreach (var index in ins.Successor)
+                    {
+                        if (index < List.Count)
+                            tempIn.UnionWith(List[index].In);
+                    }
+                    ins.Out = tempIn.ToImmutableHashSet();
+                }
+                int _i = 0;
+                if (!oldIns.TrueForAll((Set s) =>
+                {
+                    bool ret = s.SetEquals(List[_i].In);
+                    _i++;
+                    return ret;
+                })) continue;
+                _i = 0;
+                if (!oldOuts.TrueForAll((Set s) =>
+                {
+                    bool ret = s.SetEquals(List[_i].Out);
+                    _i++;
+                    return ret;
+                })) continue;
+                break;
             }
         }
 
@@ -145,6 +192,7 @@ namespace CompilerCore
             ast.translate(directTranslation);
             directTranslation.ResolveLabel();
             directTranslation.ConstructFlowGraph();
+            directTranslation.CalculateLiveSpan();
             directTranslation.Print();
         }
     }
