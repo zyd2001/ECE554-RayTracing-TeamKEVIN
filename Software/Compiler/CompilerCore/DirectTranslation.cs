@@ -71,10 +71,10 @@ namespace CompilerCore
                 if (initializer is not null)
                 {
                     string tempVar = initializer.generate(translation);
-                    if (tempVar[0..1] == ".S")
-                        translation.AddAssembly("s_mov", scopedIdentifier, tempVar);
-                    else
+                    if (type == Type.VECTOR)
                         translation.AddAssembly("v_mov", scopedIdentifier, tempVar);
+                    else
+                        translation.AddAssembly("s_mov", scopedIdentifier, tempVar);
                 }
             }
             else // array
@@ -92,10 +92,10 @@ namespace CompilerCore
             string tempVar = right.generate(translation);
             if (left is IdentifierExpression)
             {
-                if (tempVar[0] == 'S')
-                    translation.AddAssembly("s_mov", left.generate(translation), tempVar);
-                else
+                if (leftType == Type.VECTOR)
                     translation.AddAssembly("v_mov", left.generate(translation), tempVar);
+                else
+                    translation.AddAssembly("s_mov", left.generate(translation), tempVar);
             }
             else
             {

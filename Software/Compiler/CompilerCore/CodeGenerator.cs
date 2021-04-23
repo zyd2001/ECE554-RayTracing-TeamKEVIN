@@ -37,7 +37,8 @@ namespace CompilerCore
                         def.Add(operands[0]);
                         for (int i = 1; i < operands.Count; i++)
                         {
-                            if (operands[i][0] == '.')
+                            // TODO: register
+                            if (operands[i][0] == '.') // do not add constant
                                 use.Add(operands[i]);
                         }
                     }
@@ -165,6 +166,38 @@ namespace CompilerCore
                 })) continue;
                 break;
             }
+        }
+
+        internal class InferenceGraph
+        {
+            internal Dictionary<string, HashSet<string>> AdjacentList { get; } = new Dictionary<string, HashSet<string>>();
+            internal Dictionary<string, Dictionary<string, bool>> AdjacentMatrix { get; } = new Dictionary<string, Dictionary<string, bool>>();
+            internal void AddEdge(string a, string b)
+            {
+            }
+        }
+        internal InferenceGraph CreateInferenceGraph()
+        {
+            InferenceGraph graph = new InferenceGraph();
+            foreach (var ins in List)
+            {
+                if (ins.OPCode.Contains("mov"))
+                {
+                    foreach (var a in ins.Def)
+                        foreach (var b in ins.Out)
+                        {
+                            if (ins.Operands[1] != b)
+                                graph.AddEdge(a, b);
+                        }
+                }
+                else
+                {
+                    foreach (var a in ins.Def)
+                        foreach (var b in ins.Out)
+                            graph.AddEdge(a, b);
+                }
+            }
+            return graph;
         }
 
         internal void Print()
