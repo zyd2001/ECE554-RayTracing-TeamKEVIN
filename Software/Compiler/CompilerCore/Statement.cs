@@ -424,7 +424,6 @@ namespace CompilerCore
 
     partial class DeclarationList : ASTNodeList<DeclarationItem, DeclarationList>
     {
-        // TODO: top level declaration expression check
         internal DeclarationList(LexLocation location) : base(location) { }
         internal DeclarationList(LexLocation location, DeclarationItem node) : base(location, node) { }
 
@@ -459,6 +458,7 @@ namespace CompilerCore
     {
         string identifier;
         string scopedIdentifier;
+        Type type;
         Expression initializer;
         int arraySize; // -1 means normal type, 0 means pointer, > 0 means array
         internal DeclarationItem(LexLocation location, string id, Expression init = null,
@@ -512,7 +512,7 @@ namespace CompilerCore
                 }
                 if (initializer.TypeCheck(out Type resultType))
                 {
-                    if (type != resultType)
+                    if (!Statement.AssignmentTypeHelper(type, resultType))
                     {
                         Error($"Declaraion type {TypeString(type)} doesn't match with" +
                             $" initializer type {TypeString(resultType)}");
@@ -521,6 +521,7 @@ namespace CompilerCore
                 }
                 else return false;
             }
+            this.type = type;
             return true;
         }
 
