@@ -9,7 +9,7 @@ namespace CompilerCore
         internal Expression(LexLocation location) : base(location) { }
     }
 
-    class ExpressionList : ASTNodeList<Expression, ExpressionList>
+    partial class ExpressionList : ASTNodeList<Expression, ExpressionList>
     {
         internal ExpressionList(LexLocation location) : base(location) { }
         internal ExpressionList(LexLocation location, Expression node) : base(location, node) { }
@@ -50,14 +50,14 @@ namespace CompilerCore
         }
     }
 
-    abstract class LiteralExpression : Expression
+    abstract partial class LiteralExpression : Expression
     {
         internal LiteralExpression(LexLocation location) : base(location) { }
     }
 
-    class IntLiteralExpression : LiteralExpression
+    partial class IntLiteralExpression : LiteralExpression
     {
-        int i;
+        internal int i { get; }
         internal IntLiteralExpression(LexLocation location, int i) : base(location)
         {
             this.i = i;
@@ -74,7 +74,7 @@ namespace CompilerCore
             return true;
         }
     }
-    class FloatLiteralExpression : LiteralExpression
+    partial class FloatLiteralExpression : LiteralExpression
     {
         float f;
         internal FloatLiteralExpression(LexLocation location, float f) : base(location)
@@ -94,7 +94,7 @@ namespace CompilerCore
         }
     }
 
-    class VectorLiteralExpression : LiteralExpression
+    partial class VectorLiteralExpression : LiteralExpression
     {
         Vector4 vector;
         internal VectorLiteralExpression(LexLocation location, string text) : base(location)
@@ -117,16 +117,19 @@ namespace CompilerCore
             return true;
         }
     }
-    class BinaryExpression : Expression
+    partial class BinaryExpression : Expression
     {
-        Type type;
-        Expression exp1;
-        Expression exp2;
+        internal Type type;
+        internal Expression exp1;
+        internal Expression exp2;
+        internal CompilerCore.Type resultType;
+        internal CompilerCore.Type type1;
+        internal CompilerCore.Type type2;
         internal enum Type
         {
             ADD, SUB, MUL, DIV, MOD,
             EQ, NE, GT, GE, LT, LE,
-            AND, OR
+            AND, OR, XOR
         }
         internal BinaryExpression(LexLocation location, Type type, Expression e1, Expression e2) : base(location)
         {
@@ -149,7 +152,7 @@ namespace CompilerCore
                 }
                 if (type < Type.EQ || type > Type.LE)
                 {
-                    Error("Pointer can only do comparison with pointer");
+                    Error("Pointer can only do comparison with pointer"); // no other operation allowed
                     return CompilerCore.Type.NULL;
                 }
                 return type1;
@@ -173,13 +176,33 @@ namespace CompilerCore
                 }
                 if (type >= Type.EQ && type <= Type.LE)
                 {
-                    if (type1 != type2)
+                    // if (type1 <= CompilerCore.Type.VECTOR_POINTER || type2 <= CompilerCore.Type.VECTOR_POINTER)
+                    // {
+                    //     if (type1 != type2)
+                    //     {
+                    //         Error("Comparison with different pointers");
+                    //         return CompilerCore.Type.NULL;
+                    //     }
+                    // }
+                    if (type1 == CompilerCore.Type.VECTOR || type2 == CompilerCore.Type.VECTOR)
                     {
-                        Error("Comparison with different types");
+                        Error("Cannot compare vector");
                         return CompilerCore.Type.NULL;
                     }
-                    else
-                        return CompilerCore.Type.INT;
+                    if (type1 == CompilerCore.Type.FLOAT || type2 == CompilerCore.Type.FLOAT)
+                    {
+                        if (type == Type.EQ || type == Type.NE)
+                        {
+                            Error("Cannot compare equality with float");
+                            return CompilerCore.Type.NULL;
+                        }
+                        // if (type1 <= CompilerCore.Type.VECTOR_POINTER || type2 <= CompilerCore.Type.VECTOR_POINTER)
+                        // {
+                        //     Error("Cannot compare pointer with float");
+                        //     return CompilerCore.Type.NULL;
+                        // }
+                    }
+                    return CompilerCore.Type.INT;
                 }
                 if (type >= Type.AND)
                 {
@@ -192,7 +215,14 @@ namespace CompilerCore
                         return CompilerCore.Type.INT;
                 }
                 if (type <= Type.DIV)
+                {
+                    if (type2 == CompilerCore.Type.VECTOR && type1 != CompilerCore.Type.FLOAT)
+                    {
+                        Error("Scalar and Vector computation");
+                        return CompilerCore.Type.NULL;
+                    }
                     return (CompilerCore.Type)System.Math.Max((int)type1, (int)type2);
+                }
                 Error("Unexpected error, .....");
                 return CompilerCore.Type.NULL;
             }
@@ -200,12 +230,13 @@ namespace CompilerCore
 
         internal override bool TypeCheck(out CompilerCore.Type resultType)
         {
-            if (exp1.TypeCheck(out CompilerCore.Type type1))
-                if (exp2.TypeCheck(out CompilerCore.Type type2))
+            if (exp1.TypeCheck(out type1))
+                if (exp2.TypeCheck(out type2))
                 {
                     resultType = typeHelper(type1, type2);
                     if (resultType == CompilerCore.Type.NULL)
                         return false;
+                    this.resultType = resultType;
                     return true;
                 }
             resultType = CompilerCore.Type.NULL;
@@ -218,13 +249,14 @@ namespace CompilerCore
         }
     }
 
-    class UnaryExpression : Expression
+    partial class UnaryExpression : Expression
     {
         Type type;
         Expression exp;
+        CompilerCore.Type expType;
         internal enum Type
         {
-            NOT, NEGATE
+            NEGATE, NOT, BITWISE_NOT
         }
         internal UnaryExpression(LexLocation location, Type type, Expression e1) : base(location)
         {
@@ -237,13 +269,20 @@ namespace CompilerCore
             bool pass = exp.TypeCheck(out CompilerCore.Type expressionType);
             if (pass)
             {
-                if (type == Type.NOT && expressionType != CompilerCore.Type.INT)
+                if (type >= Type.NOT && expressionType != CompilerCore.Type.INT)
                 {
                     resultType = CompilerCore.Type.NULL;
-                    Error("! operator can only be used on integer or comparison expression");
+                    Error("! and ~ operator can only be used on integer or comparison expression");
+                    return false;
+                }
+                if (expressionType <= CompilerCore.Type.VECTOR_POINTER)
+                {
+                    resultType = CompilerCore.Type.NULL;
+                    Error("- operator cannot be used on pointer");
                     return false;
                 }
                 resultType = expressionType;
+                expType = expressionType;
                 return true;
             }
             resultType = CompilerCore.Type.NULL;
@@ -256,10 +295,11 @@ namespace CompilerCore
         }
     }
 
-    class IndexExpression : Expression
+    partial class IndexExpression : Expression
     {
-        Expression expression;
-        Expression indexExpression;
+        internal Expression expression;
+        internal Expression indexExpression;
+        internal Type valueType;
         internal IndexExpression(LexLocation location, Expression exp, Expression index) : base(location)
         {
             expression = exp;
@@ -284,7 +324,22 @@ namespace CompilerCore
                 if (expression.TypeCheck(out Type valueType))
                 {
                     if (valueType == Type.VECTOR)
+                    {
+                        if (indexExpression is not IntLiteralExpression)
+                        {
+                            type = Type.NULL;
+                            Error("Vector index can only be 0-3");
+                            return false;
+                        }
+                        if ((indexExpression as IntLiteralExpression).i > 3 ||
+                            (indexExpression as IntLiteralExpression).i < 0)
+                        {
+                            Error("Vector index can only be 0-3");
+                            type = Type.NULL;
+                            return false;
+                        }
                         type = Type.FLOAT;
+                    }
                     else if (valueType <= Type.VECTOR_POINTER)
                         type = valueType + 3; // become value type
                     else
@@ -293,6 +348,7 @@ namespace CompilerCore
                         Error($"Type {valueType} cannot use index");
                         return false;
                     }
+                    this.valueType = valueType;
                     return true;
                 }
             }
@@ -301,9 +357,10 @@ namespace CompilerCore
         }
     }
 
-    class VectorConstructorExpression : Expression
+    partial class VectorConstructorExpression : Expression
     {
         List<Expression> expressions;
+        List<Type> types = new List<Type>();
 
         internal VectorConstructorExpression(LexLocation location, Expression e1, Expression e2,
             Expression e3, Expression e4) : base(location)
@@ -335,13 +392,14 @@ namespace CompilerCore
                         resultType = Type.NULL;
                         return false;
                     }
+                    types.Add(type);
                 }
             resultType = Type.VECTOR;
             return true;
         }
     }
 
-    class FunctionCallExpression : Expression
+    partial class FunctionCallExpression : Expression
     {
         string identifier;
         ExpressionList expressionList;
@@ -375,7 +433,7 @@ namespace CompilerCore
         }
     }
 
-    class IdentifierExpression : Expression
+    partial class IdentifierExpression : Expression
     {
         internal Symbol LinkedSymbol { get; set; }
         string identifier;

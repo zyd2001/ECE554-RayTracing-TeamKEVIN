@@ -7,19 +7,24 @@ namespace CompilerCore
         internal Type Type { get; }
         internal string Identifier { get; }
         internal bool IsFunction { get; }
+        internal FunctionDefinitionStatement FunctionDefinition { get; }
         internal List<Type> ParametersType { get; }
-        internal Symbol(Type type, string id, bool func = false, List<Type> types = null)
+        internal Symbol(Type type, string id, bool func = false, List<Type> types = null,
+            FunctionDefinitionStatement function = null)
         {
             Type = type;
             Identifier = id;
             IsFunction = func;
             ParametersType = types;
+            FunctionDefinition = function;
         }
     }
 
     class SymbolTable
     {
         List<Dictionary<string, Symbol>> scopes;
+        internal Dictionary<string, Symbol> LocalScope { get => scopes[^1]; }
+        internal int ScopeLevel { get => scopes.Count; }
         internal SymbolTable()
         {
             scopes = new List<Dictionary<string, Symbol>> { new Dictionary<string, Symbol>() };
@@ -55,9 +60,9 @@ namespace CompilerCore
                 return null;
         }
 
-        internal void AddSymbol(Symbol symbol)
+        internal void AddSymbol(string id, Symbol symbol)
         {
-            scopes[^1][symbol.Identifier] = symbol;
+            scopes[^1][id] = symbol;
         }
     }
 }

@@ -12,6 +12,8 @@ namespace CompilerCore
 
             Console.WriteLine(parser.Parse());
             Console.WriteLine(parser.AST.StaticCheck());
+            CodeGenerator generator = new CodeGenerator(parser.AST);
+            generator.generate();
         }
     }
 }

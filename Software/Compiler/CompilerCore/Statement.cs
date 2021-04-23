@@ -8,7 +8,7 @@ namespace CompilerCore
     {
         internal Statement(LexLocation location) : base(location) { }
         abstract internal bool SyntaxCheck(bool topLevel, bool inLoop);
-        internal static Type CurrentFunctionType = Type.NULL;
+        internal static FunctionDefinitionStatement CurrentFunction = null;
         internal static bool SecondPassAnalysis = false;
         static internal bool AssignmentTypeHelper(Type rhsType, Type lhsType)
         {
@@ -34,12 +34,27 @@ namespace CompilerCore
                     return false;
             }
         }
+
+        static Stack<(string Begin, string End)> loopStack = new Stack<(string Begin, string End)>();
+        static internal void NewLoop(string begin, string end)
+        {
+            loopStack.Push((begin, end));
+        }
+        static internal void EndLoop()
+        {
+            loopStack.Pop();
+        }
+
+        static internal string CurrentLoopBeginLabel { get => loopStack.Peek().Begin; }
+        static internal string CurrentLoopEndLabel { get => loopStack.Peek().Begin; }
     }
 
-    class StatementList : ASTNodeList<Statement, StatementList>
+    partial class StatementList : ASTNodeList<Statement, StatementList>
     {
         internal StatementList(LexLocation location) : base(location) { }
         internal StatementList(LexLocation location, Statement node) : base(location, node) { }
+
+        SymbolTable globalTable;
 
         internal override bool NameAnalysis(SymbolTable table)
         {
@@ -53,10 +68,10 @@ namespace CompilerCore
         {
             if (SyntaxCheck(true, false))
             {
-                SymbolTable table = new SymbolTable();
-                NameAnalysis(table); // first pass for function definition
+                globalTable = new SymbolTable();
+                NameAnalysis(globalTable); // first pass for function definition
                 Statement.SecondPassAnalysis = true;
-                if (NameAnalysis(table)) // second pass for real analysis
+                if (NameAnalysis(globalTable)) // second pass for real analysis
                     if (TypeCheck(out _))
                         return true;
             }
@@ -87,9 +102,10 @@ namespace CompilerCore
         INT, FLOAT, VECTOR, VOID, NULL
     }
 
-    class ReturnStatement : Statement
+    partial class ReturnStatement : Statement
     {
         Expression expression = null;
+        FunctionDefinitionStatement function;
         internal ReturnStatement(LexLocation location) : base(location) { }
         internal ReturnStatement(LexLocation location, Expression exp) : base(location)
         {
@@ -116,19 +132,20 @@ namespace CompilerCore
             type = Type.NULL;
             if (expression is not null)
             {
-                if (CurrentFunctionType == Type.VOID)
+                if (CurrentFunction.returnType == Type.VOID)
                 {
                     Error("Return statement cannot have value in void function");
                     return false;
                 }
                 if (expression.TypeCheck(out Type returnType))
                 {
-                    if (CurrentFunctionType != returnType)
+                    if (!AssignmentTypeHelper(CurrentFunction.returnType, returnType))
                     {
-                        Error($"Return type doens't match. Expect: {TypeString(CurrentFunctionType)}," +
+                        Error($"Return type doens't match. Expect: {TypeString(CurrentFunction.returnType)}," +
                             $" Got: {TypeString(returnType)}");
                         return false;
                     }
+                    this.function = CurrentFunction;
                 }
                 else
                     return false;
@@ -137,7 +154,7 @@ namespace CompilerCore
         }
     }
 
-    class ControlStatement : Statement
+    partial class ControlStatement : Statement
     {
         internal enum Type
         {
@@ -171,7 +188,7 @@ namespace CompilerCore
         }
     }
 
-    class LoopStatement : Statement
+    partial class LoopStatement : Statement
     {
         Statement initialStatement = null;
         Expression condition;
@@ -231,7 +248,7 @@ namespace CompilerCore
         }
     }
 
-    class IfStatement : Statement
+    partial class IfStatement : Statement
     {
         Expression condition;
         Statement statement;
@@ -285,7 +302,7 @@ namespace CompilerCore
         }
     }
 
-    class BlockStatement : Statement
+    partial class BlockStatement : Statement
     {
         StatementList statementList;
         internal BlockStatement(LexLocation location, StatementList list) : base(location)
@@ -318,10 +335,12 @@ namespace CompilerCore
         }
     }
 
-    class AssignmentStatement : Statement
+    partial class AssignmentStatement : Statement
     {
         Expression left;
         Expression right;
+        Type leftType = Type.NULL;
+        Type rightType = Type.NULL;
         internal AssignmentStatement(LexLocation location, Expression l, Expression r) : base(location)
         {
             left = l;
@@ -354,11 +373,13 @@ namespace CompilerCore
                 Error($"Assign {TypeString(lhsType)} to {TypeString(rhsType)}");
                 return false;
             }
+            rightType = rhsType;
+            leftType = lhsType;
             return pass;
         }
     }
 
-    class DeclarationStatement : Statement
+    partial class DeclarationStatement : Statement
     {
         Type type;
         bool constant;
@@ -401,7 +422,7 @@ namespace CompilerCore
         }
     }
 
-    class DeclarationList : ASTNodeList<DeclarationItem, DeclarationList>
+    partial class DeclarationList : ASTNodeList<DeclarationItem, DeclarationList>
     {
         // TODO: top level declaration expression check
         internal DeclarationList(LexLocation location) : base(location) { }
@@ -434,9 +455,10 @@ namespace CompilerCore
         }
     }
 
-    internal class DeclarationItem : ASTNode
+    partial class DeclarationItem : ASTNode
     {
         string identifier;
+        string scopedIdentifier;
         Expression initializer;
         int arraySize; // -1 means normal type, 0 means pointer, > 0 means array
         internal DeclarationItem(LexLocation location, string id, Expression init = null,
@@ -470,7 +492,9 @@ namespace CompilerCore
             bool pass = initializer?.NameAnalysis(table) ?? true;
             if (arraySize >= 0)
                 type -= 3; // make a pointer type
-            table.AddSymbol(new Symbol(type, identifier));
+            string id = $".{table.ScopeLevel}.{identifier}";
+            scopedIdentifier = id;
+            table.AddSymbol(identifier, new Symbol(type, id));
             return pass;
         }
 
@@ -478,7 +502,7 @@ namespace CompilerCore
         {
             if (initializer is not null)
             {
-                if (Statement.CurrentFunctionType == Type.NULL) // global variable check
+                if (Statement.CurrentFunction == null) // global variable check
                 {
                     if (initializer is not LiteralExpression)
                     {
@@ -505,10 +529,10 @@ namespace CompilerCore
             throw new NotImplementedException();
         }
     }
-    class FunctionDefinitionStatement : Statement
+    partial class FunctionDefinitionStatement : Statement
     {
-        Type returnType;
-        string functionName;
+        internal Type returnType;
+        internal string functionName;
         ParameterList parameterList;
         StatementList statementList;
         internal FunctionDefinitionStatement(LexLocation location, Type type, string name,
@@ -538,7 +562,7 @@ namespace CompilerCore
                 return false;
             }
             List<Type> parameterType = new List<Type>();
-            table.AddSymbol(new Symbol(returnType, functionName, true, parameterType));
+            table.AddSymbol(functionName, new Symbol(returnType, functionName, true, parameterType, this));
             foreach (var type in parameterList.Types()) // must take care of parameter type before type checking
                 parameterType.Add(type);
             return true;
@@ -558,9 +582,9 @@ namespace CompilerCore
         {
             type = Type.NULL;
             parameterList.TypeCheck(out _); // check for void parameter
-            CurrentFunctionType = this.returnType;
+            CurrentFunction = this;
             bool pass = statementList.TypeCheck(out _);
-            CurrentFunctionType = Type.NULL;
+            CurrentFunction = null;
             return pass;
         }
     }
@@ -569,6 +593,11 @@ namespace CompilerCore
     {
         internal ParameterList(LexLocation location) : base(location) { }
         internal ParameterList(LexLocation location, Parameter node) : base(location, node) { }
+
+        internal override string generate(DirectTranslation translation)
+        {
+            throw new NotImplementedException();
+        }
 
         internal override bool NameAnalysis(SymbolTable table)
         {
@@ -610,9 +639,15 @@ namespace CompilerCore
             identifier = id;
         }
 
+        internal override string generate(DirectTranslation translation)
+        {
+            throw new NotImplementedException();
+        }
+
         internal override bool NameAnalysis(SymbolTable table)
         {
-            table.AddSymbol(new Symbol(type, identifier));
+            string id = $"{table.ScopeLevel}.{identifier}";
+            table.AddSymbol(identifier, new Symbol(type, id));
             return true;
         }
 
