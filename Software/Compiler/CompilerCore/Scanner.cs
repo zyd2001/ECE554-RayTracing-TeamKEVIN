@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  LAPTOP-KDKHEG7R
-//  DateTime: 2021/4/22 17:17:14
+//  DateTime: 2021/4/22 22:30:27
 //  UserName: zyd20
-//  GPLEX input file <RT.l - 2021/4/22 17:17:11>
+//  GPLEX input file <RT.l - 2021/4/22 22:29:32>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: parser, minimize
@@ -172,14 +172,14 @@ public override void yyerror(string format, params object[] args)
 
     static Table[] NxS = new Table[111] {
 /* NxS[   0] */ new Table(0, 0, 0, null),
-/* NxS[   1] */ new Table(9, 117, 2, new sbyte[] {3, -1, 2, 2, 2, 2, 
+/* NxS[   1] */ new Table(9, 118, 2, new sbyte[] {3, -1, 2, 2, 2, 2, 
           2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
           2, 3, 4, 2, 2, 2, 5, 6, 2, 5, 5, 5, 7, 5, 8, 9, 
           10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 2, 5, 12, 13, 14, 
           2, 2, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 
-          15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 16, 2, 5, 2, 
+          15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 16, 2, 5, 5, 
           15, 2, 15, 17, 18, 15, 19, 20, 15, 15, 21, 15, 15, 15, 15, 15, 
-          15, 15, 15, 22, 23, 15, 15, 24, 25, 15, 15, 15, 5, 26, 5}),
+          15, 15, 15, 22, 23, 15, 15, 24, 25, 15, 15, 15, 5, 26, 5, 5}),
 /* NxS[   2] */ new Table(0, 0, -1, null),
 /* NxS[   3] */ new Table(0, 0, -1, null),
 /* NxS[   4] */ new Table(61, 1, -1, new sbyte[] {85}),

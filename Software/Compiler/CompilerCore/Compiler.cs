@@ -15,8 +15,8 @@ namespace CompilerCore
         abstract internal bool NameAnalysis(SymbolTable table);
         internal void Error(string str)
         {
-            Console.Write($"{location.StartLine}:{location.StartColumn}: ");
-            Console.WriteLine(str);
+            Console.Error.Write($"{location.StartLine}:{location.StartColumn}: ");
+            Console.Error.WriteLine(str);
         }
 
         internal static string TypeString(Type type)
@@ -39,6 +39,29 @@ namespace CompilerCore
                     return "vector*";
                 default:
                     return "NULL";
+            }
+        }
+
+        abstract internal string generate(DirectTranslation translation);
+
+        static int varaibleCounter = 0;
+        internal static int VaraibleCounter
+        {
+            get
+            {
+                int ret = varaibleCounter;
+                varaibleCounter++;
+                return ret;
+            }
+        }
+        static int labelCounter = 0;
+        internal static int LabelCounter
+        {
+            get
+            {
+                int ret = labelCounter;
+                labelCounter++;
+                return ret;
             }
         }
     }

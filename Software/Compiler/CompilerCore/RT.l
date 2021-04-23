@@ -52,7 +52,8 @@ digits [0-9]+
 "*"             |
 "/"             |
 "%"             |
-"&"             |
+"^"             |
+"~"             |
 "="             return yytext[0];
 [\ \t] ;
 {identifier} {

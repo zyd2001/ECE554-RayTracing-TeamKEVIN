@@ -23,7 +23,7 @@
     internal ParameterList ParameterList;
 }
 
-%left AND "&&" OR "||"
+%left AND "&&" OR "||" '^'
 %left EQ "==" NE "!=" GT ">" GE ">=" LT "<" LE "<="
 %left '+' '-'
 %left '*' '/' '%'
@@ -114,7 +114,11 @@ optional_expression: /* empty */
     }
     | expression
     ;
-for_special_statement: declaration_statement
+for_special_statement: /* empty */
+    {
+        $$ = null;
+    }
+    | declaration_statement
     | assignment_statement
     ;
 if_statement: IF '(' expression ')' statement
@@ -279,6 +283,10 @@ binary_expression: expression '+' expression
     {
         $$ = new BinaryExpression(@$, BinaryExpression.Type.OR, $1, $3);
     }
+    | expression '^' expression
+    {
+        $$ = new BinaryExpression(@$, BinaryExpression.Type.XOR, $1, $3);
+    }
     ;
 unary_expression: '-' expression %prec UMINUS
     {
@@ -287,6 +295,10 @@ unary_expression: '-' expression %prec UMINUS
     | '!' expression %prec UMINUS
     {
         $$ = new UnaryExpression(@$, UnaryExpression.Type.NOT, $2);
+    }
+    | '~' expression %prec UMINUS
+    {
+        $$ = new UnaryExpression(@$, UnaryExpression.Type.BITWISE_NOT, $2);
     }
     ;
 identifier_expression: IDENTIFIER
