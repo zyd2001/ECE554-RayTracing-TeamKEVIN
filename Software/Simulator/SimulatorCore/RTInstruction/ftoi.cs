@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace SimulatorCore
 {
-    class ftoi : RTInstruction
+    class s_ftoi : RTInstruction
     {
         int r0, r1;
 
-        internal ftoi(int r0, int r1)
+        internal s_ftoi(int r0, int r1)
         {
             this.r0 = r0;
             this.r1 = r1;
