@@ -78,16 +78,18 @@ cmp_i x r r x
 110100 5 5 5 11
 cmp_f x r r x
 010101 5 5 5 11
-bne x l
+be x l
 110000 10 16
-bg x l
+bne x l
 110001 10 16
 bl x l
 110010 10 16
 bge x l
 110011 10 16
-ble x l
+bg x l
 110100 10 16
+ble x l
+110101 10 16
 real_jmp x i
 110110 10 16
 ret x
