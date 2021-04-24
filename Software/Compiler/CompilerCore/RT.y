@@ -110,7 +110,7 @@ loop_statement: FOR '(' for_special_statement ';' optional_expression ';' for_sp
     ;
 optional_expression: /* empty */
     {
-        $$ = new IntLiteralExpression(@$, 1);
+        $$ = null;
     }
     | expression
     ;
