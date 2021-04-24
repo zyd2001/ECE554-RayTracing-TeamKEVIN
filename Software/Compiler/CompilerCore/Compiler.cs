@@ -42,10 +42,10 @@ namespace CompilerCore
             }
         }
 
-        abstract internal string generate(DirectTranslation translation);
+        abstract internal string Generate(DirectTranslation translation);
 
         static int varaibleCounter = 0;
-        internal static int VaraibleCounter
+        internal static int VariableCounter
         {
             get
             {

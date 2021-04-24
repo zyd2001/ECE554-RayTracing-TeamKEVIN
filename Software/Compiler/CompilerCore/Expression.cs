@@ -216,7 +216,7 @@ namespace CompilerCore
                 }
                 if (type <= Type.DIV)
                 {
-                    if (type2 == CompilerCore.Type.VECTOR && type1 != CompilerCore.Type.FLOAT)
+                    if (type2 == CompilerCore.Type.VECTOR && type1 != CompilerCore.Type.VECTOR)
                     {
                         Error("Scalar and Vector computation");
                         return CompilerCore.Type.NULL;

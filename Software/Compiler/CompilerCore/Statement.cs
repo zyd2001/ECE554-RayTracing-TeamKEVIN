@@ -492,7 +492,8 @@ namespace CompilerCore
             bool pass = initializer?.NameAnalysis(table) ?? true;
             if (arraySize >= 0)
                 type -= 3; // make a pointer type
-            string id = $".{table.ScopeLevel}.{identifier}";
+            string t = type == Type.VECTOR ? "V" : "S";
+            string id = $".{t}.{table.ScopeLevel}.{identifier}";
             scopedIdentifier = id;
             table.AddSymbol(identifier, new Symbol(type, id));
             return pass;
@@ -595,7 +596,7 @@ namespace CompilerCore
         internal ParameterList(LexLocation location) : base(location) { }
         internal ParameterList(LexLocation location, Parameter node) : base(location, node) { }
 
-        internal override string generate(DirectTranslation translation)
+        internal override string Generate(DirectTranslation translation)
         {
             throw new NotImplementedException();
         }
@@ -640,7 +641,7 @@ namespace CompilerCore
             identifier = id;
         }
 
-        internal override string generate(DirectTranslation translation)
+        internal override string Generate(DirectTranslation translation)
         {
             throw new NotImplementedException();
         }
