@@ -27,7 +27,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     output logic rdy_MC;
 
     // Generate variable
-    genvar i, j;
+    genvar i;
 
     enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_sid, rd_done} state, next;
 
