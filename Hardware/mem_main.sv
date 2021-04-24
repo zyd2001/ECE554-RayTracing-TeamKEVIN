@@ -261,17 +261,6 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
     //RAM
     //Pipeline 2
     logic [31:0] q_bank_2[NUM_THREAD-1:0][3:0];
-    logic re_MC_reg;
-    logic re_MC_clr;
-    logic re_MC_en;
-    always_ff @( posedge clk, negedge rst_n ) begin
-        if (!rst_n) 
-            re_MC_reg <=1'b0;
-        else if (re_MC_clr)
-            re_MC_reg <= 1'b0;
-        else if (re_MC_en)
-            re_MC_reg <= 1'b1;
-    end
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: main_memory_bank
