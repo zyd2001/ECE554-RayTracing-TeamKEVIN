@@ -50,52 +50,52 @@ namespace SimulatorCore
         }
     }
 
-    class bge : CPInstruction
-    {
-        int rd, imm;
+    // class bge : CPInstruction
+    // {
+    //     int rd, imm;
 
-        internal bge(int rd, int imm)
-        {
-            this.rd = rd;
-            this.imm = imm;
-        }
+    //     internal bge(int rd, int imm)
+    //     {
+    //         this.rd = rd;
+    //         this.imm = imm;
+    //     }
 
-        internal override void Process(RegisterFile<int> RF, Memory mem)
-        {
-            if (RF[rd] >= 0)
-            {
-                RF[15] = imm;
-            }
-        }
+    //     internal override void Process(RegisterFile<int> RF, Memory mem)
+    //     {
+    //         if (RF[rd] >= 0)
+    //         {
+    //             RF[15] = imm;
+    //         }
+    //     }
 
-        public override string ToString()
-        {
-            return "bge r" + rd + " " + imm;
-        }
-    }
+    //     public override string ToString()
+    //     {
+    //         return "bge r" + rd + " " + imm;
+    //     }
+    // }
 
-    class ble : CPInstruction
-    {
-        int rd, imm;
+    // class ble : CPInstruction
+    // {
+    //     int rd, imm;
 
-        internal ble(int rd, int imm)
-        {
-            this.rd = rd;
-            this.imm = imm;
-        }
+    //     internal ble(int rd, int imm)
+    //     {
+    //         this.rd = rd;
+    //         this.imm = imm;
+    //     }
 
-        internal override void Process(RegisterFile<int> RF, Memory mem)
-        {
-            if (RF[rd] <= 0)
-            {
-                RF[15] = imm;
-            }
-        }
+    //     internal override void Process(RegisterFile<int> RF, Memory mem)
+    //     {
+    //         if (RF[rd] <= 0)
+    //         {
+    //             RF[15] = imm;
+    //         }
+    //     }
 
-        public override string ToString()
-        {
-            return "ble r" + rd + " " + imm;
-        }
-    }
+    //     public override string ToString()
+    //     {
+    //         return "ble r" + rd + " " + imm;
+    //     }
+    // }
 
 }

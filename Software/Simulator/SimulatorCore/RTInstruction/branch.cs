@@ -3,6 +3,31 @@ using System.Runtime.InteropServices;
 
 namespace SimulatorCore
 {
+
+    class be : RTInstruction
+    {
+        int imm;
+
+        internal be(int imm)
+        {
+            this.imm = imm;
+        }
+
+        internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
+        {
+            if (sRF[32] == 0)
+            {
+                sRF[31] = sRF[31] + imm;
+            }
+
+
+        }
+
+        public override string ToString()
+        {
+            return "bne " + imm;
+        }
+    }
     class bne : RTInstruction
     {
         int imm;
@@ -78,11 +103,11 @@ namespace SimulatorCore
         }
     }
 
-    class bge_rt : RTInstruction
+    class bge : RTInstruction
     {
         int imm;
 
-        internal bge_rt(int imm)
+        internal bge(int imm)
         {
             this.imm = imm;
         }
@@ -103,11 +128,11 @@ namespace SimulatorCore
         }
     }
 
-    class ble_rt : RTInstruction
+    class ble : RTInstruction
     {
         int imm;
 
-        internal ble_rt(int imm)
+        internal ble(int imm)
         {
             this.imm = imm;
         }
