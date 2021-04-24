@@ -16,7 +16,7 @@ namespace SimulatorCore
 
         public RayTracing(Memory insMem, Memory triangleMem, Memory dataMem)
         {
-            ScalarRegisterFile = new RegisterFile<Scalar>(32);
+            ScalarRegisterFile = new RegisterFile<Scalar>(33);
             VectorRegisterFile = new RegisterFile<Vector4>(16);
             InstructionMemory = insMem;
             DataMemory = dataMem;
