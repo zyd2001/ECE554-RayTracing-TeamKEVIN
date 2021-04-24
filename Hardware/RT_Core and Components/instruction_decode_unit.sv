@@ -41,7 +41,7 @@ module instruction_decode_unit (
     floatALU1_en, floatALU2_en,
     floatALU3_en, floatALU4_en,
     Scalar_out_select, memory_op,
-    vector_reduce_en
+    vector_reduce_en, update_int_flag, update_float_flag
 );
     input [5:0] opcode;
     input [1:0] immediate;
@@ -50,7 +50,8 @@ module instruction_decode_unit (
     output logic [1:0] floatALU1_op2_select, floatALU3_op2_select;
     output logic intALU_en, floatALU1_en, floatALU2_en, floatALU3_en, floatALU4_en, vector_reduce_en;
     output logic [2:0] Scalar_out_select, memory_op;
-    
+    output logic update_int_flag, update_float_flag;
+
     always_comb begin
         // Default values
         intALU_op2_select = 1'b1;
@@ -73,6 +74,9 @@ module instruction_decode_unit (
         memory_op = 3'b0;
         vector_reduce_en = 1'b0;
 
+        update_float_flag = 1'b0;
+        update_int_flag = 1'b0;
+        
         if (opcode[5:3] == 3'b011) intALU_op2_select = 1'b0; // only Int int will use scalar 2
         
         // float float, sqrt, v get from s 
@@ -117,15 +121,15 @@ module instruction_decode_unit (
             floatALU1_en = 1'b1;
 
         // VV, VF
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010)
+        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 6'b100111)
             floatALU2_en = 1'b1;
 
         // VV, VF, reduce
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 3'b100100)
+        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 3'b100100 | opcode[5:0] == 6'b100111)
             floatALU3_en = 1'b1;
 
         // VV, VF
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010)
+        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 6'b100111)
             floatALU4_en = 1'b1;
 
         // FF and Sqrt
@@ -143,6 +147,13 @@ module instruction_decode_unit (
             
         if (opcode == 6'b100100) 
             vector_reduce_en = 1'b1;
+
+        if (opcode == 6'b010101)
+            update_float_flag = 1'b1;
+
+        if (opcode == 6'b011101)
+            update_float_flag = 1'b1;
+        
     end
         
     
