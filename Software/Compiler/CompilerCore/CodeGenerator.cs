@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Text;
 using Set = System.Collections.Immutable.ImmutableHashSet<string>;
 
 namespace CompilerCore
@@ -38,7 +40,7 @@ namespace CompilerCore
                         for (int i = 1; i < operands.Count; i++)
                         {
                             // TODO: register
-                            if (operands[i][0] == '.') // do not add constant
+                            if (operands[i][0] == '.' || operands[i][0] == 'R') // do not add constant
                                 use.Add(operands[i]);
                         }
                     }
@@ -78,6 +80,8 @@ namespace CompilerCore
     class DirectTranslation
     {
         internal List<Assembly> List { get; } = new List<Assembly>();
+        internal List<Set> Ins { get; set; } = null;
+        internal List<Set> Outs { get; set; } = null;
         internal List<(Assembly ins, int index)> BranchList { get; } = new List<(Assembly ins, int index)>();
         internal Dictionary<string, int> Labels { get; } = new Dictionary<string, int>();
         internal Dictionary<int, string> ReverseLabels { get; } = new Dictionary<int, string>();
@@ -132,15 +136,15 @@ namespace CompilerCore
 
         internal void CalculateLiveSpan()
         {
-            List<Set> oldIns = new List<Set>(new Set[List.Count]);
-            List<Set> oldOuts = new List<Set>(new Set[List.Count]);
+            Ins = new List<Set>(new Set[List.Count]);
+            Outs = new List<Set>(new Set[List.Count]);
             while (true)
             {
                 for (int i = List.Count - 1; i >= 0; i--)
                 {
                     Assembly ins = List[i];
-                    oldIns[i] = ins.In;
-                    oldOuts[i] = ins.Out;
+                    Ins[i] = ins.In;
+                    Outs[i] = ins.Out;
                     ins.In = ins.Use.Union(ins.Out.Except(ins.Def));
                     HashSet<string> tempIn = new HashSet<string>();
                     foreach (var index in ins.Successor)
@@ -151,14 +155,14 @@ namespace CompilerCore
                     ins.Out = tempIn.ToImmutableHashSet();
                 }
                 int _i = 0;
-                if (!oldIns.TrueForAll((Set s) =>
+                if (!Ins.TrueForAll((Set s) =>
                 {
                     bool ret = s.SetEquals(List[_i].In);
                     _i++;
                     return ret;
                 })) continue;
                 _i = 0;
-                if (!oldOuts.TrueForAll((Set s) =>
+                if (!Outs.TrueForAll((Set s) =>
                 {
                     bool ret = s.SetEquals(List[_i].Out);
                     _i++;
@@ -170,15 +174,55 @@ namespace CompilerCore
 
         internal class InferenceGraph
         {
-            internal Dictionary<string, HashSet<string>> AdjacentList { get; } = new Dictionary<string, HashSet<string>>();
-            internal Dictionary<string, Dictionary<string, bool>> AdjacentMatrix { get; } = new Dictionary<string, Dictionary<string, bool>>();
+            internal Dictionary<string, int> Dict { get; } = new Dictionary<string, int>();
+            internal List<string> ReverseDict { get; } = new List<string>();
+
+            internal HashSet<int>[] AdjacentList { get; } = null;
+            internal bool[,] AdjacentMatrix { get; } = null;
+
+            public InferenceGraph(List<Set> ins, List<Set> outs)
+            {
+                for (int i = 0; i < ins.Count; i++)
+                {
+                    foreach (var item in ins[i])
+                    {
+                        if (Dict.TryAdd(item, ReverseDict.Count))
+                            ReverseDict.Add(item);
+                    }
+                    foreach (var item in outs[i])
+                    {
+                        if (Dict.TryAdd(item, ReverseDict.Count))
+                            ReverseDict.Add(item);
+                    }
+                }
+                AdjacentList = Enumerable.Range(0, ReverseDict.Count).Select((i) => new HashSet<int>()).ToArray();
+                AdjacentMatrix = new bool[ReverseDict.Count, ReverseDict.Count];
+            }
             internal void AddEdge(string a, string b)
             {
+                int ia = Dict[a];
+                int ib = Dict[b];
+                AdjacentList[ia].Add(ib);
+                AdjacentList[ib].Add(ia);
+                AdjacentMatrix[ia, ib] = true;
+                AdjacentMatrix[ib, ia] = true;
+            }
+
+            public override string ToString()
+            {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < AdjacentList.Length; i++)
+                {
+                    builder.AppendLine(ReverseDict[i]);
+                    foreach (var item in AdjacentList[i])
+                        builder.AppendLine($"{ReverseDict[i]} {ReverseDict[item]}");
+                }
+                return builder.ToString();
             }
         }
         internal InferenceGraph CreateInferenceGraph()
         {
-            InferenceGraph graph = new InferenceGraph();
+            InferenceGraph graph = new InferenceGraph(Ins, Outs);
             foreach (var ins in List)
             {
                 if (ins.OPCode.Contains("mov"))
