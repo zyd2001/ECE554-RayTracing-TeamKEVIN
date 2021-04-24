@@ -1,5 +1,5 @@
-module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
-                data_RT_out, rd_rdy_RT);
+module mem_main(clk, rst_n, we, re, addr, data_in,
+                data_out, rd_rdy);
 
     parameter NUM_RT = 4;
     parameter NUM_THREAD = 32;
@@ -12,17 +12,17 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
     */
     input clk, rst_n;
     //RT
-    input we_RT[NUM_RT-1:0];
-    input re_RT[NUM_RT-1:0];
-    input [31:0] addr_RT[NUM_RT-1:0];
-    input [127:0] data_RT_in[NUM_RT-1:0];
+    input we[NUM_RT-1:0];
+    input re[NUM_RT-1:0];
+    input [31:0] addr[NUM_RT-1:0];
+    input [127:0] data_in[NUM_RT-1:0];
 
     /*
         Output
     */
     //RT
-    output reg rd_rdy_RT[NUM_RT-1:0];
-    output [127:0] data_RT_out[NUM_RT-1:0];
+    output reg rd_rdy[NUM_RT-1:0];
+    output [127:0] data_out[NUM_RT-1:0];
 
     // Generate variable
     genvar i, j;
@@ -39,14 +39,14 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
                     rd_rdy_1[i] <= 1'b0;
                     rd_rdy_2[i] <= 1'b0;
                     rd_rdy_3[i] <= 1'b0;
-                    rd_rdy_RT[i] <= 1'b0;
+                    rd_rdy[i] <= 1'b0;
                 end
                 else begin
-                    rd_rdy_0[i] <= re_RT[i];
+                    rd_rdy_0[i] <= re[i];
                     rd_rdy_1[i] <= rd_rdy_0[i];
                     rd_rdy_2[i] <= rd_rdy_1[i];
                     rd_rdy_3[i] <= rd_rdy_2[i];
-                    rd_rdy_RT[i] <= rd_rdy_3[i];
+                    rd_rdy[i] <= rd_rdy_3[i];
                 end
             end
         end
@@ -61,10 +61,10 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
                 if (!rst_n)
                     we_bank_0[i] <= 1'b0;
                 else begin
-                    we_bank_0[i] <= ((addr_RT[0][BIT_THREAD+15:16] == i) && we_RT[0])
-                                 || ((addr_RT[1][BIT_THREAD+15:16] == i) && we_RT[1])
-                                 || ((addr_RT[2][BIT_THREAD+15:16] == i) && we_RT[2])
-                                 || ((addr_RT[3][BIT_THREAD+15:16] == i) && we_RT[3]);
+                    we_bank_0[i] <= ((addr[0][BIT_THREAD+15:16] == i) && we[0])
+                                 || ((addr[1][BIT_THREAD+15:16] == i) && we[1])
+                                 || ((addr[2][BIT_THREAD+15:16] == i) && we[2])
+                                 || ((addr[3][BIT_THREAD+15:16] == i) && we[3]);
                 end
             end
         end
@@ -90,12 +90,12 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
     logic [11:0] addr_pre[NUM_RT-1:0][3:0];
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            assign thread_id_pre[i] = addr_RT[i][BIT_THREAD+15:16];
+            assign thread_id_pre[i] = addr[i][BIT_THREAD+15:16];
 
-            assign addr_RT_pre[i][0] = addr_RT[i][15:2];
-            assign addr_RT_pre[i][1] = addr_RT[i][15:2] + 14'h1;
-            assign addr_RT_pre[i][2] = addr_RT[i][15:2] + 14'h2;
-            assign addr_RT_pre[i][3] = addr_RT[i][15:2] + 14'h3;
+            assign addr_RT_pre[i][0] = addr[i][15:2];
+            assign addr_RT_pre[i][1] = addr[i][15:2] + 14'h1;
+            assign addr_RT_pre[i][2] = addr[i][15:2] + 14'h2;
+            assign addr_RT_pre[i][3] = addr[i][15:2] + 14'h3;
             for (j = 0; j < 4; j = j + 1) begin
                 assign bank_id_pre[i][j] = addr_RT_pre[i][j][1:0];
                 assign addr_pre[i][j] = addr_RT_pre[i][j][13:2];
@@ -218,22 +218,22 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
                     data_bank_0[i][3] <= 32'b0;
 				end
                 else begin
-                    data_bank_0[i][0] <= bank_id_pre[i][0] == 2'h0 ? data_RT_in[i][31:0]
-                                        : bank_id_pre[i][1] == 2'h0 ? data_RT_in[i][63:32]
-                                        : bank_id_pre[i][2] == 2'h0 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
-                    data_bank_0[i][1] <= bank_id_pre[i][0] == 2'h1 ? data_RT_in[i][31:0]
-                                        : bank_id_pre[i][1] == 2'h1 ? data_RT_in[i][63:32]
-                                        : bank_id_pre[i][2] == 2'h1 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
-                    data_bank_0[i][2] <= bank_id_pre[i][0] == 2'h2 ? data_RT_in[i][31:0]
-                                        : bank_id_pre[i][1] == 2'h2 ? data_RT_in[i][63:32]
-                                        : bank_id_pre[i][2] == 2'h2 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
-                    data_bank_0[i][3] <= bank_id_pre[i][0] == 2'h3 ? data_RT_in[i][31:0]
-                                        : bank_id_pre[i][1] == 2'h3 ? data_RT_in[i][63:32]
-                                        : bank_id_pre[i][2] == 2'h3 ? data_RT_in[i][95:64]
-                                        : data_RT_in[i][127:96];
+                    data_bank_0[i][0] <= bank_id_pre[i][0] == 2'h0 ? data_in[i][31:0]
+                                        : bank_id_pre[i][1] == 2'h0 ? data_in[i][63:32]
+                                        : bank_id_pre[i][2] == 2'h0 ? data_in[i][95:64]
+                                        : data_in[i][127:96];
+                    data_bank_0[i][1] <= bank_id_pre[i][0] == 2'h1 ? data_in[i][31:0]
+                                        : bank_id_pre[i][1] == 2'h1 ? data_in[i][63:32]
+                                        : bank_id_pre[i][2] == 2'h1 ? data_in[i][95:64]
+                                        : data_in[i][127:96];
+                    data_bank_0[i][2] <= bank_id_pre[i][0] == 2'h2 ? data_in[i][31:0]
+                                        : bank_id_pre[i][1] == 2'h2 ? data_in[i][63:32]
+                                        : bank_id_pre[i][2] == 2'h2 ? data_in[i][95:64]
+                                        : data_in[i][127:96];
+                    data_bank_0[i][3] <= bank_id_pre[i][0] == 2'h3 ? data_in[i][31:0]
+                                        : bank_id_pre[i][1] == 2'h3 ? data_in[i][63:32]
+                                        : bank_id_pre[i][2] == 2'h3 ? data_in[i][95:64]
+                                        : data_in[i][127:96];
                 end
             end
         end
@@ -338,22 +338,22 @@ module mem_main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
     //Pipeline 5
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
-            assign data_RT_out[i][31:0] = bank_id_4[i][0] == 2'h0 ? data_out_4[i][31:0]
+            assign data_out[i][31:0] = bank_id_4[i][0] == 2'h0 ? data_out_4[i][31:0]
                                         : bank_id_4[i][0] == 2'h1 ? data_out_4[i][63:32]
                                         : bank_id_4[i][0] == 2'h2 ? data_out_4[i][95:64]
                                         : data_out_4[i][127:96];
 
-            assign data_RT_out[i][63:32] = bank_id_4[i][1] == 2'h0 ? data_out_4[i][31:0]
+            assign data_out[i][63:32] = bank_id_4[i][1] == 2'h0 ? data_out_4[i][31:0]
                                         : bank_id_4[i][1] == 2'h1 ? data_out_4[i][63:32]
                                         : bank_id_4[i][1] == 2'h2 ? data_out_4[i][95:64]
                                         : data_out_4[i][127:96];
 
-            assign data_RT_out[i][95:64] = bank_id_4[i][2] == 2'h0 ? data_out_4[i][31:0]
+            assign data_out[i][95:64] = bank_id_4[i][2] == 2'h0 ? data_out_4[i][31:0]
                                         : bank_id_4[i][2] == 2'h1 ? data_out_4[i][63:32]
                                         : bank_id_4[i][2] == 2'h2 ? data_out_4[i][95:64]
                                         : data_out_4[i][127:96];
 
-            assign data_RT_out[i][127:96] = bank_id_4[i][3] == 2'h0 ? data_out_4[i][31:0]
+            assign data_out[i][127:96] = bank_id_4[i][3] == 2'h0 ? data_out_4[i][31:0]
                                         : bank_id_4[i][3] == 2'h1 ? data_out_4[i][63:32]
                                         : bank_id_4[i][3] == 2'h2 ? data_out_4[i][95:64]
                                         : data_out_4[i][127:96];

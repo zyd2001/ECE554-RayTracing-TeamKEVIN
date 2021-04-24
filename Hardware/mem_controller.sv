@@ -21,7 +21,7 @@ module mem_controller
     parameter BIT_THREAD = $clog2(NUM_THREAD);
     parameter DMA_WRITE_SIZE = NUM_THREAD / 4;
     parameter DMA_WRITE_BIT = $clog2(DMA_WRITE_SIZE);
-    parameter DMA_PATCH_SIZE = 1;
+    parameter DMA_PATCH_SIZE = 2;
     parameter DMA_PATCH_BIT = $clog2(DMA_PATCH_SIZE);
 
 
@@ -436,7 +436,7 @@ module mem_controller
     */
 
     // Patch Counter
-    logic [DMA_PATCH_BIT-1:0] dma_patch_cnt;
+    logic [DMA_PATCH_BIT:0] dma_patch_cnt;
     logic dma_patch_inc;
     logic term;
     always_ff @( posedge clk, negedge rst_n ) begin
@@ -456,9 +456,9 @@ module mem_controller
         else if (mmio.wr_en && mmio.wr_addr[0])
             mmio_rd_data <= 64'h0;
         else if (term)
-            mmio_rd_data <= {{62'h0}, {2'h2}};
+            mmio_rd_data <= 64'h2;
         else if (dma.wr_done)
-            mmio_rd_data <= {{62'h0}, {2'h1}};
+            mmio_rd_data <= 64'h1;
     end
 
     assign mmio.rd_data = mmio_rd_data;
@@ -493,7 +493,7 @@ module mem_controller
             mem_rd_cnt <= mem_rd_cnt + 3'h1;
     end
 
-    logic [DMA_WRITE_BIT-1:0] dma_write_cnt;
+    logic [DMA_WRITE_BIT:0] dma_write_cnt;
     logic dma_wr_clr, dma_wr_inc;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) 
@@ -501,7 +501,7 @@ module mem_controller
         else if (dma_wr_clr)
             dma_write_cnt <= '0;
         else if (dma_wr_inc)
-            dma_write_cnt <= dma_write_cnt + {{(DMA_WRITE_BIT-1){1'b0}}, {1'b1}};
+            dma_write_cnt <= dma_write_cnt + 1;
     end
 
     logic [BIT_THREAD-1:0] thread_MC[3:0];
@@ -566,7 +566,7 @@ module mem_controller
                 end
             end
             DMA_WR_LOAD: begin
-                if (mem_rd_cnt == 2'h4) begin
+                if (mem_rd_cnt == 3'h4) begin
                     nxt_state_dma_wr = DMA_WR_HOLD;
                     dma_wr_data_upd = 1'h1;
                     mem_rd_clr = 1'h1;
