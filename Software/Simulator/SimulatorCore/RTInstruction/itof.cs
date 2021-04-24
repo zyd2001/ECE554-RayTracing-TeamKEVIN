@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace SimulatorCore
 {
-    class itof : RTInstruction
+    class s_itof : RTInstruction
     {
         int r0, r1;
 
-        internal itof(int r0, int r1)
+        internal s_itof(int r0, int r1)
         {
             this.r0 = r0;
             this.r1 = r1;
