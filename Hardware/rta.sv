@@ -154,22 +154,22 @@ module rta
   endgenerate
 
 
-  // mem_triangle memory_triangle
-  //  (
-  //   .clk(clk),
-  //   .rst_n(rst_n),
-  //   .re_IC(re_ic_tri),
-  //   .triangle_id(tri_id_ic_tri),
-  //   .data_MC(data_128_mc_tri),
-  //   .we_MC(we_mem_mc_x[3]),
-  //   .rdy_MC(rdy_tri_mc),
-  //   .rdy_IC(rdy_tri_ic),
-  //   .not_valid_IC(unvalid_tri_ic),
-  //   .vertex0_IC(vertex_0_tri_ic),
-  //   .vertex1_IC(vertex_1_tri_ic),
-  //   .vertex2_IC(vertex_2_tri_ic),
-  //   .sid_IC(sid_tri_ic)
-  //   );
+  mem_triangle memory_triangle
+   (
+    .clk(clk),
+    .rst_n(rst_n),
+    .re_IC(re_ic_tri),
+    .triangle_id(tri_id_ic_tri),
+    .data_MC(data_128_mc_tri),
+    .we_MC(we_mem_mc_x[3]),
+    .rdy_MC(rdy_tri_mc),
+    .rdy_IC(rdy_tri_ic),
+    .not_valid_IC(unvalid_tri_ic),
+    .vertex0_IC(vertex_0_tri_ic),
+    .vertex1_IC(vertex_1_tri_ic),
+    .vertex2_IC(vertex_2_tri_ic),
+    .sid_IC(sid_tri_ic)
+    );
   
             
 endmodule

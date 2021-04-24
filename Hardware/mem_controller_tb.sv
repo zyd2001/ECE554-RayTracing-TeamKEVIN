@@ -74,13 +74,16 @@ module mem_controller_tb();
     logic [31:0] mmio_wr_addr[4:0];
     logic [511:0] dma_rd_data[3:0][3:0];
 
+
+    logic [15:0] temp[3:0];
+
     initial begin
         clk = 0;
         rst_n = 1;
         we_RT_MC[0] = 0;
-	we_RT_MC[1] = 0;
-	we_RT_MC[2] = 0;
-	we_RT_MC[3] = 0;
+	      we_RT_MC[1] = 0;
+	      we_RT_MC[2] = 0;
+	      we_RT_MC[3] = 0;
 
         mem_wr_strt_CP_MC = 0;
         mem_wr_rdy_tri_TRI_MC = 0;
@@ -363,107 +366,27 @@ module mem_controller_tb();
         end
 
         for (int k = 0; k < 2; k++) begin
+          we_RT_MC[0] = 1'h1;
+          we_RT_MC[1] = 1'h1;
+          we_RT_MC[2] = 1'h1;
+          we_RT_MC[3] = 1'h1;
+          for (int i = 0; i < 8; i++) begin
+            temp[0] = i*4;
+            temp[1] = i*4+1;
+            temp[2] = i*4+2;
+            temp[3] = i*4+3;
 
-            we_RT_MC[0] = 1'h1;
-            we_RT_MC[1] = 1'h1;
-            we_RT_MC[2] = 1'h1;
-            we_RT_MC[3] = 1'h1;
-            
-            addr_RT_MAIN[0] = 32'h0000FFF0;
-            addr_RT_MAIN[1] = 32'h0001FFF0;
-            addr_RT_MAIN[2] = 32'h0002FFF0;
-            addr_RT_MAIN[3] = 32'h0003FFF0;
+            addr_RT_MAIN[0] = {temp[0], {16'hFFF0}};
+            addr_RT_MAIN[1] = {temp[1], {16'hFFF0}};
+            addr_RT_MAIN[2] = {temp[2], {16'hFFF0}};
+            addr_RT_MAIN[3] = {temp[3], {16'hFFF0}};
 
-            data_RT_MAIN[0] = data_MAIN[k][0];
-            data_RT_MAIN[1] = data_MAIN[k][1];
-            data_RT_MAIN[2] = data_MAIN[k][2];
-            data_RT_MAIN[3] = data_MAIN[k][3];
-
+            data_RT_MAIN[0] = data_MAIN[k][i*4];
+            data_RT_MAIN[1] = data_MAIN[k][i*4+1];
+            data_RT_MAIN[2] = data_MAIN[k][i*4+2];
+            data_RT_MAIN[3] = data_MAIN[k][i*4+3];
             @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h0004FFF0;
-            addr_RT_MAIN[1] = 32'h0005FFF0;
-            addr_RT_MAIN[2] = 32'h0006FFF0;
-            addr_RT_MAIN[3] = 32'h0007FFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][4];
-            data_RT_MAIN[1] = data_MAIN[k][5];
-            data_RT_MAIN[2] = data_MAIN[k][6];
-            data_RT_MAIN[3] = data_MAIN[k][7];
-
-            @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h0008FFF0;
-            addr_RT_MAIN[1] = 32'h0009FFF0;
-            addr_RT_MAIN[2] = 32'h000AFFF0;
-            addr_RT_MAIN[3] = 32'h000BFFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][8];
-            data_RT_MAIN[1] = data_MAIN[k][9];
-            data_RT_MAIN[2] = data_MAIN[k][10];
-            data_RT_MAIN[3] = data_MAIN[k][11];
-
-            @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h000CFFF0;
-            addr_RT_MAIN[1] = 32'h000DFFF0;
-            addr_RT_MAIN[2] = 32'h000EFFF0;
-            addr_RT_MAIN[3] = 32'h000FFFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][12];
-            data_RT_MAIN[1] = data_MAIN[k][13];
-            data_RT_MAIN[2] = data_MAIN[k][14];
-            data_RT_MAIN[3] = data_MAIN[k][15];
-
-            @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h0010FFF0;
-            addr_RT_MAIN[1] = 32'h0011FFF0;
-            addr_RT_MAIN[2] = 32'h0012FFF0;
-            addr_RT_MAIN[3] = 32'h0013FFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][16];
-            data_RT_MAIN[1] = data_MAIN[k][17];
-            data_RT_MAIN[2] = data_MAIN[k][18];
-            data_RT_MAIN[3] = data_MAIN[k][19];
-
-            @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h0014FFF0;
-            addr_RT_MAIN[1] = 32'h0015FFF0;
-            addr_RT_MAIN[2] = 32'h0016FFF0;
-            addr_RT_MAIN[3] = 32'h0017FFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][20];
-            data_RT_MAIN[1] = data_MAIN[k][21];
-            data_RT_MAIN[2] = data_MAIN[k][22];
-            data_RT_MAIN[3] = data_MAIN[k][23];
-
-            @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h0018FFF0;
-            addr_RT_MAIN[1] = 32'h0019FFF0;
-            addr_RT_MAIN[2] = 32'h001AFFF0;
-            addr_RT_MAIN[3] = 32'h001BFFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][24];
-            data_RT_MAIN[1] = data_MAIN[k][25];
-            data_RT_MAIN[2] = data_MAIN[k][26];
-            data_RT_MAIN[3] = data_MAIN[k][27];
-
-            @(negedge clk);
-
-            addr_RT_MAIN[0] = 32'h001CFFF0;
-            addr_RT_MAIN[1] = 32'h001DFFF0;
-            addr_RT_MAIN[2] = 32'h001EFFF0;
-            addr_RT_MAIN[3] = 32'h001FFFF0;
-
-            data_RT_MAIN[0] = data_MAIN[k][28];
-            data_RT_MAIN[1] = data_MAIN[k][29];
-            data_RT_MAIN[2] = data_MAIN[k][30];
-            data_RT_MAIN[3] = data_MAIN[k][31];
-
-            @(negedge clk);
+          end
 
             we_RT_MC[0] = 1'h0;
             we_RT_MC[1] = 1'h0;
@@ -471,8 +394,6 @@ module mem_controller_tb();
             we_RT_MC[3] = 1'h0;
 
             repeat(30) @(negedge clk);
-
-            
 
             @(posedge clk);
             patch_done_PD_MC = 1'h1;
