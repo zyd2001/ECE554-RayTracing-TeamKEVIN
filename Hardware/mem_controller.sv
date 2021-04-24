@@ -4,16 +4,14 @@ module mem_controller
         input rst_n,
         mmio_if.user mmio,
         dma_if.peripheral dma,
-        input mem_wr_strt,
-        input mem_wr_rdy_tri,
+        input rdy_tri,
         input patch_done,
-        input [127:0] out_data[3:0], 
-        output reg cp_strt,
-        output reg [1:0] mem_wr_en[3:0],
-        output [31:0] mem_wr_data_32,
-        output [127:0] mem_wr_data_128,
-        output reg re_MAIN,
-        output [31:0] addr_MAIN[3:0]
+        input [127:0] result[3:0], 
+        output reg [1:0] we_mem[3:0],
+        output [31:0] data_32,
+        output [127:0] data_128,
+        output reg re_main,
+        output [31:0] addr_main[3:0]
         );
 
     
@@ -263,7 +261,7 @@ module mem_controller
         else if (dma_rd_data_32_upd)
             dma_rd_data_32[15] <= dma.rd_data[511:480];
     end
-    assign mem_wr_data_32 = dma_rd_data_32[0];
+    assign data_32 = dma_rd_data_32[0];
 
     logic dma_rd_data_32_upd_cp, dma_rd_data_32_upd_rt, dma_rd_data_32_upd_const;
     logic dma_rd_data_32_shft_cp, dma_rd_data_32_shft_rt, dma_rd_data_32_shft_const;
@@ -281,7 +279,7 @@ module mem_controller
                                         .dma_rd_data_32_upd(dma_rd_data_32_upd_cp),
                                         .dma_rd_data_32_shft(dma_rd_data_32_shft_cp),
                                         .dma_rd_done_clr_32(dma_rd_done_clr_cp),
-                                        .mem_wr_en_32(mem_wr_en[0])
+                                        .mem_wr_en_32(we_mem[0])
                                         );
 
     mem_controller_dma_rd_32 dma_rd_rt(.clk(clk),.rst_n(rst_n),
@@ -294,7 +292,7 @@ module mem_controller
                                         .dma_rd_data_32_upd(dma_rd_data_32_upd_rt),
                                         .dma_rd_data_32_shft(dma_rd_data_32_shft_rt),
                                         .dma_rd_done_clr_32(dma_rd_done_clr_rt),
-                                        .mem_wr_en_32(mem_wr_en[1])
+                                        .mem_wr_en_32(we_mem[1])
                                         );
                                         
     mem_controller_dma_rd_32 dma_rd_const(.clk(clk),.rst_n(rst_n),
@@ -307,7 +305,7 @@ module mem_controller
                                         .dma_rd_data_32_upd(dma_rd_data_32_upd_const),
                                         .dma_rd_data_32_shft(dma_rd_data_32_shft_const),
                                         .dma_rd_done_clr_32(dma_rd_done_clr_const),
-                                        .mem_wr_en_32(mem_wr_en[2])
+                                        .mem_wr_en_32(we_mem[2])
                                         );
 
 
@@ -335,24 +333,24 @@ module mem_controller
         end
     end
 
-    assign mem_wr_data_128 = dma_rd_data_128[0];
+    assign data_128 = dma_rd_data_128[0];
 
     mem_controller_dma_rd_128 dma_rd_tri(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_tri),
                                         .dma_rd_done(dma_rd_done),
                                         .dma_empty(dma.empty),
-                                        .mem_wr_rdy(mem_wr_rdy_tri),
+                                        .mem_wr_rdy(rdy_tri),
                                         .dma_rd_end_128(dma_rd_end_tri),
                                         .dma_rd_go_128(dma_rd_go_tri),
                                         .dma_rd_en_128(dma_rd_en_tri),
                                         .dma_rd_data_128_upd(dma_rd_data_128_upd),
                                         .dma_rd_data_128_shft(dma_rd_data_128_shft),
                                         .dma_rd_done_clr_128(dma_rd_done_clr_tri),
-                                        .mem_wr_en_128(mem_wr_en[3])
+                                        .mem_wr_en_128(we_mem[3])
                                         );
 
     //Central Control Logic
-    typedef enum reg [2:0] {DMA_RD_IDLE, DMA_RD_CP, DMA_RD_WAIT, DMA_RD_RT, DMA_RD_CONST, DMA_RD_TRI} t_state_dma_rd;
+    typedef enum reg [2:0] {DMA_RD_IDLE, DMA_RD_CP, DMA_RD_RT, DMA_RD_CONST, DMA_RD_TRI} t_state_dma_rd;
     t_state_dma_rd state_dma_rd, nxt_state_dma_rd;
     
     always_ff @( posedge clk, negedge rst_n ) begin
@@ -370,8 +368,6 @@ module mem_controller
         dma_rd_strt_const = 1'h0;
         dma_rd_strt_tri = 1'h0;
 
-        cp_strt = 1'h0;
-
         case(state_dma_rd)
             DMA_RD_IDLE: begin
                 if (dma_rd_strt)
@@ -379,8 +375,7 @@ module mem_controller
             end
             DMA_RD_CP: begin
                 if (dma_rd_req_cp && dma_rd_end_cp) begin
-                    nxt_state_dma_rd = DMA_RD_WAIT; 
-                    cp_strt = 1'h1;
+                    nxt_state_dma_rd = DMA_RD_RT; 
                 end
                 else if (dma_rd_req_cp) begin
                     nxt_state_dma_rd = DMA_RD_CP;
@@ -389,12 +384,6 @@ module mem_controller
                 else
                     nxt_state_dma_rd = DMA_RD_RT;
             end 
-            DMA_RD_WAIT: begin
-                if (mem_wr_strt)
-                    nxt_state_dma_rd = DMA_RD_RT;
-                else 
-                    nxt_state_dma_rd = DMA_RD_WAIT;
-            end
             DMA_RD_RT: begin
                 if (dma_rd_req_rt && dma_rd_end_rt)
                     nxt_state_dma_rd = DMA_RD_CONST;
@@ -479,7 +468,7 @@ module mem_controller
         if (!rst_n)
             dma_wr_data <= 512'h0;
         else if (dma_wr_data_upd)
-            dma_wr_data <= {out_data[3], out_data[2], out_data[1], out_data[0]};
+            dma_wr_data <= {result[3], result[2], result[1], result[0]};
     end
 
     logic [2:0] mem_rd_cnt;
@@ -526,10 +515,10 @@ module mem_controller
             thread_MC[3] <= thread_MC[3] + {{(BIT_THREAD-3){1'h0}}, {3'h4}};
         end
     end
-    assign addr_MAIN[0] = {{(16-BIT_THREAD){1'h0}}, thread_MC[0], {16'hFFF0}};
-    assign addr_MAIN[1] = {{(16-BIT_THREAD){1'h0}}, thread_MC[1], {16'hFFF0}};
-    assign addr_MAIN[2] = {{(16-BIT_THREAD){1'h0}}, thread_MC[2], {16'hFFF0}};
-    assign addr_MAIN[3] = {{(16-BIT_THREAD){1'h0}}, thread_MC[3], {16'hFFF0}};
+    assign addr_main[0] = {{(16-BIT_THREAD){1'h0}}, thread_MC[0], {16'hFFF0}};
+    assign addr_main[1] = {{(16-BIT_THREAD){1'h0}}, thread_MC[1], {16'hFFF0}};
+    assign addr_main[2] = {{(16-BIT_THREAD){1'h0}}, thread_MC[2], {16'hFFF0}};
+    assign addr_main[3] = {{(16-BIT_THREAD){1'h0}}, thread_MC[3], {16'hFFF0}};
     
     typedef enum reg [1:0] {DMA_WR_IDLE, DMA_WR_HOLD, DMA_WR_LOAD, DMA_WR_DONE} t_state_DMA_wr;
     t_state_DMA_wr state_dma_wr, nxt_state_dma_wr;
@@ -544,7 +533,7 @@ module mem_controller
     always_comb begin
         nxt_state_dma_wr = DMA_WR_IDLE;
         dma_wr_go = 1'b0;
-        re_MAIN = 1'b0;
+        re_main = 1'b0;
         dma_wr_en = 1'b0;
         dma_wr_data_upd = 1'b0;
         dma_wr_addr_inc = 1'b0;
@@ -562,7 +551,7 @@ module mem_controller
                 if (patch_done) begin
                     nxt_state_dma_wr = DMA_WR_LOAD;
                     dma_wr_go = 1'b1;
-                    re_MAIN = 1'b1;
+                    re_main = 1'b1;
                 end
             end
             DMA_WR_LOAD: begin
@@ -581,7 +570,7 @@ module mem_controller
             DMA_WR_HOLD: begin
                 if (!dma.full) begin
                     dma_wr_en = 1'h1;
-                    re_MAIN = 1'h1;
+                    re_main = 1'h1;
                     if (dma_write_cnt == DMA_WRITE_SIZE) begin
                         nxt_state_dma_wr = DMA_WR_DONE;
                         dma_wr_addr_inc = 1'h1;

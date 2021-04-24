@@ -76,76 +76,101 @@ module rta
 	 dma_if.peripheral dma
    );
 
-   wire rst_n;
-   assign rst_n = ~rst;
 
-   mem_main(.clk(clk), .rst_n(rst_n), we_RT, re_RT, addr_RT, data_RT_in,
-                data_RT_out, rd_rdy_RT);
+  localparam NUM_RT = 4;
+  localparam NUM_TRI = 512;
+  localparam BIT_TRI = $clog2(NUM_TRI);
 
+  wire rst_n;
+  assign rst_n = ~rst;
+
+  // Memory Controller
+  logic rdy_tri_mc;
+  logic patch_done_pd_mc;
+  logic [1:0] we_mem_mc_x[NUM_RT-1:0];
+  logic [31:0] data_32_mc_x;
+  logic [127:0] data_128_mc_tri;
+  logic re_mc_main;
+  logic [31:0] addr_mc_main[NUM_RT-1:0];
+
+  // Stack Memory
+  logic we_rt_main[NUM_RT-1:0];
+  logic re_x_main[NUM_RT-1:0];
+  logic [31:0] addr_x_main[NUM_RT-1:0];
+  logic [127:0] data_in_rt_main[NUM_RT-1:0];
+  logic [127:0] data_out_main_x[NUM_RT-1:0];
+  logic rd_rdy_main_rt[NUM_RT-1:0];
+
+  // RT CORE
+  logic re_rt_main[NUM_RT-1:0];
+  logic [31:0] addr_rt_main[NUM_RT-1:0];
+
+  // Triangle Memory
+  logic re_ic_tri;
+  logic unsigned [BIT_TRI-1:0] tri_id_ic_tri;
+  logic rdy_tri_ic;
+  logic unvalid_tri_ic;
+  logic [95:0] vertex_0_tri_ic;
+  logic [95:0] vertex_1_tri_ic;
+  logic [95:0] vertex_2_tri_ic;
+  logic sid_tri_ic;
+
+
+  mem_controller memory_controller
+   (
+    .clk(clk),
+    .rst_n(rst_n),
+    .dma(dma.peripheral),
+    .mmio(mmio.user),
+    .rdy_tri(rdy_tri_mc),
+    .patch_done(patch_done_pd_mc),
+    .result(data_out_main_x),
+    .we_mem(we_mem_mc_x),
+    .data_32(data_32_mc_x),
+    .data_128(data_128_mc_tri),
+    .re_main(re_mc_main),
+    .addr_main(addr_mc_main)
+    );
+
+
+  mem_main memory_stack
+   (
+    .clk(clk), 
+    .rst_n(rst_n),
+    .we(we_rt_main), 
+    .re(re_x_main), 
+    .addr(addr_x_main), 
+    .data_in(data_in_rt_main),
+    .data_out(data_out_main_x), 
+    .rd_rdy(rd_rdy_main_rt)
+    );
+
+  genvar i;
+  generate
+    for (i = 0; i < NUM_RT; i++) begin
+      assign re_x_main[i] = re_mc_main ? 1'h1 : re_rt_main[i];
+      assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_main[i]; 
+    end
+  endgenerate
+
+
+  // mem_triangle memory_triangle
+  //  (
+  //   .clk(clk),
+  //   .rst_n(rst_n),
+  //   .re_IC(re_ic_tri),
+  //   .triangle_id(tri_id_ic_tri),
+  //   .data_MC(data_128_mc_tri),
+  //   .we_MC(we_mem_mc_x[3]),
+  //   .rdy_MC(rdy_tri_mc),
+  //   .rdy_IC(rdy_tri_ic),
+  //   .not_valid_IC(unvalid_tri_ic),
+  //   .vertex0_IC(vertex_0_tri_ic),
+  //   .vertex1_IC(vertex_1_tri_ic),
+  //   .vertex2_IC(vertex_2_tri_ic),
+  //   .sid_IC(sid_tri_ic)
+  //   );
   
-  
-  
-  
-  
-  
-  
-   localparam int CL_ADDR_WIDTH = $size(t_ccip_clAddr);
-      
-   // I want to just use dma.count_t, but apparently
-   // either SV or Modelsim doesn't support that. Similarly, I can't
-   // just do dma.SIZE_WIDTH without getting errors or warnings about
-   // "constant expression cannot contain a hierarchical identifier" in
-   // some tools. Declaring a function within the interface works just fine in
-   // some tools, but in Quartus I get an error about too many ports in the
-   // module instantiation.
-   typedef logic [CL_ADDR_WIDTH:0] count_t;   
-   count_t 	size;
-   logic 	go;
-   logic 	done;
-
-   // Software provides 64-bit virtual byte addresses.
-   // Again, this constant would ideally get read from the DMA interface if
-   // there was widespread tool support.
-   localparam int VIRTUAL_BYTE_ADDR_WIDTH = 64;
-   logic [VIRTUAL_BYTE_ADDR_WIDTH-1:0] rd_addr, wr_addr;
-
-   // Instantiate the memory map, which provides the starting read/write
-   // 64-bit virtual byte addresses, a transfer size (in cache lines), and a
-   // go signal. It also sends a done signal back to software.
-   memory_map
-     #(
-       .ADDR_WIDTH(VIRTUAL_BYTE_ADDR_WIDTH),
-       .SIZE_WIDTH(CL_ADDR_WIDTH+1)
-       )
-     memory_map (.*);
-
-   // Assign the starting addresses from the memory map.
-   assign dma.rd_addr = rd_addr;
-   assign dma.wr_addr = wr_addr;
-   
-   // Use the size (# of cache lines) specified by software.
-   assign dma.rd_size = size;
-   assign dma.wr_size = size;
-
-   // Start both the read and write channels when the MMIO go is received.
-   // Note that writes don't actually occur until dma.wr_en is asserted.
-   assign dma.rd_go = go;
-   assign dma.wr_go = go;
-
-   // Read from the DMA when there is data available (!dma.empty) and when
-   // it is safe to write data (!dma.full).
-   assign dma.rd_en = !dma.empty && !dma.full;
-
-   // Since this is a simple loopback, write to the DMA anytime we read.
-   // For most applications, write enable would be asserted when there is an
-   // output from a pipeline. In this case, the "pipeline" is a wire.
-   assign dma.wr_en = dma.rd_en;
-
-   // Write the data that is read.
-   assign dma.wr_data = dma.rd_data;
-
-   // The AFU is done when the DMA is done writing size cache lines.
-   assign done = dma.wr_done;
             
 endmodule
 

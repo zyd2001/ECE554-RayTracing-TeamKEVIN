@@ -35,16 +35,14 @@ module mem_controller_tb();
                             .rst_n(rst_n),
                             .dma(dma.peripheral),
                             .mmio(mmio),
-                            .mem_wr_strt(mem_wr_strt_CP_MC),
-                            .mem_wr_rdy_tri(mem_wr_rdy_tri_TRI_MC),
+                            .rdy_tri(mem_wr_rdy_tri_TRI_MC),
                             .patch_done(patch_done_PD_MC),
-                            .out_data(out_data_MAIN_MC),
-                            .cp_strt(cp_strt_MC_CP),
-                            .mem_wr_en(mem_wr_en_MC_X),
-                            .mem_wr_data_32(mem_wr_data_32_MC_X),
-                            .mem_wr_data_128(mem_wr_data_128_MC_TRI),
-                            .re_MAIN(re_MC_MAIN),
-                            .addr_MAIN(addr_MC_MAIN));
+                            .result(out_data_MAIN_MC),
+                            .we_mem(mem_wr_en_MC_X),
+                            .data_32(mem_wr_data_32_MC_X),
+                            .data_128(mem_wr_data_128_MC_TRI),
+                            .re_main(re_MC_MAIN),
+                            .addr_main(addr_MC_MAIN));
 
     logic we_RT_MC[3:0];
     logic [31:0] addr_RT_MAIN[3:0];
@@ -209,17 +207,8 @@ module mem_controller_tb();
               $display("Error: wr_en incorrect");
               $stop();
         end
-        if (cp_strt_MC_CP !== 1'h1) begin
-              $display("Error: cp_start incorrect");
-              $stop();
-        end
-
-        repeat(5)@(negedge clk);
-        mem_wr_strt_CP_MC = 1'h1;
         @(negedge clk);
-        mem_wr_strt_CP_MC = 1'h0;
         @(negedge clk);
-
         if (dma.rd_go !== 1'h1) begin
             $display("Error: dma.rd_go not incurred");
             $stop();
