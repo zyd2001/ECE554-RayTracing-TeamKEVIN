@@ -14,7 +14,7 @@
 ///////////////////////////////
 
 module Integer_alu (
-    op1, op2, clk, out, done, operation, flag, en, rst_n
+    op1, op2, clk, out, done, operation, flag, en, rst_n, en_knock_down
 );
     input clk, en, rst_n;
     input signed [31:0] op1, op2;
