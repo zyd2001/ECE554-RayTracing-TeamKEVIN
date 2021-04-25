@@ -39,7 +39,7 @@ namespace CompilerCore
         internal override string Generate(DirectTranslation translation)
         {
             translation.AddLabel(functionName);
-
+            translation.AddNewStackFrame(functionName);
             statementList.Generate(translation);
             return null;
         }
@@ -339,10 +339,11 @@ namespace CompilerCore
             {
                 string tempVar = expression.Generate(translation);
                 if (function.returnType == Type.VECTOR)
-                    translation.AddAssembly("v_mov", ".V" + function.functionName, tempVar);
+                    translation.AddAssembly("v_mov", "RV1", tempVar);
                 else
-                    translation.AddAssembly("s_mov", ".S" + function.functionName, tempVar);
+                    translation.AddAssembly("s_mov", "RS1", tempVar);
             }
+            translation.AddRestoreStack(function.functionName);
             translation.AddAssembly("ret");
             return null;
         }
@@ -363,7 +364,7 @@ namespace CompilerCore
             ushort high = (ushort)(i >> 16);
             ushort low = (ushort)i;
             if (i == 0)
-                translation.AddAssembly("xor", tempScalar, tempScalar);
+                translation.AddAssembly("s_setzero", tempScalar);
             else
             {
                 translation.AddAssembly("s_write_low", tempScalar, (low).ToString());
@@ -554,7 +555,7 @@ namespace CompilerCore
                     default:
                         break;
                 }
-                translation.AddAssembly("xor", tempVar, tempVar, tempVar);
+                translation.AddAssembly("s_setzero", tempVar);
                 translation.AddLabel(skipLabel);
             }
             else
@@ -701,7 +702,7 @@ namespace CompilerCore
                             {
                                 string skipLabel = "L" + LabelCounter;
                                 translation.AddAssembly("cmp_i", "RS0", temp);
-                                translation.AddAssembly("xor", tempVar, tempVar, tempVar); // != 0
+                                translation.AddAssembly("s_setzero", tempVar); // != 0
                                 translation.AddBranch("bne", skipLabel);
                                 translation.AddAssembly("ii_addi", tempVar, "RS0", "1"); // == 0
                                 translation.AddLabel(skipLabel);
@@ -761,7 +762,10 @@ namespace CompilerCore
             string tempVar = func.Type == Type.VECTOR ? ".V" : ".S" + VariableCounter;
             expressionList.Generate(translation);
             translation.AddBranch("jmp_link", identifier);
-            //
+            if (func.Type == Type.VECTOR)
+                translation.AddAssembly("v_mov", tempVar, "RV1");
+            else
+                translation.AddAssembly("s_mov", tempVar, "RS1");
             return tempVar;
         }
     }
