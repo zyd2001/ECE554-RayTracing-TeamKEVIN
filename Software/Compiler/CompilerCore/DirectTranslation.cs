@@ -28,7 +28,7 @@ namespace CompilerCore
 
                 }
             }
-            main.FunctionDefinition.Generate(translation);
+            // main.FunctionDefinition.Generate(translation);
             foreach (var item in globalTable.LocalScope)
             {
                 if (item.Value.IsFunction)

@@ -84,6 +84,10 @@ statement: if_statement
         $$ = new ControlStatement(@$, ControlStatement.Type.BREAK);
     }
     | block_statement
+    | function_call_expression ';'
+    {
+        $$ = new FunctionCallStatement(@$, $1 as FunctionCallExpression);
+    }
     ;
 return_statement: RETURN ';'
     {

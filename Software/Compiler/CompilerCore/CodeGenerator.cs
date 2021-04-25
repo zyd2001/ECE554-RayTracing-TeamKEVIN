@@ -64,7 +64,7 @@ namespace CompilerCore
                         {
                             // TODO: register
                             string op = operands[i];
-                            if (op[0] == '.') // do not add constant
+                            if (op[0] == '.' || op[0] == 'R') // do not add constant
                             {
                                 if (op[1] == 'V')
                                     vuse.Add(op);
