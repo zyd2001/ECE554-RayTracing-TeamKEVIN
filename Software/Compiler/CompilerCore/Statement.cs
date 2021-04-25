@@ -493,7 +493,7 @@ namespace CompilerCore
             if (arraySize >= 0)
                 type -= 3; // make a pointer type
             string t = type == Type.VECTOR ? "V" : "S";
-            string id = $".{t}.{table.ScopeLevel}.{identifier}";
+            string id = $".{t}.{Statement.CurrentFunction.functionName}.{table.ScopeLevel}.{identifier}";
             scopedIdentifier = id;
             table.AddSymbol(identifier, new Symbol(type, id));
             return pass;
@@ -552,7 +552,9 @@ namespace CompilerCore
             {
                 table.AddScope();
                 parameterList.NameAnalysis(table); // only add new symbol, no possible error
+                CurrentFunction = this;
                 bool pass = statementList.NameAnalysis(table);
+                CurrentFunction = null;
                 table.RemoveScope();
                 return pass;
             }
@@ -667,6 +669,40 @@ namespace CompilerCore
                 return false;
             }
             return true;
+        }
+    }
+
+    class FunctionCallStatement : Statement
+    {
+        internal FunctionCallExpression expression;
+        internal FunctionCallStatement(LexLocation location, FunctionCallExpression exp) : base(location)
+        {
+            expression = exp;
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return expression.NameAnalysis(table);
+        }
+        internal override string Generate(DirectTranslation translation)
+        {
+            expression.Generate(translation);
+            return null;
+        }
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            if (topLevel)
+            {
+                Error("Function call in toplevel");
+                return false;
+            }
+            return true;
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            resultType = Type.NULL;
+            return expression.TypeCheck(out _);
         }
     }
 }
