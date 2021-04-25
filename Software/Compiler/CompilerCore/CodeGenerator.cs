@@ -4,24 +4,35 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Set = System.Collections.Immutable.ImmutableHashSet<string>;
+using Move = System.ValueTuple<int, int>;
+
 
 namespace CompilerCore
 {
     class Assembly
     {
-        internal string OPCode { get; }
-        internal List<string> Operands { get; }
+        internal string OPCode { get; set; }
+        internal List<string> Operands { get; set; }
         internal Set SUse { get; set; } = Set.Empty;
         internal Set VUse { get; set; } = Set.Empty;
         internal Set SDef { get; set; } = Set.Empty;
         internal Set VDef { get; set; } = Set.Empty;
         internal string UsedLabel { get; set; } = null;
-        internal HashSet<int> Predecessor { get; } = new HashSet<int>();
-        internal HashSet<int> Successor { get; } = new HashSet<int>();
+        // internal HashSet<int> Predecessor { get; } = new HashSet<int>();
+        internal HashSet<Assembly> Successor { get; } = new HashSet<Assembly>();
         internal Set SIn { get; set; } = Set.Empty;
         internal Set VIn { get; set; } = Set.Empty;
         internal Set SOut { get; set; } = Set.Empty;
         internal Set VOut { get; set; } = Set.Empty;
+        internal string Label { get; set; } = null;
+
+        internal void Copy(Assembly asm)
+        {
+            this.OPCode = asm.OPCode;
+            this.Operands = asm.Operands;
+            this.UsedLabel = asm.UsedLabel;
+            this.Label = asm.Label;
+        }
 
         internal Assembly(string opcode, List<string> operands)
         {
@@ -105,8 +116,10 @@ namespace CompilerCore
         internal List<Set> SOuts { get; set; } = null;
         internal List<Set> VOuts { get; set; } = null;
         internal List<(Assembly ins, int index)> BranchList { get; } = new List<(Assembly ins, int index)>();
+        internal Dictionary<string, Assembly> LabelReferences { get; } = new Dictionary<string, Assembly>();
         internal Dictionary<string, int> Labels { get; } = new Dictionary<string, int>();
         internal Dictionary<int, string> ReverseLabels { get; } = new Dictionary<int, string>();
+        internal Dictionary<string, Assembly> FunctionStackWaiting { get; } = new Dictionary<string, Assembly>();
         internal void AddLabel(string label, bool nextLine = true)
         {
             int index = nextLine ? List.Count : List.Count - 1;
@@ -133,7 +146,10 @@ namespace CompilerCore
                 string resultLabel = ReverseLabels[Labels[label]];
                 item.ins.Operands[0] = resultLabel;
                 item.ins.UsedLabel = resultLabel;
-                List[item.index] = item.ins;
+                List[item.index].Copy(item.ins);
+                Assembly target = List[Labels[label]];
+                target.Label = resultLabel;
+                LabelReferences.TryAdd(resultLabel, target);
             }
         }
 
@@ -142,16 +158,20 @@ namespace CompilerCore
             for (int i = 0; i < List.Count; i++)
             {
                 Assembly ins = List[i];
-                ins.Predecessor.Add(i - 1);
+                // ins.Predecessor.Add(i - 1);
                 if (ins.UsedLabel == null)
-                    ins.Successor.Add(i + 1);
+                {
+                    if (i + 1 < List.Count)
+                        ins.Successor.Add(List[i + 1]);
+                }
                 else // is branch
                 {
                     if (ins.OPCode[0] == 'b')
-                        ins.Successor.Add(i + 1);
-                    int index = Labels[ins.UsedLabel];
-                    ins.Successor.Add(index);
-                    List[index].Predecessor.Add(i);
+                        if (i + 1 < List.Count)
+                            ins.Successor.Add(List[i + 1]);
+                    Assembly target = LabelReferences[ins.UsedLabel];
+                    ins.Successor.Add(target);
+                    // List[index].Predecessor.Add(i);
                 }
             }
         }
@@ -168,21 +188,12 @@ namespace CompilerCore
                 {
                     Assembly ins = List[i];
                     SIns[i] = ins.SIn;
-                    VIns[i] = ins.VIn;
                     SOuts[i] = ins.SOut;
-                    VOuts[i] = ins.VOut;
                     ins.SIn = ins.SUse.Union(ins.SOut.Except(ins.SDef));
-                    ins.VIn = ins.VUse.Union(ins.VOut.Except(ins.VDef));
                     HashSet<string> tempSIn = new HashSet<string>();
-                    foreach (var index in ins.Successor)
-                        if (index < List.Count)
-                            tempSIn.UnionWith(List[index].SIn);
+                    foreach (var assembly in ins.Successor)
+                        tempSIn.UnionWith(assembly.SIn);
                     ins.SOut = tempSIn.ToImmutableHashSet();
-                    HashSet<string> tempVIn = new HashSet<string>();
-                    foreach (var index in ins.Successor)
-                        if (index < List.Count)
-                            tempVIn.UnionWith(List[index].VIn);
-                    ins.VOut = tempVIn.ToImmutableHashSet();
                 }
                 int _i = 0;
                 if (!SIns.TrueForAll((Set s) =>
@@ -198,6 +209,22 @@ namespace CompilerCore
                     _i++;
                     return ret;
                 })) continue;
+                break;
+            }
+            while (true)
+            {
+                for (int i = List.Count - 1; i >= 0; i--)
+                {
+                    Assembly ins = List[i];
+                    VIns[i] = ins.VIn;
+                    VOuts[i] = ins.VOut;
+                    ins.VIn = ins.VUse.Union(ins.VOut.Except(ins.VDef));
+                    HashSet<string> tempVIn = new HashSet<string>();
+                    foreach (var assembly in ins.Successor)
+                        tempVIn.UnionWith(assembly.VIn);
+                    ins.VOut = tempVIn.ToImmutableHashSet();
+                }
+                int _i = 0;
                 if (!VIns.TrueForAll((Set s) =>
                 {
                     bool ret = s.SetEquals(List[_i].VIn);
@@ -215,36 +242,48 @@ namespace CompilerCore
             }
         }
 
+        // v_get_from_s always appear consecutively on same temp var, so there will be no inference
+
         internal (InferenceGraph sgraph, InferenceGraph vgraph) CreateInferenceGraph()
         {
+            ConstructFlowGraph();
+            CalculateLiveSpan();
             InferenceGraph sgraph = new InferenceGraph(SIns, SOuts);
             InferenceGraph vgraph = new InferenceGraph(VIns, VOuts);
             foreach (var ins in List)
             {
                 if (ins.OPCode.Contains("mov"))
                 {
-                    foreach (var a in ins.SDef)
-                        foreach (var b in ins.SOut)
+                    ins.SOut = ins.SOut.Except(ins.SUse);
+                    ins.VOut = ins.VOut.Except(ins.VUse);
+                    if (ins.OPCode[0] == 's')
+                    {
+                        if (ins.SDef.Overlaps(ins.SOut)) // if define is used
                         {
-                            if (ins.Operands[1] != b)
-                                sgraph.AddEdge(a, b);
+                            sgraph.AddToWorklistMoves(ins.SDef, ins.SUse);
+                            foreach (var item in ins.SUse.Union(ins.SDef))
+                                sgraph.AddToMoveList(item, ins.SDef, ins.SUse);
                         }
-                    foreach (var a in ins.VDef)
-                        foreach (var b in ins.VOut)
+                    }
+                    else
+                    {
+                        if (ins.VDef.Overlaps(ins.VOut))
                         {
-                            if (ins.Operands[1] != b)
-                                vgraph.AddEdge(a, b);
+                            vgraph.AddToWorklistMoves(ins.VDef, ins.VUse);
+                            foreach (var item in ins.VUse.Union(ins.VDef))
+                                vgraph.AddToMoveList(item, ins.VDef, ins.VUse);
                         }
+                    }
                 }
-                else
-                {
+                // if define is not used
+                if (ins.SDef.Overlaps(ins.SOut))
                     foreach (var a in ins.SDef)
                         foreach (var b in ins.SOut)
                             sgraph.AddEdge(a, b);
+                if (ins.VDef.Overlaps(ins.VOut))
                     foreach (var a in ins.VDef)
                         foreach (var b in ins.VOut)
                             vgraph.AddEdge(a, b);
-                }
             }
             return (sgraph, vgraph);
         }
@@ -253,19 +292,39 @@ namespace CompilerCore
         {
             for (int i = 0; i < List.Count; i++)
             {
-                if (ReverseLabels.TryGetValue(i, out string label))
-                    Console.Write(label + ":");
+                if (List[i].Label is not null)
+                    Console.Write(List[i].Label + ":");
                 Console.WriteLine("\t" + List[i]);
             }
+        }
+
+        internal void AddNewStackFrame(string functionName)
+        {
+            AddAssembly("s_push", "R28");
+            AddAssembly("s_mov", "R28", "R29");
+            AddAssembly("ii_addi", "R29", "R29", "wtf");
+            FunctionStackWaiting.Add(functionName, List[^1]);
+        }
+
+        internal void AddRestoreStack(string functionName)
+        {
+            AddAssembly("s_mov", "R29", "R28");
+            AddAssembly("s_pop", "R28");
         }
     }
     class InferenceGraph
     {
-        internal Dictionary<string, int> Dict { get; } = new Dictionary<string, int>();
-        internal List<string> ReverseDict { get; } = new List<string>();
+        internal Dictionary<string, int> Map { get; } = new Dictionary<string, int>();
+        internal List<string> ReverseMap { get; } = new List<string>();
 
-        internal HashSet<int>[] AdjacentList { get; } = null;
+        internal ImmutableHashSet<int>[] AdjacentList { get; set; } = null;
+        internal ImmutableHashSet<int>.Builder[] AdjacentListBuilder { get; } = null;
         internal bool[,] AdjacentMatrix { get; } = null;
+        // internal Dictionary<Move, int> MoveMap { get; } = new Dictionary<Move, int>();
+        // internal List<Move> ReverseMoveMap { get; } = new List<Move>();
+        internal HashSet<Move>[] MoveList = null;
+        internal HashSet<Move> WorklistMoves = new HashSet<Move>();
+        internal int[] Degree = null;
 
         public InferenceGraph(List<Set> ins, List<Set> outs)
         {
@@ -273,26 +332,40 @@ namespace CompilerCore
             {
                 foreach (var item in ins[i])
                 {
-                    if (Dict.TryAdd(item, ReverseDict.Count))
-                        ReverseDict.Add(item);
+                    if (Map.TryAdd(item, ReverseMap.Count))
+                        ReverseMap.Add(item);
                 }
                 foreach (var item in outs[i])
                 {
-                    if (Dict.TryAdd(item, ReverseDict.Count))
-                        ReverseDict.Add(item);
+                    if (Map.TryAdd(item, ReverseMap.Count))
+                        ReverseMap.Add(item);
                 }
             }
-            AdjacentList = Enumerable.Range(0, ReverseDict.Count).Select((i) => new HashSet<int>()).ToArray();
-            AdjacentMatrix = new bool[ReverseDict.Count, ReverseDict.Count];
+            AdjacentListBuilder = Enumerable.Range(0, ReverseMap.Count).Select((i) => ImmutableHashSet.CreateBuilder<int>()).ToArray();
+            AdjacentList = new ImmutableHashSet<int>[ReverseMap.Count];
+            AdjacentMatrix = new bool[ReverseMap.Count, ReverseMap.Count];
+            MoveList = Enumerable.Range(0, ReverseMap.Count).Select((i) => new HashSet<Move>()).ToArray();
+            Degree = new int[ReverseMap.Count];
         }
         internal void AddEdge(string a, string b)
         {
-            int ia = Dict[a];
-            int ib = Dict[b];
-            AdjacentList[ia].Add(ib);
-            AdjacentList[ib].Add(ia);
+            int ia = Map[a];
+            int ib = Map[b];
+            Degree[ia]++;
+            AdjacentListBuilder[ia].Add(ib);
             AdjacentMatrix[ia, ib] = true;
+            Degree[ib]++;
             AdjacentMatrix[ib, ia] = true;
+            AdjacentListBuilder[ib].Add(ia);
+        }
+        internal void AddEdge(int a, int b)
+        {
+            Degree[a]++;
+            AdjacentListBuilder[a].Add(b);
+            AdjacentMatrix[a, b] = true;
+            Degree[b]++;
+            AdjacentMatrix[b, a] = true;
+            AdjacentListBuilder[b].Add(a);
         }
 
         public override string ToString()
@@ -300,27 +373,45 @@ namespace CompilerCore
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < AdjacentList.Length; i++)
             {
-                builder.AppendLine(ReverseDict[i]);
-                foreach (var item in AdjacentList[i])
-                    builder.AppendLine($"{ReverseDict[i]} {ReverseDict[item]}");
+                builder.AppendLine(ReverseMap[i]);
+                foreach (var item in AdjacentListBuilder[i])
+                    builder.AppendLine($"{ReverseMap[i]} {ReverseMap[item]}");
             }
             return builder.ToString();
         }
 
-        internal void Allocation(int k)
+        static T getFirstInSet<T>(ISet<T> set)
         {
-            HashSet<int> InitialNodes = new HashSet<int>();
-            HashSet<int> PrecoloredNodes = new HashSet<int>();
-            HashSet<int> SimplifyNodes = new HashSet<int>();
-            HashSet<int> FreezeNodes = new HashSet<int>();
-            HashSet<int> SiginificantNodes = new HashSet<int>();
-            HashSet<int> SpilledNodes = new HashSet<int>();
-            HashSet<int> ColoredNodes = new HashSet<int>();
-            HashSet<int> CoalescedNodes = new HashSet<int>();
-            HashSet<int> NodeMoves = new HashSet<int>();
-            Stack<int> SelectStack = new Stack<int>();
+            var e = set.GetEnumerator();
+            e.MoveNext();
+            return e.Current;
+        }
+
+        internal void AddToMoveList(string item, Set Def, Set Use)
+        {
+            if (Def.Count != 1 || Use.Count != 1)
+                throw new Exception("fv<k");
+            // if (Map.ContainsKey(getFirstInSet(Def))) 
+            // {
+            int u = Map[getFirstInSet(Def)];
+            int v = Map[getFirstInSet(Use)];
+            MoveList[Map[item]].Add((u, v));
+            // }
+        }
+
+        internal void AddToWorklistMoves(Set Def, Set Use)
+        {
+            if (Def.Count != 1 || Use.Count != 1)
+                throw new Exception("fv<k");
+            // if (Map.ContainsKey(getFirstInSet(Def)))
+            // {
+            int u = Map[getFirstInSet(Def)];
+            int v = Map[getFirstInSet(Use)];
+            WorklistMoves.Add((u, v));
+            // }
         }
     }
+
     class CodeGenerator
     {
         StatementList ast;
@@ -335,8 +426,9 @@ namespace CompilerCore
         {
             ast.translate(directTranslation);
             directTranslation.ResolveLabel();
-            directTranslation.ConstructFlowGraph();
-            directTranslation.CalculateLiveSpan();
+            // directTranslation.ConstructFlowGraph();
+            // directTranslation.CalculateLiveSpan();
+            RegisterAllocator.fk(directTranslation);
             directTranslation.Print();
         }
     }
