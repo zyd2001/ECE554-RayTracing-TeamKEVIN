@@ -8,9 +8,13 @@ module RT_Core_single_tb;
 	logic [31:0] not_MRTI [0:4095];
 	int status;
 
-	// Trace Log
-	int tracefile;
-	string tracefilename;
+	// Output signal Trace Log
+	int signaltracefile;
+	string signaltracefilename;
+
+	// Reg/Mem Trace log
+	int rmtracefile;
+	string rmtracefilename;
 	
 	// RT core inputs
 	logic clk, rst_n;
@@ -32,6 +36,10 @@ module RT_Core_single_tb;
 	// set high after reset to start trace
 	logic started;
 
+	// for monitoring regs/memory
+	genvar g;
+
+	int clk_cnt;
 
 	assign MRTI_data_rd = MRTI[MRTI_addr_rd];
 
@@ -40,6 +48,8 @@ module RT_Core_single_tb;
 	// Flip all bits to fix this
 	always_comb foreach (not_MRTI[i]) MRTI[i] = ~not_MRTI[i];
 
+	// RT core instantiation, comment out if
+	// RT core not ready
 	//RT_core_single rt_core(.clk(clk), .rst_n(rst_n),
 	//		.Kernel_mode(Kernel_mode), .End_program(End_program), .Context_switch(Context_switch),
 	//		.scalar_wen(scalar_wen), .scalar_wb_address(scalar_wb_address), .scalar_wb_data(scalar_wb_data),
@@ -54,30 +64,43 @@ module RT_Core_single_tb;
 
 	initial begin
 		// Initialize MRTI
+		// change the filename to what binary file 
+		// you want to use
 		filename = {getenv("PWD"), "/rand_assembly.out"};
 		file = $fopen(filename, "rb");
 		status = $fread(not_MRTI, file);
 
-		// Initialize Trace 
-		tracefilename = {getenv("PWD"), "/trace.out"};
-		tracefile = $fopen(tracefilename, "w+");
+		// Initialize Out Signal Trace 
+		signaltracefilename = {getenv("PWD"), "/sigtrace.out"};
+		signaltracefile = $fopen(signaltracefilename, "w+");
+
+		// Initialize Reg/Mem Trace
+		rmtracefilename = {getenv("PWD"), "/rmtrace.out"};
+		rmtracefile = $fopen(rmtracefilename, "w+");		
 
 
 		clk = 0;
+		clk_cnt = 0;
 		rst_n = 0;
 		started = 0;
 		
+
 		@(posedge clk)
 		rst_n = 1;
 		@(posedge clk)
 		started = 1;
 
 		// test trace log print
+		// comment out unless testing file print
 		scalar_wen = 0;
 		MRTI_addr_rd = 200;
+		not_MRTI[0] = 5;
+		not_MRTI[1] = 1;
 		@(posedge clk)
 		scalar_wen = 1;
 		MRTI_addr_rd = 400;
+		not_MRTI[0] = 6;
+		not_MRTI[2] = 2;
 		@(posedge clk)
 		End_program = 1;
 
@@ -85,23 +108,31 @@ module RT_Core_single_tb;
 
 	end
 
-	//always@(End_program, Context_switch, scalar_wen, vector_wen, scalar_wb_address, scalar_read_address1, scalar_read_address2,
-	//vector_wb_address, vector_read_address1, vector_read_address2, Scalar_wb_data, vector_wb_data, MRTI_addr_rd) begin
-		
-	//	if(started == 1) begin
+	
+	// Reg file tracing
+	// Right now, monitors changing of the instruction memory (to make sure tb works)
+	// When testing the RT core, change MRTI to the registers of the 
+	// RT reg file
+	// Should be rt_core.scalar_ram and rt.core.vector_ram
+	generate
+		for(g = 0; g < 4096; g++) begin
+			always@(MRTI[g]) begin
+				if(started == 1) begin
+					$fwrite(rmtracefile, "%d Reg %h: %h\n", clk_cnt,g, MRTI[g]);
+				end
+			end
+		end
 
-	//	end
-
-
-	//end
+	endgenerate
+	
 
 	// Trace log sensitivities for change of outputs from RT core
 	always@(End_program) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "End_program <= %h\n", End_program);
+			$fwrite(signaltracefile, "End_program <= %h\n", End_program);
 			
 			// End test when thread is finished?
-			$fclose(tracefilename);
+			$fclose(signaltracefilename);
 			$fclose(filename);
 			$stop; 
 		end
@@ -109,77 +140,79 @@ module RT_Core_single_tb;
 
 	always@(Context_switch) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "Context_switch <= %h\n", Context_switch);
+			$fwrite(signaltracefile, "Context_switch <= %h\n", Context_switch);
 		end
 	end
 
 	always@(scalar_wen) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_wen <= %h\n", scalar_wen);
+			$fwrite(signaltracefile, "scalar_wen <= %h\n", scalar_wen);
 		end
 	end
 
 	always@(vector_wen) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_wen <= %h\n", vector_wen);
+			$fwrite(signaltracefile, "vector_wen <= %h\n", vector_wen);
 		end
 	end
 
 	always@(scalar_wb_address) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_wb_address <= %h\n", scalar_wb_address);
+			$fwrite(signaltracefile, "scalar_wb_address <= %h\n", scalar_wb_address);
 		end
 	end
 
 	always@(scalar_read_address1) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_read_address1 <= %h\n", scalar_read_address1);
+			$fwrite(signaltracefile, "scalar_read_address1 <= %h\n", scalar_read_address1);
 		end
 	end
 
 	always@(scalar_read_address2) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_read_address2 <= %h\n", scalar_read_address2);
+			$fwrite(signaltracefile, "scalar_read_address2 <= %h\n", scalar_read_address2);
 		end
 	end
 
 
 	always@(vector_read_address1) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_read_address1 <= %h\n", vector_read_address1);
+			$fwrite(signaltracefile, "vector_read_address1 <= %h\n", vector_read_address1);
 		end
 	end
 
 	always@(vector_read_address2) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_read_address2 <= %h\n", vector_read_address2);
+			$fwrite(signaltracefile, "vector_read_address2 <= %h\n", vector_read_address2);
 		end
 	end
 
 	always@(vector_wb_address) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_wb_address <= %h\n", vector_wb_address);
+			$fwrite(signaltracefile, "vector_wb_address <= %h\n", vector_wb_address);
 		end
 	end
 
 	always@(scalar_wb_data) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "scalar_wb_data <= %h\n", scalar_wb_data);
+			$fwrite(signaltracefile, "scalar_wb_data <= %h\n", scalar_wb_data);
 		end
 	end
 
 	always@(vector_wb_data) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "vector_wb_data <= %h\n", vector_wb_data);
+			$fwrite(signaltracefile, "vector_wb_data <= %h\n", vector_wb_data);
 		end
 	end
 
 	always@(MRTI_addr_rd) begin
 		if(started == 1) begin
-			$fwrite(tracefile, "MRTI_addr_rd <= %h\n", MRTI_addr_rd);
+			$fwrite(signaltracefile, "MRTI_addr_rd <= %h\n", MRTI_addr_rd);
 		end
 	end
 	
 	always #5 clk = ~clk;
+	
+	always@(posedge clk) clk_cnt = clk_cnt + 1;
 
 endmodule
