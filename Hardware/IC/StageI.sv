@@ -38,7 +38,7 @@ module StageI(
   
   always_ff@(posedge clk or posedge rst) begin
     if (rst)
-      state <= IDLE;
+      state <= CAP;
     else 
       state <= nxt_state;
   end
@@ -80,13 +80,17 @@ module StageI(
             ld = 1'b1;
             nxt_state = LOAD;
           end
+          else
+            nxt_state = CAP;
         end
       DONE: 
         begin
           if (StageII_capture) begin
             ld = 1'b1;
             nxt_state = LOAD;
-          end
+          end 
+          else 
+            nxt_state = DONE;
         end
       default: 
         begin
