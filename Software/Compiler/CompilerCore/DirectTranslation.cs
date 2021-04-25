@@ -29,7 +29,11 @@ namespace CompilerCore
                 }
             }
             main.FunctionDefinition.Generate(translation);
-            translation.AddAssembly("Fin");
+            foreach (var item in globalTable.LocalScope)
+            {
+                if (item.Value.IsFunction)
+                    item.Value.FunctionDefinition.Generate(translation);
+            }
             return true;
         }
     }
@@ -39,7 +43,7 @@ namespace CompilerCore
         internal override string Generate(DirectTranslation translation)
         {
             translation.AddLabel(functionName);
-            translation.AddNewStackFrame(functionName);
+            translation.AddPrologue(this);
             statementList.Generate(translation);
             return null;
         }
@@ -335,6 +339,11 @@ namespace CompilerCore
     {
         internal override string Generate(DirectTranslation translation)
         {
+            if (function.functionName == "main")
+            {
+                translation.AddAssembly("Fin");
+                return null;
+            }
             if (expression is not null)
             {
                 string tempVar = expression.Generate(translation);
@@ -343,7 +352,7 @@ namespace CompilerCore
                 else
                     translation.AddAssembly("s_mov", "RS1", tempVar);
             }
-            translation.AddRestoreStack(function.functionName);
+            translation.AddEpilogue(function);
             translation.AddAssembly("ret");
             return null;
         }
@@ -760,18 +769,40 @@ namespace CompilerCore
         internal override string Generate(DirectTranslation translation)
         {
             string tempVar = func.Type == Type.VECTOR ? ".V" : ".S" + VariableCounter;
-            expressionList.Generate(translation);
+            expressionList.Generate(translation, func);
+            translation.AddAssembly("s_push", "R30");
             translation.AddBranch("jmp_link", identifier);
             if (func.Type == Type.VECTOR)
                 translation.AddAssembly("v_mov", tempVar, "RV1");
             else
                 translation.AddAssembly("s_mov", tempVar, "RS1");
+            translation.AddAssembly("s_pop", "R30");
             return tempVar;
         }
     }
 
     partial class ExpressionList
     {
+        internal string Generate(DirectTranslation translation, Symbol func)
+        {
+            int vector = 1, scalar = 1;
+            for (int i = 0; i < list.Count; i++)
+            {
+                string tempVar = list[i].Generate(translation);
+                if (func.ParametersType[i] == Type.VECTOR)
+                {
+                    translation.AddAssembly("v_mov", $"RV{vector}", tempVar);
+                    vector++;
+                }
+                else
+                {
+                    translation.AddAssembly("s_mov", $"RS{scalar}", tempVar);
+                    scalar++;
+                }
+            }
+            return null;
+        }
+
         internal override string Generate(DirectTranslation translation)
         {
             throw new NotImplementedException();
