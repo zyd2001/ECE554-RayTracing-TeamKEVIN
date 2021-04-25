@@ -21,7 +21,7 @@ module address_decode_unit (
                 DE_S2_address = 5'b0;
 
                 DE_Swb_address = 5'b0;
-                DE_Vwb_address = instruction[28] == 1'b0? instruction[24:21] : 4'b0;
+                DE_Vwb_address = instruction[28] == 1'b0 ? instruction[24:21] : 4'b0;
             end 
             // VF instructions
             else if(instruction[30:28] === 3'b010) begin
@@ -41,7 +41,7 @@ module address_decode_unit (
                 DE_V1_address = 4'b0;
                 DE_V2_address = 4'b0; 
                 DE_Vwb_address = 4'b0; 
-                DE_Swb_address = instruction[28] == 1'b0? instruction[25:21] : 5'b0;
+                DE_Swb_address = instruction[28] == 1'b0 ? instruction[25:21] : 5'b0;
             end
         end
         // Immediate MODe
@@ -103,7 +103,7 @@ module address_decode_unit (
                 // for load instructions
                 if (instruction[29:28] == 2'b11) begin
                     DE_S1_address = instruction[20:16];
-                    if (instruction[27:26] == 2'b11) DE_V1_address = instruction[24:21]
+                    if (instruction[27:26] == 2'b11) DE_V1_address = instruction[24:21];
                     else DE_S2_address = instruction[25:21];
 
                 end

@@ -12,7 +12,7 @@ module Float_alu (
 );
     input clk, en, rst_n;
     input [31:0] op1, op2;
-    input [2:0] operation
+    input [2:0] operation;
     output logic [31:0] out;
     output [1:0]flag;
     output logic en_knock_down, done;
