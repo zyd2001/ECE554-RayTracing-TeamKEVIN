@@ -1,5 +1,0 @@
-MRTI_addr_rd <= 000000c8
-scalar_wen <= 0
-MRTI_addr_rd <= 00000190
-scalar_wen <= 1
-End_program <= 1

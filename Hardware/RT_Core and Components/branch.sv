@@ -18,7 +18,7 @@ module branch (
 );
     input clk, rst_n;
     input EX_busy, MEM_busy, int_flag_en, float_flag_en, branch_en;
-    input [1:0] int_flag, float_flag
+    input [1:0] int_flag, float_flag;
     input [2:0] branch_opcode;
 
     output logic IF_DE_stall;
@@ -55,7 +55,6 @@ module branch (
     end
 
     always_comb begin 
-        next_pc_select = 2'b0;
         IF_DE_stall = 1'b0;
         next_state = current_state;
         // No matter what, if the later stage is busy, we will wait
