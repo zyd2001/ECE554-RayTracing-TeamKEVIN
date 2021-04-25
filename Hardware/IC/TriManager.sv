@@ -5,7 +5,8 @@ module TriManager(
   v2_in, v2_out,
   v0_in, v0_out,
   sid_in, sid_out,
-  Mem_notValid, Mem_En,
+  Mem_NotValid, Mem_En,
+  triangle_id,
   Tri_Rdy);
 
   parameter NUM_TRIANGLE = 512;
