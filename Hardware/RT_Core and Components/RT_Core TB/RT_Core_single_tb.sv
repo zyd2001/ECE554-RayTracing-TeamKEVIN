@@ -32,25 +32,48 @@ module RT_Core_single_tb;
 	// set high after reset to start trace
 	logic started;
 
+	// Memory signal
+	logic [31:0] mem_inst_out, mem_const_out;
+	logic [127:0] mem_main_out, mem_out;
+	logic [8:0] inst_address, const_address;
+	logic MM_we, MM_re, MM_done, MM_en, Const_en;
+	logic [127:0] MM_data_out;
+	
+	logic [31:0] RT_MEM_addr;
+	logic [127:0] RT_MEM_data_write, RT_MEM_data_read;
+	logic RT_MEM_read_en, RT_MEM_write_en, RT_MEM_done;
 
-	assign MRTI_data_rd = MRTI[MRTI_addr_rd];
+	assign inst_address = MRTI_addr_rd[10:2];
+	assign const_address = MRTI_addr_rd[10:2];
 
+	// We don't care about invalid address
+	assign MM_en = RT_MEM_addr[31:29] == 3'b100 ? 1'b1 : 1'b0;
+	assign Const_en = = RT_MEM_addr[31:29] == 3'b010 ? 1'b1 : 1'b0;
 
-	// Reading the binary file contains 0's for 1's and vice versa
-	// Flip all bits to fix this
-	always_comb foreach (not_MRTI[i]) MRTI[i] = ~not_MRTI[i];
+	assign RT_MEM_data_read = MM_en == 1'b1 ? MM_data_out : {96'b0, mem_const_out};
+	assign MM_we = RT_MEM_write_en & MM_en;
+	assign MM_re = RT_MEM_read_en & MM_en;
+	assign RT_MEM_done = Const_en | (MM_en & MM_done);
 
-	//RT_core_single rt_core(.clk(clk), .rst_n(rst_n),
-	//		.Kernel_mode(Kernel_mode), .End_program(End_program), .Context_switch(Context_switch),
-	//		.scalar_wen(scalar_wen), .scalar_wb_address(scalar_wb_address), .scalar_wb_data(scalar_wb_data),
-	//		.vector_wen(vector_wen), .vector_wb_address(vector_wb_address), .vector_wb_data(vector_wb_data),
-	//		.scalar_read_address1(scalar_read_address1), .scalar_read_address2(scalar_read_address2), 
-	//		.vector_read_address1(vector_read_address1), .vector_read_address2(vector_read_address2),
-	//		.scalar_read1(scalar_read1), .scalar_read2(scalar_read2),
-	//		.vector_read1(vector_read1), .vector_read2(vector_read2),
-	//		.MRTI_addr_rd(MRTI_addr_rd), .MRTI_data_rd(MRTI_data_rd)
+	single_port_ram_inst #(.ADDR_WIDTH(9), .DATA_WIDTH(32)) inst_mem(.clk(clk), .addr(inst_address), .q(mem_inst_out), .we(1'b0), .data(32'b0));
+	single_port_ram_const #(.ADDR_WIDTH(9), .DATA_WIDTH(32)) const_mem(.clk(clk), .addr(const_address), .q(mem_const_out), .we(1'b0), .data(32'b0));
 
-	//	);
+	mem_main #(.NUM_RT(1), .NUM_THREAD(1)) main_mem(.clk(clk), .rst_n(rst_n), .we_RT(MM_we), .re_RT(MM_re), .addr_RT(RT_MEM_addr), 
+		.data_RT_in(RT_MEM_data_write), .data_RT_out(MM_data_out), .rd_rdy_RT(MM_done));
+	
+	RT_core_single rt_core(.clk(clk), .rst_n(rst_n),
+		.Kernel_mode(Kernel_mode), .End_program(End_program), .Context_switch(Context_switch),
+		.scalar_wen(scalar_wen), .scalar_wb_address(scalar_wb_address), .scalar_wb_data(scalar_wb_data),
+		.vector_wen(vector_wen), .vector_wb_address(vector_wb_address), .vector_wb_data(vector_wb_data),
+		.scalar_read_address1(scalar_read_address1), .scalar_read_address2(scalar_read_address2), 
+		.vector_read_address1(vector_read_address1), .vector_read_address2(vector_read_address2),
+		.scalar_read1(scalar_read1), .scalar_read2(scalar_read2),
+		.vector_read1(vector_read1), .vector_read2(vector_read2),
+
+		.MRTI_addr(MRTI_addr_rd), .MRTI_data(mem_inst_out),
+    	.MEM_addr(RT_MEM_addr), .MEM_data_write(RT_MEM_data_write), .MEM_data_read(RT_MEM_data_read),
+		.MEM_read_en(RT_MEM_read_en), .MEM_write_en(RT_MEM_write_en), .MEM_done(RT_MEM_done)
+	);
 
 	initial begin
 		// Initialize MRTI

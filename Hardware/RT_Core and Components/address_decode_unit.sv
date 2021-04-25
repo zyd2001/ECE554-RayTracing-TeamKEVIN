@@ -72,11 +72,11 @@ module address_decode_unit (
                                 DE_Vwb_address = 4'b0;
                             end
                             2'b10: begin
-                                DE_V1_address = instruction[24:21];
+                                DE_V1_address = 4'b0;
                                 DE_Vwb_address = 4'b0;
                             end
                             default: begin
-                                DE_V1_address = 4'b0;
+                                DE_V1_address = instruction[24:21];
                                 DE_Swb_address = 5'b0;
                             end
                                 
