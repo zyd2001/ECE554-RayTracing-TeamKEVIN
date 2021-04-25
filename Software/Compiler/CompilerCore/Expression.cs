@@ -38,7 +38,7 @@ namespace CompilerCore
             {
                 if (list[i].TypeCheck(out Type type))
                 {
-                    if (Statement.AssignmentTypeHelper(parametersType[i], type))
+                    if (!Statement.AssignmentTypeHelper(parametersType[i], type))
                     {
                         Error($"Argument type {TypeString(type)} doesn't match with" +
                             $" parameter type {TypeString(parametersType[i])}");

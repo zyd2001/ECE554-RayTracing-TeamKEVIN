@@ -314,13 +314,13 @@ namespace CompilerCore
             scalars = types.Count - vectors;
             var d = (new List<(int, int)>(), new List<(int, int)>());
             FunctionSaveRegisterPair.Add(function.functionName, d);
-            for (int i = 0, index = 27; i < scalars; i++, index--)
+            for (int i = 0, index = 27; i < 27 - scalars; i++, index--)
             {
                 int c = Statement.VariableCounter;
                 AddAssembly("s_mov", $".S{c}", $"RS{index}");
                 d.Item1.Add((c, index));
             }
-            for (int i = 0, index = 15; i < vectors; i++, index--)
+            for (int i = 0, index = 15; i < 15 - vectors; i++, index--)
             {
                 int c = Statement.VariableCounter;
                 AddAssembly("v_mov", $".V{c}", $"RV{index}");
@@ -454,7 +454,7 @@ namespace CompilerCore
             directTranslation.ResolveLabel();
             // directTranslation.ConstructFlowGraph();
             // directTranslation.CalculateLiveSpan();
-            RegisterAllocator.fk(directTranslation);
+            // RegisterAllocator.fk(directTranslation);
             directTranslation.Print();
         }
     }

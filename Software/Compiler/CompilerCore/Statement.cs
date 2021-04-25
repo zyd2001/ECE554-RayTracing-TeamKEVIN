@@ -493,7 +493,11 @@ namespace CompilerCore
             if (arraySize >= 0)
                 type -= 3; // make a pointer type
             string t = type == Type.VECTOR ? "V" : "S";
-            string id = $".{t}.{Statement.CurrentFunction.functionName}.{table.ScopeLevel}.{identifier}";
+            string id;
+            if (table.ScopeLevel > 1)
+                id = $".{t}.{Statement.CurrentFunction.functionName}.{table.ScopeLevel}.{identifier}";
+            else
+                id = $"_{t}.{identifier}";
             scopedIdentifier = id;
             table.AddSymbol(identifier, new Symbol(type, id));
             return pass;
