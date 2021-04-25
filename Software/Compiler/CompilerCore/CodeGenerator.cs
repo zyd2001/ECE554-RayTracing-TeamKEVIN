@@ -49,27 +49,67 @@ namespace CompilerCore
                     if (opcode[0] == 'c' || opcode == "s_store_4byte" || opcode == "v_store_4byte")
                     {
                         for (int i = 0; i < 2; i++)
-                            if (operands[i][1] == 'V')
-                                vuse.Add(operands[i]);
-                            else
-                                suse.Add(operands[i]);
+                        {
+                            string op = operands[i];
+                            switch (op)
+                            {
+                                case "RS0":
+                                case "RV0":
+                                case "RS28":
+                                case "RS29":
+                                case "RS30":
+                                case "RS31":
+                                    break;
+                                default:
+                                    if (op[1] == 'V')
+                                        vuse.Add(op);
+                                    else
+                                        suse.Add(op);
+                                    break;
+                            }
+                        }
                     }
                     else
                     {
-                        if (operands[0][1] == 'V')
-                            vdef.Add(operands[0]);
-                        else
-                            sdef.Add(operands[0]);
+                        switch (operands[0])
+                        {
+                            case "RS0":
+                            case "RV0":
+                            case "RS28":
+                            case "RS29":
+                            case "RS30":
+                            case "RS31":
+                                break;
+                            default:
+                                if (operands[0][1] == 'V')
+                                    vdef.Add(operands[0]);
+                                else
+                                    sdef.Add(operands[0]);
+                                break;
+                        }
                         for (int i = 1; i < operands.Count; i++)
                         {
                             // TODO: register
                             string op = operands[i];
                             if (op[0] == '.' || op[0] == 'R') // do not add constant
                             {
-                                if (op[1] == 'V')
-                                    vuse.Add(op);
-                                else
-                                    suse.Add(op);
+                                switch (op)
+                                {
+                                    case "RS0":
+                                    case "RV0":
+                                    case "RS28":
+                                    case "RS29":
+                                    case "RS30":
+                                    case "RS31":
+                                        break;
+                                    default:
+                                        if (op[1] == 'V')
+                                            vuse.Add(op);
+                                        else
+                                            suse.Add(op);
+                                        break;
+                                }
+
                             }
                         }
                     }
@@ -111,15 +151,13 @@ namespace CompilerCore
     class DirectTranslation
     {
         internal List<Assembly> List { get; } = new List<Assembly>();
-        internal List<Set> SIns { get; set; } = null;
-        internal List<Set> VIns { get; set; } = null;
-        internal List<Set> SOuts { get; set; } = null;
-        internal List<Set> VOuts { get; set; } = null;
+        internal List<List<Assembly>> ListOfList { get; } = new List<List<Assembly>>();
         internal List<(Assembly ins, int index)> BranchList { get; } = new List<(Assembly ins, int index)>();
         internal Dictionary<string, Assembly> LabelReferences { get; } = new Dictionary<string, Assembly>();
         internal Dictionary<string, int> Labels { get; } = new Dictionary<string, int>();
         internal Dictionary<int, string> ReverseLabels { get; } = new Dictionary<int, string>();
         internal Dictionary<string, Assembly> FunctionStackWaiting { get; } = new Dictionary<string, Assembly>();
+        internal List<string> Functions { get; } = new List<string>();
         internal Dictionary<string, (List<(int, int)> s, List<(int, int)> v)> FunctionSaveRegisterPair { get; }
             = new Dictionary<string, (List<Move> s, List<Move> v)>();
         internal void AddLabel(string label, bool nextLine = true)
@@ -127,6 +165,12 @@ namespace CompilerCore
             int index = nextLine ? List.Count : List.Count - 1;
             ReverseLabels.TryAdd(index, label);
             Labels.Add(label, index);
+        }
+        internal void AddFunctionLabel(string functionName)
+        {
+            ReverseLabels.Add(List.Count, functionName);
+            Labels.Add(functionName, List.Count);
+            Functions.Add(functionName);
         }
 
         internal void AddAssembly(string opcode, params string[] operands)
@@ -153,141 +197,16 @@ namespace CompilerCore
                 target.Label = resultLabel;
                 LabelReferences.TryAdd(resultLabel, target);
             }
-        }
-
-        internal void ConstructFlowGraph()
-        {
-            for (int i = 0; i < List.Count; i++)
+            int last = -1;
+            foreach (var item in Functions) // assign function labels and split the program
             {
-                Assembly ins = List[i];
-                // ins.Predecessor.Add(i - 1);
-                if (ins.UsedLabel == null || ins.OPCode == "jmp_link") // function call will return
-                {
-                    if (i + 1 < List.Count)
-                        ins.Successor.Add(List[i + 1]);
-                }
-                else  // is branch
-                {
-                    if (ins.OPCode[0] == 'b')
-                        if (i + 1 < List.Count)
-                            ins.Successor.Add(List[i + 1]); // branch may not proceed
-                    Assembly target = LabelReferences[ins.UsedLabel];
-                    ins.Successor.Add(target);
-                    // List[index].Predecessor.Add(i);
-                }
+                int index = Labels[item];
+                List[index].Label = item;
+                if (last != -1)
+                    ListOfList.Add(new List<Assembly>(List.GetRange(last, index - last)));
+                last = index;
             }
-        }
-
-        internal void CalculateLiveSpan()
-        {
-            SIns = new List<Set>(new Set[List.Count]);
-            VIns = new List<Set>(new Set[List.Count]);
-            SOuts = new List<Set>(new Set[List.Count]);
-            VOuts = new List<Set>(new Set[List.Count]);
-            while (true)
-            {
-                for (int i = List.Count - 1; i >= 0; i--)
-                {
-                    Assembly ins = List[i];
-                    SIns[i] = ins.SIn;
-                    SOuts[i] = ins.SOut;
-                    ins.SIn = ins.SUse.Union(ins.SOut.Except(ins.SDef));
-                    HashSet<string> tempSIn = new HashSet<string>();
-                    foreach (var assembly in ins.Successor)
-                        tempSIn.UnionWith(assembly.SIn);
-                    ins.SOut = tempSIn.ToImmutableHashSet();
-                }
-                int _i = 0;
-                if (!SIns.TrueForAll((Set s) =>
-                {
-                    bool ret = s.SetEquals(List[_i].SIn);
-                    _i++;
-                    return ret;
-                })) continue;
-                _i = 0;
-                if (!SOuts.TrueForAll((Set s) =>
-                {
-                    bool ret = s.SetEquals(List[_i].SOut);
-                    _i++;
-                    return ret;
-                })) continue;
-                break;
-            }
-            while (true)
-            {
-                for (int i = List.Count - 1; i >= 0; i--)
-                {
-                    Assembly ins = List[i];
-                    VIns[i] = ins.VIn;
-                    VOuts[i] = ins.VOut;
-                    ins.VIn = ins.VUse.Union(ins.VOut.Except(ins.VDef));
-                    HashSet<string> tempVIn = new HashSet<string>();
-                    foreach (var assembly in ins.Successor)
-                        tempVIn.UnionWith(assembly.VIn);
-                    ins.VOut = tempVIn.ToImmutableHashSet();
-                }
-                int _i = 0;
-                if (!VIns.TrueForAll((Set s) =>
-                {
-                    bool ret = s.SetEquals(List[_i].VIn);
-                    _i++;
-                    return ret;
-                })) continue;
-                _i = 0;
-                if (!VOuts.TrueForAll((Set s) =>
-                {
-                    bool ret = s.SetEquals(List[_i].VOut);
-                    _i++;
-                    return ret;
-                })) continue;
-                break;
-            }
-        }
-
-        // v_get_from_s always appear consecutively on same temp var, so there will be no inference
-
-        internal (InferenceGraph sgraph, InferenceGraph vgraph) CreateInferenceGraph()
-        {
-            ConstructFlowGraph();
-            CalculateLiveSpan();
-            InferenceGraph sgraph = new InferenceGraph(SIns, SOuts);
-            InferenceGraph vgraph = new InferenceGraph(VIns, VOuts);
-            foreach (var ins in List)
-            {
-                if (ins.OPCode.Contains("mov"))
-                {
-                    ins.SOut = ins.SOut.Except(ins.SUse);
-                    ins.VOut = ins.VOut.Except(ins.VUse);
-                    if (ins.OPCode[0] == 's')
-                    {
-                        if (ins.SDef.Overlaps(ins.SOut)) // if define is used
-                        {
-                            sgraph.AddToWorklistMoves(ins.SDef, ins.SUse);
-                            foreach (var item in ins.SUse.Union(ins.SDef))
-                                sgraph.AddToMoveList(item, ins.SDef, ins.SUse);
-                        }
-                    }
-                    else
-                    {
-                        if (ins.VDef.Overlaps(ins.VOut))
-                        {
-                            vgraph.AddToWorklistMoves(ins.VDef, ins.VUse);
-                            foreach (var item in ins.VUse.Union(ins.VDef))
-                                vgraph.AddToMoveList(item, ins.VDef, ins.VUse);
-                        }
-                    }
-                }
-                // if define is not used
-                if (ins.SDef.Overlaps(ins.SOut))
-                    foreach (var a in ins.SDef)
-                        foreach (var b in ins.SOut)
-                            sgraph.AddEdge(a, b);
-                if (ins.VDef.Overlaps(ins.VOut))
-                    foreach (var a in ins.VDef)
-                        foreach (var b in ins.VOut)
-                            vgraph.AddEdge(a, b);
-            }
-            return (sgraph, vgraph);
+            ListOfList.Add(new List<Assembly>(List.GetRange(last, List.Count - last)));
         }
 
         internal void Print()
@@ -302,9 +221,9 @@ namespace CompilerCore
 
         internal void AddPrologue(FunctionDefinitionStatement function)
         {
-            AddAssembly("s_push", "R28");
-            AddAssembly("s_mov", "R28", "R29");
-            AddAssembly("ii_addi", "R29", "R29", "wtf");
+            AddAssembly("s_push", "RS28");
+            AddAssembly("s_mov", "RS28", "RS29");
+            AddAssembly("ii_addi", "RS29", "RS29", "wtf");
             FunctionStackWaiting.Add(function.functionName, List[^1]); // wait for calculating stack size
             var types = function.parameterList.Types();
             int vectors = 0, scalars;
@@ -334,107 +253,8 @@ namespace CompilerCore
                 AddAssembly("s_mov", $"RS{item.Item2}", $".S{item.Item1}");
             foreach (var item in FunctionSaveRegisterPair[function.functionName].v)
                 AddAssembly("v_mov", $"RV{item.Item2}", $".V{item.Item1}");
-            AddAssembly("s_mov", "R29", "R28");
-            AddAssembly("s_pop", "R28");
-        }
-    }
-    class InferenceGraph
-    {
-        internal Dictionary<string, int> Map { get; } = new Dictionary<string, int>();
-        internal List<string> ReverseMap { get; } = new List<string>();
-
-        internal ImmutableHashSet<int>[] AdjacentList { get; set; } = null;
-        internal ImmutableHashSet<int>.Builder[] AdjacentListBuilder { get; } = null;
-        internal bool[,] AdjacentMatrix { get; } = null;
-        // internal Dictionary<Move, int> MoveMap { get; } = new Dictionary<Move, int>();
-        // internal List<Move> ReverseMoveMap { get; } = new List<Move>();
-        internal HashSet<Move>[] MoveList = null;
-        internal HashSet<Move> WorklistMoves = new HashSet<Move>();
-        internal int[] Degree = null;
-
-        public InferenceGraph(List<Set> ins, List<Set> outs)
-        {
-            for (int i = 0; i < ins.Count; i++)
-            {
-                foreach (var item in ins[i])
-                {
-                    if (Map.TryAdd(item, ReverseMap.Count))
-                        ReverseMap.Add(item);
-                }
-                foreach (var item in outs[i])
-                {
-                    if (Map.TryAdd(item, ReverseMap.Count))
-                        ReverseMap.Add(item);
-                }
-            }
-            AdjacentListBuilder = Enumerable.Range(0, ReverseMap.Count).Select((i) => ImmutableHashSet.CreateBuilder<int>()).ToArray();
-            AdjacentList = new ImmutableHashSet<int>[ReverseMap.Count];
-            AdjacentMatrix = new bool[ReverseMap.Count, ReverseMap.Count];
-            MoveList = Enumerable.Range(0, ReverseMap.Count).Select((i) => new HashSet<Move>()).ToArray();
-            Degree = new int[ReverseMap.Count];
-        }
-        internal void AddEdge(string a, string b)
-        {
-            int ia = Map[a];
-            int ib = Map[b];
-            Degree[ia]++;
-            AdjacentListBuilder[ia].Add(ib);
-            AdjacentMatrix[ia, ib] = true;
-            Degree[ib]++;
-            AdjacentMatrix[ib, ia] = true;
-            AdjacentListBuilder[ib].Add(ia);
-        }
-        internal void AddEdge(int a, int b)
-        {
-            Degree[a]++;
-            AdjacentListBuilder[a].Add(b);
-            AdjacentMatrix[a, b] = true;
-            Degree[b]++;
-            AdjacentMatrix[b, a] = true;
-            AdjacentListBuilder[b].Add(a);
-        }
-
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < AdjacentList.Length; i++)
-            {
-                builder.AppendLine(ReverseMap[i]);
-                foreach (var item in AdjacentListBuilder[i])
-                    builder.AppendLine($"{ReverseMap[i]} {ReverseMap[item]}");
-            }
-            return builder.ToString();
-        }
-
-        static T getFirstInSet<T>(ISet<T> set)
-        {
-            var e = set.GetEnumerator();
-            e.MoveNext();
-            return e.Current;
-        }
-
-        internal void AddToMoveList(string item, Set Def, Set Use)
-        {
-            if (Def.Count != 1 || Use.Count != 1)
-                throw new Exception("fv<k");
-            // if (Map.ContainsKey(getFirstInSet(Def))) 
-            // {
-            int u = Map[getFirstInSet(Def)];
-            int v = Map[getFirstInSet(Use)];
-            MoveList[Map[item]].Add((u, v));
-            // }
-        }
-
-        internal void AddToWorklistMoves(Set Def, Set Use)
-        {
-            if (Def.Count != 1 || Use.Count != 1)
-                throw new Exception("fv<k");
-            // if (Map.ContainsKey(getFirstInSet(Def)))
-            // {
-            int u = Map[getFirstInSet(Def)];
-            int v = Map[getFirstInSet(Use)];
-            WorklistMoves.Add((u, v));
-            // }
+            AddAssembly("s_mov", "RS29", "RS28");
+            AddAssembly("s_pop", "RS28");
         }
     }
 
@@ -454,7 +274,11 @@ namespace CompilerCore
             directTranslation.ResolveLabel();
             // directTranslation.ConstructFlowGraph();
             // directTranslation.CalculateLiveSpan();
-            // RegisterAllocator.fk(directTranslation);
+            foreach (var item in directTranslation.ListOfList)
+            {
+                var f = new FunctionTranslation(item, directTranslation.LabelReferences);
+                RegisterAllocator.fk(f);
+            }
             directTranslation.Print();
         }
     }

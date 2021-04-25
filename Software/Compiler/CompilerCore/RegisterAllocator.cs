@@ -24,7 +24,7 @@ namespace CompilerCore
         HashSet<Move> worklistMoves = new HashSet<Move>();
         HashSet<Move> activeMoves = new HashSet<Move>();
         HashSet<Move>[] moveList = null;
-        HashSet<int> tempNodes = new HashSet<int>();
+        HashSet<string> tempNodes = new HashSet<string>();
         Dictionary<int, int> alias = new Dictionary<int, int>();
         int[] color;
         int RegisterNumber;
@@ -170,7 +170,7 @@ namespace CompilerCore
             }
         }
 
-        static T getFirstInSet<T>(ISet<T> set)
+        static T getFirstInSet<T>(IEnumerable<T> set)
         {
             var e = set.GetEnumerator();
             e.MoveNext();
@@ -242,7 +242,7 @@ namespace CompilerCore
             // TODO: select
             foreach (var m in spillWorklist)
             {
-                if (!tempNodes.Contains(m)) // temp nodes will be negative
+                if (!tempNodes.Contains(graph.ReverseMap[m])) // temp nodes
                 {
                     spillWorklist.Remove(m);
                     simplifyWorklist.Add(m);
@@ -276,25 +276,37 @@ namespace CompilerCore
                 color[n] = color[getAlias(n)];
         }
 
-        void rewrite(DirectTranslation translation, bool scalar)
+        void rewrite(FunctionTranslation translation, bool scalar)
         {
-            for (int i = 0; i < translation.List.Count; i++)
+            for (var node = translation.List.First; node != null; node = node.Next)
             {
-                Assembly ins = translation.List[i];
+                Assembly ins = node.Value;
                 if (scalar)
                 {
                     HashSet<int> defs = new HashSet<int>();
                     HashSet<int> uses = new HashSet<int>();
                     foreach (var item in ins.SDef)
-                        defs.Add(graph.Map[item]);
+                        if (ins.SDef.Overlaps(ins.SOut)) // if define is used
+                            defs.Add(graph.Map[item]);
                     foreach (var item in ins.SUse)
                         uses.Add(graph.Map[item]);
                     if (spilledNodes.Overlaps(defs))
-                        translation.List.Insert(i + 1, new Assembly("s_store_4byte", new List<string> { "", "R28", "1" }));
-                    if (spilledNodes.Overlaps(uses))
                     {
-                        translation.List.Insert(i, new Assembly("s_load_4byte", new List<string> { "", "R28", "1" }));
-                        i++;
+                        if (defs.Count > 1)
+                            throw new Exception("fv<k");
+                        var tempVar = ".S" + Statement.VariableCounter;
+                        ins.SDef = (new HashSet<string> { tempVar }).ToImmutableHashSet();
+                        tempNodes.Add(tempVar);
+                        translation.List.AddAfter(node, new Assembly("s_store_4byte", new List<string> { tempVar, "RS28", "1" }));
+                        node = node.Next;
+                    }
+                    uses.IntersectWith(spilledNodes);
+                    foreach (var item in uses)
+                    {
+                        var tempVar = ".S" + Statement.VariableCounter;
+                        ins.SUse = ins.SUse.Remove(graph.ReverseMap[item]).Add(tempVar);
+                        tempNodes.Add(tempVar);
+                        translation.List.AddBefore(node, new Assembly("s_load_4byte", new List<string> { tempVar, "RS28", "1" }));
                     }
                 }
                 else
@@ -302,28 +314,56 @@ namespace CompilerCore
                     HashSet<int> defs = new HashSet<int>();
                     HashSet<int> uses = new HashSet<int>();
                     foreach (var item in ins.VDef)
-                        defs.Add(graph.Map[item]);
+                        if (ins.VDef.Overlaps(ins.VOut)) // if define is used
+                            defs.Add(graph.Map[item]);
                     foreach (var item in ins.VUse)
                         uses.Add(graph.Map[item]);
                     if (spilledNodes.Overlaps(defs))
-                        translation.List.Insert(i + 1, new Assembly("v_store_16byte", new List<string> { "", "R28", "1" }));
-                    if (spilledNodes.Overlaps(uses))
                     {
-                        translation.List.Insert(i, new Assembly("v_load_16byte", new List<string> { "", "R28", "1" }));
-                        i++;
+                        if (defs.Count > 1)
+                            throw new Exception("fv<k");
+                        var tempVar = ".V" + Statement.VariableCounter;
+                        ins.VDef = (new HashSet<string> { tempVar }).ToImmutableHashSet();
+                        tempNodes.Add(tempVar);
+                        translation.List.AddAfter(node, new Assembly("v_store_4byte", new List<string> { tempVar, "RS28", "1" }));
+                        node = node.Next;
+                    }
+                    uses.IntersectWith(spilledNodes);
+                    foreach (var item in uses)
+                    {
+                        var tempVar = ".V" + Statement.VariableCounter;
+                        ins.VUse = ins.VUse.Remove(graph.ReverseMap[item]).Add(tempVar);
+                        tempNodes.Add(tempVar);
+                        translation.List.AddBefore(node, new Assembly("v_load_4byte", new List<string> { tempVar, "RS28", "1" }));
                     }
                 }
             }
         }
 
-        internal static void fk(DirectTranslation translation)
+        internal static void fk(FunctionTranslation translation)
         {
             while (true)
             {
-                (var sgraph, var vgraph) = translation.CreateInferenceGraph();
-                Console.WriteLine(sgraph.ToString());
-                RegisterAllocator sAllocator = new RegisterAllocator(sgraph, 27);
-                // RegisterAllocator vAllocator = new RegisterAllocator(vgraph, 15);
+                HashSet<string> spre = new HashSet<string>();
+                HashSet<string> vpre = new HashSet<string>();
+                for (int i = 1; i < 28; i++)
+                    spre.Add($"RS{i}");
+                for (int i = 1; i < 16; i++)
+                    spre.Add($"RV{i}");
+
+                (var sgraph, var vgraph) = translation.CreateInferenceGraph(spre, vpre);
+
+                HashSet<int> sPrecolored = new HashSet<int>();
+                HashSet<int> vPrecolored = new HashSet<int>();
+
+                for (int i = 1; i < 28; i++)
+                    sPrecolored.Add(sgraph.Map[$"RS{i}"]);
+                for (int i = 1; i < 16; i++)
+                    vPrecolored.Add(sgraph.Map[$"RV{i}"]);
+
+                // Console.WriteLine(sgraph.ToString());
+                RegisterAllocator sAllocator = new RegisterAllocator(sgraph, 27, sPrecolored);
+                RegisterAllocator vAllocator = new RegisterAllocator(vgraph, 15, vPrecolored);
                 bool sDone = false, vDone = true;
                 while (!sDone)
                     if (sAllocator.simplifyWorklist.Count != 0)
@@ -363,10 +403,11 @@ namespace CompilerCore
             }
         }
 
-        internal RegisterAllocator(InferenceGraph graph, int number)
+        internal RegisterAllocator(InferenceGraph graph, int number, HashSet<int> pre)
         {
             RegisterNumber = number;
             this.graph = graph;
+            precolored = pre;
             color = new int[graph.Map.Count];
             initial = new HashSet<int>(graph.Map.Values);
             moveList = graph.MoveList;
