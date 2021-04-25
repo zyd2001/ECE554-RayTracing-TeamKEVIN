@@ -535,7 +535,7 @@ namespace CompilerCore
     {
         internal Type returnType;
         internal string functionName;
-        ParameterList parameterList;
+        internal ParameterList parameterList;
         StatementList statementList;
         internal FunctionDefinitionStatement(LexLocation location, Type type, string name,
             ParameterList parameters, StatementList statements) : base(location)

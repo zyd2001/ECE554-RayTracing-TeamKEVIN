@@ -120,6 +120,8 @@ namespace CompilerCore
         internal Dictionary<string, int> Labels { get; } = new Dictionary<string, int>();
         internal Dictionary<int, string> ReverseLabels { get; } = new Dictionary<int, string>();
         internal Dictionary<string, Assembly> FunctionStackWaiting { get; } = new Dictionary<string, Assembly>();
+        internal Dictionary<string, (List<(int, int)> s, List<(int, int)> v)> FunctionSaveRegisterPair { get; }
+            = new Dictionary<string, (List<Move> s, List<Move> v)>();
         internal void AddLabel(string label, bool nextLine = true)
         {
             int index = nextLine ? List.Count : List.Count - 1;
@@ -159,16 +161,16 @@ namespace CompilerCore
             {
                 Assembly ins = List[i];
                 // ins.Predecessor.Add(i - 1);
-                if (ins.UsedLabel == null)
+                if (ins.UsedLabel == null || ins.OPCode == "jmp_link") // function call will return
                 {
                     if (i + 1 < List.Count)
                         ins.Successor.Add(List[i + 1]);
                 }
-                else // is branch
+                else  // is branch
                 {
                     if (ins.OPCode[0] == 'b')
                         if (i + 1 < List.Count)
-                            ins.Successor.Add(List[i + 1]);
+                            ins.Successor.Add(List[i + 1]); // branch may not proceed
                     Assembly target = LabelReferences[ins.UsedLabel];
                     ins.Successor.Add(target);
                     // List[index].Predecessor.Add(i);
@@ -298,16 +300,40 @@ namespace CompilerCore
             }
         }
 
-        internal void AddNewStackFrame(string functionName)
+        internal void AddPrologue(FunctionDefinitionStatement function)
         {
             AddAssembly("s_push", "R28");
             AddAssembly("s_mov", "R28", "R29");
             AddAssembly("ii_addi", "R29", "R29", "wtf");
-            FunctionStackWaiting.Add(functionName, List[^1]);
+            FunctionStackWaiting.Add(function.functionName, List[^1]); // wait for calculating stack size
+            var types = function.parameterList.Types();
+            int vectors = 0, scalars;
+            foreach (var t in types)
+                if (t == Type.VECTOR)
+                    vectors++;
+            scalars = types.Count - vectors;
+            var d = (new List<(int, int)>(), new List<(int, int)>());
+            FunctionSaveRegisterPair.Add(function.functionName, d);
+            for (int i = 0, index = 27; i < scalars; i++, index--)
+            {
+                int c = Statement.VariableCounter;
+                AddAssembly("s_mov", $".S{c}", $"RS{index}");
+                d.Item1.Add((c, index));
+            }
+            for (int i = 0, index = 15; i < vectors; i++, index--)
+            {
+                int c = Statement.VariableCounter;
+                AddAssembly("v_mov", $".V{c}", $"RV{index}");
+                d.Item2.Add((c, index));
+            }
         }
 
-        internal void AddRestoreStack(string functionName)
+        internal void AddEpilogue(FunctionDefinitionStatement function)
         {
+            foreach (var item in FunctionSaveRegisterPair[function.functionName].s)
+                AddAssembly("s_mov", $"RS{item.Item2}", $".S{item.Item1}");
+            foreach (var item in FunctionSaveRegisterPair[function.functionName].v)
+                AddAssembly("v_mov", $"RV{item.Item2}", $".V{item.Item1}");
             AddAssembly("s_mov", "R29", "R28");
             AddAssembly("s_pop", "R28");
         }
