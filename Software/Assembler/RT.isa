@@ -112,3 +112,7 @@ v_pop r
 # ii_addi R29 R29 -16, v_load_16byte $r0 R29 0
 v_push r
 # v_store_4byte $r0 R29 0, ii_addi R29 R29 16
+v_get_from_s_d r r i
+# v_get_from_s $r0 $r1 $i
+s_setzero r
+# xor $r0 $r0 $r0
