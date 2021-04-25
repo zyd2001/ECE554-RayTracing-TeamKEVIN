@@ -41,7 +41,8 @@ module instruction_decode_unit (
     floatALU1_en, floatALU2_en,
     floatALU3_en, floatALU4_en,
     Scalar_out_select, memory_op,
-    vector_reduce_en, update_int_flag, update_float_flag
+    vector_reduce_en, update_int_flag, update_float_flag,
+    context_switch
 );
     input [5:0] opcode;
     input [1:0] immediate;
@@ -51,6 +52,7 @@ module instruction_decode_unit (
     output logic intALU_en, floatALU1_en, floatALU2_en, floatALU3_en, floatALU4_en, vector_reduce_en;
     output logic [2:0] Scalar_out_select, memory_op;
     output logic update_int_flag, update_float_flag;
+    output logic context_switch;
 
     always_comb begin
         // Default values
@@ -154,6 +156,8 @@ module instruction_decode_unit (
         if (opcode == 6'b011101)
             update_float_flag = 1'b1;
         
+        if (opcode == 6'b111010)
+            context_switch = 1'b1;
     end
         
     
