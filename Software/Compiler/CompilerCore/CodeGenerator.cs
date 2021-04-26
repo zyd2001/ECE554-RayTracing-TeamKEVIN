@@ -213,7 +213,8 @@ namespace CompilerCore
         internal Dictionary<string, Assembly> LabelReferences { get; } = new Dictionary<string, Assembly>();
         internal Dictionary<string, int> Labels { get; } = new Dictionary<string, int>();
         internal Dictionary<int, string> ReverseLabels { get; } = new Dictionary<int, string>();
-        internal Dictionary<string, Assembly> FunctionStackWaiting { get; } = new Dictionary<string, Assembly>();
+        internal Dictionary<FunctionDefinitionStatement, Assembly> FunctionStackWaiting { get; } =
+            new Dictionary<FunctionDefinitionStatement, Assembly>();
         internal List<string> FunctionNames { get; } = new List<string>();
         internal List<FunctionDefinitionStatement> Functions { get; } = new List<FunctionDefinitionStatement>();
         internal Dictionary<string, (List<(int, int)> s, List<(int, int)> v)> FunctionSaveRegisterPair { get; }
@@ -293,7 +294,7 @@ namespace CompilerCore
             AddAssembly("s_push", "RS28");
             AddAssembly("s_mov", "RS28", "RS29");
             AddAssembly("ii_addi", "RS29", "RS29", "wtf");
-            FunctionStackWaiting.Add(function.functionName, List[^1]); // wait for calculating stack size
+            FunctionStackWaiting.Add(function, List[^1]); // wait for calculating stack size
             var types = function.parameterList.Types();
             var names = function.parameterList.Names();
             int vectors = 1, scalars = 1;
@@ -392,6 +393,13 @@ namespace CompilerCore
             }
             foreach (var item in list)
                 item.ResolveCallerSave(rlist);
+            foreach (var item in directTranslation.FunctionStackWaiting)
+            {
+                int size = item.Key.StackSize;
+                if (size % 4 != 0)
+                    size = size - (size % 4) + 4;
+                item.Value.Operands[2] = size.ToString();
+            }
             foreach (var item in list)
                 item.Output(Console.Out);
             // directTranslation.Print();

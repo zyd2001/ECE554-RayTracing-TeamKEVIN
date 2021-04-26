@@ -297,7 +297,8 @@ namespace CompilerCore
                         var tempVar = ".S" + Statement.VariableCounter;
                         ins.changeDef(tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddAfter(node, new Assembly("s_store_4byte", new List<string> { tempVar, "RS28", "1" }));
+                        translation.List.AddAfter(node, new Assembly("s_store_4byte",
+                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
                         node = node.Next;
                     }
                     uses.IntersectWith(spilledNodes);
@@ -306,8 +307,10 @@ namespace CompilerCore
                         var tempVar = ".S" + Statement.VariableCounter;
                         ins.changeUse(graph.ReverseMap[item], tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddBefore(node, new Assembly("s_load_4byte", new List<string> { tempVar, "RS28", "1" }));
+                        translation.List.AddBefore(node, new Assembly("s_load_4byte",
+                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
                     }
+                    translation.function.StackSize += 4;
                 }
                 else
                 {
@@ -325,7 +328,8 @@ namespace CompilerCore
                         var tempVar = ".V" + Statement.VariableCounter;
                         ins.changeDef(tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddAfter(node, new Assembly("v_store_4byte", new List<string> { tempVar, "RS28", "1" }));
+                        translation.List.AddAfter(node, new Assembly("v_store_4byte",
+                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
                         node = node.Next;
                     }
                     uses.IntersectWith(spilledNodes);
@@ -334,8 +338,10 @@ namespace CompilerCore
                         var tempVar = ".V" + Statement.VariableCounter;
                         ins.changeUse(graph.ReverseMap[item], tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddBefore(node, new Assembly("v_load_4byte", new List<string> { tempVar, "RS28", "1" }));
+                        translation.List.AddBefore(node, new Assembly("v_load_4byte",
+                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
                     }
+                    translation.function.StackSize += 16;
                 }
             }
         }
