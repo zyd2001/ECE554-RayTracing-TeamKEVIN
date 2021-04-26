@@ -73,6 +73,7 @@ module rta
   logic [127:0] data_128_mc_tri;
   logic re_mc_main;
   logic [31:0] addr_mc_main[NUM_RT-1:0];
+  logic term_mc_cp;
 
   // Stack Memory
   logic we_rt_main[NUM_RT-1:0];
@@ -110,7 +111,8 @@ module rta
     .data_32(data_32_mc_x),
     .data_128(data_128_mc_tri),
     .re_main(re_mc_main),
-    .addr_main(addr_mc_main)
+    .addr_main(addr_mc_main),
+    .term(term_mc_cp)
     );
 
 

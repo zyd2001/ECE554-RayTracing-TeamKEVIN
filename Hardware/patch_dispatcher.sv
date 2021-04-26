@@ -80,7 +80,6 @@ module patch_dispatcher
         Command Processor Initialization
     */
     
-    logic load_done;
     logic en_q_load;
     logic [31:0] pixel_id[NUM_THREAD-1:0];
     logic [BIT_THREAD:0] pixel_id_addr;
@@ -105,7 +104,7 @@ module patch_dispatcher
             pixel_id[pixel_id_addr[BIT_THREAD-1:0]] <= pixel_id_cp;
     end
 
-    typedef enum reg [1:0] {LOAD_IDLE, LOAD_LOADING, LOAD_WORKING} t_state_load;
+    typedef enum reg {LOAD_IDLE, LOAD_LOADING} t_state_load;
     t_state_load state_load, nxt_state_load;
 
     always_ff @( posedge clk, negedge rst_n ) begin 
@@ -120,7 +119,6 @@ module patch_dispatcher
         pixel_id_we = 1'h0;
         pixel_id_addr_clr = 1'h0;
         en_q_load = 1'h0;
-        load_done = 1'h0;
 
         case(state_load)
             LOAD_IDLE: begin
@@ -130,9 +128,9 @@ module patch_dispatcher
                     en_q_load = 1'h1;
                 end
             end
-            LOAD_LOADING: begin
+            default: begin
                if (pixel_id_addr[BIT_THREAD] = 1'h1) begin
-                   nxt_state_load = LOAD_WORKING;
+                   nxt_state_load = LOAD_IDLE;
                    pixel_id_addr_clr = 1'h1;
                end 
                else begin
@@ -140,11 +138,6 @@ module patch_dispatcher
                    pixel_id_we = 1'h1;
                    en_q_load = 1'h1;
                end
-            end
-            default: begin
-                load_done = 1'h1;
-                if (!job_done[BIT_THREAD])
-                    nxt_state_load = LOAD_WORKING;
             end
         endcase
     end
@@ -316,7 +309,7 @@ module patch_dispatcher
     assign en_q_tid_ic2rt = context_switch_ic2rt[0] || context_switch_ic2rt[1] || context_switch_ic2rt[2] || context_switch_ic2rt[3]
     assign q_en_ic2rt = en_q_tid_ic2rt;
 
-    assign data_in_tid_ic2rt = load_done ? data_sel_tid_ic2rt : {{(31-BIT_THREAD){1'h0}}, pixel_id_addr};
+    assign data_in_tid_ic2rt = en_q_load ? {{(31-BIT_THREAD){1'h0}}, pixel_id_addr} : data_sel_tid_ic2rt;
     assign data_sel_tid_ic2rt = en_q_sel_ic2rt[0] ? thread_id_in_ic[0]   
                                 : en_q_sel_ic2rt[1] ? thread_id_in_ic[1]
                                 : en_q_sel_ic2rt[2] ? thread_id_in_ic[2]
@@ -356,12 +349,12 @@ module patch_dispatcher
 
     // output 
 
-    assign de_q_tid_ic2rt = load_done && !empty_tid_ic2rt && !(busy_rt[0] && busy_rt[1] && busy_rt[2] && busy_rt[3]);
+    assign de_q_tid_ic2rt = !empty_tid_ic2rt && !(busy_rt[0] && busy_rt[1] && busy_rt[2] && busy_rt[3]);
 
-    assign job_dispatch_rt[0] = load_done && !empty_tid_ic2rt && !busy_rt[0];
-    assign job_dispatch_rt[1] = load_done && !empty_tid_ic2rt && busy_rt[0] && !busy_rt[1];
-    assign job_dispatch_rt[2] = load_done && !empty_tid_ic2rt && busy_rt[0] && busy_rt[1] && !busy_rt[2];
-    assign job_dispatch_rt[3] = load_done && !empty_tid_ic2rt && busy_rt[0] && busy_rt[1] && busy_rt[2] && !busy_rt[3];
+    assign job_dispatch_rt[0] = !empty_tid_ic2rt && !busy_rt[0];
+    assign job_dispatch_rt[1] = !empty_tid_ic2rt && busy_rt[0] && !busy_rt[1];
+    assign job_dispatch_rt[2] = !empty_tid_ic2rt && busy_rt[0] && busy_rt[1] && !busy_rt[2];
+    assign job_dispatch_rt[3] = !empty_tid_ic2rt && busy_rt[0] && busy_rt[1] && busy_rt[2] && !busy_rt[3];
 
     assign thread_id_out_rt = data_out_tid_ic2rt;
     assign pixel_id_rt = pixel_id[data_out_tid_ic2rt];
