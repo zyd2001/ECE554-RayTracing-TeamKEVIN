@@ -25,6 +25,7 @@ namespace CompilerCore
         internal Set SOut { get; set; } = Set.Empty;
         internal Set VOut { get; set; } = Set.Empty;
         internal string Label { get; set; } = null;
+        internal List<string> FunctionArgument { get; set; } = null;
         internal Type returnType { get; set; } = Type.NULL;
 
         internal void Copy(Assembly asm)
@@ -33,6 +34,10 @@ namespace CompilerCore
             this.Operands = asm.Operands;
             this.UsedLabel = asm.UsedLabel;
             this.Label = asm.Label;
+            this.SUse = asm.SUse;
+            this.VUse = asm.VUse;
+            this.SDef = asm.SDef;
+            this.VDef = asm.VDef;
         }
 
         internal Assembly(string opcode, List<string> operands)
@@ -48,6 +53,14 @@ namespace CompilerCore
             var suse = ImmutableHashSet.CreateBuilder<string>();
             var vdef = ImmutableHashSet.CreateBuilder<string>();
             var sdef = ImmutableHashSet.CreateBuilder<string>();
+            if (OPCode == "jmp_link")
+            {
+                foreach (var item in FunctionArgument)
+                    if (item[1] == 'V')
+                        vuse.Add(item);
+                    else
+                        suse.Add(item);
+            }
             if (OPCode == "ret")
             {
                 for (int i = 0, index = 27; i < 10; i++, index--)
@@ -173,6 +186,14 @@ namespace CompilerCore
             calculateUseDef();
         }
 
+        internal Assembly(string opcode, string label, List<string> args)
+        {
+            OPCode = opcode;
+            Operands = new List<string> { label };
+            FunctionArgument = args;
+            calculateUseDef();
+        }
+
         public override string ToString()
         {
             string str = OPCode;
@@ -205,6 +226,12 @@ namespace CompilerCore
             ReverseLabels.Add(List.Count, functionName);
             Labels.Add(functionName, List.Count);
             Functions.Add(functionName);
+        }
+
+        internal void AddFunctionCall(string label, List<string> args)
+        {
+            BranchList.Add((new Assembly("jmp_link", label, args), List.Count));
+            AddAssembly(""); // placeholder
         }
 
         internal void AddAssembly(string opcode, params string[] operands)
