@@ -28,6 +28,8 @@ digits [0-9]+
 "return"        return (int)Tokens.RETURN;
 "struct"        return (int)Tokens.STRUCT;
 "const"         return (int)Tokens.CONST;
+"trace"         return (int)Tokens.TRACE;
+"reduce"        return (int)Tokens.REDUCE;
 "&&"            return (int)Tokens.AND;
 "||"            return (int)Tokens.OR;
 "=="            return (int)Tokens.EQ;
