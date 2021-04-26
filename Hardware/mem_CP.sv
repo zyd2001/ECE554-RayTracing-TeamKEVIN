@@ -1,6 +1,6 @@
 module mem_CP(clk, rst_n, re_CP, data_MC, ctrl_MC, invalid_CP, data_out_CP);
 
-    parameter DEPTH = 32 * 1024;
+    parameter DEPTH = 65536;
     localparam BIT_ADDR = $clog2(DEPTH);
     /*
         Input

@@ -1,6 +1,6 @@
 module mem_CP_tb();
 
-    parameter DEPTH = 32 * 1024;
+    parameter DEPTH = 65536;
     localparam BIT_ADDR = $clog2(DEPTH);
     /*
         Input
