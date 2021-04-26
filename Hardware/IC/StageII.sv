@@ -6,6 +6,7 @@ module StageII(
   tvec_in, tvec_out,
   pvec_in, pvec_out,
   qvec_in, qvec_out,
+  norm_in, norm_out,
   thread_id_in, thread_id_out,
   triangle_id_in, triangle_id_out,
   sid_in, sid_out
@@ -20,13 +21,13 @@ module StageII(
   input [BIT_TRIANGLE-1:0] triangle_id_in;
   input [BIT_THREAD-1:0] thread_id_in;
   input [31:0] sid_in;
-  input [95:0] v0v1_in, v0v2_in, dir_in, tvec_in, pvec_in, qvec_in;
+  input [95:0] v0v1_in, v0v2_in, dir_in, tvec_in, pvec_in, qvec_in, norm_in;
   
   output StageII_capture;
   output [BIT_TRIANGLE-1:0] triangle_id_out;
   output [BIT_THREAD-1:0] thread_id_out;
   output [31:0] sid_out;
-  output [95:0] v0v1_out, v0v2_out, dir_out, tvec_out, pvec_out, qvec_out;
+  output [95:0] v0v1_out, v0v2_out, dir_out, tvec_out, pvec_out, qvec_out, norm_out;
   
   typedef enum reg [1:0] {DONE, CAP, LOAD, IDLE} state_t;
   state_t state, nxt_state;
@@ -35,7 +36,7 @@ module StageII(
   logic [BIT_TRIANGLE-1:0] triangle_id_reg;
   logic [BIT_THREAD-1:0] thread_id_reg;
   logic [31:0] sid_reg;
-  logic [95:0] v0v1_reg, v0v2_reg, dir_reg, tvec_reg, pvec_reg, qvec_reg;
+  logic [95:0] v0v1_reg, v0v2_reg, dir_reg, tvec_reg, pvec_reg, qvec_reg, norm_reg;
   
   
   always_ff@(posedge clk or posedge rst) begin
@@ -56,6 +57,7 @@ module StageII(
       tvec_reg <= '0;
       pvec_reg <= '0;
       qvec_reg <= '0;
+      norm_reg <= '0;
     end
     else if (ld) begin
       triangle_id_reg <= triangle_id_in;
@@ -67,6 +69,7 @@ module StageII(
       tvec_reg <= tvec_in;
       pvec_reg <= pvec_in;
       qvec_reg <= qvec_in;
+      norm_reg <= norm_in;
     end
   end
 
@@ -122,5 +125,6 @@ module StageII(
   assign tvec_out = tvec_reg;
   assign pvec_out = pvec_reg;
   assign qvec_out = qvec_reg;
+  assign norm_out = norm_reg;
   
 endmodule
