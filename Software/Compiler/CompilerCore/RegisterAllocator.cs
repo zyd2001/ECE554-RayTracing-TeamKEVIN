@@ -295,7 +295,7 @@ namespace CompilerCore
                         if (defs.Count > 1)
                             throw new Exception("fv<k");
                         var tempVar = ".S" + Statement.VariableCounter;
-                        ins.SDef = (new HashSet<string> { tempVar }).ToImmutableHashSet();
+                        ins.changeDef(tempVar);
                         tempNodes.Add(tempVar);
                         translation.List.AddAfter(node, new Assembly("s_store_4byte", new List<string> { tempVar, "RS28", "1" }));
                         node = node.Next;
@@ -304,7 +304,7 @@ namespace CompilerCore
                     foreach (var item in uses)
                     {
                         var tempVar = ".S" + Statement.VariableCounter;
-                        ins.SUse = ins.SUse.Remove(graph.ReverseMap[item]).Add(tempVar);
+                        ins.changeUse(graph.ReverseMap[item], tempVar);
                         tempNodes.Add(tempVar);
                         translation.List.AddBefore(node, new Assembly("s_load_4byte", new List<string> { tempVar, "RS28", "1" }));
                     }
@@ -323,7 +323,7 @@ namespace CompilerCore
                         if (defs.Count > 1)
                             throw new Exception("fv<k");
                         var tempVar = ".V" + Statement.VariableCounter;
-                        ins.VDef = (new HashSet<string> { tempVar }).ToImmutableHashSet();
+                        ins.changeDef(tempVar);
                         tempNodes.Add(tempVar);
                         translation.List.AddAfter(node, new Assembly("v_store_4byte", new List<string> { tempVar, "RS28", "1" }));
                         node = node.Next;
@@ -332,11 +332,38 @@ namespace CompilerCore
                     foreach (var item in uses)
                     {
                         var tempVar = ".V" + Statement.VariableCounter;
-                        ins.VUse = ins.VUse.Remove(graph.ReverseMap[item]).Add(tempVar);
+                        ins.changeUse(graph.ReverseMap[item], tempVar);
                         tempNodes.Add(tempVar);
                         translation.List.AddBefore(node, new Assembly("v_load_4byte", new List<string> { tempVar, "RS28", "1" }));
                     }
                 }
+            }
+        }
+
+        void finalRewrite(FunctionTranslation translation, bool scalar)
+        {
+            for (var node = translation.List.First; node != null; node = node.Next)
+            {
+                Assembly ins = node.Value;
+                if (ins.OPCode != "")
+                    // if (ins.SDef.Overlaps(ins.SOut) || ins.VDef.Overlaps(ins.VOut))
+                    // {
+                    for (int i = 0; i < ins.Operands.Count; i++)
+                    {
+                        string op = ins.Operands[i];
+                        if (op[0] == '.')
+                            if ((op[0..2] == ".S" && scalar) || (op[0..2] == ".V" && !scalar))
+                            {
+                                int index = graph.Map[ins.Operands[i]];
+                                int register = color[index];
+                                ins.Operands[i] = "R" + op[1] + register;
+                            }
+                    }
+                // }
+                // else
+                // {
+                //     throw new Exception("wierd");
+                // }
             }
         }
 
@@ -349,7 +376,7 @@ namespace CompilerCore
                 for (int i = 1; i < 28; i++)
                     spre.Add($"RS{i}");
                 for (int i = 1; i < 16; i++)
-                    spre.Add($"RV{i}");
+                    vpre.Add($"RV{i}");
 
                 (var sgraph, var vgraph) = translation.CreateInferenceGraph(spre, vpre);
 
@@ -359,12 +386,12 @@ namespace CompilerCore
                 for (int i = 1; i < 28; i++)
                     sPrecolored.Add(sgraph.Map[$"RS{i}"]);
                 for (int i = 1; i < 16; i++)
-                    vPrecolored.Add(sgraph.Map[$"RV{i}"]);
+                    vPrecolored.Add(vgraph.Map[$"RV{i}"]);
 
                 // Console.WriteLine(sgraph.ToString());
                 RegisterAllocator sAllocator = new RegisterAllocator(sgraph, 27, sPrecolored);
                 RegisterAllocator vAllocator = new RegisterAllocator(vgraph, 15, vPrecolored);
-                bool sDone = false, vDone = true;
+                bool sDone = false, vDone = false;
                 while (!sDone)
                     if (sAllocator.simplifyWorklist.Count != 0)
                         sAllocator.simplify();
@@ -376,30 +403,35 @@ namespace CompilerCore
                         sAllocator.selectSpill();
                     else
                         break;
-                // while (!vDone)
-                //     if (vAllocator.simplifyWorklist.Count != 0)
-                //         vAllocator.simplify();
-                //     else if (vAllocator.worklistMoves.Count != 0)
-                //         vAllocator.coalesce();
-                //     else if (vAllocator.freezeWorklist.Count != 0)
-                //         vAllocator.freeze();
-                //     else if (vAllocator.spillWorklist.Count != 0)
-                //         vAllocator.selectSpill();
-                //     else
-                //         break;
+                while (!vDone)
+                    if (vAllocator.simplifyWorklist.Count != 0)
+                        vAllocator.simplify();
+                    else if (vAllocator.worklistMoves.Count != 0)
+                        vAllocator.coalesce();
+                    else if (vAllocator.freezeWorklist.Count != 0)
+                        vAllocator.freeze();
+                    else if (vAllocator.spillWorklist.Count != 0)
+                        vAllocator.selectSpill();
+                    else
+                        break;
                 sAllocator.assignColors();
-                // vAllocator.assignColors();
+                vAllocator.assignColors();
                 if (sAllocator.spilledNodes.Count == 0)
                     sDone = true;
                 else
                     sAllocator.rewrite(translation, true);
-                // if (vAllocator.spilledNodes.Count != 0)
-                // {
-                //     vAllocator.rewrite(translation);
-                //     vDone = true;
-                // }
+                if (vAllocator.spilledNodes.Count == 0)
+                    vDone = true;
+                else
+                    vAllocator.rewrite(translation, false);
                 if (sDone && vDone)
+                {
+                    sAllocator.finalRewrite(translation, true);
+                    vAllocator.finalRewrite(translation, false);
+                    translation.ResolvePhysicalRegister();
+                    translation.Output(Console.Out);
                     break;
+                }
             }
         }
 
@@ -408,8 +440,11 @@ namespace CompilerCore
             RegisterNumber = number;
             this.graph = graph;
             precolored = pre;
-            color = new int[graph.Map.Count];
+            color = Enumerable.Repeat(-1, graph.Map.Count).ToArray();
+            foreach (var item in precolored)
+                color[item] = int.Parse(graph.ReverseMap[item][2..^0]);
             initial = new HashSet<int>(graph.Map.Values);
+            initial.ExceptWith(pre);
             moveList = graph.MoveList;
             worklistMoves = graph.WorklistMoves;
             for (int i = 0; i < graph.AdjacentListBuilder.Length; i++)

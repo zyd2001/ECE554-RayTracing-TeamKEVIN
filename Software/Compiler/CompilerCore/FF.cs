@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Set = System.Collections.Immutable.ImmutableHashSet<string>;
+using System.Linq;
+using System.IO;
+using System;
 
 namespace CompilerCore
 {
@@ -25,7 +28,11 @@ namespace CompilerCore
             {
                 Assembly ins = node.Value;
                 // ins.Predecessor.Add(i - 1);
-                if (ins.UsedLabel == null || ins.OPCode == "jmp_link") // function call will return
+                if (ins.OPCode == "ret" || ins.OPCode == "Fin")
+                {
+                    // no successor
+                }
+                else if (ins.UsedLabel == null || ins.OPCode == "jmp_link") // function call will return
                 {
                     if (node.Next is not null)
                         ins.Successor.Add(node.Next.Value);
@@ -54,13 +61,18 @@ namespace CompilerCore
                 for (int i = List.Count - 1; node != null; i--, node = node.Previous)
                 {
                     Assembly ins = node.Value;
+                    if (ins.OPCode == "ret")
+                        ins.SOut = ins.SUse;
                     SIns[i] = ins.SIn;
                     SOuts[i] = ins.SOut;
                     ins.SIn = ins.SUse.Union(ins.SOut.Except(ins.SDef));
-                    HashSet<string> tempSIn = new HashSet<string>();
-                    foreach (var assembly in ins.Successor)
-                        tempSIn.UnionWith(assembly.SIn);
-                    ins.SOut = tempSIn.ToImmutableHashSet();
+                    if (ins.OPCode != "ret")
+                    {
+                        HashSet<string> tempSIn = new HashSet<string>();
+                        foreach (var assembly in ins.Successor)
+                            tempSIn.UnionWith(assembly.SIn);
+                        ins.SOut = tempSIn.ToImmutableHashSet();
+                    }
                 }
                 bool pass = true;
                 node = List.First;
@@ -93,13 +105,18 @@ namespace CompilerCore
                 for (int i = List.Count - 1; node != null; i--, node = node.Previous)
                 {
                     Assembly ins = node.Value;
+                    if (ins.OPCode == "ret")
+                        ins.VOut = ins.VUse;
                     VIns[i] = ins.VIn;
                     VOuts[i] = ins.VOut;
                     ins.VIn = ins.VUse.Union(ins.VOut.Except(ins.VDef));
-                    HashSet<string> tempVIn = new HashSet<string>();
-                    foreach (var assembly in ins.Successor)
-                        tempVIn.UnionWith(assembly.VIn);
-                    ins.VOut = tempVIn.ToImmutableHashSet();
+                    if (ins.OPCode != "ret")
+                    {
+                        HashSet<string> tempVIn = new HashSet<string>();
+                        foreach (var assembly in ins.Successor)
+                            tempVIn.UnionWith(assembly.VIn);
+                        ins.VOut = tempVIn.ToImmutableHashSet();
+                    }
                 }
                 bool pass = true;
                 node = List.First;
@@ -128,12 +145,74 @@ namespace CompilerCore
             }
         }
 
+        internal bool DeleteStupidLine()
+        {
+            bool something = false;
+            for (var node = List.First; node != null; node = node.Next)
+            {
+                Assembly ins = node.Value;
+                if (ins.OPCode != "")
+                    if (withVariable(ins.OPCode))
+                        if (!ins.SDef.Overlaps(ins.SOut) && !ins.VDef.Overlaps(ins.VOut))
+                        {
+                            if (OperandsCheck(ins.Operands))
+                                continue;
+                            if (ins.OPCode[0] == 'c' || ins.OPCode == "s_store_4byte" || ins.OPCode == "v_store_4byte")
+                                continue;
+                            something = true;
+                            ins.Operands = new List<string>();
+                            ins.OPCode = "";
+                            ins.SUse = Set.Empty;
+                            ins.SDef = Set.Empty;
+                            ins.VUse = Set.Empty;
+                            ins.VDef = Set.Empty;
+                        }
+            }
+            return something;
+        }
+
+        internal static bool OperandsCheck(List<string> operands)
+        {
+            var list = new List<string>(operands.Intersect(new List<string> { "RS28", "RS29", "RS30" }));
+            if (list.Count > 0)
+                return true;
+            return false;
+        }
+
+        internal static bool CheckRegister(string operand)
+        {
+            switch (operand)
+            {
+                case "RS0":
+                case "RV0":
+                case "RS28":
+                case "RS29":
+                case "RS30":
+                case "RS31":
+                    return true;
+            }
+            return false;
+        }
+        private static bool withVariable(string opcode)
+        {
+            switch (opcode[0])
+            {
+                case 'b':
+                case 'j':
+                case 'r':
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
         // v_get_from_s always appear consecutively on same temp var, so there will be no inference
 
         internal (InferenceGraph sgraph, InferenceGraph vgraph) CreateInferenceGraph(HashSet<string> spre, HashSet<string> vpre)
         {
             ConstructFlowGraph();
-            CalculateLiveSpan();
+            do { CalculateLiveSpan(); }
+            while (DeleteStupidLine());
             InferenceGraph sgraph = new InferenceGraph(SIns, SOuts, spre);
             InferenceGraph vgraph = new InferenceGraph(VIns, VOuts, vpre);
             foreach (var ins in List)
@@ -172,6 +251,37 @@ namespace CompilerCore
                             vgraph.AddEdge(a, b);
             }
             return (sgraph, vgraph);
+        }
+
+        internal void ResolvePhysicalRegister()
+        {
+            for (var node = List.First; node != null; node = node.Next)
+            {
+                Assembly ins = node.Value;
+                if (ins.OPCode != "")
+                    for (int i = 0; i < ins.Operands.Count; i++)
+                    {
+                        string op = ins.Operands[i];
+                        if (op[0] == 'R')
+                        {
+                            if (op[0] == '.')
+                                throw new Exception("unexpected");
+                            int register = int.Parse(op[2..^0]);
+                            ins.Operands[i] = "R" + register;
+                        }
+                    }
+
+            }
+        }
+
+        internal void Output(TextWriter t)
+        {
+            foreach (var item in List)
+            {
+                if (item.Label is not null)
+                    t.Write(item.Label);
+                t.WriteLine("\t" + item);
+            }
         }
     }
 }

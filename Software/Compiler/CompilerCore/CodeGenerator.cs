@@ -25,6 +25,7 @@ namespace CompilerCore
         internal Set SOut { get; set; } = Set.Empty;
         internal Set VOut { get; set; } = Set.Empty;
         internal string Label { get; set; } = null;
+        internal Type returnType { get; set; } = Type.NULL;
 
         internal void Copy(Assembly asm)
         {
@@ -38,89 +39,120 @@ namespace CompilerCore
         {
             OPCode = opcode;
             Operands = operands;
+            calculateUseDef();
+        }
+
+        internal void calculateUseDef()
+        {
             var vuse = ImmutableHashSet.CreateBuilder<string>();
             var suse = ImmutableHashSet.CreateBuilder<string>();
             var vdef = ImmutableHashSet.CreateBuilder<string>();
             var sdef = ImmutableHashSet.CreateBuilder<string>();
-            if (operands.Count > 0)
+            if (OPCode == "ret")
             {
-                if (withVariable(opcode))
+                for (int i = 0, index = 27; i < 10; i++, index--)
+                    suse.Add($"RS{index}");
+                for (int i = 0, index = 15; i < 6; i++, index--)
+                    vuse.Add($"RV{index}");
+                if (returnType == Type.NULL)
+                    throw new Exception("fv<k");
+                if (returnType == Type.VECTOR)
+                    vuse.Add("RV1");
+                else
+                    suse.Add("RS1");
+            }
+            if (Operands.Count > 0)
+            {
+                if (withVariable(OPCode))
                 {
-                    if (opcode[0] == 'c' || opcode == "s_store_4byte" || opcode == "v_store_4byte")
+                    // if (OPCode == "s_push")
+                    //     suse.Add(Operands[0]);
+                    // else if (OPCode == "v_push")
+                    //     vuse.Add(Operands[0]);
+                    // else if (OPCode == "s_pop")
+                    //     sdef.Add(Operands[0]);
+                    // else if (OPCode == "v_pop")
+                    //     vdef.Add(Operands[0]);
+                    // else 
+                    if (OPCode == "v_get_from_s") // first need to be changed to v_get_from_s_d
+                    {
+                        vdef.Add(Operands[0]);
+                        vuse.Add(Operands[0]);
+                        suse.Add(Operands[1]);
+                    }
+                    else if (OPCode == "s_write_high") // always comes after s_write_low
+                    {
+                        sdef.Add(Operands[0]);
+                        suse.Add(Operands[0]);
+                    }
+                    else if (OPCode[0] == 'c' || OPCode == "s_store_4byte" || OPCode == "v_store_4byte")
                     {
                         for (int i = 0; i < 2; i++)
                         {
-                            string op = operands[i];
-                            switch (op)
-                            {
-                                case "RS0":
-                                case "RV0":
-                                case "RS28":
-                                case "RS29":
-                                case "RS30":
-                                case "RS31":
-                                    break;
-                                default:
-                                    if (op[1] == 'V')
-                                        vuse.Add(op);
-                                    else
-                                        suse.Add(op);
-                                    break;
-                            }
+                            string op = Operands[i];
+                            if (!checkRegister(op))
+                                if (op[1] == 'V')
+                                    vuse.Add(op);
+                                else
+                                    suse.Add(op);
                         }
                     }
                     else
                     {
-                        switch (operands[0])
-                        {
-                            case "RS0":
-                            case "RV0":
-                            case "RS28":
-                            case "RS29":
-                            case "RS30":
-                            case "RS31":
-                                break;
-                            default:
-                                if (operands[0][1] == 'V')
-                                    vdef.Add(operands[0]);
-                                else
-                                    sdef.Add(operands[0]);
-                                break;
-                        }
-                        for (int i = 1; i < operands.Count; i++)
+                        if (!checkRegister(Operands[0]))
+                            if (Operands[0][1] == 'V')
+                                vdef.Add(Operands[0]);
+                            else
+                                sdef.Add(Operands[0]);
+                        for (int i = 1; i < Operands.Count; i++)
                         {
                             // TODO: register
-                            string op = operands[i];
+                            string op = Operands[i];
                             if (op[0] == '.' || op[0] == 'R') // do not add constant
                             {
-                                switch (op)
-                                {
-                                    case "RS0":
-                                    case "RV0":
-                                    case "RS28":
-                                    case "RS29":
-                                    case "RS30":
-                                    case "RS31":
-                                        break;
-                                    default:
-                                        if (op[1] == 'V')
-                                            vuse.Add(op);
-                                        else
-                                            suse.Add(op);
-                                        break;
-                                }
-
+                                if (!checkRegister(op))
+                                    if (op[1] == 'V')
+                                        vuse.Add(op);
+                                    else
+                                        suse.Add(op);
                             }
                         }
                     }
-                    SUse = suse.ToImmutable();
-                    VUse = vuse.ToImmutable();
-                    SDef = sdef.ToImmutable();
-                    VDef = vdef.ToImmutable();
                 }
             }
+            SUse = suse.ToImmutable();
+            VUse = vuse.ToImmutable();
+            SDef = sdef.ToImmutable();
+            VDef = vdef.ToImmutable();
         }
 
+        internal void changeDef(string newDef)
+        {
+            Operands[0] = newDef;
+            calculateUseDef();
+        }
+
+        internal void changeUse(string oldUse, string newUse)
+        {
+            Operands[Operands.IndexOf(oldUse)] = newUse;
+            calculateUseDef();
+            return;
+        }
+
+        private static bool checkRegister(string operand)
+        {
+            switch (operand)
+            {
+                case "RS0":
+                case "RV0":
+                case "RS28":
+                case "RS29":
+                case "RS30":
+                case "RS31":
+                    return true;
+            }
+            return false;
+        }
         private static bool withVariable(string opcode)
         {
             switch (opcode[0])
@@ -133,10 +165,12 @@ namespace CompilerCore
             }
         }
 
-        internal Assembly(string opcode)
+        internal Assembly(string opcode, Type type)
         {
             OPCode = opcode;
             Operands = new List<string>();
+            returnType = type;
+            calculateUseDef();
         }
 
         public override string ToString()
@@ -183,6 +217,10 @@ namespace CompilerCore
             BranchList.Add((new Assembly(opcode, new List<string> { label }), List.Count));
             AddAssembly(""); // placeholder
         }
+        internal void AddReturn(string v, Type returnType)
+        {
+            List.Add(new Assembly(v, returnType));
+        }
 
         internal void ResolveLabel()
         {
@@ -226,29 +264,44 @@ namespace CompilerCore
             AddAssembly("ii_addi", "RS29", "RS29", "wtf");
             FunctionStackWaiting.Add(function.functionName, List[^1]); // wait for calculating stack size
             var types = function.parameterList.Types();
-            int vectors = 0, scalars;
-            foreach (var t in types)
-                if (t == Type.VECTOR)
-                    vectors++;
-            scalars = types.Count - vectors;
+            // int vectors = 0, scalars;
+            // foreach (var t in types)
+            //     if (t == Type.VECTOR)
+            //         vectors++;
+            // scalars = types.Count - vectors;
             var d = (new List<(int, int)>(), new List<(int, int)>());
             FunctionSaveRegisterPair.Add(function.functionName, d);
-            for (int i = 0, index = 27; i < 27 - scalars; i++, index--)
+            if (function.functionName != "main") // main do not need save anything
             {
-                int c = Statement.VariableCounter;
-                AddAssembly("s_mov", $".S{c}", $"RS{index}");
-                d.Item1.Add((c, index));
-            }
-            for (int i = 0, index = 15; i < 15 - vectors; i++, index--)
-            {
-                int c = Statement.VariableCounter;
-                AddAssembly("v_mov", $".V{c}", $"RV{index}");
-                d.Item2.Add((c, index));
+                for (int i = 0, index = 27; i < 10; i++, index--)
+                {
+                    int c = Statement.VariableCounter;
+                    AddAssembly("s_mov", $".S{c}", $"RS{index}");
+                    d.Item1.Add((c, index));
+                }
+                for (int i = 0, index = 15; i < 6; i++, index--)
+                {
+                    int c = Statement.VariableCounter;
+                    AddAssembly("v_mov", $".V{c}", $"RV{index}");
+                    d.Item2.Add((c, index));
+                }
             }
         }
 
         internal void AddEpilogue(FunctionDefinitionStatement function)
         {
+            // for (int i = 0, index = 27; i < 10; i++, index--)
+            // {
+            //     int c = Statement.VariableCounter;
+            //     AddAssembly("s_mov", $"RS{index}", $".S{c}");
+            //     // d.Item1.Add((c, index));
+            // }
+            // for (int i = 0, index = 15; i < 6; i++, index--)
+            // {
+            //     int c = Statement.VariableCounter;
+            //     AddAssembly("v_mov", $"RV{index}", $".V{c}");
+            //     // d.Item2.Add((c, index));
+            // }
             foreach (var item in FunctionSaveRegisterPair[function.functionName].s)
                 AddAssembly("s_mov", $"RS{item.Item2}", $".S{item.Item1}");
             foreach (var item in FunctionSaveRegisterPair[function.functionName].v)
@@ -279,7 +332,7 @@ namespace CompilerCore
                 var f = new FunctionTranslation(item, directTranslation.LabelReferences);
                 RegisterAllocator.fk(f);
             }
-            directTranslation.Print();
+            // directTranslation.Print();
         }
     }
 }

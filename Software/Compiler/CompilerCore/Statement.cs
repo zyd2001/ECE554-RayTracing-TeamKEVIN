@@ -145,11 +145,11 @@ namespace CompilerCore
                             $" Got: {TypeString(returnType)}");
                         return false;
                     }
-                    this.function = CurrentFunction;
                 }
                 else
                     return false;
             }
+            this.function = CurrentFunction;
             return true;
         }
     }
@@ -555,8 +555,8 @@ namespace CompilerCore
             if (SecondPassAnalysis)
             {
                 table.AddScope();
-                parameterList.NameAnalysis(table); // only add new symbol, no possible error
                 CurrentFunction = this;
+                parameterList.NameAnalysis(table); // only add new symbol, no possible error
                 bool pass = statementList.NameAnalysis(table);
                 CurrentFunction = null;
                 table.RemoveScope();
@@ -654,7 +654,9 @@ namespace CompilerCore
 
         internal override bool NameAnalysis(SymbolTable table)
         {
-            string id = $"{table.ScopeLevel}.{identifier}";
+            string id;
+            string t = type == CompilerCore.Type.VECTOR ? "V" : "S";
+            id = $".{t}.{Statement.CurrentFunction.functionName}.{table.ScopeLevel}.{identifier}";
             table.AddSymbol(identifier, new Symbol(type, id));
             return true;
         }

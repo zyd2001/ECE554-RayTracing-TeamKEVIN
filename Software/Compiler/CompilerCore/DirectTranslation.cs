@@ -353,7 +353,8 @@ namespace CompilerCore
                     translation.AddAssembly("s_mov", "RS1", tempVar);
             }
             translation.AddEpilogue(function);
-            translation.AddAssembly("ret");
+            translation.AddReturn("ret", function.returnType);
+            // translation.List[^1].returnType = function.returnType;
             return null;
         }
     }
@@ -423,7 +424,7 @@ namespace CompilerCore
             int i;
             i = BitConverter.SingleToInt32Bits(vector.X);
             LiteralHelper(translation, tempScalar, i);
-            translation.AddAssembly("v_get_from_s", tempVar, tempScalar, "0");
+            translation.AddAssembly("v_get_from_s_d", tempVar, tempScalar, "0");
             i = BitConverter.SingleToInt32Bits(vector.Y);
             LiteralHelper(translation, tempScalar, i);
             translation.AddAssembly("v_get_from_s", tempVar, tempScalar, "1");
@@ -453,7 +454,10 @@ namespace CompilerCore
                 tempScalar = expressions[i].Generate(translation);
                 if (types[i] == Type.INT)
                     translation.AddAssembly("s_itof", tempScalar, tempScalar);
-                translation.AddAssembly("v_get_from_s", tempVar, tempScalar, i.ToString());
+                if (i == 0)
+                    translation.AddAssembly("v_get_from_s_d", tempVar, tempScalar, i.ToString());
+                else
+                    translation.AddAssembly("v_get_from_s", tempVar, tempScalar, i.ToString());
             }
             return tempVar;
         }
