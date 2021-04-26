@@ -1,8 +1,8 @@
 module mem_IC (
     //input
     clk, rst_n, q_en_rt2ic_PD, core_id_rt2ic_PD, q_en_ic2rt_PD, core_id_ic2rt_PD,
-    ray_origin_RT, ray_direction_RT, thread_id_RT_in, shift_en_RT,
-    shader_info_IC, normal_IC, thread_id_IC_in, shift_en_IC,
+    ray_origin_RT, ray_direction_RT, thread_id_RT_in, dequeue_RT,
+    shader_info_IC, normal_IC, thread_id_IC_in, dequeue_IC,
     //output
     ray_origin_IC, ray_direction_IC, thread_id_IC_out,
     shader_info_RT, normal_RT, thread_id_RT_out
@@ -27,12 +27,12 @@ module mem_IC (
     input [127:0] ray_origin_RT [NUM_RT-1:0];
     input [127:0] ray_direction_RT [NUM_RT-1:0];
     input [BIT_THREAD-1:0] thread_id_RT_in [NUM_RT-1:0];
-    input shift_en_RT;
+    input dequeue_RT;
     // IC​
     input [127:0] shader_info_IC [NUM_IC-1:0]; //(v0, v1, v2, sid)
     input [127:0] normal_IC [NUM_IC-1:0];
     input [BIT_THREAD-1:0] thread_id_IC_in [NUM_IC-1:0];
-    input shift_en_IC;
+    input dequeue_IC;
     /*
         Output
     */
@@ -57,11 +57,13 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_RT2IC[0] <= 1'b1;
         end
-        else if (q_en_rt2ic_PD) begin
-            enqueue_RT2IC[0] <= 1'b0;
-        end
-        else if (shift_en_RT & !enqueue_RT2IC[0]) begin
-            enqueue_RT2IC[0] <= enqueue_RT2IC[1];
+        else if (!(q_en_rt2ic_PD & dequeue_IC)) begin
+            if (q_en_rt2ic_PD) begin
+                enqueue_RT2IC[0] <= 1'b0;
+            end
+            else begin
+                enqueue_RT2IC[0] <= enqueue_RT2IC[1];
+            end
         end
         else begin
             enqueue_RT2IC[0] <= enqueue_RT2IC[0];
@@ -71,11 +73,13 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_IC2RT[0] <= 1'b1;
         end
-        else if (q_en_ic2rt_PD) begin
-            enqueue_IC2RT[0] <= 1'b0;
-        end
-        else if (shift_en_IC & !enqueue_IC2RT[0]) begin
-            enqueue_IC2RT[0] <= enqueue_IC2RT[1];
+        else if (!(q_en_ic2rt_PD & dequeue_RT)) begin
+            if (q_en_ic2rt_PD) begin
+                enqueue_IC2RT[0] <= 1'b0;
+            end
+            else begin
+                enqueue_IC2RT[0] <= enqueue_IC2RT[1];
+            end
         end
         else begin
             enqueue_IC2RT[0] <= enqueue_IC2RT[0];
@@ -86,11 +90,13 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_RT2IC[NUM_THREAD-1] <= 1'b0;
         end
-        else if (q_en_rt2ic_PD & !enqueue_RT2IC[NUM_THREAD-1]) begin
-            enqueue_RT2IC[NUM_THREAD-1] <= enqueue_RT2IC[NUM_THREAD-2];
-        end
-        else if (shift_en_RT) begin
-            enqueue_RT2IC[NUM_THREAD-1] <= 1'b0;
+        else if (!(q_en_rt2ic_PD & dequeue_IC)) begin
+            if (dequeue_IC) begin
+                enqueue_RT2IC[NUM_THREAD-1] <= 1'b0;
+            end
+            else begin
+                enqueue_RT2IC[NUM_THREAD-1] <= enqueue_RT2IC[NUM_THREAD-2];
+            end
         end
         else begin
             enqueue_RT2IC[NUM_THREAD-1] <= enqueue_RT2IC[NUM_THREAD-1];
@@ -100,14 +106,16 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_IC2RT[NUM_THREAD-1] <= 1'b0;
         end
-        else if (q_en_ic2rt_PD & !enqueue_IC2RT[NUM_THREAD-1]) begin
-            enqueue_IC2RT[NUM_THREAD-1] <= enqueue_IC2RT[NUM_THREAD-2];
-        end
-        else if (shift_en_IC) begin
-            enqueue_IC2RT[NUM_THREAD-1] <= 1'b0;
+        else if (!(q_en_ic2rt_PD & dequeue_RT)) begin
+            if (dequeue_IC) begin
+                enqueue_IC2RT[NUM_THREAD-1] <= 1'b0;
+            end
+            else begin
+                enqueue_IC2RT[NUM_THREAD-1] <= enqueue_IC2RT[NUM_THREAD-2];
+            end
         end
         else begin
-            enqueue_IC2RT[NUM_THREAD-1] <= enqueue_IC2RT[NUM_THREAD-1];
+            enqueue_IC2RT[NUM_THREAD-1] <= enqueue_IC2RT[0];
         end
     end
     // enable queue
@@ -117,11 +125,13 @@ module mem_IC (
                 if(!rst_n) begin
                     enqueue_RT2IC[j] <= 1'b0;
                 end
-                else if (q_en_rt2ic_PD) begin
-                    enqueue_RT2IC[j] <= enqueue_RT2IC[j+1];
-                end
-                else if (shift_en_RT) begin
-                    enqueue_RT2IC[j] <= enqueue_RT2IC[j-1];
+                else if (!(q_en_rt2ic_PD & dequeue_IC)) begin
+                    if (q_en_rt2ic_PD) begin
+                        enqueue_RT2IC[j] <= enqueue_RT2IC[j-1];
+                    end
+                    else begin
+                        enqueue_RT2IC[j] <= enqueue_RT2IC[j+1];
+                    end
                 end
                 else begin
                     enqueue_RT2IC[j] <= enqueue_RT2IC[j];
@@ -131,11 +141,13 @@ module mem_IC (
                 if(!rst_n) begin
                     enqueue_IC2RT[j] <= 1'b0;
                 end
-                else if (q_en_ic2rt_PD) begin
-                    enqueue_IC2RT[j] <= enqueue_IC2RT[j+1];
-                end
-                else if (shift_en_IC) begin
-                    enqueue_IC2RT[j] <= enqueue_IC2RT[j-1];
+                else if (!(q_en_ic2rt_PD & dequeue_RT)) begin
+                    if (q_en_ic2rt_PD) begin
+                        enqueue_IC2RT[j] <= enqueue_IC2RT[j-1];
+                    end
+                    else if (dequeue_RT) begin
+                        enqueue_IC2RT[j] <= enqueue_IC2RT[j+1];
+                    end
                 end
                 else begin
                     enqueue_IC2RT[j] <= enqueue_IC2RT[j];
@@ -171,7 +183,7 @@ module mem_IC (
         else if (enqueue_RT2IC[NUM_THREAD-1] & q_en_rt2ic_PD) begin
             fifo_RT2IC[NUM_THREAD-1] <= data_in_RT2IC;
         end
-        else if (shift_en_RT) begin
+        else if (dequeue_RT) begin
             fifo_RT2IC[NUM_THREAD-1] <= {RT2IC_WIDTH{1'b0}};
         end
         else begin
@@ -185,7 +197,7 @@ module mem_IC (
         else if (enqueue_IC2RT[NUM_THREAD-1] & q_en_ic2rt_PD) begin
             fifo_IC2RT[NUM_THREAD-1] <= data_in_IC2RT;
         end
-        else if (shift_en_IC) begin
+        else if (dequeue_IC) begin
             fifo_IC2RT[NUM_THREAD-1] <= {IC2RT_WIDTH{1'b0}};
         end
         else begin
@@ -202,7 +214,7 @@ module mem_IC (
                 else if (enqueue_RT2IC[j] & q_en_rt2ic_PD) begin
                     fifo_RT2IC[j] <= data_in_RT2IC;
                 end
-                else if (shift_en_RT) begin
+                else if (dequeue_RT) begin
                     fifo_RT2IC[j] <= fifo_RT2IC[j+1];
                 end
                 else begin
@@ -216,7 +228,7 @@ module mem_IC (
                 else if (enqueue_IC2RT[j] & q_en_ic2rt_PD) begin
                     fifo_IC2RT[j] <= data_in_IC2RT;
                 end
-                else if (shift_en_IC) begin
+                else if (dequeue_IC) begin
                     fifo_IC2RT[j] <= fifo_IC2RT[j+1];
                 end
                 else begin
