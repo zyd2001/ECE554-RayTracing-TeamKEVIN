@@ -11,7 +11,8 @@ module mem_controller
         output [31:0] data_32,
         output [127:0] data_128,
         output reg re_main,
-        output [31:0] addr_main[3:0]
+        output [31:0] addr_main[3:0],
+        output reg term
         );
 
     
@@ -427,7 +428,7 @@ module mem_controller
     // Patch Counter
     logic [DMA_PATCH_BIT:0] dma_patch_cnt;
     logic dma_patch_inc;
-    logic term;
+    
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
             dma_patch_cnt <= '0;
