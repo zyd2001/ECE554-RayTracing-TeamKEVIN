@@ -1,4 +1,8 @@
 start:
+    s_write_high r1 0
+    s_write_low r1 0
+    s_write_high r2 0
+    s_write_low r2 0
     ii_addi r1 r1 5
     ii_addi r2 r2 5
     cmp_i r1 r2
