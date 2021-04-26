@@ -15,11 +15,14 @@ namespace CompilerCore
         internal List<Set> SOuts { get; set; } = null;
         internal List<Set> VOuts { get; set; } = null;
         internal Dictionary<string, Assembly> LabelReferences { get; }
+        internal FunctionDefinitionStatement function;
 
-        internal FunctionTranslation(List<Assembly> list, Dictionary<string, Assembly> r)
+        internal FunctionTranslation(List<Assembly> list, Dictionary<string, Assembly> r,
+            FunctionDefinitionStatement f)
         {
             List = new LinkedList<Assembly>(list);
             LabelReferences = r;
+            function = f;
         }
 
         internal void ConstructFlowGraph()
@@ -195,6 +198,8 @@ namespace CompilerCore
         }
         private static bool withVariable(string opcode)
         {
+            if (opcode == "Fin")
+                return false;
             switch (opcode[0])
             {
                 case 'b':
@@ -274,13 +279,51 @@ namespace CompilerCore
             }
         }
 
+        internal void ResolveCallerSave(Dictionary<string, (SortedSet<int> s, SortedSet<int> v)> d)
+        {
+            for (var node = List.First; node != null; node = node.Next)
+            {
+                Assembly ins = node.Value;
+                if (ins.CallerSave)
+                {
+                    if (node.Next.Value.OPCode != "jmp_link")
+                        throw new Exception("wtf");
+                    string func = node.Next.Value.UsedLabel;
+                    (var s, var v) = d[func];
+                    foreach (var item in s)
+                        List.AddAfter(node, new Assembly("s_push", new List<string> { $"R{item}" }));
+                    foreach (var item in v)
+                        List.AddAfter(node, new Assembly("v_push", new List<string> { $"R{item}" }));
+                }
+                if (ins.CallerRestore)
+                {
+                    if (node.Previous.Value.OPCode != "jmp_link")
+                        throw new Exception("wtf");
+                    string func = node.Previous.Value.UsedLabel;
+                    (var s, var v) = d[func];
+                    foreach (var item in s)
+                        List.AddAfter(node, new Assembly("s_pop", new List<string> { $"R{item}" }));
+                    foreach (var item in v)
+                        List.AddAfter(node, new Assembly("v_pop", new List<string> { $"R{item}" }));
+                }
+            }
+        }
+
         internal void Output(TextWriter t)
         {
             foreach (var item in List)
             {
                 if (item.Label is not null)
                     t.Write(item.Label);
-                t.WriteLine("\t" + item);
+                if (item.OPCode.Contains("mov"))
+                {
+                    if (item.Operands[0] != item.Operands[1])
+                        t.WriteLine("\t" + item);
+                    else
+                        t.WriteLine();
+                }
+                else
+                    t.WriteLine("\t" + item);
             }
         }
     }

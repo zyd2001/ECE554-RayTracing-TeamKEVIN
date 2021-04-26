@@ -340,8 +340,9 @@ namespace CompilerCore
             }
         }
 
-        void finalRewrite(FunctionTranslation translation, bool scalar)
+        SortedSet<int> finalRewrite(FunctionTranslation translation, bool scalar)
         {
+            SortedSet<int> ret = new SortedSet<int>();
             for (var node = translation.List.First; node != null; node = node.Next)
             {
                 Assembly ins = node.Value;
@@ -357,6 +358,7 @@ namespace CompilerCore
                                 int index = graph.Map[ins.Operands[i]];
                                 int register = color[index];
                                 ins.Operands[i] = "R" + op[1] + register;
+                                ret.Add(register);
                             }
                     }
                 // }
@@ -365,9 +367,10 @@ namespace CompilerCore
                 //     throw new Exception("wierd");
                 // }
             }
+            return ret;
         }
 
-        internal static void fk(FunctionTranslation translation)
+        internal static (SortedSet<int> s, SortedSet<int> v) fk(FunctionTranslation translation)
         {
             while (true)
             {
@@ -426,11 +429,28 @@ namespace CompilerCore
                     vAllocator.rewrite(translation, false);
                 if (sDone && vDone)
                 {
-                    sAllocator.finalRewrite(translation, true);
-                    vAllocator.finalRewrite(translation, false);
+                    SortedSet<int> usedScalar = sAllocator.finalRewrite(translation, true);
+                    SortedSet<int> usedVector = vAllocator.finalRewrite(translation, false);
+                    var types = translation.function.parameterList.Types();
+                    HashSet<int> parameterScalar = new HashSet<int>();
+                    HashSet<int> parameterVector = new HashSet<int>();
+                    int vectors = 1, scalars = 1;
+                    for (int i = 0; i < types.Count; i++)
+                        if (types[i] == Type.VECTOR)
+                        {
+                            parameterVector.Add(vectors);
+                            vectors++;
+                        }
+                        else
+                        {
+                            parameterScalar.Add(scalars);
+                            scalars++;
+                        }
+                    usedScalar.ExceptWith(parameterScalar);
+                    usedVector.ExceptWith(parameterVector);
                     translation.ResolvePhysicalRegister();
-                    translation.Output(Console.Out);
-                    break;
+                    // translation.Output(Console.Out);
+                    return (usedScalar, usedVector);
                 }
             }
         }

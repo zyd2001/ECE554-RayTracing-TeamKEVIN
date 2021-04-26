@@ -42,7 +42,7 @@ namespace CompilerCore
     {
         internal override string Generate(DirectTranslation translation)
         {
-            translation.AddFunctionLabel(functionName);
+            translation.AddFunctionLabel(functionName, this);
             translation.AddPrologue(this);
             statementList.Generate(translation);
             return null;
@@ -776,12 +776,14 @@ namespace CompilerCore
             var args = expressionList.GenerateArgs(translation, func);
             translation.AddAssembly("s_push", "RS30");
             // translation.AddBranch("jmp_link", identifier);
+            translation.AddCallerSave();
             translation.AddFunctionCall(identifier, args);
+            translation.AddCallerRestore();
+            translation.AddAssembly("s_pop", "RS30");
             if (func.Type == Type.VECTOR)
                 translation.AddAssembly("v_mov", tempVar, "RV1");
             else
                 translation.AddAssembly("s_mov", tempVar, "RS1");
-            translation.AddAssembly("s_pop", "RS30");
             return tempVar;
         }
     }
