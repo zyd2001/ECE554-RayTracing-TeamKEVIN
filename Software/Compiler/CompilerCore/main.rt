@@ -1,0 +1,28 @@
+
+void main(int id)
+{
+    // vector v0 = [ -1, -1, -5, 0 ];
+    // vector v1 = [ 1, -1, -5, 0 ];
+    // vector v2 = [ 0, -1, -5, 0 ];
+    float result[1];
+    int width = 640;
+    int height = 480;
+    float fov = 51.52;
+    float scale = 0.449596;
+    float imageAspectRatio = width / float(height);
+    vector orig = [ 0, 0, 0, 0 ];
+    // compute primary ray
+    float x = (2 * (id + 0.5) / width - 1) * imageAspectRatio * scale;
+    float y = (1 - 2 * (id + 0.5) / height) * scale;
+    vector dir = [ x, y, -1, 0 ];
+    float t, u, v;
+    vector hit, normal;
+    hit, normal = trace(orig, dir);
+    // [comment]
+    // Interpolate colors using the barycentric coordinates
+    // [/comment]
+    result[0] = hit[0] * 0.2 + hit[1] * 0.4 + hit[2] * 0.7;
+    // uncomment this line if you want to visualize the row barycentric coordinates
+    //*pix = Vec3f(u, v, 1 - u - v);
+    return;
+}
