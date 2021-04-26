@@ -81,7 +81,9 @@ module rta
   localparam NUM_TRI = 512;
   localparam BIT_TRI = $clog2(NUM_TRI);
 
-  wire rst_n;
+  genvar i, j;
+
+  logic rst_n;
   assign rst_n = ~rst;
 
   // Memory Controller
@@ -101,9 +103,14 @@ module rta
   logic [127:0] data_out_main_x[NUM_RT-1:0];
   logic rd_rdy_main_rt[NUM_RT-1:0];
 
-  // RT CORE
-  logic re_rt_main[NUM_RT-1:0];
-  logic [31:0] addr_rt_main[NUM_RT-1:0];
+  // CP Memory
+  logic [31:0] data_out_cp_pd;
+  
+  // Instruction Memory
+  logic [31:0] data_out_inst_rt[NUM_RT-1:0];
+
+  // Constant Memory
+  logic [31:0] data_out_const_rt[NUM_RT-1:0];
 
   // Triangle Memory
   logic re_ic_tri;
@@ -114,6 +121,12 @@ module rta
   logic [95:0] vertex_1_tri_ic;
   logic [95:0] vertex_2_tri_ic;
   logic sid_tri_ic;
+
+  // RT CORE
+  logic re_rt_main[NUM_RT-1:0];
+  logic [31:0] addr_rt_inst[NUM_RT-1:0];
+  logic [31:0] addr_rt_x[NUM_RT-1:0];
+  logic [31:0] addr_rt_main[NUM_RT-1:0];
 
 
   mem_controller memory_controller
@@ -145,11 +158,53 @@ module rta
     .rd_rdy(rd_rdy_main_rt)
     );
 
-  genvar i;
   generate
     for (i = 0; i < NUM_RT; i++) begin
       assign re_x_main[i] = re_mc_main ? 1'h1 : re_rt_main[i];
       assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_main[i]; 
+    end
+  endgenerate
+
+
+  mem_CP memory_command_processor
+   (
+    .clk(clk),
+    .rst_n(rst_n),
+    .re_CP(),
+    .data_MC(data_32_mc_x),
+    .ctrl_MC(we_mem_mc_x[0]),
+    .invalid_CP(),
+    .data_out_CP(data_out_cp_pd)
+    );
+
+
+  generate
+    for (i = 0; i < NUM_RT; i++) begin: inst_const_memory
+      mem_simple memory_instruction
+       (
+        .clk(clk),
+        .rst_n(rst_n),
+        .we(),
+        .addr(addr_rt_inst[i]),
+        .data_in(),
+        .data_MC(data_32_mc_x),
+        .ctrl_MC(we_mem_mc_x[1]),
+        .busy(),
+        .data_out(data_out_inst_rt[i])
+        );
+
+      mem_simple memory_constant
+       (
+        .clk(clk),
+        .rst_n(rst_n),
+        .we(),
+        .addr(addr_rt_x[i]),
+        .data_in(),
+        .data_MC(data_32_mc_x),
+        .ctrl_MC(we_mem_mc_x[2]),
+        .busy(),
+        .data_out(data_out_const_rt[i])
+        );
     end
   endgenerate
 
@@ -170,6 +225,8 @@ module rta
     .vertex2_IC(vertex_2_tri_ic),
     .sid_IC(sid_tri_ic)
     );
+
+  
   
             
 endmodule
