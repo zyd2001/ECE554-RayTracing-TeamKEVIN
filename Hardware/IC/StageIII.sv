@@ -4,6 +4,7 @@ module StageIII(
   upre_in, upre_out,
   vpre_in, vpre_out,
   tpre_in, tpre_out,
+  norm_in, norm_out,
   thread_id_in, thread_id_out,
   triangle_id_in, triangle_id_out,
   sid_in, sid_out
@@ -19,12 +20,14 @@ module StageIII(
   input [BIT_THREAD-1:0] thread_id_in;
   input [31:0] sid_in;
   input [31:0] det_in, upre_in, vpre_in, tpre_in;
+  input [95:0] norm_in;
   
   output StageIII_capture;
   output [BIT_TRIANGLE-1:0] triangle_id_out;
   output [BIT_THREAD-1:0] thread_id_out;
   output [31:0] sid_out;
   output [31:0] det_out, upre_out, vpre_out, tpre_out;
+  output [95:0] qvec_out;
   
   typedef enum reg [1:0] {DONE, CAP, LOAD, IDLE} state_t;
   state_t state, nxt_state;
@@ -34,6 +37,7 @@ module StageIII(
   logic [BIT_THREAD-1:0] thread_id_reg;
   logic [31:0] sid_reg;
   logic [31:0] det_reg, upre_reg, vpre_reg, tpre_reg;
+  logic [95:0] norm_out;
   
   
   always_ff@(posedge clk or posedge rst) begin
@@ -52,6 +56,7 @@ module StageIII(
       upre_reg <= '0;
       vpre_reg <= '0;
       tpre_reg <= '0;
+      norm_reg <= '0;
     end
     else if (ld) begin
       triangle_id_reg <= triangle_id_in;
@@ -61,6 +66,7 @@ module StageIII(
       upre_reg <= upre_in;
       vpre_reg <= vpre_in;
       tpre_reg <= tpre_in;
+      norm_reg <= norm_in;
     end
   end
 
@@ -114,5 +120,5 @@ module StageIII(
   assign upre_out = upre_reg;
   assign vpre_out = vpre_reg;
   assign tpre_out = tpre_reg;
-  
+  assign norm_out = norm_reg;
 endmodule
