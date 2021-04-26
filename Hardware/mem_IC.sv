@@ -57,7 +57,7 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_RT2IC[0] <= 1'b1;
         end
-        else if (!(q_en_rt2ic_PD & dequeue_IC)) begin
+        else if (q_en_rt2ic_PD ^ dequeue_IC) begin
             if (q_en_rt2ic_PD) begin
                 enqueue_RT2IC[0] <= 1'b0;
             end
@@ -73,7 +73,7 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_IC2RT[0] <= 1'b1;
         end
-        else if (!(q_en_ic2rt_PD & dequeue_RT)) begin
+        else if (q_en_ic2rt_PD ^ dequeue_RT) begin
             if (q_en_ic2rt_PD) begin
                 enqueue_IC2RT[0] <= 1'b0;
             end
@@ -90,7 +90,7 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_RT2IC[NUM_THREAD-1] <= 1'b0;
         end
-        else if (!(q_en_rt2ic_PD & dequeue_IC)) begin
+        else if (q_en_rt2ic_PD ^ dequeue_IC) begin
             if (dequeue_IC) begin
                 enqueue_RT2IC[NUM_THREAD-1] <= 1'b0;
             end
@@ -106,7 +106,7 @@ module mem_IC (
         if(!rst_n) begin
             enqueue_IC2RT[NUM_THREAD-1] <= 1'b0;
         end
-        else if (!(q_en_ic2rt_PD & dequeue_RT)) begin
+        else if (q_en_ic2rt_PD ^ dequeue_RT) begin
             if (dequeue_IC) begin
                 enqueue_IC2RT[NUM_THREAD-1] <= 1'b0;
             end
@@ -125,7 +125,7 @@ module mem_IC (
                 if(!rst_n) begin
                     enqueue_RT2IC[j] <= 1'b0;
                 end
-                else if (!(q_en_rt2ic_PD & dequeue_IC)) begin
+                else if (q_en_rt2ic_PD ^ dequeue_IC) begin
                     if (q_en_rt2ic_PD) begin
                         enqueue_RT2IC[j] <= enqueue_RT2IC[j-1];
                     end
@@ -141,7 +141,7 @@ module mem_IC (
                 if(!rst_n) begin
                     enqueue_IC2RT[j] <= 1'b0;
                 end
-                else if (!(q_en_ic2rt_PD & dequeue_RT)) begin
+                else if (q_en_ic2rt_PD ^ dequeue_RT) begin
                     if (q_en_ic2rt_PD) begin
                         enqueue_IC2RT[j] <= enqueue_IC2RT[j-1];
                     end
