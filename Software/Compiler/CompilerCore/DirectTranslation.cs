@@ -83,9 +83,7 @@ namespace CompilerCore
                 }
             }
             else // array
-            {
-                // translation.AddAssembly("s_mov", identifier, tempVar);
-            }
+                translation.AddAssembly("ii_addi", scopedIdentifier, "RS29", offset.ToString());
             return null;
         }
     }

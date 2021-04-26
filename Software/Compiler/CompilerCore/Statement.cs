@@ -461,6 +461,7 @@ namespace CompilerCore
         Type type;
         Expression initializer;
         int arraySize; // -1 means normal type, 0 means pointer, > 0 means array
+        int offset;
         internal DeclarationItem(LexLocation location, string id, Expression init = null,
             int size = -1) : base(location)
         {
@@ -500,6 +501,11 @@ namespace CompilerCore
                 id = $"_{t}.{identifier}";
             scopedIdentifier = id;
             table.AddSymbol(identifier, new Symbol(type, id));
+            if (arraySize > 0)
+            {
+                offset = Statement.CurrentFunction.StackSize;
+                Statement.CurrentFunction.StackSize += arraySize;
+            }
             return pass;
         }
 
@@ -541,6 +547,7 @@ namespace CompilerCore
         internal string functionName;
         internal ParameterList parameterList;
         StatementList statementList;
+        internal int StackSize = 0;
         internal FunctionDefinitionStatement(LexLocation location, Type type, string name,
             ParameterList parameters, StatementList statements) : base(location)
         {

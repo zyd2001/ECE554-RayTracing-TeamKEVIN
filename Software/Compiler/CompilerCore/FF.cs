@@ -309,6 +309,11 @@ namespace CompilerCore
             }
         }
 
+        internal void ResolveFunctionStack()
+        {
+
+        }
+
         internal void Output(TextWriter t)
         {
             foreach (var item in List)
