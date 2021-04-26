@@ -42,16 +42,18 @@ module branch (
     end
 
     always_comb begin : branch_opcode_compare
-        case (branch_opcode)
-            3'b000: next_pc_select = flag == 2'b0x ? 2'b10 : 2'b00;
-            3'b001: next_pc_select = flag == 2'b1x ? 2'b10 : 2'b00;
-            3'b010: next_pc_select = flag == 2'b10 ? 2'b10 : 2'b00;
-            3'b011: next_pc_select = flag == 2'b11 ? 2'b10 : 2'b00;
-            3'b100: next_pc_select = flag == (2'b10 || flag == 2'b0x) ? 2'b10 : 2'b00;
-            3'b101: next_pc_select = flag == (2'b11 || flag == 2'b0x) ? 2'b10 : 2'b00;
-            3'b110: next_pc_select = 2'b10;
-            default: next_pc_select = 2'b11;
-        endcase
+        next_pc_select = 2'b0;
+        if (branch_en)
+            case (branch_opcode)
+                3'b000: next_pc_select = flag == 2'b0x ? 2'b10 : 2'b00;
+                3'b001: next_pc_select = flag == 2'b1x ? 2'b10 : 2'b00;
+                3'b010: next_pc_select = flag == 2'b10 ? 2'b10 : 2'b00;
+                3'b011: next_pc_select = flag == 2'b11 ? 2'b10 : 2'b00;
+                3'b100: next_pc_select = flag == (2'b10 || flag == 2'b0x) ? 2'b10 : 2'b00;
+                3'b101: next_pc_select = flag == (2'b11 || flag == 2'b0x) ? 2'b10 : 2'b00;
+                3'b110: next_pc_select = 2'b10;
+                default: next_pc_select = 2'b11;
+            endcase
     end
 
     always_comb begin 

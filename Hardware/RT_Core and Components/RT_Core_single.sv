@@ -116,12 +116,16 @@ module RT_core_single (
     assign IF_PC_plus_four = PC_reg + 4;
 
     always_comb begin : Select_next_PC
+        IF_next_PC = IF_PC_plus_four;
         case (next_pc_select)
             2'b0x: IF_next_PC = IF_PC_plus_four;
             2'b10: IF_next_PC = DE_PC_plus_four_offset;
             default: IF_next_PC = IF_link_address;
         endcase
         if (IF_FIN) IF_next_PC = PC_reg;
+        else if (DE_EX_FIN)
+            IF_next_PC = IF_PC_plus_four;
+
     end
 
     assign MRTI_addr = kernel_mode == 1'b1 ? PC_reg : IF_next_PC; // read first
@@ -173,19 +177,19 @@ module RT_core_single (
     //////////////////////////
     
     
-    logic IF_DE_enable, IF_DE_reset, IF_DE_FIN;
+    logic IF_DE_FIN;
     logic [31:0] IF_DE_current_PC, IF_DE_instruction, IF_DE_current_PC_plus_four, IF_DE_instruction_bypass;
 
     always @(posedge clk, negedge rst_n) begin : IF_DE_pipeline
         if (!rst_n) begin
             IF_DE_current_PC <= 31'h0000;
-            IF_DE_instruction <= 31'h0000;
+            IF_DE_instruction <= 31'h30000000;
             IF_DE_current_PC_plus_four <= 31'h0000;
-            IF_DE_FIN <= 1'b0;
-        end else if (!IF_DE_stall && !kernel_mode) begin
+            IF_DE_FIN <= 1'b1;
+        end else if (~IF_DE_stall && ~IF_FIN) begin
             if (next_pc_select != 2'b00) begin
                 IF_DE_current_PC <= 31'h0000;
-                IF_DE_instruction <= 31'h0000;
+                IF_DE_instruction <= 31'h30000000;
                 IF_DE_current_PC_plus_four <= 31'h0000;
                 IF_DE_FIN <= 1'b0;
             end else begin
@@ -312,7 +316,7 @@ module RT_core_single (
         .DE_EX_S1_select(DE_EX_S1_select), .DE_EX_S2_select(DE_EX_S2_select), .DE_EX_V1_select(DE_EX_V1_select), .DE_EX_V2_select(DE_EX_V2_selectDE_EX_V2_select)
     );
 
-    assign IF_DE_stall = DE_Branch_stall | DE_Mem_address_stall;
+    assign IF_DE_stall = (DE_Branch_stall | DE_Mem_address_stall) & ~IF_DE_FIN;
     
     //////////////////////////
     // DE EX Pipeline
@@ -383,7 +387,7 @@ module RT_core_single (
             DE_EX_vector_reduce_en <= 1'b0;
             DE_EX_update_int_flag <= 1'b0;
             DE_EX_update_float_flag <= 1'b0;
-            DE_EX_FIN <= 1'b0;
+            DE_EX_FIN <= 1'b1;
             DE_EX_context_switch <= 1'b0;
         end
         else begin
@@ -432,27 +436,27 @@ module RT_core_single (
             if (EX_int_knockdown)
                 DE_EX_intALU_en <= 1'b0;
             else if (!EX_busy && !MEM_busy)
-                DE_EX_intALU_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_intALU_en;
+                DE_EX_intALU_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_intALU_en & ~DE_EX_FIN;
 
             if (EX_float1_knockdown)
                 DE_EX_floatALU1_en <= 1'b0;
             else if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU1_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_floatALU1_en;
+                DE_EX_floatALU1_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_floatALU1_en & ~DE_EX_FIN;
             
             if (EX_float2_knockdown)
                 DE_EX_floatALU2_en <= 1'b0;
             else if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU2_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_floatALU2_en;
+                DE_EX_floatALU2_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_floatALU2_en & ~DE_EX_FIN;
 
             if (EX_float3_knockdown)
                 DE_EX_floatALU3_en <= 1'b0;
             else if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU3_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_floatALU3_en;
+                DE_EX_floatALU3_en <= IF_DE_stall == 1'b1 ? 1'b0 : DE_floatALU3_en & ~DE_EX_FIN;
 
             if (EX_float4_knockdown)
                 DE_EX_floatALU4_en <= 1'b0;
             else if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU4_en <= IF_DE_stall == 1'b1 ? 1'b0 :  DE_floatALU4_en;
+                DE_EX_floatALU4_en <= IF_DE_stall == 1'b1 ? 1'b0 :  DE_floatALU4_en & ~DE_EX_FIN;
         end
 
     end
@@ -675,22 +679,22 @@ module RT_core_single (
         if (!rst_n) begin
             EX_MEM_memory_op <= 3'b0;
             EX_MEM_vector_reduce_en <= 1'b0;
-            EX_MEM_FIN <= 1'b0;
+            EX_MEM_FIN <= 1'b1;
             EX_MEM_context_switch <= 1'b0;
         end else begin
             if (!MEM_busy) begin
-                DE_EX_FIN <= 1'b0;
+                EX_MEM_FIN <= DE_EX_FIN;
                 DE_EX_context_switch <= 1'b0;
             end
             if (MEM_knockdown)
                 EX_MEM_memory_op <= 3'b0;
             else if (!MEM_busy)
-                EX_MEM_memory_op <= EX_busy == 1'b1 ? 3'b0 : DE_EX_memory_op;
+                EX_MEM_memory_op <= EX_busy == 1'b1 ? 3'b0 : DE_EX_memory_op & ~EX_MEM_FIN;
 
             if (MEM_v_reduce_knockdown)
                 EX_MEM_vector_reduce_en <= 3'b0;
             else if (!MEM_busy)
-                EX_MEM_vector_reduce_en <= EX_busy == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
+                EX_MEM_vector_reduce_en <= EX_busy == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en & ~EX_MEM_FIN;
         end
     end
 
