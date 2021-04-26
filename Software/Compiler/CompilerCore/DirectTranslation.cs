@@ -773,9 +773,10 @@ namespace CompilerCore
         internal override string Generate(DirectTranslation translation)
         {
             string tempVar = func.Type == Type.VECTOR ? ".V" : ".S" + VariableCounter;
-            expressionList.Generate(translation, func);
+            var args = expressionList.GenerateArgs(translation, func);
             translation.AddAssembly("s_push", "RS30");
-            translation.AddBranch("jmp_link", identifier);
+            // translation.AddBranch("jmp_link", identifier);
+            translation.AddFunctionCall(identifier, args);
             if (func.Type == Type.VECTOR)
                 translation.AddAssembly("v_mov", tempVar, "RV1");
             else
@@ -787,24 +788,27 @@ namespace CompilerCore
 
     partial class ExpressionList
     {
-        internal string Generate(DirectTranslation translation, Symbol func)
+        internal List<string> GenerateArgs(DirectTranslation translation, Symbol func)
         {
             int vector = 1, scalar = 1;
+            List<string> ret = new List<string>();
             for (int i = 0; i < list.Count; i++)
             {
                 string tempVar = list[i].Generate(translation);
                 if (func.ParametersType[i] == Type.VECTOR)
                 {
+                    ret.Add($"RV{vector}");
                     translation.AddAssembly("v_mov", $"RV{vector}", tempVar);
                     vector++;
                 }
                 else
                 {
+                    ret.Add($"RS{vector}");
                     translation.AddAssembly("s_mov", $"RS{scalar}", tempVar);
                     scalar++;
                 }
             }
-            return null;
+            return ret;
         }
 
         internal override string Generate(DirectTranslation translation)
