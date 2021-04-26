@@ -291,28 +291,31 @@ namespace CompilerCore
             AddAssembly("ii_addi", "RS29", "RS29", "wtf");
             FunctionStackWaiting.Add(function.functionName, List[^1]); // wait for calculating stack size
             var types = function.parameterList.Types();
-            // int vectors = 0, scalars;
-            // foreach (var t in types)
-            //     if (t == Type.VECTOR)
-            //         vectors++;
+            var names = function.parameterList.Names();
+            int vectors = 1, scalars = 1;
+            for (int i = 0; i < types.Count; i++)
+                if (types[i] == Type.VECTOR)
+                    AddAssembly("v_mov", names[i], $"RV{vectors}");
+                else
+                    AddAssembly("s_mov", names[i], $"RS{scalars}");
             // scalars = types.Count - vectors;
-            var d = (new List<(int, int)>(), new List<(int, int)>());
-            FunctionSaveRegisterPair.Add(function.functionName, d);
-            if (function.functionName != "main") // main do not need save anything
-            {
-                for (int i = 0, index = 27; i < 10; i++, index--)
-                {
-                    int c = Statement.VariableCounter;
-                    AddAssembly("s_mov", $".S{c}", $"RS{index}");
-                    d.Item1.Add((c, index));
-                }
-                for (int i = 0, index = 15; i < 6; i++, index--)
-                {
-                    int c = Statement.VariableCounter;
-                    AddAssembly("v_mov", $".V{c}", $"RV{index}");
-                    d.Item2.Add((c, index));
-                }
-            }
+            // var d = (new List<(int, int)>(), new List<(int, int)>());
+            // FunctionSaveRegisterPair.Add(function.functionName, d);
+            // if (function.functionName != "main") // main do not need save anything
+            // {
+            //     for (int i = 0, index = 27; i < 10; i++, index--)
+            //     {
+            //         int c = Statement.VariableCounter;
+            //         AddAssembly("s_mov", $".S{c}", $"RS{index}");
+            //         d.Item1.Add((c, index));
+            //     }
+            //     for (int i = 0, index = 15; i < 6; i++, index--)
+            //     {
+            //         int c = Statement.VariableCounter;
+            //         AddAssembly("v_mov", $".V{c}", $"RV{index}");
+            //         d.Item2.Add((c, index));
+            //     }
+            // }
         }
 
         internal void AddEpilogue(FunctionDefinitionStatement function)
@@ -329,10 +332,10 @@ namespace CompilerCore
             //     AddAssembly("v_mov", $"RV{index}", $".V{c}");
             //     // d.Item2.Add((c, index));
             // }
-            foreach (var item in FunctionSaveRegisterPair[function.functionName].s)
-                AddAssembly("s_mov", $"RS{item.Item2}", $".S{item.Item1}");
-            foreach (var item in FunctionSaveRegisterPair[function.functionName].v)
-                AddAssembly("v_mov", $"RV{item.Item2}", $".V{item.Item1}");
+            // foreach (var item in FunctionSaveRegisterPair[function.functionName].s)
+            //     AddAssembly("s_mov", $"RS{item.Item2}", $".S{item.Item1}");
+            // foreach (var item in FunctionSaveRegisterPair[function.functionName].v)
+            //     AddAssembly("v_mov", $"RV{item.Item2}", $".V{item.Item1}");
             AddAssembly("s_mov", "RS29", "RS28");
             AddAssembly("s_pop", "RS28");
         }

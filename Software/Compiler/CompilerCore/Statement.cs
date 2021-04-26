@@ -630,11 +630,20 @@ namespace CompilerCore
                 types.Add(item.Type());
             return types;
         }
+
+        internal List<string> Names()
+        {
+            List<string> ret = new List<string>(list.Count);
+            foreach (var item in list)
+                ret.Add(item.Name());
+            return ret;
+        }
     }
     internal class Parameter : ASTNode
     {
         Type type;
         string identifier;
+        string name;
         internal Parameter(LexLocation location, Type type, string id) : base(location)
         {
             this.type = type;
@@ -652,11 +661,17 @@ namespace CompilerCore
             throw new NotImplementedException();
         }
 
+        internal string Name()
+        {
+            return name;
+        }
+
         internal override bool NameAnalysis(SymbolTable table)
         {
             string id;
             string t = type == CompilerCore.Type.VECTOR ? "V" : "S";
             id = $".{t}.{Statement.CurrentFunction.functionName}.{table.ScopeLevel}.{identifier}";
+            name = id;
             table.AddSymbol(identifier, new Symbol(type, id));
             return true;
         }
