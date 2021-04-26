@@ -27,6 +27,8 @@ namespace CompilerCore
         internal string Label { get; set; } = null;
         internal List<string> FunctionArgument { get; set; } = null;
         internal Type returnType { get; set; } = Type.NULL;
+        internal bool CallerSave { get; set; } = false;
+        internal bool CallerRestore { get; set; } = false;
 
         internal void Copy(Assembly asm)
         {
@@ -212,7 +214,8 @@ namespace CompilerCore
         internal Dictionary<string, int> Labels { get; } = new Dictionary<string, int>();
         internal Dictionary<int, string> ReverseLabels { get; } = new Dictionary<int, string>();
         internal Dictionary<string, Assembly> FunctionStackWaiting { get; } = new Dictionary<string, Assembly>();
-        internal List<string> Functions { get; } = new List<string>();
+        internal List<string> FunctionNames { get; } = new List<string>();
+        internal List<FunctionDefinitionStatement> Functions { get; } = new List<FunctionDefinitionStatement>();
         internal Dictionary<string, (List<(int, int)> s, List<(int, int)> v)> FunctionSaveRegisterPair { get; }
             = new Dictionary<string, (List<Move> s, List<Move> v)>();
         internal void AddLabel(string label, bool nextLine = true)
@@ -221,11 +224,12 @@ namespace CompilerCore
             ReverseLabels.TryAdd(index, label);
             Labels.Add(label, index);
         }
-        internal void AddFunctionLabel(string functionName)
+        internal void AddFunctionLabel(string functionName, FunctionDefinitionStatement function)
         {
             ReverseLabels.Add(List.Count, functionName);
             Labels.Add(functionName, List.Count);
-            Functions.Add(functionName);
+            FunctionNames.Add(functionName);
+            Functions.Add(function);
         }
 
         internal void AddFunctionCall(string label, List<string> args)
@@ -263,7 +267,7 @@ namespace CompilerCore
                 LabelReferences.TryAdd(resultLabel, target);
             }
             int last = -1;
-            foreach (var item in Functions) // assign function labels and split the program
+            foreach (var item in FunctionNames) // assign function labels and split the program
             {
                 int index = Labels[item];
                 List[index].Label = item;
@@ -295,9 +299,15 @@ namespace CompilerCore
             int vectors = 1, scalars = 1;
             for (int i = 0; i < types.Count; i++)
                 if (types[i] == Type.VECTOR)
+                {
                     AddAssembly("v_mov", names[i], $"RV{vectors}");
+                    vectors++;
+                }
                 else
+                {
                     AddAssembly("s_mov", names[i], $"RS{scalars}");
+                    scalars++;
+                }
             // scalars = types.Count - vectors;
             // var d = (new List<(int, int)>(), new List<(int, int)>());
             // FunctionSaveRegisterPair.Add(function.functionName, d);
@@ -339,6 +349,18 @@ namespace CompilerCore
             AddAssembly("s_mov", "RS29", "RS28");
             AddAssembly("s_pop", "RS28");
         }
+
+        internal void AddCallerSave()
+        {
+            AddAssembly("");
+            List[^1].CallerSave = true;
+        }
+
+        internal void AddCallerRestore()
+        {
+            AddAssembly("");
+            List[^1].CallerRestore = true;
+        }
     }
 
     class CodeGenerator
@@ -357,11 +379,21 @@ namespace CompilerCore
             directTranslation.ResolveLabel();
             // directTranslation.ConstructFlowGraph();
             // directTranslation.CalculateLiveSpan();
-            foreach (var item in directTranslation.ListOfList)
+            List<FunctionTranslation> list = new List<FunctionTranslation>();
+            Dictionary<string, (SortedSet<int> s, SortedSet<int> v)> rlist =
+                new Dictionary<string, (SortedSet<int> s, SortedSet<int> v)>();
+            for (int i = 0; i < directTranslation.ListOfList.Count; i++)
             {
-                var f = new FunctionTranslation(item, directTranslation.LabelReferences);
-                RegisterAllocator.fk(f);
+                var item = directTranslation.ListOfList[i];
+                var f = new FunctionTranslation(item, directTranslation.LabelReferences,
+                     directTranslation.Functions[i]);
+                list.Add(f);
+                rlist.Add(item[0].Label, RegisterAllocator.fk(f));
             }
+            foreach (var item in list)
+                item.ResolveCallerSave(rlist);
+            foreach (var item in list)
+                item.Output(Console.Out);
             // directTranslation.Print();
         }
     }
