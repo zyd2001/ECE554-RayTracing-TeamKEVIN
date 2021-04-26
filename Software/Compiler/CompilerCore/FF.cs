@@ -15,6 +15,8 @@ namespace CompilerCore
         internal List<Set> SOuts { get; set; } = null;
         internal List<Set> VOuts { get; set; } = null;
         internal Dictionary<string, Assembly> LabelReferences { get; }
+        internal SortedSet<int> usedScalar;
+        internal SortedSet<int> usedVector;
         internal FunctionDefinitionStatement function;
 
         internal FunctionTranslation(List<Assembly> list, Dictionary<string, Assembly> r,
@@ -290,6 +292,8 @@ namespace CompilerCore
                         throw new Exception("wtf");
                     string func = node.Next.Value.UsedLabel;
                     (var s, var v) = d[func];
+                    s.IntersectWith(usedScalar);
+                    v.IntersectWith(usedVector);
                     foreach (var item in s)
                         List.AddAfter(node, new Assembly("s_push", new List<string> { $"R{item}" }));
                     foreach (var item in v)
@@ -309,17 +313,12 @@ namespace CompilerCore
             }
         }
 
-        internal void ResolveFunctionStack()
-        {
-
-        }
-
         internal void Output(TextWriter t)
         {
             foreach (var item in List)
             {
                 if (item.Label is not null)
-                    t.Write(item.Label);
+                    t.Write(item.Label + ":");
                 if (item.OPCode.Contains("mov"))
                 {
                     if (item.Operands[0] != item.Operands[1])

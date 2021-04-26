@@ -455,6 +455,8 @@ namespace CompilerCore
                     usedScalar.ExceptWith(parameterScalar);
                     usedVector.ExceptWith(parameterVector);
                     translation.ResolvePhysicalRegister();
+                    translation.usedScalar = usedScalar;
+                    translation.usedVector = usedVector;
                     // translation.Output(Console.Out);
                     return (usedScalar, usedVector);
                 }
