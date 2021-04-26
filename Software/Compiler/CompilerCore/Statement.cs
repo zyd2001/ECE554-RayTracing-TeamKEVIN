@@ -733,4 +733,54 @@ namespace CompilerCore
             return expression.TypeCheck(out _);
         }
     }
+
+    class TraceStatement : Statement
+    {
+        Expression id1;
+        Expression id2;
+        Expression expression1;
+        Expression expression2;
+
+        internal TraceStatement(LexLocation location, Expression i1, Expression i2,
+            Expression e1, Expression e2) : base(location)
+        {
+            id1 = i1;
+            id2 = i2;
+            expression1 = e1;
+            expression2 = e2;
+        }
+
+        internal override string Generate(DirectTranslation translation)
+        {
+            string v1 = expression1.Generate(translation);
+            string v2 = expression2.Generate(translation);
+            string i1 = id1.Generate(translation);
+            string i2 = id2.Generate(translation);
+            translation.AddAssembly("v_mov", "RV14", v1);
+            translation.AddAssembly("v_mov", "RV15", v2);
+            translation.AddCallerSave();
+            translation.AddAssembly("Trace");
+            translation.AddCallerRestore();
+            translation.AddAssembly("v_mov", i1, "RV14");
+            translation.AddAssembly("v_mov", i2, "RV15");
+            return null;
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return id1.NameAnalysis(table) & id2.NameAnalysis(table)
+                & expression1.NameAnalysis(table) & expression2.NameAnalysis(table);
+        }
+
+        internal override bool SyntaxCheck(bool topLevel, bool inLoop)
+        {
+            return true;
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            resultType = Type.NULL;
+            return true;
+        }
+    }
 }

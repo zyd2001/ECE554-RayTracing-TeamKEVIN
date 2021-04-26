@@ -28,7 +28,8 @@ namespace CompilerCore
 
                 }
             }
-            // main.FunctionDefinition.Generate(translation);
+            main.FunctionDefinition.Generate(translation);
+            globalTable.LocalScope.Remove("main");
             foreach (var item in globalTable.LocalScope)
             {
                 if (item.Value.IsFunction)
@@ -159,9 +160,11 @@ namespace CompilerCore
                     else
                     {
                         if (be.type1 == Type.INT)
-                            translation.AddAssembly("s_itof", temp1, temp1);
+                            temp1 = BinaryExpression.ItoFHelper(translation, temp1);
+                        // translation.AddAssembly("s_itof", temp1, temp1);
                         if (be.type2 == Type.INT)
-                            translation.AddAssembly("s_itof", temp2, temp2);
+                            temp2 = BinaryExpression.ItoFHelper(translation, temp2);
+                        // translation.AddAssembly("s_itof", temp2, temp2);
                         translation.AddAssembly("cmp_f", temp1, temp2);
                     }
                     switch (be.type)
@@ -255,9 +258,11 @@ namespace CompilerCore
                         else
                         {
                             if (be.type1 == Type.INT)
-                                translation.AddAssembly("s_itof", temp1, temp1);
+                                temp1 = BinaryExpression.ItoFHelper(translation, temp1);
+                            // translation.AddAssembly("s_itof", temp1, temp1);
                             if (be.type2 == Type.INT)
-                                translation.AddAssembly("s_itof", temp2, temp2);
+                                temp2 = BinaryExpression.ItoFHelper(translation, temp2);
+                            // translation.AddAssembly("s_itof", temp2, temp2);
                             translation.AddAssembly("cmp_f", temp1, temp2);
                         }
                         switch (be.type)
@@ -451,7 +456,8 @@ namespace CompilerCore
             {
                 tempScalar = expressions[i].Generate(translation);
                 if (types[i] == Type.INT)
-                    translation.AddAssembly("s_itof", tempScalar, tempScalar);
+                    tempScalar = BinaryExpression.ItoFHelper(translation, tempScalar);
+                // translation.AddAssembly("s_itof", tempScalar, tempScalar);
                 if (i == 0)
                     translation.AddAssembly("v_get_from_s_d", tempVar, tempScalar, i.ToString());
                 else
@@ -463,6 +469,17 @@ namespace CompilerCore
 
     partial class BinaryExpression
     {
+        internal static string ItoFHelper(DirectTranslation translation, string temp)
+        {
+            string tempF;
+            if (temp[2] == '.') // temp is not temporary
+                tempF = $".{temp[1]}{VariableCounter}";
+            else
+                tempF = temp;
+            translation.AddAssembly("s_itof", tempF, temp);
+            return tempF;
+        }
+
         static Vector4 getVectorFromLiteral((int type, int i, float f, Vector4 v) l)
         {
             switch (l.type)
@@ -626,7 +643,7 @@ namespace CompilerCore
         {
             if (type2 == CompilerCore.Type.INT)
             {
-                translation.AddAssembly("s_itof", temp2, temp2);
+                temp2 = BinaryExpression.ItoFHelper(translation, temp2);
                 switch (type)
                 {
                     case Type.ADD:
@@ -668,9 +685,9 @@ namespace CompilerCore
         private void floatHelper(DirectTranslation translation, string tempVar, string temp1, string temp2)
         {
             if (type1 == CompilerCore.Type.INT)
-                translation.AddAssembly("s_itof", temp1, temp1);
+                temp1 = BinaryExpression.ItoFHelper(translation, temp1);
             if (type2 == CompilerCore.Type.INT)
-                translation.AddAssembly("s_itof", temp2, temp2);
+                temp2 = BinaryExpression.ItoFHelper(translation, temp2);
             switch (type)
             {
                 case Type.ADD:
@@ -775,7 +792,7 @@ namespace CompilerCore
             translation.AddAssembly("s_push", "RS30");
             // translation.AddBranch("jmp_link", identifier);
             translation.AddCallerSave();
-            translation.AddFunctionCall(identifier, args);
+            translation.AddFunctionCall(identifier, args, func.Type);
             translation.AddCallerRestore();
             translation.AddAssembly("s_pop", "RS30");
             if (func.Type == Type.VECTOR)
@@ -803,7 +820,7 @@ namespace CompilerCore
                 }
                 else
                 {
-                    ret.Add($"RS{vector}");
+                    ret.Add($"RS{scalar}");
                     translation.AddAssembly("s_mov", $"RS{scalar}", tempVar);
                     scalar++;
                 }
@@ -814,6 +831,35 @@ namespace CompilerCore
         internal override string Generate(DirectTranslation translation)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    partial class TypeCastExpression
+    {
+        internal override string Generate(DirectTranslation translation)
+        {
+            string temp = expression.Generate(translation);
+            string tempVar;
+            if (temp[2] == '.') // temp is not temporary
+                tempVar = $".{temp[1]}{VariableCounter}";
+            else
+                tempVar = temp;
+            if (type == Type.FLOAT)
+                translation.AddAssembly("s_itof", tempVar, temp);
+            else
+                translation.AddAssembly("s_ftoi", tempVar, temp);
+            return tempVar;
+        }
+    }
+
+    partial class ReduceExpression
+    {
+        internal override string Generate(DirectTranslation translation)
+        {
+            string temp = expression.Generate(translation);
+            string tempVar = $".S{VariableCounter}";
+            translation.AddAssembly("v_reduce", tempVar, temp);
+            return tempVar;
         }
     }
 }

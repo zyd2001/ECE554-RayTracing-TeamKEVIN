@@ -33,7 +33,7 @@
 %token<VectorLiteral> VECTOR_LITERAL
 %token<Identifier> IDENTIFIER
 %token INT FLOAT VECTOR VOID IF ELSE FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
-    EQ NE GT GE LT LE INCREMENT DECREMENT
+    EQ NE GT GE LT LE INCREMENT DECREMENT TRACE REDUCE
 
 %type<Type> value_type
 %type<Statement> statement  loop_statement return_statement assignment_statement function_definition_statement
@@ -87,6 +87,10 @@ statement: if_statement
     | function_call_expression ';'
     {
         $$ = new FunctionCallStatement(@$, $1 as FunctionCallExpression);
+    }
+    | identifier_expression ',' identifier_expression '=' TRACE '(' expression ',' expression ')' ';'
+    {
+        $$ = new TraceStatement(@$, $1, $3, $7, $9);
     }
     ;
 return_statement: RETURN ';'
@@ -181,6 +185,14 @@ expression: '(' expression ')'
     | possible_array_expression
     | function_call_expression
     | literal_expression
+    | value_type '(' expression ')'
+    {
+        $$ = new TypeCastExpression(@$, $1, $3);
+    }
+    | REDUCE '(' expression ')'
+    {
+        $$ = new ReduceExpression(@$, $3);
+    }
     ;
 declaration_statement: value_type declaration_list
     {

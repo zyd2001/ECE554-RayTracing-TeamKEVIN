@@ -257,19 +257,22 @@ namespace CompilerCore
             while (selectStack.Count > 0)
             {
                 int n = selectStack.Pop();
-                var colors = Enumerable.Range(1, RegisterNumber).ToHashSet();
-                foreach (var w in graph.AdjacentList[n])
+                if (!precolored.Contains(n))
                 {
-                    int a = getAlias(w);
-                    if (coloredNodes.Contains(a) || precolored.Contains(a))
-                        colors.Remove(color[a]);
-                }
-                if (colors.Count == 0)
-                    spilledNodes.Add(n);
-                else
-                {
-                    coloredNodes.Add(n);
-                    color[n] = getFirstInSet(colors);
+                    var colors = Enumerable.Range(1, RegisterNumber).ToHashSet();
+                    foreach (var w in graph.AdjacentList[n])
+                    {
+                        int a = getAlias(w);
+                        if (coloredNodes.Contains(a) || precolored.Contains(a))
+                            colors.Remove(color[a]);
+                    }
+                    if (colors.Count == 0)
+                        spilledNodes.Add(n);
+                    else
+                    {
+                        coloredNodes.Add(n);
+                        color[n] = getFirstInSet(colors);
+                    }
                 }
             }
             foreach (var n in coalescedNodes)
@@ -454,7 +457,7 @@ namespace CompilerCore
                         }
                     usedScalar.ExceptWith(parameterScalar);
                     usedVector.ExceptWith(parameterVector);
-                    translation.ResolvePhysicalRegister();
+                    // translation.ResolvePhysicalRegister();
                     translation.usedScalar = usedScalar;
                     translation.usedVector = usedVector;
                     // translation.Output(Console.Out);

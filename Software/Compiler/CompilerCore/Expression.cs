@@ -461,4 +461,46 @@ namespace CompilerCore
             return true;
         }
     }
+
+    partial class TypeCastExpression : Expression
+    {
+        Type type;
+        Expression expression;
+        internal TypeCastExpression(LexLocation location, Type type, Expression exp) : base(location)
+        {
+            this.type = type;
+            expression = exp;
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return expression.NameAnalysis(table);
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            resultType = type;
+            return true;
+        }
+    }
+
+    partial class ReduceExpression : Expression
+    {
+        Expression expression;
+        internal ReduceExpression(LexLocation location, Expression exp) : base(location)
+        {
+            expression = exp;
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return expression.NameAnalysis(table);
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            resultType = Type.FLOAT;
+            return true;
+        }
+    }
 }

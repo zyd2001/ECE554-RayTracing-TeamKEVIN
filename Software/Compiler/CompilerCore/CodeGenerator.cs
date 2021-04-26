@@ -25,6 +25,7 @@ namespace CompilerCore
         internal Set SOut { get; set; } = Set.Empty;
         internal Set VOut { get; set; } = Set.Empty;
         internal string Label { get; set; } = null;
+        internal Type FunctionType { get; set; } = Type.NULL;
         internal List<string> FunctionArgument { get; set; } = null;
         internal Type returnType { get; set; } = Type.NULL;
         internal bool CallerSave { get; set; } = false;
@@ -35,6 +36,8 @@ namespace CompilerCore
             this.OPCode = asm.OPCode;
             this.Operands = asm.Operands;
             this.UsedLabel = asm.UsedLabel;
+            this.FunctionArgument = asm.FunctionArgument;
+            this.FunctionType = asm.FunctionType;
             this.Label = asm.Label;
             this.SUse = asm.SUse;
             this.VUse = asm.VUse;
@@ -46,10 +49,18 @@ namespace CompilerCore
         {
             OPCode = opcode;
             Operands = operands;
-            calculateUseDef();
+            CalculateUseDef();
         }
 
-        internal void calculateUseDef()
+        internal void Clear()
+        {
+            SIn = Set.Empty;
+            SOut = Set.Empty;
+            VIn = Set.Empty;
+            VOut = Set.Empty;
+        }
+
+        internal void CalculateUseDef()
         {
             var vuse = ImmutableHashSet.CreateBuilder<string>();
             var suse = ImmutableHashSet.CreateBuilder<string>();
@@ -62,13 +73,17 @@ namespace CompilerCore
                         vuse.Add(item);
                     else
                         suse.Add(item);
+                if (FunctionType == Type.VECTOR)
+                    vdef.Add("RV1");
+                else
+                    sdef.Add("RS1");
             }
             if (OPCode == "ret")
             {
-                for (int i = 0, index = 27; i < 10; i++, index--)
-                    suse.Add($"RS{index}");
-                for (int i = 0, index = 15; i < 6; i++, index--)
-                    vuse.Add($"RV{index}");
+                // for (int i = 0, index = 27; i < 10; i++, index--)
+                //     suse.Add($"RS{index}");
+                // for (int i = 0, index = 15; i < 6; i++, index--)
+                //     vuse.Add($"RV{index}");
                 if (returnType == Type.NULL)
                     throw new Exception("fv<k");
                 if (returnType == Type.VECTOR)
@@ -76,19 +91,17 @@ namespace CompilerCore
                 else
                     suse.Add("RS1");
             }
+            if (OPCode == "Trace")
+            {
+                vuse.Add("RV14");
+                vuse.Add("RV15");
+                vdef.Add("RV14");
+                vdef.Add("RV15");
+            }
             if (Operands.Count > 0)
             {
                 if (withVariable(OPCode))
                 {
-                    // if (OPCode == "s_push")
-                    //     suse.Add(Operands[0]);
-                    // else if (OPCode == "v_push")
-                    //     vuse.Add(Operands[0]);
-                    // else if (OPCode == "s_pop")
-                    //     sdef.Add(Operands[0]);
-                    // else if (OPCode == "v_pop")
-                    //     vdef.Add(Operands[0]);
-                    // else 
                     if (OPCode == "v_get_from_s") // first need to be changed to v_get_from_s_d
                     {
                         vdef.Add(Operands[0]);
@@ -144,13 +157,13 @@ namespace CompilerCore
         internal void changeDef(string newDef)
         {
             Operands[0] = newDef;
-            calculateUseDef();
+            CalculateUseDef();
         }
 
         internal void changeUse(string oldUse, string newUse)
         {
             Operands[Operands.IndexOf(oldUse)] = newUse;
-            calculateUseDef();
+            CalculateUseDef();
             return;
         }
 
@@ -185,15 +198,16 @@ namespace CompilerCore
             OPCode = opcode;
             Operands = new List<string>();
             returnType = type;
-            calculateUseDef();
+            CalculateUseDef();
         }
 
-        internal Assembly(string opcode, string label, List<string> args)
+        internal Assembly(string opcode, string label, List<string> args, Type funcType)
         {
             OPCode = opcode;
             Operands = new List<string> { label };
             FunctionArgument = args;
-            calculateUseDef();
+            FunctionType = funcType;
+            CalculateUseDef();
         }
 
         public override string ToString()
@@ -233,9 +247,9 @@ namespace CompilerCore
             Functions.Add(function);
         }
 
-        internal void AddFunctionCall(string label, List<string> args)
+        internal void AddFunctionCall(string label, List<string> args, Type functionType)
         {
-            BranchList.Add((new Assembly("jmp_link", label, args), List.Count));
+            BranchList.Add((new Assembly("jmp_link", label, args, functionType), List.Count));
             AddAssembly(""); // placeholder
         }
 
@@ -392,7 +406,10 @@ namespace CompilerCore
                 rlist.Add(item[0].Label, RegisterAllocator.fk(f));
             }
             foreach (var item in list)
+            {
+                item.CalculateLiveSpan2();
                 item.ResolveCallerSave(rlist);
+            }
             foreach (var item in directTranslation.FunctionStackWaiting)
             {
                 int size = item.Key.StackSize;

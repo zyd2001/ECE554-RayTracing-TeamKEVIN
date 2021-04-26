@@ -54,6 +54,15 @@ namespace CompilerCore
             }
         }
 
+        internal void CalculateLiveSpan2()
+        {
+            foreach (var ins in List)
+            {
+                ins.CalculateUseDef();
+                ins.Clear();
+            }
+            CalculateLiveSpan();
+        }
         internal void CalculateLiveSpan()
         {
             SIns = new List<Set>(new Set[List.Count]);
@@ -288,27 +297,45 @@ namespace CompilerCore
                 Assembly ins = node.Value;
                 if (ins.CallerSave)
                 {
-                    if (node.Next.Value.OPCode != "jmp_link")
+                    Assembly nextIns = node.Next.Value;
+                    if (nextIns.OPCode != "jmp_link" && nextIns.OPCode != "Trace")
                         throw new Exception("wtf");
-                    string func = node.Next.Value.UsedLabel;
-                    (var s, var v) = d[func];
-                    s.IntersectWith(usedScalar);
-                    v.IntersectWith(usedVector);
-                    foreach (var item in s)
-                        List.AddAfter(node, new Assembly("s_push", new List<string> { $"R{item}" }));
-                    foreach (var item in v)
-                        List.AddAfter(node, new Assembly("v_push", new List<string> { $"R{item}" }));
+                    SortedSet<int> ss = new SortedSet<int>(), vv = new SortedSet<int>();
+                    foreach (var i in nextIns.SOut.Except(nextIns.SDef))
+                        ss.Add(int.Parse(i[2..^0]));
+                    foreach (var i in nextIns.VOut.Except(nextIns.VDef))
+                        vv.Add(int.Parse(i[2..^0]));
+                    if (nextIns.OPCode == "jmp_link")
+                    {
+                        (var s, var v) = d[nextIns.UsedLabel];
+                        ss.IntersectWith(s);
+                        vv.IntersectWith(v);
+                    }
+                    foreach (var item in ss)
+                        List.AddAfter(node, new Assembly("s_push", new List<string> { $"RS{item}" }));
+                    foreach (var item in vv)
+                        List.AddAfter(node, new Assembly("v_push", new List<string> { $"RV{item}" }));
                 }
                 if (ins.CallerRestore)
                 {
-                    if (node.Previous.Value.OPCode != "jmp_link")
+                    Assembly previousIns = node.Previous.Value;
+                    if (previousIns.OPCode != "jmp_link" && previousIns.OPCode != "Trace")
                         throw new Exception("wtf");
-                    string func = node.Previous.Value.UsedLabel;
-                    (var s, var v) = d[func];
-                    foreach (var item in s)
-                        List.AddAfter(node, new Assembly("s_pop", new List<string> { $"R{item}" }));
-                    foreach (var item in v)
-                        List.AddAfter(node, new Assembly("v_pop", new List<string> { $"R{item}" }));
+                    SortedSet<int> ss = new SortedSet<int>(), vv = new SortedSet<int>();
+                    foreach (var i in previousIns.SOut.Except(previousIns.SDef))
+                        ss.Add(int.Parse(i[2..^0]));
+                    foreach (var i in previousIns.VOut.Except(previousIns.VDef))
+                        vv.Add(int.Parse(i[2..^0]));
+                    if (previousIns.OPCode == "jmp_link")
+                    {
+                        (var s, var v) = d[previousIns.UsedLabel];
+                        ss.IntersectWith(s);
+                        vv.IntersectWith(v);
+                    }
+                    foreach (var item in vv.Reverse()) // opposite
+                        List.AddAfter(node, new Assembly("v_pop", new List<string> { $"RV{item}" }));
+                    foreach (var item in ss.Reverse())
+                        List.AddAfter(node, new Assembly("s_pop", new List<string> { $"RS{item}" }));
                 }
             }
         }
