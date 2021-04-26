@@ -38,6 +38,8 @@ start:
     s_write_low r2 4
     cmp_i r1 r2
     bne wrong8
+right:
+    fin
 wrong1:
     fin
 wrong2:
