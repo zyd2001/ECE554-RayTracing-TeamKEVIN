@@ -13,6 +13,7 @@ namespace SimulatorCore
         IntersectionCore IC;
         Dictionary<int, RTInstruction> cache;
         Decoder decoder;
+        public string LastInstruction { get; private set; }
 
         public RayTracing(Memory insMem, Memory triangleMem, Memory dataMem)
         {
@@ -34,6 +35,7 @@ namespace SimulatorCore
                 ins = (RTInstruction)decoder.Decode(InstructionMemory.Read(PC));
                 cache[PC] = ins;
             }
+            LastInstruction = ins.ToString();
             if (ins is fin)
                 return true;
             ScalarRegisterFile[31] += 4;

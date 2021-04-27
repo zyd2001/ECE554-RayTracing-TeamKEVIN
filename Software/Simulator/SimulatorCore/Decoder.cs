@@ -13,7 +13,8 @@ namespace SimulatorCore
         {
             Placeholder,
             Register,
-            Immediate
+            Immediate,
+            Unsigned
         }
         struct Definition
         {
@@ -58,9 +59,12 @@ namespace SimulatorCore
                             newDef.realSize++;
                             break;
                         case "i":
-                        case "ui":
                         case "l":
                             newDef.section[i - 1] = OperandType.Immediate;
+                            newDef.realSize++;
+                            break;
+                        case "ui":
+                            newDef.section[i - 1] = OperandType.Unsigned;
                             newDef.realSize++;
                             break;
                         default:
@@ -92,6 +96,10 @@ namespace SimulatorCore
                         break;
                     case OperandType.Immediate:
                         arguments[counter] = ((int)value << bitsBefore) >> (32 - def.bitWidths[i]);
+                        counter++;
+                        break;
+                    case OperandType.Unsigned:
+                        arguments[counter] = (int)((value << bitsBefore) >> (32 - def.bitWidths[i]));
                         counter++;
                         break;
                     default:

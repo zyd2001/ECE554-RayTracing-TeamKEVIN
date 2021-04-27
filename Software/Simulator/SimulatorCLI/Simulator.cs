@@ -23,6 +23,8 @@ namespace SimulatorCLI
         {
             CPMem = new Memory(CPMemorySize);
             traingleMem = new Memory(triangleFile == null ? 0 : (int)triangleFile.Length);
+            if (traingleMem != null)
+                traingleMem.LoadToMemory(triangleFile.OpenRead());
             if (RTFile != null)
             {
                 RTMem = new Memory((int)RTFile.Length);
@@ -92,7 +94,8 @@ namespace SimulatorCLI
 
         static string Hex(Vector4 v)
         {
-            return $"<{Hex(v.X)},{Hex(v.Y)},{Hex(v.Z)},{Hex(v.W)}>";
+            // return $"<{Hex(v.X)},{Hex(v.Y)},{Hex(v.Z)},{Hex(v.W)}>";
+            return v.ToString();
         }
 
         internal void RunRT(int pixelID)
@@ -105,6 +108,7 @@ namespace SimulatorCLI
                 RT.EndTrace();
                 if (!disableTrace)
                 {
+                    RTOutputFile.WriteLine(RT.LastInstruction);
                     RTOutputFile.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
                         RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.Hex(), trace.after.Hex());

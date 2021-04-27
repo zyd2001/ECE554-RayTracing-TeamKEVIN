@@ -19,19 +19,19 @@ namespace SimulatorCore
 
             if (index == 0)
             {
-                sRF[r0] = (int)vRF[r1].X;
+                sRF[r0] = vRF[r1].X;
             }
             else if (index == 1)
             {
-                sRF[r0] = (int)vRF[r1].Y;
+                sRF[r0] = vRF[r1].Y;
             }
             else if (index == 2)
             {
-                sRF[r0] = (int)vRF[r1].Z;
+                sRF[r0] = vRF[r1].Z;
             }
             else if (index == 3)
             {
-                sRF[r0] = (int)vRF[r1].W;
+                sRF[r0] = vRF[r1].W;
             }
 
 

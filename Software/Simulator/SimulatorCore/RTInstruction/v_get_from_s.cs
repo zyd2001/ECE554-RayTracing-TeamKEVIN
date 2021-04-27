@@ -19,19 +19,19 @@ namespace SimulatorCore
 
             if (index == 0)
             {
-                vRF[r1] = new Vector4(sRF[r0].f, vRF[r1].Y, vRF[r1].Z, vRF[r1].W);
+                vRF[r0] = new Vector4(sRF[r1].f, vRF[r0].Y, vRF[r0].Z, vRF[r0].W);
             }
             else if (index == 1)
             {
-                vRF[r1] = new Vector4(vRF[r1].X, sRF[r0].f, vRF[r1].Z, vRF[r1].W);
+                vRF[r0] = new Vector4(vRF[r0].X, sRF[r1].f, vRF[r0].Z, vRF[r0].W);
             }
             else if (index == 2)
             {
-                vRF[r1] = new Vector4(vRF[r1].X, vRF[r1].Y, sRF[r0].f, vRF[r1].W);
+                vRF[r0] = new Vector4(vRF[r0].X, vRF[r0].Y, sRF[r1].f, vRF[r0].W);
             }
             else if (index == 3)
             {
-                vRF[r1] = new Vector4(vRF[r1].X, vRF[r1].Y, vRF[r1].Z, sRF[r0].f);
+                vRF[r0] = new Vector4(vRF[r0].X, vRF[r0].Y, vRF[r0].Z, sRF[r1].f);
             }
 
 
