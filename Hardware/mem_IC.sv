@@ -12,8 +12,8 @@ module mem_IC (
     parameter NUM_IC = 4;
     parameter NUM_THREAD = 32;
     localparam BIT_THREAD = $clog2(NUM_THREAD);
-    localparam RT2IC_WIDTH = 255+BIT_THREAD;
-    localparam IC2RT_WIDTH = 255+BIT_THREAD;
+    localparam RT2IC_WIDTH = 256+BIT_THREAD;
+    localparam IC2RT_WIDTH = 256+BIT_THREAD;
     /*
         Input​
     */
@@ -41,7 +41,7 @@ module mem_IC (
     output [127:0] ray_direction_IC;
     output [BIT_THREAD-1:0] thread_id_IC_out;
     // RT​
-    output [31:0] shader_info_RT;
+    output [127:0] shader_info_RT;
     output [127:0] normal_RT;
     output [BIT_THREAD-1:0] thread_id_RT_out;
 
@@ -183,7 +183,7 @@ module mem_IC (
         else if (enqueue_RT2IC[NUM_THREAD-1] & q_en_rt2ic_PD) begin
             fifo_RT2IC[NUM_THREAD-1] <= data_in_RT2IC;
         end
-        else if (dequeue_RT) begin
+        else if (dequeue_IC) begin
             fifo_RT2IC[NUM_THREAD-1] <= {RT2IC_WIDTH{1'b0}};
         end
         else begin
@@ -197,7 +197,7 @@ module mem_IC (
         else if (enqueue_IC2RT[NUM_THREAD-1] & q_en_ic2rt_PD) begin
             fifo_IC2RT[NUM_THREAD-1] <= data_in_IC2RT;
         end
-        else if (dequeue_IC) begin
+        else if (dequeue_RT) begin
             fifo_IC2RT[NUM_THREAD-1] <= {IC2RT_WIDTH{1'b0}};
         end
         else begin
@@ -211,10 +211,23 @@ module mem_IC (
                 if(!rst_n) begin
                     fifo_RT2IC[j] <= {RT2IC_WIDTH{1'b0}};
                 end
-                else if (enqueue_RT2IC[j] & q_en_rt2ic_PD) begin
-                    fifo_RT2IC[j] <= data_in_RT2IC;
+                else if (q_en_rt2ic_PD) begin
+                    if(dequeue_IC) begin
+                        if (enqueue_RT2IC[j+1]) begin
+                            fifo_RT2IC[j] <= data_in_RT2IC;
+                        end
+                        else begin
+                            fifo_RT2IC[j] <= fifo_RT2IC[j+1];
+                        end
+                    end
+                    else if (enqueue_RT2IC[j]) begin
+                        fifo_RT2IC[j] <= data_in_RT2IC;
+                    end
+                    else begin
+                        fifo_RT2IC[j] <= fifo_RT2IC[j];
+                    end
                 end
-                else if (dequeue_RT) begin
+                else if (dequeue_IC) begin
                     fifo_RT2IC[j] <= fifo_RT2IC[j+1];
                 end
                 else begin
@@ -225,10 +238,23 @@ module mem_IC (
                 if(!rst_n) begin
                     fifo_IC2RT[j] <= {IC2RT_WIDTH{1'b0}};
                 end
-                else if (enqueue_IC2RT[j] & q_en_ic2rt_PD) begin
-                    fifo_IC2RT[j] <= data_in_IC2RT;
+                else if (q_en_ic2rt_PD) begin
+                    if(dequeue_RT) begin
+                        if (enqueue_IC2RT[j+1]) begin
+                            fifo_IC2RT[j] <= data_in_IC2RT;
+                        end
+                        else begin
+                            fifo_IC2RT[j] <= fifo_IC2RT[j+1];
+                        end
+                    end
+                    else if (enqueue_IC2RT[j]) begin
+                        fifo_IC2RT[j] <= data_in_IC2RT;
+                    end
+                    else begin
+                        fifo_IC2RT[j] <= fifo_IC2RT[j];
+                    end
                 end
-                else if (dequeue_IC) begin
+                else if (dequeue_RT) begin
                     fifo_IC2RT[j] <= fifo_IC2RT[j+1];
                 end
                 else begin
@@ -239,10 +265,10 @@ module mem_IC (
     endgenerate
 
     // output
-    assign ray_origin_IC = fifo_RT2IC[0][127:0];
-    assign ray_direction_IC = fifo_RT2IC[0][255:128];
+    assign ray_direction_IC = fifo_RT2IC[0][127:0];
+    assign ray_origin_IC = fifo_RT2IC[0][255:128];
     assign thread_id_IC_out = fifo_RT2IC[0][255+BIT_THREAD:256];
-    assign shader_info_RT = fifo_IC2RT[0][127:0];
-    assign normal_RT = fifo_IC2RT[0][255:128];
+    assign normal_RT = fifo_IC2RT[0][127:0];
+    assign shader_info_RT = fifo_IC2RT[0][255:128];
     assign thread_id_RT_out = fifo_IC2RT[0][255+BIT_THREAD:256];
 endmodule
