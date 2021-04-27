@@ -6,7 +6,7 @@ localparam NUM_RT = 4;
 localparam BIT_RT = $clog2(NUM_RT);
 localparam NUM_IC = 4;
 localparam BIT_IC = $clog2(NUM_IC);
-localparam NUM_CYCLE = 4;
+localparam NUM_CYCLE = 5;
 
 genvar i;
 integer j;
@@ -50,6 +50,10 @@ logic context_switch_0[NUM_RT-1:0];
 logic context_switch_1[NUM_RT-1:0];
 logic context_switch_2[NUM_RT-1:0];
 logic context_switch_3[NUM_RT-1:0];
+logic context_switch_4[NUM_RT-1:0];
+logic context_switch_5[NUM_RT-1:0];
+logic context_switch_6[NUM_RT-1:0];
+logic context_switch_7[NUM_RT-1:0];
 
 logic [BIT_THREAD-1:0] tid[NUM_RT-1:0];
 logic [31:0] pid[NUM_RT-1:0];
@@ -104,9 +108,17 @@ generate
                 context_switch_1[i] <= 0;
                 context_switch_2[i] <= 0;
                 context_switch_3[i] <= 0;
+                context_switch_4[i] <= 0;
+                context_switch_5[i] <= 0;
+                context_switch_6[i] <= 0;
+                context_switch_7[i] <= 0;
             end
             else begin
-                context_switch_3[i] <= job_dispatch_rt[i];
+                context_switch_7[i] <= job_dispatch_rt[i];
+                context_switch_6[i] <= context_switch_7[i];
+                context_switch_5[i] <= context_switch_6[i];
+                context_switch_4[i] <= context_switch_5[i];
+                context_switch_3[i] <= context_switch_4[i];
                 context_switch_2[i] <= context_switch_3[i];
                 context_switch_1[i] <= context_switch_2[i];
                 context_switch_0[i] <= context_switch_1[i];
@@ -143,7 +155,14 @@ logic cs_ic_0[NUM_IC-1:0];
 logic cs_ic_1[NUM_IC-1:0];
 logic cs_ic_2[NUM_IC-1:0];
 logic cs_ic_3[NUM_IC-1:0];
-
+logic cs_ic_4[NUM_IC-1:0];
+logic cs_ic_5[NUM_IC-1:0];
+logic cs_ic_6[NUM_IC-1:0];
+logic cs_ic_7[NUM_IC-1:0];
+logic cs_ic_8[NUM_IC-1:0];
+logic cs_ic_9[NUM_IC-1:0];
+logic cs_ic_10[NUM_IC-1:0];
+logic cs_ic_11[NUM_IC-1:0];
 generate
     for (i = 0; i < NUM_IC; i++) begin
         always_ff @(posedge clk or negedge rst_n) begin
@@ -152,9 +171,25 @@ generate
                 cs_ic_1[i] <= 0;
                 cs_ic_2[i] <= 0;
                 cs_ic_3[i] <= 0;
+                cs_ic_4[i] <= 0;
+                cs_ic_5[i] <= 0;
+                cs_ic_6[i] <= 0;
+                cs_ic_7[i] <= 0;
+                cs_ic_8[i] <= 0;
+                cs_ic_9[i] <= 0;
+                cs_ic_10[i] <= 0;
+                cs_ic_11[i] <= 0;
             end
             else begin
-                cs_ic_3[i] <= job_dispatch_ic[i];
+                cs_ic_11[i] <= job_dispatch_ic[i];
+                cs_ic_10[i] <= cs_ic_11[i];
+                cs_ic_9[i] <= cs_ic_10[i];
+                cs_ic_8[i] <= cs_ic_9[i];
+                cs_ic_7[i] <= cs_ic_8[i];
+                cs_ic_6[i] <= cs_ic_7[i];
+                cs_ic_5[i] <= cs_ic_6[i];
+                cs_ic_4[i] <= cs_ic_5[i];
+                cs_ic_3[i] <= cs_ic_4[i];
                 cs_ic_2[i] <= cs_ic_3[i];
                 cs_ic_1[i] <= cs_ic_2[i];
                 cs_ic_0[i] <= cs_ic_1[i];
@@ -199,6 +234,7 @@ initial begin
     @(negedge clk);
 
     for (int k = 0; k < NUM_THREAD; k++) begin
+        $display("pc: %d; sp: %d; pid: %d;", pc_done[k], sp_done[k], pid_done[k]);
         if (pc_done[k] !== (k + 100*(NUM_CYCLE-1) + 1000)) 
             $stop();
         if (sp_done[k] !== (k + 100*(NUM_CYCLE-1) + 2000))
