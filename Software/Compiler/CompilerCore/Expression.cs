@@ -50,6 +50,34 @@ namespace CompilerCore
         }
     }
 
+    class AsExpression : Expression
+    {
+        Expression expression;
+        Type type;
+        internal AsExpression(LexLocation location, Type type, Expression exp) : base(location)
+        {
+            this.type = type;
+            expression = exp;
+        }
+
+        internal override string Generate(DirectTranslation translation)
+        {
+            return expression.Generate(translation);
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return expression.NameAnalysis(table);
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            resultType = type;
+            expression.TypeCheck(out _);
+            return true;
+        }
+    }
+
     abstract partial class LiteralExpression : Expression
     {
         internal LiteralExpression(LexLocation location) : base(location) { }
@@ -480,6 +508,7 @@ namespace CompilerCore
         internal override bool TypeCheck(out Type resultType)
         {
             resultType = type;
+            expression.TypeCheck(out _);
             return true;
         }
     }
@@ -500,6 +529,7 @@ namespace CompilerCore
         internal override bool TypeCheck(out Type resultType)
         {
             resultType = Type.FLOAT;
+            expression.TypeCheck(out _);
             return true;
         }
     }

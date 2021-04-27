@@ -18,6 +18,8 @@ digits [0-9]+
 "int"           return (int)Tokens.INT;
 "vector"        return (int)Tokens.VECTOR;
 "float"         return (int)Tokens.FLOAT;
+"asInt"         return (int)Tokens.ASINT;
+"asFloat"       return (int)Tokens.ASFLOAT;
 "void"          return (int)Tokens.VOID;
 "if"            return (int)Tokens.IF;
 "else"          return (int)Tokens.ELSE;

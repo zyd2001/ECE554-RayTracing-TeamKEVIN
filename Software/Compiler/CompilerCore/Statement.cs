@@ -780,6 +780,10 @@ namespace CompilerCore
         internal override bool TypeCheck(out Type resultType)
         {
             resultType = Type.NULL;
+            id1.TypeCheck(out _);
+            id2.TypeCheck(out _);
+            expression1.TypeCheck(out _);
+            expression2.TypeCheck(out _);
             return true;
         }
     }
