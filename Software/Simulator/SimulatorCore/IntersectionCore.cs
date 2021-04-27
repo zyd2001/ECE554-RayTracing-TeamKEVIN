@@ -27,15 +27,14 @@ namespace SimulatorCore
         {
             Vector3 orig = new Vector3(origin.X, origin.Y, origin.Z);
             Vector3 dir = new Vector3(direction.X, direction.Y, direction.Z);
-            Vector4 resultPoint = new Vector4(0, 0, 0, BitConverter.Int32BitsToSingle(-1)),
-                resultNormal = new Vector4();
+            Vector4 resultPoint = new Vector4(0, 0, 0, 0), resultNormal = new Vector4();
             float minDistance = float.MaxValue;
-            for (int i = 0; i < Memory.Mem.Length;)
+            int id = 1;
+            for (int i = 0; i < Memory.Mem.Length; id++)
             {
                 Vector3 v0 = VectorHelper(ref i);
                 Vector3 v1 = VectorHelper(ref i);
                 Vector3 v2 = VectorHelper(ref i);
-                int id = BitConverter.ToInt32(Memory.Read(i));
                 i += 4;
                 Vector3 v0v1 = v1 - v0;
                 Vector3 v0v2 = v2 - v0;
