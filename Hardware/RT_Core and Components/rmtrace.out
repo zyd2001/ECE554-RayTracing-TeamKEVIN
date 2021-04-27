@@ -1,0 +1,42 @@
+PC at 00000000, instruction: 8ef00000 
+ Reading scalar 16: xxxxxxxx, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar 23: 00000000.  No vector write back. 
+
+PC at 00000004, instruction: 4cf11800 
+ Reading scalar 17: xxxxxxxx, Reading scalar  3: xxxxxxxx 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ No memory operations
+ write back scalar  7: ffc00000.  No vector write back. 
+
+PC at 00000008, instruction: 37b5d800 
+ Reading scalar 21: xxxxxxxx, Reading scalar 27: xxxxxxxx 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ No memory operations
+ write back scalar 29: xxxxxxxx.  No vector write back. 
+
+PC at 0000000c, instruction: 8ef00000 
+ Reading scalar 16: xxxxxxxx, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar 23: 00000000.  No vector write back. 
+
+PC at 00000010, instruction: 4cf11800 
+ Reading scalar 17: xxxxxxxx, Reading scalar  3: xxxxxxxx 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ No memory operations
+ write back scalar  7: ffc00000.  No vector write back. 
+
+PC at 00000014, instruction: 37b5d800 
+ Reading scalar 21: xxxxxxxx, Reading scalar 27: xxxxxxxx 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ No memory operations
+ write back scalar 29: xxxxxxxx.  No vector write back. 
+
+PC at 00000018, instruction: e0000000 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ No scalar write back.  No vector write back. 
+

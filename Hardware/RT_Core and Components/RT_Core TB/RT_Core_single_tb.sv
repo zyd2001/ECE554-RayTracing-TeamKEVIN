@@ -1,6 +1,9 @@
 //import rand_assembly.out;
 import "DPI-C" function string getenv(input string env_name);
-module RT_Core_single_tb;
+
+
+
+module RT_Core_single_tb();
 
 	// Output signal Trace Log
 	int signaltracefile;
@@ -17,10 +20,7 @@ module RT_Core_single_tb;
 
 	// set high after reset to start trace
 	logic started;
-
-
-
-
+ 
 	// RT core control inputs
 	logic clk, rst_n;
 	logic kernel_mode;
@@ -39,8 +39,17 @@ module RT_Core_single_tb;
 	logic [31:0] DEBUG_scalar_wb_data, DEBUG_scalar_read1, DEBUG_scalar_read2;
 	logic [127:0] DEBUG_vector_wb_data, DEBUG_vector_read1, DEBUG_vector_read2;
 
+	logic [31:0] Instruction;
+	logic [31:0] PC;
+
+	logic [31:0] memory_address;
+	logic memory_R_enable;
+	logic memory_W_enable;
+	logic [127:0] memory_R_data;
+	logic [127:0] memory_W_data;
+
 	// Memory signal
-	logic [31:0] mem_inst_out, mem_const_out, MRTI_addr_rd;
+	logic [31:0] mem_inst_out, mem_const_out, MRTI_addr_rd, pc_reg;
 	logic [127:0] mem_main_out, mem_out;
 	logic [8:0] inst_address, const_address;
 	logic MM_we, MM_re, MM_done, MM_en, Const_en;
@@ -99,7 +108,10 @@ module RT_Core_single_tb;
 		.DEBUG_scalar_read_address1(DEBUG_scalar_read_address1), .DEBUG_scalar_read_address2(DEBUG_scalar_read_address2), 
 		.DEBUG_vector_read_address1(DEBUG_vector_read_address1), .DEBUG_vector_read_address2(DEBUG_vector_read_address2),
 		.DEBUG_scalar_read1(DEBUG_scalar_read1), .DEBUG_scalar_read2(DEBUG_scalar_read2),
-		.DEBUG_vector_read1(DEBUG_vector_read1), .DEBUG_vector_read2(DEBUG_vector_read2),
+		.DEBUG_vector_read1(DEBUG_vector_read1), .DEBUG_vector_read2(DEBUG_vector_read2), .DEBUG_PC(PC),
+		.DEBUG_inst(Instruction),
+		.DEBUG_memory_address(memory_address), .DEBUG_memory_R_enable(memory_R_enable), .DEBUG_memory_W_enable(memory_W_enable),
+		.DEBUG_memory_R_data(memory_R_data), .DEBUG_memory_W_data(memory_W_data),
 
 		.MRTI_addr(MRTI_addr_rd), .MRTI_data(mem_inst_out),
     	.MEM_addr(RT_MEM_addr), .MEM_data_write(RT_MEM_data_write), .MEM_data_read(RT_MEM_data_read),
@@ -139,7 +151,7 @@ module RT_Core_single_tb;
 		@(negedge clk)
 		kernel_mode = 0;
 		started = 1;
-
+		#1
 		fork
         // we want to make sure that no more responses
         begin
@@ -147,28 +159,45 @@ module RT_Core_single_tb;
             disable timeout;
 	    end
 	    begin: timeout
-	        @(posedge End_program);
+	        while (End_program != 1'b1) begin
+				@(posedge clk);
+				print_output(rmtracefile);
+			end
 	        $display("Program Correctly terminates");
             $stop();
 	    end
     	join
 
-		// test trace log print
-		// comment out unless testing file print
-		// scalar_wen = 0;
-		// MRTI_addr_rd = 200;
-		// not_MRTI[0] = 5;
-		// not_MRTI[1] = 1;
-		// @(posedge clk)
-		// scalar_wen = 1;
-		// MRTI_addr_rd = 400;
-		// not_MRTI[0] = 6;
-		// not_MRTI[2] = 2;
-		// @(posedge clk)
-		// End_program = 1;
+
 		$stop();
 		
 	end
+
+
+	task print_output(int file);
+		if (Instruction != 32'hF8000000 && Instruction != 32'h30000000) begin
+			$fwrite(rmtracefile, "PC at %h, instruction: %h \n", PC, Instruction);
+			$fwrite(rmtracefile, " Reading scalar %d: %h, Reading scalar %d: %h \n", DEBUG_scalar_read_address1, DEBUG_scalar_read1,DEBUG_scalar_read_address2, DEBUG_scalar_read2);
+			$fwrite(rmtracefile, " Reading vector %d: %h, Reading vector %d: %h \n", DEBUG_vector_read_address1, DEBUG_vector_read1,DEBUG_vector_read_address2, DEBUG_vector_read2);
+			if (memory_R_enable) 
+				$fwrite(rmtracefile, " Reading memory location %h: %h \n",memory_address, memory_R_data);
+			else if (memory_W_enable)
+				$fwrite(rmtracefile, " writing memory location %h: %h \n",memory_address, memory_W_data);
+			else 
+				$fwrite(rmtracefile, " No memory operations\n");
+
+			if (DEBUG_scalar_wb_address == 5'b0) 
+				$fwrite(rmtracefile, " No scalar write back. ");
+			else 
+				$fwrite(rmtracefile, " write back scalar %d: %h. ", DEBUG_scalar_wb_address, DEBUG_scalar_wb_data);
+
+
+			if (DEBUG_vector_wb_address == 4'b0) 
+				$fwrite(rmtracefile, " No vector write back. \n\n");
+			else 
+				$fwrite(rmtracefile, " write back vector %d: %h. \n\n", DEBUG_vector_wb_address, DEBUG_vector_wb_data);
+		end
+	endtask
 
 	
 	// Reg file tracing
