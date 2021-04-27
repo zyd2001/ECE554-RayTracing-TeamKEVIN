@@ -13,7 +13,7 @@ v_load_16byte x r r i
 v_store_16byte x r r i
 111111 1 4 5 16
 v_get_from_s r x r x ui
-100111 1 4 5 14 2
+100111 5 1 4 14 2
 vv_add x r x r x r x
 000000 1 4 1 4 1 4 11
 vv_sub x r x r x r x
