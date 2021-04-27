@@ -417,6 +417,8 @@ namespace CompilerCore
                     size = size - (size % 4) + 4;
                 item.Value.Operands[2] = size.ToString();
             }
+            list[0].List.AddFirst(new Assembly("s_mov", new List<string> { "RS2", "RS28" }));
+            list[0].List.AddFirst(new Assembly("s_mov", new List<string> { "RS29", "RS28" }));
             foreach (var item in list)
             {
                 item.ResolvePhysicalRegister();
