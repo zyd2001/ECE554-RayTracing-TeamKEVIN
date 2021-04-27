@@ -641,9 +641,10 @@ namespace CompilerCore
 
         private void vectorHelper(DirectTranslation translation, string tempVar, string temp1, string temp2)
         {
-            if (type2 == CompilerCore.Type.INT)
+            if (type2 <= CompilerCore.Type.FLOAT)
             {
-                temp2 = BinaryExpression.ItoFHelper(translation, temp2);
+                if (type2 == CompilerCore.Type.INT)
+                    temp2 = BinaryExpression.ItoFHelper(translation, temp2);
                 switch (type)
                 {
                     case Type.ADD:
