@@ -116,3 +116,7 @@ v_get_from_s_d r r i
 # v_get_from_s $r0 $r1 $i
 s_setzero r
 # xor $r0 $r0 $r0
+s_mov r r
+# ii_add $r0 $r1 R0
+v_mov r r
+# vv_add $r0 $r1 R0
