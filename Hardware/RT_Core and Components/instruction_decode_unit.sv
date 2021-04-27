@@ -78,8 +78,8 @@ module instruction_decode_unit (
 
         update_float_flag = 1'b0;
         update_int_flag = 1'b0;
-        
-        if (opcode[5:3] == 3'b011) intALU_op2_select = 1'b0; // only Int int will use scalar 2
+        context_switch = 1'b0;
+        if (opcode[5:3] == 3'b011 | opcode[5:2] == 3'b0011) intALU_op2_select = 1'b0; // only Int int will use scalar 2
         
         // float float, sqrt, v get from s 
         if (opcode[5:3] == 3'b010 | opcode[5:0] == 6'b100110 

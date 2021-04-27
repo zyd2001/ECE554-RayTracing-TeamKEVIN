@@ -32,22 +32,22 @@ module Forwarding_decode (
 
     // By pass the write back value to
     always_comb begin : WB_bypass
-        if (DE_S1_address == MEM_WB_Swb_address)
+        if (DE_S1_address == MEM_WB_Swb_address && DE_S1_address != 5'b0)
             DE_EX_S1_select = 1'b1;
         else 
             DE_EX_S1_select = 1'b0;
         
-        if (DE_S2_address == MEM_WB_Swb_address)
+        if (DE_S2_address == MEM_WB_Swb_address && DE_S2_address != 5'b0)
             DE_EX_S2_select = 1'b1;
         else 
             DE_EX_S2_select = 1'b0;
 
-        if (DE_V1_address == MEM_WB_Vwb_address)
+        if (DE_V1_address == MEM_WB_Vwb_address && DE_V1_address != 4'b0)
             DE_EX_V1_select = 1'b1;
         else 
             DE_EX_V1_select = 1'b0;
 
-        if (DE_V2_address == MEM_WB_Vwb_address)
+        if (DE_V2_address == MEM_WB_Vwb_address && DE_V2_address != 4'b0)
             DE_EX_V2_select = 1'b1;
         else 
             DE_EX_V2_select = 1'b0;
