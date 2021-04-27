@@ -37,7 +37,7 @@ module IC_Controller(
   input [31:0] u, v, t, det;
   output Controller_capture;
   
-  typedef enum reg [1:0] {DTCT, HIT, IDLE} state_t;
+  typedef enum reg [1:0] {DTCT, HIT, IDLE, START} state_t;
   state_t state, nxt_state;
   
   // logic
@@ -47,7 +47,7 @@ module IC_Controller(
   
     always_ff@(posedge clk or posedge rst) begin
     if (rst)
-      state <= IDLE;
+      state <= START;
     else 
       state <= nxt_state;
   end
@@ -98,6 +98,15 @@ module IC_Controller(
             Controller_capture_in = 1'b1;
           else 
             nxt_state = DTCT;
+        end
+      START:
+        begin
+          if (Core_ID) begin
+            CD_start = 1'b1;
+            nxt_state = DTCT;
+          end
+          else
+            nxt_state = START;
         end
       default: 
         begin
