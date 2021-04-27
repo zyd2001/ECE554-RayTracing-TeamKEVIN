@@ -133,8 +133,8 @@ module rta
    (
     .clk(clk),
     .rst_n(rst_n),
-    .dma(dma.peripheral),
-    .mmio(mmio.user),
+    .dma(dma),
+    .mmio(mmio),
     .rdy_tri(rdy_tri_mc),
     .patch_done(patch_done_pd_mc),
     .result(data_out_main_x),
