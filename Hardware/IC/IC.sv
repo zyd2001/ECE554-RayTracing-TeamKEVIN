@@ -2,7 +2,7 @@ module IC(
   clk, rst,
   Core_ID, thread_id_in, thread_id_out, IntersectionPoint,
   sid_in, sid_out, dir, orig, norm, IC_Mem_Rdy,
-  Mem_Rdy, v1, v2, v0, Mem_NotValid, triangle_id, Mem_En, 
+  Mem_Rdy, v1, v2, v0, Mem_NotValid, triangle_id, Mem_En
   );
 
   parameter NUM_THREAD = 32;
@@ -28,17 +28,27 @@ module IC(
   output Mem_En;
   output unsigned [BIT_TRIANGLE-1:0] triangle_id;
   
+  logic flag;
+  
   logic [4:0] counter;
+  
+  logic [95:0] norm_in, orig_out, dir_out, v1_out, v2_out, v0_out, v1, v2, v0, orig, dir, 
+               v0v1_0, v0v1_1, v0v1_2, v0v2_0, v0v2_1, v0v2_2, tvec_0, tvec_1, tvec_2,
+               dir_1, dir_2, pvec_1, pvec_2, qvec_1, qvec_2, norm_1, norm_2;
+ 
+  logic [31:0] sid_IC_in, sid_Mem_out, u, v, t, det, sid_1, sid_2, det_2, upre_2, vpre_2, tpre_2,
+               upre_3, vpre_3, tpre_3, invDet;
+  
   
   IC_Controller ICC (
     .clk(clk), .rst(rst), .StageI_capture(StageI_capture), .Controller_capture(Controller_capture),
-    .Core_ID(Core_ID), .thread_id_IC_in(thread_id_IC_in), .thread_id_Mem_in(thread_id_in), 
+    .Core_ID(Core_ID), .thread_id_Mem_in(thread_id_in), 
     .sid_IC_in(sid_IC_in), .orig_in(orig), .dir_in(dir), .norm_in(norm_in),
     .IC_Mem_Rdy(IC_Mem_Rdy), .thread_id_out(thread_id_out), .orig_out(orig_out), 
     .dir_out(dir_out), .norm_out(norm), .IntersectionPoint_out(IntersectionPoint), .sid_IC_out(sid_out),
     .Mem_Rdy(Mem_Rdy), .v1_in(v1), .v2_in(v2), .v0_in(v0), .sid_Mem_in(sid_in), .Mem_NotValid(Mem_NotValid),
     .Mem_En(Mem_En), .v1_out(v1_out), .v2_out(v2_out), .v0_out(v0_out), 
-    .sid_Mem_out(sid_Mem_out), .triangle_id(triangle_id),
+    .sid_Mem_out(sid_Mem_out), .triangle_id(triangle_id), .Tri_Rdy(PrePro_start),
     .u(u), .v(v), .t(t), .det(det), .trace_done(trace_done)
   );
   // Stage I
@@ -125,23 +135,32 @@ module IC(
     .result(tpre_2)
   );
   
-  StageIII(
+  StageIII SIII(
     .clk(clk), .rst(rst), .StageIII_done(DotP1_done & DotP2_done & DotP3_done & DotP4_done), .Controller_capture(Controller_capture), .StageIII_capture(StageIII_capture),
     .det_in(det_2), .det_out(det),
     .upre_in(upre_2), .upre_out(upre_3),
     .vpre_in(vpre_2), .vpre_out(vpre_3),
     .tpre_in(tpre_2), .tpre_out(tpre_3),
-    .norm_in(norm_2), .norm_out(norm),
+    .norm_in(norm_2), .norm_out(norm_in),
     .sid_in(sid_2), .sid_out(sid_IC_in)
   );
   // Last Stage
   
   always@(posedge clk or posedge rst) begin
     if (rst) 
+      flag <= '0;
+    else if (StageIII_capture) 
+      flag <= 1'b1;
+    else if (trace_done) 
+      flag <= 1'b0;
+  end
+  
+  always@(posedge clk or posedge rst) begin
+    if (rst) 
       counter <= '0;
     else if (counter == 5'd19) 
       counter <= '0;
-    else
+    else if (flag)
       counter <= counter + 1'b1;
   end
   
@@ -155,30 +174,30 @@ module IC(
 	);
   
   Float_Mul Mul1 (
-		.clk    (clk),    //   input,   width = 1,    clk.clk
-		.areset (rst), //   input,   width = 1, areset.reset
+		.clk    (clk),      //   input,   width = 1,    clk.clk
+		.areset (rst),      //   input,   width = 1, areset.reset
 		.en     (1'b1),     //   input,   width = 1,     en.en
-		.a      (upre_3),      //   input,  width = 32,      a.a
-		.b      (invDet),      //   input,  width = 32,      b.b
-		.q      (u)       //  output,  width = 32,      q.q
+		.a      (upre_3),   //   input,  width = 32,      a.a
+		.b      (invDet),   //   input,  width = 32,      b.b
+		.q      (u)         //  output,  width = 32,      q.q
 	);
   
   Float_Mul Mul2 (
-		.clk    (clk),    //   input,   width = 1,    clk.clk
-		.areset (rst), //   input,   width = 1, areset.reset
+		.clk    (clk),      //   input,   width = 1,    clk.clk
+		.areset (rst),      //   input,   width = 1, areset.reset
 		.en     (1'b1),     //   input,   width = 1,     en.en
-		.a      (vpre_3),      //   input,  width = 32,      a.a
-		.b      (invDet),      //   input,  width = 32,      b.b
-		.q      (v)       //  output,  width = 32,      q.q
+		.a      (vpre_3),   //   input,  width = 32,      a.a
+		.b      (invDet),   //   input,  width = 32,      b.b
+		.q      (v)         //  output,  width = 32,      q.q
 	);
   
   Float_Mul Mul3 (
-		.clk    (clk),    //   input,   width = 1,    clk.clk
-		.areset (rst), //   input,   width = 1, areset.reset
+		.clk    (clk),      //   input,   width = 1,    clk.clk
+		.areset (rst),      //   input,   width = 1, areset.reset
 		.en     (1'b1),     //   input,   width = 1,     en.en
-		.a      (tpre_3),      //   input,  width = 32,      a.a
-		.b      (invDet),      //   input,  width = 32,      b.b
-		.q      (t)       //  output,  width = 32,      q.q
+		.a      (tpre_3),   //   input,  width = 32,      a.a
+		.b      (invDet),   //   input,  width = 32,      b.b
+		.q      (t)         //  output,  width = 32,      q.q
 	);
   
 endmodule

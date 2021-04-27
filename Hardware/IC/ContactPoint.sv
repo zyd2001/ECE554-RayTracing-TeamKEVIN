@@ -110,7 +110,7 @@ module ContactPoint(
 		.opSel  (1'b1)             //   input,   width = 1,  opSel.opSel
 	);
   
-  Float_Add Add2 (
+  Float_Add Add3 (
     .clk    (clk),             //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Add_en),          //   input,   width = 1,     en.en

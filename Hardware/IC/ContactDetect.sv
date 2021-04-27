@@ -20,7 +20,8 @@ module ContactDetect(
   logic done_in, en;
   logic [3:0] counter, counter_in;
   
-  logic [31:0] Add_out, Less1_out, Less2_out, Less3_out, Greater1_out, Greater2_out;
+  logic Less1_out, Less2_out, Less3_out, Greater1_out, Greater2_out;
+  logic [31:0] Add_out;
   
   typedef enum reg {COUNT, IDLE} state_t;
   state_t state, nxt_state;

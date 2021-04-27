@@ -1,7 +1,7 @@
 module ICMemManager(
   clk, rst,
   Core_ID, IC_Done,
-  thread_id_IC_in, thread_id_Mem_in,
+  thread_id_Mem_in,
   thread_id_out,
   orig_in, orig_out,
   dir_in, dir_out,
@@ -15,7 +15,7 @@ module ICMemManager(
   
   input clk, rst;
   input Core_ID, IC_Done;
-  input [BIT_THREAD-1:0] thread_id_IC_in, thread_id_Mem_in;
+  input [BIT_THREAD-1:0] thread_id_Mem_in;
   input [95:0] orig_in, dir_in, norm_in, IntersectionPoint_in;
   input [31:0] sid_in;
 
@@ -57,7 +57,6 @@ module ICMemManager(
     else if (ld_out) begin
       IntersectionPoint_reg <= IntersectionPoint_in;
       sid_reg <= sid_in;
-      thread_id_reg <= thread_id_IC_in;
       IC_Mem_Rdy_reg <= IC_Mem_Rdy_in;
     end
     else
