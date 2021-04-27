@@ -205,16 +205,16 @@ module RT_Core_single_tb();
 	// When testing the RT core, change MRTI to the registers of the 
 	// RT reg file
 	// Should be rt_core.scalar_ram and rt.core.vector_ram
-	// generate
-	// 	for(g = 0; g < 4096; g++) begin
-	// 		always@(MRTI[g]) begin
-	// 			if(started == 1) begin
-	// 				$fwrite(rmtracefile, "%d Reg %h: %h\n", clk_cnt,g, MRTI[g]);
-	// 			end
-	// 		end
-	// 	end
+	generate
+	 	for(g = 0; g < 32; g++) begin
+	 		always@(rt_core.RF.scalar_ram[g]) begin
+	 			if(started == 1) begin
+	 				$fwrite(rmtracefile, "%d Reg %h: %h\n", clk_cnt,g, rt_core.RF.scalar_ram[g]);
+	 			end
+	 		end
+ 		end
 
-	// endgenerate
+	endgenerate
 	
 
 	// // Trace log sensitivities for change of outputs from RT core
