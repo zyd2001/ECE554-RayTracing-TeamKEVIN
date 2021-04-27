@@ -67,7 +67,7 @@ or r r r x
 xor r r r x
 001111 5 5 5 11
 trace x
-111000 26
+111010 26
 s_itof r r x
 100010 5 5 16
 s_ftoi r r x
@@ -75,7 +75,7 @@ s_ftoi r r x
 cmp_v x r x r x
 000101 6 4 1 4 11
 cmp_i x r r x
-110100 5 5 5 11
+011101 5 5 5 11
 cmp_f x r r x
 010101 5 5 5 11
 be x l
