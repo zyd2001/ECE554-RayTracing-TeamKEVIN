@@ -29,7 +29,8 @@ namespace SimulatorCLI
             if (CP != null)
                 sim.Run();
             else
-                sim.RunRT(0);
+                for (int i = 0; i < 160 * 90; i++)
+                    sim.RunRT(i);
         }
 
     }

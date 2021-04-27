@@ -62,8 +62,8 @@ namespace SimulatorCore
                 if (t < minDistance)
                 {
                     minDistance = t;
-                    resultPoint = new Vector4(orig + t * dir, 0);
-                    resultNormal = new Vector4(Vector3.Cross(v0v1, v0v2), BitConverter.Int32BitsToSingle(id));
+                    resultPoint = new Vector4(orig + t * dir, BitConverter.Int32BitsToSingle(id));
+                    resultNormal = new Vector4(Vector3.Cross(v0v1, v0v2), 0);
                 }
             }
             return (resultPoint, resultNormal);

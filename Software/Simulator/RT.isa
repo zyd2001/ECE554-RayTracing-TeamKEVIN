@@ -67,7 +67,7 @@ or r r r x
 xor r r r x
 001111 5 5 5 11
 trace x
-111000 26
+111010 26
 s_itof r r x
 100010 5 5 16
 s_ftoi r r x
@@ -75,19 +75,21 @@ s_ftoi r r x
 cmp_v x r x r x
 000101 6 4 1 4 11
 cmp_i x r r x
-110100 5 5 5 11
+011101 5 5 5 11
 cmp_f x r r x
 010101 5 5 5 11
-bne x l
+be x l
 110000 10 16
-bg x l
+bne x l
 110001 10 16
 bl x l
 110010 10 16
 bge x l
 110011 10 16
-ble x l
+bg x l
 110100 10 16
+ble x l
+110101 10 16
 real_jmp x i
 110110 10 16
 ret x
@@ -110,3 +112,11 @@ v_pop r
 # ii_addi R29 R29 -16, v_load_16byte $r0 R29 0
 v_push r
 # v_store_4byte $r0 R29 0, ii_addi R29 R29 16
+v_get_from_s_d r r i
+# v_get_from_s $r0 $r1 $i
+s_setzero r
+# xor $r0 $r0 $r0
+s_mov r r
+# ii_add $r0 $r1 R0
+v_mov r r
+# vv_add $r0 $r1 R0

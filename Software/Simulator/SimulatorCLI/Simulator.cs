@@ -100,6 +100,9 @@ namespace SimulatorCLI
 
         internal void RunRT(int pixelID)
         {
+            RT.ScalarRegisterFile[28] = 0; // set Stack Pointer
+            RT.ScalarRegisterFile[31] = 0; // set PC
+            RT.ScalarRegisterFile[1] = pixelID;
             while (true)
             {
                 RT.StartTrace();
