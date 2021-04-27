@@ -101,7 +101,7 @@ module IC_Controller(
         end
       START:
         begin
-          if (Core_ID) begin
+          if (trace_done) begin
             CD_start = 1'b1;
             nxt_state = DTCT;
           end

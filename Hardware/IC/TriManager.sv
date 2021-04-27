@@ -129,7 +129,7 @@ module TriManager(
   assign triangle_id = triangle_id_reg;
   assign v1_out = v1_reg;
   assign v2_out = v2_reg;
-  assign v0_out = v2_reg;
+  assign v0_out = v0_reg;
   assign sid_out = sid_reg;
 
 endmodule
