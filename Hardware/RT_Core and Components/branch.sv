@@ -1,10 +1,11 @@
 /////////////////////
 // branch_opcode
-// 000	bne	Branch if not equal
-// 001	bg	Branch if greater than
+// 000	be	Branch if equal
+// 001	bne	Branch if not equal
 // 010	bl	Branch If less than
 // 011	bge	Branch if greater or equal than
-// 100	ble	Branh if less or equal than
+// 100  bg	Branch if greater than
+// 101  ble Branch if less or equal
 // 110	jmp	Jump to a label
 // 111	ret	Return to a stored address
 //
@@ -36,7 +37,7 @@ module branch (
             current_state <= next_state;
             if (int_flag_en)
                 flag <= int_flag;
-            else
+            else if (float_flag_en)
                 flag <= float_flag;
         end
     end
@@ -45,12 +46,12 @@ module branch (
         next_pc_select = 2'b0;
         if (branch_en)
             case (branch_opcode)
-                3'b000: next_pc_select = flag == 2'b0x ? 2'b10 : 2'b00;
-                3'b001: next_pc_select = flag == 2'b1x ? 2'b10 : 2'b00;
-                3'b010: next_pc_select = flag == 2'b10 ? 2'b10 : 2'b00;
-                3'b011: next_pc_select = flag == 2'b11 ? 2'b10 : 2'b00;
-                3'b100: next_pc_select = flag == (2'b10 || flag == 2'b0x) ? 2'b10 : 2'b00;
-                3'b101: next_pc_select = flag == (2'b11 || flag == 2'b0x) ? 2'b10 : 2'b00;
+                3'b000: next_pc_select = flag[1] == 1'b0 ? 2'b10 : 2'b00;
+                3'b001: next_pc_select = flag[1] == 1'b1 ? 2'b10 : 2'b00;
+                3'b010: next_pc_select = flag == 2'b11 ? 2'b10 : 2'b00;
+                3'b011: next_pc_select = flag == 2'b11 ? 2'b00 : 2'b10;
+                3'b100: next_pc_select = flag == 2'b10 ? 2'b10 : 2'b10;
+                3'b101: next_pc_select = flag == 2'b10 ? 2'b00 : 2'b10;
                 3'b110: next_pc_select = 2'b10;
                 default: next_pc_select = 2'b11;
             endcase
@@ -64,11 +65,13 @@ module branch (
             IF_DE_stall = 1'b1;  
         end
 
-        
         if (branch_en && current_state == idle) begin
             // case one, MEM not busy and EX not busy
             if (!EX_busy && !MEM_busy) begin
-                IF_DE_stall = 1'b0;  
+                if(int_flag_en == 1'b0 && float_flag_en == 1'b0) 
+                    IF_DE_stall = 1'b0;
+                else
+                    IF_DE_stall = 1'b1;  
             end
             // case two, EX and MEM busy
             else begin

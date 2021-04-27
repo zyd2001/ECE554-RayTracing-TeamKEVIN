@@ -1,40 +1,80 @@
-PC at 00000000, instruction: 8ef00000 
- Reading scalar 16: xxxxxxxx, Reading scalar  0: 00000000 
+PC at 00000000, Flushed 
+
+PC at 00000000, Flushed 
+
+PC at 00000000, Flushed 
+
+PC at 00000000, instruction: 80200000 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
  Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
  No memory operations
- write back scalar 23: 00000000.  No vector write back. 
+ write back scalar  1: 00000000.  No vector write back. 
 
-PC at 00000004, instruction: 4cf11800 
- Reading scalar 17: xxxxxxxx, Reading scalar  3: xxxxxxxx 
- Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
- No memory operations
- write back scalar  7: ffc00000.  No vector write back. 
-
-PC at 00000008, instruction: 37b5d800 
- Reading scalar 21: xxxxxxxx, Reading scalar 27: xxxxxxxx 
- Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
- No memory operations
- write back scalar 29: xxxxxxxx.  No vector write back. 
-
-PC at 0000000c, instruction: 8ef00000 
- Reading scalar 16: xxxxxxxx, Reading scalar  0: 00000000 
+PC at 00000004, instruction: 84200000 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
  Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
  No memory operations
- write back scalar 23: 00000000.  No vector write back. 
+ write back scalar  1: 00000000.  No vector write back. 
 
-PC at 00000010, instruction: 4cf11800 
- Reading scalar 17: xxxxxxxx, Reading scalar  3: xxxxxxxx 
+PC at 00000008, instruction: 80400000 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar  2: 00000000.  No vector write back. 
+
+PC at 0000000c, instruction: 84400000 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar  2: 00000000.  No vector write back. 
+
+PC at 00000010, instruction: a0210005 
+ Reading scalar  1: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar  1: 00000005.  No vector write back. 
+
+PC at 00000014, instruction: a0420005 
+ Reading scalar  2: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar  2: 00000005.  No vector write back. 
+
+PC at 00000018, instruction: 74011000 
+ Reading scalar  1: 00000005, Reading scalar  2: 00000000 
  Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  No memory operations
- write back scalar  7: ffc00000.  No vector write back. 
+ No scalar write back.  No vector write back. 
 
-PC at 00000014, instruction: 37b5d800 
- Reading scalar 21: xxxxxxxx, Reading scalar 27: xxxxxxxx 
+PC at 0000001c, instruction: cc000004 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ No scalar write back.  No vector write back. 
+
+PC at 0000001c, Flushed 
+
+PC at 00000024, instruction: a0210001 
+ Reading scalar  1: 00000005, Reading scalar  0: 00000000 
+ Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ write back scalar  1: 00000006.  No vector write back. 
+
+PC at 00000028, instruction: 74011000 
+ Reading scalar  1: 00000005, Reading scalar  2: 00000005 
  Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, Reading vector  0: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  No memory operations
- write back scalar 29: xxxxxxxx.  No vector write back. 
+ No scalar write back.  No vector write back. 
 
-PC at 00000018, instruction: e0000000 
+PC at 0000002c, instruction: d400000c 
+ Reading scalar  0: 00000000, Reading scalar  0: 00000000 
+ Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
+ No memory operations
+ No scalar write back.  No vector write back. 
+
+PC at 0000002c, Flushed 
+
+PC at 0000003c, instruction: ec000000 
  Reading scalar  0: 00000000, Reading scalar  0: 00000000 
  Reading vector  0: 00000000000000000000000000000000, Reading vector  0: 00000000000000000000000000000000 
  No memory operations
