@@ -33,7 +33,7 @@
 %token<VectorLiteral> VECTOR_LITERAL
 %token<Identifier> IDENTIFIER
 %token INT FLOAT VECTOR VOID IF ELSE FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
-    EQ NE GT GE LT LE INCREMENT DECREMENT TRACE REDUCE
+    EQ NE GT GE LT LE INCREMENT DECREMENT TRACE REDUCE ASINT ASFLOAT
 
 %type<Type> value_type
 %type<Statement> statement  loop_statement return_statement assignment_statement function_definition_statement
@@ -188,6 +188,14 @@ expression: '(' expression ')'
     | value_type '(' expression ')'
     {
         $$ = new TypeCastExpression(@$, $1, $3);
+    }
+    | ASINT '(' expression ')'
+    {
+        $$ = new AsExpression(@$, Type.INT, $3);
+    }
+    | ASFLOAT '(' expression ')'
+    {
+        $$ = new AsExpression(@$, Type.FLOAT, $3);
     }
     | REDUCE '(' expression ')'
     {

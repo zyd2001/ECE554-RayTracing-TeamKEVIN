@@ -1,10 +1,12 @@
 
-void main(int id)
+void main(int id, int stackBase)
 {
     // vector v0 = [ -1, -1, -5, 0 ];
     // vector v1 = [ 1, -1, -5, 0 ];
     // vector v2 = [ 0, -1, -5, 0 ];
-    float result[1];
+    float *result;
+    result = stackBase + 65520;
+
     int width = 640;
     int height = 480;
     float fov = 51.52;
@@ -21,7 +23,20 @@ void main(int id)
     // [comment]
     // Interpolate colors using the barycentric coordinates
     // [/comment]
-    result[0] = hit[0] * 0.2 + hit[1] * 0.4 + hit[2] * 0.7;
+    if (asInt(hit[3]) != 0)
+    {
+        result[0] = 0.0;
+        result[1] = 1.0;
+        result[2] = 1.0;
+        result[3] = id;
+    }
+    else
+    {
+        result[0] = 0.0;
+        result[1] = 0.0;
+        result[2] = 0.0;
+        result[3] = id;
+    }
     // uncomment this line if you want to visualize the row barycentric coordinates
     //*pix = Vec3f(u, v, 1 - u - v);
     return;
