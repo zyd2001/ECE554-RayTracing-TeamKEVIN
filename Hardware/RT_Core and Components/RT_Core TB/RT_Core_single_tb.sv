@@ -6,8 +6,8 @@ import "DPI-C" function string getenv(input string env_name);
 module RT_Core_single_tb();
 
 	// Output signal Trace Log
-	int signaltracefile;
-	string signaltracefilename;
+	// int signaltracefile;
+	// string signaltracefilename;
 
 	// Reg/Mem Trace log
 	int rmtracefile;
@@ -120,8 +120,8 @@ module RT_Core_single_tb();
 
 	initial begin
 		// Initialize Out Signal Trace 
-		signaltracefilename = {getenv("PWD"), "/sigtrace.out"};
-		signaltracefile = $fopen(signaltracefilename, "w+");
+		// signaltracefilename = {getenv("PWD"), "/sigtrace.out"};
+		// signaltracefile = $fopen(signaltracefilename, "w+");
 
 		// Initialize Reg/Mem Trace
 		rmtracefilename = {getenv("PWD"), "/rmtrace.out"};
@@ -175,27 +175,32 @@ module RT_Core_single_tb();
 
 
 	task print_output(int file);
-		if (Instruction != 32'hF8000000 && Instruction != 32'h30000000) begin
-			$fwrite(rmtracefile, "PC at %h, instruction: %h \n", PC, Instruction);
-			$fwrite(rmtracefile, " Reading scalar %d: %h, Reading scalar %d: %h \n", DEBUG_scalar_read_address1, DEBUG_scalar_read1,DEBUG_scalar_read_address2, DEBUG_scalar_read2);
-			$fwrite(rmtracefile, " Reading vector %d: %h, Reading vector %d: %h \n", DEBUG_vector_read_address1, DEBUG_vector_read1,DEBUG_vector_read_address2, DEBUG_vector_read2);
-			if (memory_R_enable) 
-				$fwrite(rmtracefile, " Reading memory location %h: %h \n",memory_address, memory_R_data);
-			else if (memory_W_enable)
-				$fwrite(rmtracefile, " writing memory location %h: %h \n",memory_address, memory_W_data);
-			else 
-				$fwrite(rmtracefile, " No memory operations\n");
+		if (Instruction != 32'hF8000000) begin
+			if (Instruction == 32'h30000000) begin
+				$fwrite(rmtracefile, "PC at %h, Flushed \n\n", PC);
+			end
+			else begin
+				$fwrite(rmtracefile, "PC at %h, instruction: %h \n", PC, Instruction);
+				$fwrite(rmtracefile, " Reading scalar %d: %h, Reading scalar %d: %h \n", DEBUG_scalar_read_address1, DEBUG_scalar_read1,DEBUG_scalar_read_address2, DEBUG_scalar_read2);
+				$fwrite(rmtracefile, " Reading vector %d: %h, Reading vector %d: %h \n", DEBUG_vector_read_address1, DEBUG_vector_read1,DEBUG_vector_read_address2, DEBUG_vector_read2);
+				if (memory_R_enable) 
+					$fwrite(rmtracefile, " Reading memory location %h: %h \n",memory_address, memory_R_data);
+				else if (memory_W_enable)
+					$fwrite(rmtracefile, " writing memory location %h: %h \n",memory_address, memory_W_data);
+				else 
+					$fwrite(rmtracefile, " No memory operations\n");
 
-			if (DEBUG_scalar_wb_address == 5'b0) 
-				$fwrite(rmtracefile, " No scalar write back. ");
-			else 
-				$fwrite(rmtracefile, " write back scalar %d: %h. ", DEBUG_scalar_wb_address, DEBUG_scalar_wb_data);
+				if (DEBUG_scalar_wb_address == 5'b0) 
+					$fwrite(rmtracefile, " No scalar write back. ");
+				else 
+					$fwrite(rmtracefile, " write back scalar %d: %h. ", DEBUG_scalar_wb_address, DEBUG_scalar_wb_data);
 
 
-			if (DEBUG_vector_wb_address == 4'b0) 
-				$fwrite(rmtracefile, " No vector write back. \n\n");
-			else 
-				$fwrite(rmtracefile, " write back vector %d: %h. \n\n", DEBUG_vector_wb_address, DEBUG_vector_wb_data);
+				if (DEBUG_vector_wb_address == 4'b0) 
+					$fwrite(rmtracefile, " No vector write back. \n\n");
+				else 
+					$fwrite(rmtracefile, " write back vector %d: %h. \n\n", DEBUG_vector_wb_address, DEBUG_vector_wb_data);
+			end
 		end
 	endtask
 
@@ -205,16 +210,16 @@ module RT_Core_single_tb();
 	// When testing the RT core, change MRTI to the registers of the 
 	// RT reg file
 	// Should be rt_core.scalar_ram and rt.core.vector_ram
-	generate
-	 	for(g = 0; g < 32; g++) begin
-	 		always@(rt_core.RF.scalar_ram[g]) begin
-	 			if(started == 1) begin
-	 				$fwrite(rmtracefile, "%d Reg %h: %h\n", clk_cnt,g, rt_core.RF.scalar_ram[g]);
-	 			end
-	 		end
- 		end
+	// generate
+	//  	for(g = 0; g < 32; g++) begin
+	//  		always@(rt_core.RF.scalar_ram[g]) begin
+	//  			if(started == 1) begin
+	//  				$fwrite(rmtracefile, "%d Reg %h: %h\n", clk_cnt,g, rt_core.RF.scalar_ram[g]);
+	//  			end
+	//  		end
+ 	// 	end
 
-	endgenerate
+	// endgenerate
 	
 
 	// // Trace log sensitivities for change of outputs from RT core

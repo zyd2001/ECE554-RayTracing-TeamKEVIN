@@ -275,7 +275,6 @@ module RT_core_single (
         end else if (~IF_DE_stall) begin
             if (~(IF_DE_FIN && IF_FIN))
                 if (IF_next_pc_select != 2'b00) begin
-                    IF_DE_current_PC <= 32'h0000;
                     IF_DE_instruction <= 32'h30000000;
                     IF_DE_current_PC_plus_four <= 32'h0000;
                     IF_DE_FIN <= 1'b0;
@@ -367,7 +366,7 @@ module RT_core_single (
     );
 
     branch branch_unit(
-        .clk(clk), .rst_n(clk), 
+        .clk(clk), .rst_n(rst_n), 
         .EX_busy(EX_busy), .MEM_busy(MEM_busy), 
         .IF_DE_stall(DE_Branch_stall), .next_pc_select(IF_next_pc_select), 
         .int_flag(EX_int_flag), .float_flag(EX_float_flag), .int_flag_en(EX_int_flag_en), .float_flag_en(EX_float_flag_en), 
@@ -505,30 +504,30 @@ module RT_core_single (
             DE_EX_floatALU4_en <= 1'b0;
         end
         else begin
-            if (EX_int_knockdown)
-                DE_EX_intALU_en <= 1'b0;
-            else if (!EX_busy && !MEM_busy)
+            if (!EX_busy && !MEM_busy)
                 DE_EX_intALU_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_intALU_en;
-
-            if (EX_float1_knockdown)
-                DE_EX_floatALU1_en <= 1'b0;
-            else if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU1_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU1_en;
+            else if (EX_int_knockdown)
+                DE_EX_intALU_en <= 1'b0;
             
-            if (EX_float2_knockdown)
-                DE_EX_floatALU2_en <= 1'b0;
-            else if (!EX_busy && !MEM_busy)
+            if (!EX_busy && !MEM_busy)
+                DE_EX_floatALU1_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU1_en;
+            else if (EX_float1_knockdown)
+                DE_EX_floatALU1_en <= 1'b0;
+
+            if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU2_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU2_en;
+            else if (EX_float2_knockdown)
+                DE_EX_floatALU2_en <= 1'b0;
 
-            if (EX_float3_knockdown)
-                DE_EX_floatALU3_en <= 1'b0;
-            else if (!EX_busy && !MEM_busy)
+            if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU3_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU3_en;
+            else if (EX_float3_knockdown)
+                DE_EX_floatALU3_en <= 1'b0;
 
-            if (EX_float4_knockdown)
-                DE_EX_floatALU4_en <= 1'b0;
-            else if (!EX_busy && !MEM_busy)
+            if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU4_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 :  DE_floatALU4_en;
+            else if (EX_float4_knockdown)
+                DE_EX_floatALU4_en <= 1'b0;
         end
 
     end
@@ -785,18 +784,18 @@ module RT_core_single (
                 end
             end
 
-            if (MEM_knockdown)
-                EX_MEM_memory_op <= 3'b0;
-            else if (!MEM_busy)
+            if (!MEM_busy)
                 EX_MEM_memory_op <= (EX_busy || DE_EX_FIN) == 1'b1 ? 3'b0 : DE_EX_memory_op;
+            else if (MEM_knockdown)
+                EX_MEM_memory_op <= 3'b0;
 
             if (!MEM_busy)
                 DEBUG_EX_MEM_op <= DE_EX_memory_op;
 
-            if (MEM_v_reduce_knockdown)
-                EX_MEM_vector_reduce_en <= 3'b0;
-            else if (!MEM_busy)
+            if (!MEM_busy)
                 EX_MEM_vector_reduce_en <= (EX_busy || DE_EX_FIN) == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
+            else if (MEM_v_reduce_knockdown)
+                EX_MEM_vector_reduce_en <= 3'b0;
         end
     end
 

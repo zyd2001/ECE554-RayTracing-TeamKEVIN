@@ -154,7 +154,7 @@ module instruction_decode_unit (
             update_float_flag = 1'b1;
 
         if (opcode == 6'b011101)
-            update_float_flag = 1'b1;
+            update_int_flag = 1'b1;
         
         if (opcode == 6'b111010)
             context_switch = 1'b1;
