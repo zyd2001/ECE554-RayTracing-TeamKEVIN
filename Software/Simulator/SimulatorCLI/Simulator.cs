@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using SimulatorCore;
@@ -79,6 +80,21 @@ namespace SimulatorCLI
             lastRTTask?.Wait(); // wait the last launch to complete
         }
 
+        static string Hex(float f)
+        {
+            return Convert.ToHexString(BitConverter.GetBytes(f));
+        }
+
+        static string Hex(int i)
+        {
+            return Convert.ToHexString(BitConverter.GetBytes(i));
+        }
+
+        static string Hex(Vector4 v)
+        {
+            return $"<{Hex(v.X)},{Hex(v.Y)},{Hex(v.Z)},{Hex(v.W)}>";
+        }
+
         internal void RunRT(int pixelID)
         {
             while (true)
@@ -93,9 +109,9 @@ namespace SimulatorCLI
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
                         RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.Hex(), trace.after.Hex());
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
-                        RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, trace.before, trace.after);
+                        RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, Hex(trace.before), Hex(trace.after));
                     foreach (var trace in RT.DataMemory.TraceLog)
-                        RTOutputFile.Write("{0} {1} => {2}; ", trace.address, trace.before, trace.after);
+                        RTOutputFile.Write("{0} {1} => {2}; ", trace.address, Hex(trace.before), Hex(trace.after));
                     RTOutputFile.WriteLine();
                 }
             }
