@@ -33,7 +33,7 @@
 %token<VectorLiteral> VECTOR_LITERAL
 %token<Identifier> IDENTIFIER
 %token INT FLOAT VECTOR VOID IF ELSE FOR WHILE BREAK CONTINUE RETURN STRUCT CONST AND OR 
-    EQ NE GT GE LT LE INCREMENT DECREMENT TRACE REDUCE ASINT ASFLOAT
+    EQ NE GT GE LT LE INCREMENT DECREMENT TRACE REDUCE ASINT ASFLOAT SQRT
 
 %type<Type> value_type
 %type<Statement> statement  loop_statement return_statement assignment_statement function_definition_statement
@@ -200,6 +200,10 @@ expression: '(' expression ')'
     | REDUCE '(' expression ')'
     {
         $$ = new ReduceExpression(@$, $3);
+    }
+    | SQRT '(' expression ')'
+    {
+        $$ = new SquareRootExpression(@$, $3);
     }
     ;
 declaration_statement: value_type declaration_list
