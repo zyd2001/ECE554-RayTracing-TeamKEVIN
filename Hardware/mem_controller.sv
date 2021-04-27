@@ -20,7 +20,7 @@ module mem_controller
     parameter BIT_THREAD = $clog2(NUM_THREAD);
     parameter DMA_WRITE_SIZE = NUM_THREAD / 4;
     parameter DMA_WRITE_BIT = $clog2(DMA_WRITE_SIZE);
-    parameter DMA_PATCH_SIZE = 2;
+    parameter DMA_PATCH_SIZE = 2048;
     parameter DMA_PATCH_BIT = $clog2(DMA_PATCH_SIZE);
 
 
@@ -44,7 +44,7 @@ module mem_controller
         end
         else if (dma_rd_upd_cp) begin
             dma_rd_addr_cp <= mmio.wr_data;
-            dma_rd_size_cp <= {{13'h0}, mmio.wr_addr[30:1]};
+            dma_rd_size_cp <= 43'd4096;
             dma_rd_req_cp <= mmio.wr_addr[31];
         end
     end
@@ -428,7 +428,7 @@ module mem_controller
     // Patch Counter
     logic [DMA_PATCH_BIT:0] dma_patch_cnt;
     logic dma_patch_inc;
-    
+
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
             dma_patch_cnt <= '0;
