@@ -55,6 +55,12 @@ module IC_tb();
     rst = 1'b0;
     #4
     Core_ID = 1'b1;
+    #4
+    Mem_Rdy = 1'b1;
+    Mem_NotValid = 1'b0;
+    #4
+    Mem_Rdy = 1'b0;
+    Mem_NotValid = 1'b1;
     
   end
   
