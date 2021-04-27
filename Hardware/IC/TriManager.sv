@@ -1,6 +1,6 @@
 module TriManager(
   clk, rst,
-  Mem_Rdy, Fetch,
+  Mem_Rdy, Fetch, clear,
   v1_in, v1_out,
   v2_in, v2_out,
   v0_in, v0_out,
@@ -13,7 +13,7 @@ module TriManager(
   localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
   
   input clk, rst;
-  input Mem_Rdy, Fetch;
+  input Mem_Rdy, Fetch, clear;
   input [95:0] v1_in, v2_in, v0_in;
   input [31:0] sid_in;
   input Mem_NotValid;
@@ -35,13 +35,13 @@ module TriManager(
 
   always_ff@(posedge clk or posedge rst) begin
     if (rst)
-      state <= CAP;
+      state <= IDLE;
     else 
       state <= nxt_state;
   end
   
   always@(posedge clk or posedge rst) begin
-    if (rst) begin
+    if (rst|clear) begin
       v1_reg <= '0;
       v2_reg <= '0;
       v0_reg <= '0;
