@@ -9,6 +9,8 @@ Software/Simulator/SimulatorCore/obj/
 Software/Simulator/SimulatorTest/bin/
 Software/Simulator/SimulatorTest/obj/
 
+.venv/
+
 [_@]*
 
 # ignore compilation output of ModelSim
@@ -42,4 +44,6 @@ work/
 
 *.mpf
 *.vcd
-
+Software/Assembler/rand_assembly.asm
+Software/Simulator/SimulatorTest/rand_assembly.asm
+Software/Assembler/rand_assembly.asm.out

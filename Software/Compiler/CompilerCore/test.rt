@@ -1,0 +1,78 @@
+// #define vector double
+
+// int a = 0;
+// float c = 1.2;
+// int *pointer;
+float dot(vector a, vector b)
+{
+    vector c = a * b;
+    return reduce(c);
+}
+
+int func(int a)
+{
+    int b = a + 1;
+    vector res1, res2, dir, orig;
+    dir = [ a, b, a, 0 ];
+    orig = [ a, b, -b, 0 ];
+    // res1, res2 = trace(dir, orig);
+    dir, orig = trace(dir, orig);
+    // a = int(dot(res1, res2));
+    a = int(dot(dir, orig));
+    return a / b;
+}
+
+void main()
+{
+    int *pointer;
+    int a = 0;
+    int array[23];
+    vector c = [ 1.5, 3, 4, 0 ];
+    int b = a;
+    // int vcd = a + 1 + 5 * 4 - 8;
+    for (int i = 0; i < 100; i++)
+    {
+        if (a < 1.2)
+        {
+            return;
+        }
+        else if (a)
+        {
+            func(b);
+            return;
+        }
+        else
+        {
+            if (array[a])
+                continue;
+            return;
+        }
+    }
+    test(1, 2, c);
+    return;
+}
+
+vector test(int v, int c, vector b)
+{
+    int array[13];
+    int *pointer;
+    pointer = array;
+    int d = c + 5;
+    for (int i = 0; i < 100; i++)
+    {
+        if (c)
+        {
+            func(array[i]);
+            return [ 1, 2, 3, 4 ];
+        }
+        else if (v)
+        {
+            return b;
+        }
+        else
+        {
+            return [ 1.5, 3, d, v ];
+        }
+    }
+    return [ 0, 0, 0, 0 ];
+}
