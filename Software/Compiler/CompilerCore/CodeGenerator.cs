@@ -418,7 +418,10 @@ namespace CompilerCore
                 item.Value.Operands[2] = size.ToString();
             }
             foreach (var item in list)
+            {
+                item.ResolvePhysicalRegister();
                 item.Output(Console.Out);
+            }
             // directTranslation.Print();
         }
     }

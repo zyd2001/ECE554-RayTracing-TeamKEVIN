@@ -533,4 +533,25 @@ namespace CompilerCore
             return true;
         }
     }
+
+    partial class SquareRootExpression : Expression
+    {
+        Expression expression;
+        internal SquareRootExpression(LexLocation location, Expression exp) : base(location)
+        {
+            expression = exp;
+        }
+
+        internal override bool NameAnalysis(SymbolTable table)
+        {
+            return expression.NameAnalysis(table);
+        }
+
+        internal override bool TypeCheck(out Type resultType)
+        {
+            resultType = Type.FLOAT;
+            expression.TypeCheck(out _);
+            return true;
+        }
+    }
 }

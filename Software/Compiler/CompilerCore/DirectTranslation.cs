@@ -841,7 +841,7 @@ namespace CompilerCore
             string temp = expression.Generate(translation);
             string tempVar;
             if (temp[2] == '.') // temp is not temporary
-                tempVar = $".{temp[1]}{VariableCounter}";
+                tempVar = $".S{VariableCounter}";
             else
                 tempVar = temp;
             if (type == Type.FLOAT)
@@ -859,6 +859,21 @@ namespace CompilerCore
             string temp = expression.Generate(translation);
             string tempVar = $".S{VariableCounter}";
             translation.AddAssembly("v_reduce", tempVar, temp);
+            return tempVar;
+        }
+    }
+
+    partial class SquareRootExpression
+    {
+        internal override string Generate(DirectTranslation translation)
+        {
+            string temp = expression.Generate(translation);
+            string tempVar;
+            if (temp[2] == '.') // temp is not temporary
+                tempVar = $".S{VariableCounter}";
+            else
+                tempVar = temp;
+            translation.AddAssembly("s_sqrt", tempVar, temp);
             return tempVar;
         }
     }

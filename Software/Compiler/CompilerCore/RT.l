@@ -32,6 +32,7 @@ digits [0-9]+
 "const"         return (int)Tokens.CONST;
 "trace"         return (int)Tokens.TRACE;
 "reduce"        return (int)Tokens.REDUCE;
+"sqrt"          return (int)Tokens.SQRT;
 "&&"            return (int)Tokens.AND;
 "||"            return (int)Tokens.OR;
 "=="            return (int)Tokens.EQ;

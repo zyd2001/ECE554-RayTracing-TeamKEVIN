@@ -1,43 +1,51 @@
 
 void main(int id, int stackBase)
 {
-    // vector v0 = [ -1, -1, -5, 0 ];
-    // vector v1 = [ 1, -1, -5, 0 ];
-    // vector v2 = [ 0, -1, -5, 0 ];
     float *result;
     result = stackBase + 65520;
 
-    int width = 640;
-    int height = 480;
-    float fov = 51.52;
-    float scale = 0.449596;
-    float imageAspectRatio = width / float(height);
-    vector orig = [ 0, 0, 0, 0 ];
+    int width = 1280;
+    int height = 720;
+    float fov = 60;
+    float scale = 0.57735;
+    float imageAspectRatio = 1.6;
+    vector orig = [ -2, -2, -2, 0 ];
+    int div = id / width;
     // compute primary ray
-    float x = (2 * (id + 0.5) / width - 1) * imageAspectRatio * scale;
-    float y = (1 - 2 * (id + 0.5) / height) * scale;
+    float x = (2 * (id - div + 0.5) / width - 1) * imageAspectRatio * scale;
+    float y = (1 - 2 * (div + 0.5) / height) * scale;
     vector dir = [ x, y, -1, 0 ];
-    float t, u, v;
+    dir = normalize(dir);
     vector hit, normal;
     hit, normal = trace(orig, dir);
-    // [comment]
-    // Interpolate colors using the barycentric coordinates
-    // [/comment]
     if (asInt(hit[3]) != 0)
     {
-        result[0] = 0.0;
-        result[1] = 1.0;
-        result[2] = 1.0;
+        hit[3] = 0;
+        float d = norm(hit);
+        result[0] = d;
+        result[1] = d;
+        result[2] = d;
         result[3] = id;
     }
     else
     {
-        result[0] = 0.0;
-        result[1] = 0.0;
-        result[2] = 0.0;
+        result[0] = -1.0;
+        result[1] = -1.0;
+        result[2] = -1.0;
         result[3] = id;
     }
-    // uncomment this line if you want to visualize the row barycentric coordinates
-    //*pix = Vec3f(u, v, 1 - u - v);
     return;
+}
+
+vector normalize(vector v)
+{
+    float temp0 = v[0], temp1 = v[1], temp2 = v[2], temp3 = v[3];
+    float norm = sqrt(temp0 * temp0 + temp1 * temp1 + temp2 * temp2 + temp3 * temp3);
+    return v / norm;
+}
+
+float norm(vector v)
+{
+    float temp0 = v[0], temp1 = v[1], temp2 = v[2], temp3 = v[3];
+    return sqrt(temp0 * temp0 + temp1 * temp1 + temp2 * temp2 + temp3 * temp3);
 }
