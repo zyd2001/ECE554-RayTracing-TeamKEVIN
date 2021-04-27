@@ -24,6 +24,8 @@ Software/Simulator/SimulatorTest/obj/
 .DS_Store
 
 
+*.do
+
 # ignore simulation output of ModelSim
 
 wlf*
