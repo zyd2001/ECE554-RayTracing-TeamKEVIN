@@ -27,7 +27,7 @@ module StageIII(
   output [BIT_THREAD-1:0] thread_id_out;
   output [31:0] sid_out;
   output [31:0] det_out, upre_out, vpre_out, tpre_out;
-  output [95:0] qvec_out;
+  output [95:0] norm_out;
   
   typedef enum reg [1:0] {DONE, CAP, LOAD, IDLE} state_t;
   state_t state, nxt_state;
@@ -37,7 +37,7 @@ module StageIII(
   logic [BIT_THREAD-1:0] thread_id_reg;
   logic [31:0] sid_reg;
   logic [31:0] det_reg, upre_reg, vpre_reg, tpre_reg;
-  logic [95:0] norm_out;
+  logic [95:0] norm_reg;
   
   
   always_ff@(posedge clk or posedge rst) begin

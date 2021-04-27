@@ -60,6 +60,8 @@ module ICMemManager(
       thread_id_reg <= thread_id_IC_in;
       IC_Mem_Rdy_reg <= IC_Mem_Rdy_in;
     end
+    else
+      IC_Mem_Rdy_reg <= IC_Mem_Rdy_in;
   end
 
   always_comb begin
