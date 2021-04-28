@@ -1,21 +1,3 @@
-// Copyright (c) 2020 University of Florida
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-// Greg Stitt
-// University of Florida
-
 // Module Name:  afu.sv
 // Project:      dma_loopback
 // Description:  This AFU provides a loopback DMA test that simply reads
@@ -102,6 +84,7 @@ module rta
   logic [31:0] data_32_mc_x;
   // TRI
   logic [127:0] data_128_mc_tri;
+  logic term_mc_cp;
 
 
   /////////////////// Stack Memory ///////////////////
@@ -204,7 +187,8 @@ module rta
     .data_32(data_32_mc_x),
     .data_128(data_128_mc_tri),
     .re_main(re_mc_main),
-    .addr_main(addr_mc_main)
+    .addr_main(addr_mc_main),
+    .term(term_mc_cp)
     );
 
 
