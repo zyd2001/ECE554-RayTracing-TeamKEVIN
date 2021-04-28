@@ -112,7 +112,7 @@ module mem_CP_tb();
             @(posedge clk);
             @(negedge clk);
             if(data_out_CP !== i << 2) begin
-                $display("Error! first read at: %h, expacting: %h, got: %h", i, i << 2, data_out_CP);
+                $display("Error! full read at: %h, expacting: %h, got: %h", i, i << 2, data_out_CP);
                 error ++;
             end
         end
