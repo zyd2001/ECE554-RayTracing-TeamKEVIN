@@ -1,18 +1,18 @@
 module Calculation(
   clk, rst, 
   v0, v1, v2, orig, dir, sid_in,
-  sid_out, Intersection_Point, norm_out);
+  sid_out, Intersection_Point, norm_out, t);
   
   input clk, rst;
   input [31:0] sid_in;
   input [95:0] v0, v1, v2, orig, dir;
   
-  output [31:0] sid_out;
+  output [31:0] sid_out, t;
   output [95:0] Intersection_Point, norm_out;
   
   logic hit;
   logic [5:0] counter;
-  logic [31:0] det, invDet, upre, vpre, tpre, u, v, t, sid_ff_out;
+  logic [31:0] det, invDet, upre, vpre, tpre, u, v, sid_ff_out;
   logic [95:0] v0v2, v0v1, tvec,
                pvec, qvec, norm, Intersection_Point_in;
                
