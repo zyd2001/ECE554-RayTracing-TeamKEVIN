@@ -131,7 +131,7 @@ module top_test(clk, rst, rx, tx);
 
     logic [63:0] tx_reg_0, tx_reg_1, tx_reg_2;
     always_ff @(posedge clk or negedge rst_n) begin
-        if (rst_n) begin
+        if (!rst_n) begin
             tx_reg_0 <= 64'h0;
             tx_reg_1 <= 64'h0;
             tx_reg_2 <= 64'h0;
