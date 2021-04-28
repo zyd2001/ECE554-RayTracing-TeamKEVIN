@@ -1,0 +1,25 @@
+forwarding test
+start:
+    s_write_high r1 0
+    s_write_low r1 20 // mem[r1] will store the address held in r2
+    s_write_high r2 0
+    s_write_low r2 32 // mem[r2] will store the value of r3 
+    s_write_high r3 0
+    s_write_low r3 5
+    s_store_4byte r2 r1 0 // store address 32 in mem[r1]
+    s_store_4byte r3 r2 0 // store value 5 in mem[32] (which is mem[r2])
+    s_load_4byte r4 r1 0 // load address in mem[r1] to r4
+    s_load_4byte r5 r4 0 // load value in mem[r4] to r5
+    cmp_i r3 r5 
+    bne wrong1
+    s_load_4byte r6 r4 0 // load val into r6 and use it in calculation immediately after
+    ii_addi r6 r6 2 
+    s_write_low r7 7 // 5 + 2 = 7
+    cmp_i r6 r7 // check if the add worked
+    bne wrong2
+    fin
+wrong1:
+    fin
+wrong2:
+    fin
+     
