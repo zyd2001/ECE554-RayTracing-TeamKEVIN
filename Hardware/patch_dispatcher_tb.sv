@@ -6,7 +6,10 @@ localparam NUM_RT = 4;
 localparam BIT_RT = $clog2(NUM_RT);
 localparam NUM_IC = 4;
 localparam BIT_IC = $clog2(NUM_IC);
-localparam NUM_CYCLE = 5;
+localparam NUM_CYCLE = 10;
+
+localparam [6:0] rt_cycle[NUM_RT-1:0] = {7'd60, 7'd45, 7'd80, 7'd100};
+localparam [6:0] ic_cycle[NUM_IC-1:0] = {7'd50, 789, 7'd30, 7'd120};
 
 genvar i;
 integer j;
@@ -46,14 +49,9 @@ logic q_en_ic2rt;
 logic core_id_ic2rt[NUM_IC-1:0];
 
 // tb
-logic context_switch_0[NUM_RT-1:0];
-logic context_switch_1[NUM_RT-1:0];
-logic context_switch_2[NUM_RT-1:0];
-logic context_switch_3[NUM_RT-1:0];
-logic context_switch_4[NUM_RT-1:0];
-logic context_switch_5[NUM_RT-1:0];
-logic context_switch_6[NUM_RT-1:0];
-logic context_switch_7[NUM_RT-1:0];
+
+logic cs_rt[NUM_RT-1:0][511:0];
+
 
 logic [BIT_THREAD-1:0] tid[NUM_RT-1:0];
 logic [31:0] pid[NUM_RT-1:0];
@@ -74,7 +72,7 @@ logic [31:0] sp_done[NUM_THREAD-1:0];
         end
         else begin
             for (j = 0; j < NUM_RT; j++) begin
-                if (context_switch_1[j] == 1'h1)
+                if (cs_rt[j][1] == 1'h1)
                     job_cnt[tid[j]] <= job_cnt[tid[j]] + 1;
             end
         end
@@ -100,29 +98,20 @@ logic [31:0] sp_done[NUM_THREAD-1:0];
         end
      end
 
+
 generate
     for (i = 0; i < NUM_RT; i++) begin
         always_ff @(posedge clk or negedge rst_n) begin
             if (!rst_n) begin
-                context_switch_0[i] <= 0;
-                context_switch_1[i] <= 0;
-                context_switch_2[i] <= 0;
-                context_switch_3[i] <= 0;
-                context_switch_4[i] <= 0;
-                context_switch_5[i] <= 0;
-                context_switch_6[i] <= 0;
-                context_switch_7[i] <= 0;
+                for (j = 0; j < rt_cycle[i]-1; j++) 
+                    cs_rt[i][j] <= 0;
+                cs_rt[i][rt_cycle[i]-1] <= 0;
             end
             else begin
-                context_switch_7[i] <= job_dispatch_rt[i];
-                context_switch_6[i] <= context_switch_7[i];
-                context_switch_5[i] <= context_switch_6[i];
-                context_switch_4[i] <= context_switch_5[i];
-                context_switch_3[i] <= context_switch_4[i];
-                context_switch_2[i] <= context_switch_3[i];
-                context_switch_1[i] <= context_switch_2[i];
-                context_switch_0[i] <= context_switch_1[i];
-            end 
+                for (j = 0; j < rt_cycle[i]-1; j++) 
+                    cs_rt[i][j] <= cs_rt[i][j+1];
+                cs_rt[i][rt_cycle[i]-1] <= job_dispatch_rt[i];
+            end
         end
 
         always_ff @(posedge clk or negedge rst_n) begin
@@ -140,9 +129,9 @@ generate
             end
         end
 
-        assign task_done_rt[i] = context_switch_0[i] && job_cnt[tid[i]] == NUM_CYCLE;
+        assign task_done_rt[i] = cs_rt[i][0] && job_cnt[tid[i]] == NUM_CYCLE;
 
-        assign context_switch_rt[i] = task_done_rt[i] ? 0 : context_switch_0[i];
+        assign context_switch_rt[i] = task_done_rt[i] ? 0 : cs_rt[i][0];
         assign thread_id_in_rt[i] = tid[i];
         assign pc_in_rt[i] = pc[i];
         assign stack_ptr_in_rt[i] = sp[i];
@@ -151,48 +140,19 @@ generate
 endgenerate
 
 logic [BIT_THREAD-1:0] tid_ic[NUM_IC-1:0];
-logic cs_ic_0[NUM_IC-1:0];
-logic cs_ic_1[NUM_IC-1:0];
-logic cs_ic_2[NUM_IC-1:0];
-logic cs_ic_3[NUM_IC-1:0];
-logic cs_ic_4[NUM_IC-1:0];
-logic cs_ic_5[NUM_IC-1:0];
-logic cs_ic_6[NUM_IC-1:0];
-logic cs_ic_7[NUM_IC-1:0];
-logic cs_ic_8[NUM_IC-1:0];
-logic cs_ic_9[NUM_IC-1:0];
-logic cs_ic_10[NUM_IC-1:0];
-logic cs_ic_11[NUM_IC-1:0];
+logic cs_ic[NUM_IC][511:0];
 generate
     for (i = 0; i < NUM_IC; i++) begin
         always_ff @(posedge clk or negedge rst_n) begin
             if (!rst_n) begin
-                cs_ic_0[i] <= 0;
-                cs_ic_1[i] <= 0;
-                cs_ic_2[i] <= 0;
-                cs_ic_3[i] <= 0;
-                cs_ic_4[i] <= 0;
-                cs_ic_5[i] <= 0;
-                cs_ic_6[i] <= 0;
-                cs_ic_7[i] <= 0;
-                cs_ic_8[i] <= 0;
-                cs_ic_9[i] <= 0;
-                cs_ic_10[i] <= 0;
-                cs_ic_11[i] <= 0;
+                for (j = 0; j < ic_cycle[i]-1; j++)
+                    cs_ic[i][j] <= 0;
+                cs_ic[i][ic_cycle[i]-1] <= 0;
             end
             else begin
-                cs_ic_11[i] <= job_dispatch_ic[i];
-                cs_ic_10[i] <= cs_ic_11[i];
-                cs_ic_9[i] <= cs_ic_10[i];
-                cs_ic_8[i] <= cs_ic_9[i];
-                cs_ic_7[i] <= cs_ic_8[i];
-                cs_ic_6[i] <= cs_ic_7[i];
-                cs_ic_5[i] <= cs_ic_6[i];
-                cs_ic_4[i] <= cs_ic_5[i];
-                cs_ic_3[i] <= cs_ic_4[i];
-                cs_ic_2[i] <= cs_ic_3[i];
-                cs_ic_1[i] <= cs_ic_2[i];
-                cs_ic_0[i] <= cs_ic_1[i];
+                for (j = 0; j < ic_cycle[i]-1; j++)
+                    cs_ic[i][j] <= cs_ic[i][j+1];
+                cs_ic[i][ic_cycle[i]-1] <= job_dispatch_ic[i];
             end
         end
 
@@ -203,7 +163,7 @@ generate
                 tid_ic[i] <= thread_id_out_ic;
         end
 
-        assign context_switch_ic[i] = cs_ic_0[i];
+        assign context_switch_ic[i] = cs_ic[i][0];
         assign thread_id_in_ic[i] = tid_ic[i];
     end
 endgenerate
