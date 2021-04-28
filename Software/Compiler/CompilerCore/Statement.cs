@@ -10,15 +10,15 @@ namespace CompilerCore
         abstract internal bool SyntaxCheck(bool topLevel, bool inLoop);
         internal static FunctionDefinitionStatement CurrentFunction = null;
         internal static bool SecondPassAnalysis = false;
-        static internal bool AssignmentTypeHelper(Type rhsType, Type lhsType)
+        static internal bool AssignmentTypeHelper(Type lhsType, Type rhsType)
         {
-            switch (rhsType)
+            switch (lhsType)
             {
                 case Type.INT:
                 case Type.VECTOR:
-                    return rhsType == lhsType;
+                    return lhsType == rhsType;
                 case Type.FLOAT:
-                    switch (lhsType)
+                    switch (rhsType)
                     {
                         case Type.INT:
                         case Type.FLOAT:
@@ -29,7 +29,7 @@ namespace CompilerCore
                 case Type.INT_POINTER:
                 case Type.FLOAT_POINTER:
                 case Type.VECTOR_POINTER:
-                    return rhsType == lhsType || lhsType == Type.INT;
+                    return lhsType == rhsType || rhsType == Type.INT;
                 default:
                     return false;
             }
@@ -366,11 +366,11 @@ namespace CompilerCore
         {
             type = Type.NULL;
             bool pass = true;
-            pass &= left.TypeCheck(out Type rhsType);
-            pass &= right.TypeCheck(out Type lhsType);
-            if (!AssignmentTypeHelper(rhsType, lhsType))
+            pass &= left.TypeCheck(out Type lhsType);
+            pass &= right.TypeCheck(out Type rhsType);
+            if (!AssignmentTypeHelper(lhsType, rhsType))
             {
-                Error($"Assign {TypeString(lhsType)} to {TypeString(rhsType)}");
+                Error($"Assign {TypeString(rhsType)} to {TypeString(lhsType)}");
                 return false;
             }
             rightType = rhsType;
@@ -395,7 +395,7 @@ namespace CompilerCore
         internal override bool NameAnalysis(SymbolTable table)
         {
             if (SecondPassAnalysis)
-                return declarationList.NameAnalysisType(table, type);
+                return declarationList.NameAnalysisType(table, type, constant);
             else
                 return true;
         }
@@ -432,11 +432,11 @@ namespace CompilerCore
             throw new NotImplementedException();
         }
 
-        internal bool NameAnalysisType(SymbolTable table, Type type)
+        internal bool NameAnalysisType(SymbolTable table, Type type, bool con)
         {
             bool pass = true;
             foreach (var item in list)
-                pass &= item.NameAnalysisType(table, type);
+                pass &= item.NameAnalysisType(table, type, con);
             return pass;
         }
 
@@ -456,6 +456,7 @@ namespace CompilerCore
 
     partial class DeclarationItem : ASTNode
     {
+        static int constantOffset = 0;
         string identifier;
         string scopedIdentifier;
         Type type;
@@ -482,7 +483,7 @@ namespace CompilerCore
             throw new NotImplementedException();
         }
 
-        internal bool NameAnalysisType(SymbolTable table, Type type)
+        internal bool NameAnalysisType(SymbolTable table, Type type, bool constant)
         {
             if (table.LocalSearch(identifier) is not null)
             {
@@ -495,16 +496,21 @@ namespace CompilerCore
                 type -= 3; // make a pointer type
             string t = type == Type.VECTOR ? "V" : "S";
             string id;
+            int cOffset = constantOffset;
             if (table.ScopeLevel > 1)
                 id = $".{t}.{Statement.CurrentFunction.functionName}.{table.ScopeLevel}.{identifier}";
             else
-                id = $"_{t}.{identifier}";
+            {
+                constantOffset += type == Type.VECTOR ? 16 : 4;
+                id = $"c{t}.{identifier}";
+            }
             scopedIdentifier = id;
-            table.AddSymbol(identifier, new Symbol(type, id));
+            table.AddSymbol(identifier, new Symbol(type, id, cOffset));
             if (arraySize > 0)
             {
                 offset = Statement.CurrentFunction.StackSize;
-                Statement.CurrentFunction.StackSize += arraySize;
+                Statement.CurrentFunction.StackSize += arraySize *
+                    (type == Type.VECTOR_POINTER ? 16 : 4);
             }
             return pass;
         }
