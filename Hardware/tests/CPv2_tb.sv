@@ -16,6 +16,7 @@ module CPv2_tb();
     logic init_mem_fin_MC;
     logic patch_out_done_MC;
     logic [31:0] pixel_size_MC;
+    logic we_ps_MC;
     /*
         output
     */
@@ -23,7 +24,7 @@ module CPv2_tb();
     logic load_start_PD;
     logic load_done_PD;
     logic [31:0] pixel_id_PD;
-    CP #(NUM_THREAD) cp(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC,
+    CP #(NUM_THREAD) cp(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_MC,
         load_start_PD, load_done_PD, pixel_id_PD);
     int error = 0;
     initial begin
@@ -32,6 +33,7 @@ module CPv2_tb();
         init_mem_fin_MC = 0;
         patch_out_done_MC = 0;
         pixel_size_MC = 0;
+        we_ps_MC = 0;
         // reset
         @(posedge clk) begin end
         rst_n = 1'b0; // active low reset
@@ -39,8 +41,11 @@ module CPv2_tb();
         rst_n = 1'b1; // reset finished
         @(posedge clk) begin end
         for(int i = 1; i < 11; i++) begin
-            init_mem_fin_MC = 1;
             pixel_size_MC = (pixel_max_size/10) * i;
+            we_ps_MC = 1;
+            @(posedge clk);
+            we_ps_MC = 0;
+            init_mem_fin_MC = 1;
             $display("Test %d starting ... with %d pixels", i, pixel_size_MC);
             for(int j = 0; j < pixel_size_MC; j++) begin
                 @(negedge clk);
