@@ -63,7 +63,7 @@ module CrossProduct_v2(
     .clk    (clk),              //   input,   width = 1,    clk.clk
 		.areset (rst),              //   input,   width = 1, areset.reset
 		.en     (1'b1),           //   input,   width = 1,     en.en
-		.a      (Mul2_1out),       //   input,  width = 32,      a.a
+		.a      (Mul2_1_out),       //   input,  width = 32,      a.a
 		.b      (Mul2_2_out),       //   input,  width = 32,      b.b
 		.q      (result[63:32]),    //  output,  width = 32,      q.q
 		.opSel  (1'b0)              //   input,   width = 1,  opSel.opSel

@@ -5,7 +5,7 @@
 
 module fifo
   #(
-  parameter DEPTH=44,
+  parameter DEPTH=45,
   parameter BITS=32
   )
   (
