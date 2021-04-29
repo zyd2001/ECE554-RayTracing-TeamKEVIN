@@ -84,7 +84,7 @@ namespace CompilerCore
                 }
             }
             else // array
-                translation.AddAssembly("ii_addi", scopedIdentifier, "RS29", offset.ToString());
+                translation.AddAssembly("ii_addi", scopedIdentifier, "RS28", offset.ToString());
             return null;
         }
     }
@@ -96,10 +96,25 @@ namespace CompilerCore
             string rhsVar = right.Generate(translation);
             if (left is IdentifierExpression)
             {
+                string id = (left as IdentifierExpression).LinkedSymbol.Identifier;
+                // if (id[0] != '.')
+                // {
+                //     Symbol s = (left as IdentifierExpression).LinkedSymbol;
+                //     string tempScalar = $".S{VariableCounter}";
+                //     translation.AddAssembly("s_write_low", tempScalar, "0");
+                //     translation.AddAssembly("s_write_high", tempScalar, "8192");
+                //     if (leftType == Type.VECTOR)
+                //         translation.AddAssembly("v_store_16byte", rhsVar, tempScalar, s.Offset.ToString());
+                //     else
+                //         translation.AddAssembly("s_store_4byte", rhsVar, tempScalar, s.Offset.ToString());
+                // }
+                // else
+                // {
                 if (leftType == Type.VECTOR)
-                    translation.AddAssembly("v_mov", left.Generate(translation), rhsVar);
+                    translation.AddAssembly("v_mov", id, rhsVar);
                 else
-                    translation.AddAssembly("s_mov", left.Generate(translation), rhsVar);
+                    translation.AddAssembly("s_mov", id, rhsVar);
+                // }
             }
             else
             {
@@ -366,7 +381,27 @@ namespace CompilerCore
     {
         internal override string Generate(DirectTranslation translation)
         {
-            return LinkedSymbol.Identifier; // scoped identifier
+            string id = LinkedSymbol.Identifier;
+            if (id[0] == '.')
+                return id; // scoped identifier
+            else
+            {
+                string tempScalar = $".S{VariableCounter}";
+                if (id[1] == 'V')
+                {
+                    string tempVar = $".V{VariableCounter}";
+                    translation.AddAssembly("s_write_low", tempScalar, "0");
+                    translation.AddAssembly("s_write_high", tempScalar, "8192");
+                    translation.AddAssembly("v_load_16byte", tempVar, tempScalar, LinkedSymbol.Offset.ToString());
+                }
+                else
+                {
+                    translation.AddAssembly("s_write_low", tempScalar, "0");
+                    translation.AddAssembly("s_write_high", tempScalar, "8192");
+                    translation.AddAssembly("s_load_4byte", tempScalar, tempScalar, LinkedSymbol.Offset.ToString());
+                }
+                return tempScalar;
+            }
         }
     }
 
