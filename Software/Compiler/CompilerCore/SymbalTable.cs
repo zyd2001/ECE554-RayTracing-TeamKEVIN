@@ -7,6 +7,7 @@ namespace CompilerCore
         internal Type Type { get; }
         internal string Identifier { get; }
         internal bool IsFunction { get; }
+        internal int Offset { get; }
         internal FunctionDefinitionStatement FunctionDefinition { get; }
         internal List<Type> ParametersType { get; }
         internal Symbol(Type type, string id, bool func = false, List<Type> types = null,
@@ -17,6 +18,16 @@ namespace CompilerCore
             IsFunction = func;
             ParametersType = types;
             FunctionDefinition = function;
+        }
+
+        internal Symbol(Type type, string id, int offset)
+        {
+            Type = type;
+            Identifier = id;
+            Offset = offset;
+            IsFunction = false;
+            ParametersType = null;
+            FunctionDefinition = null;
         }
     }
 
