@@ -78,6 +78,8 @@ module rta
   // MAIN
   logic re_mc_main;
   logic [31:0] addr_mc_main[NUM_RT-1:0];
+  // CP
+  logic wr_out_done_mc_cp;
   // CP || INST || CONST
   logic [1:0] we_mem_mc_x[NUM_RT-1:0];
   logic [31:0] data_32_mc_x;
@@ -127,6 +129,7 @@ module rta
 
   //////////////// Command Processor ////////////////
   logic load_cp_pd;
+  logic load_done_cp_pd;
   logic [31:0] pixel_id_cp_pd;
 
 
@@ -190,6 +193,7 @@ module rta
     .data_128(data_128_mc_tri),
     .cp_strt(cp_strt_mc_cp),
     .re_main(re_mc_main),
+    .wr_out_done(wr_out_done_mc_cp),
     .addr_main(addr_mc_main),
     .term(term_mc_cp)
     );
@@ -215,17 +219,19 @@ module rta
   endgenerate
 
 
-  // mem_CP memory_command_processor
-  //  (
-  //   .clk(clk),
-  //   .rst_n(rst_n),
-  //   .re_CP(),
-  //   .data_MC(data_32_mc_x),
-  //   .ctrl_MC(we_mem_mc_x[0]),
-  //   .invalid_CP(),
-  //   .data_out_CP(data_out_cpm_pd)
-  //   );
-
+  CP command_processer
+   (
+    .clk(clk), 
+    .rst_n(rst_n),
+    .init_mem_fin_MC(cp_strt_mc_cp),
+    .patch_out_done_MC(wr_out_done_mc_cp),
+    .pixel_size_MC(data_32_mc_x),
+    .we_ps_MC(we_mem_mc_x[0]),
+    .load_start_PD(load_cp_pd),
+    .load_done_PD(load_done_cp_pd),
+    .pixel_id_PD(pixel_id_cp_pd)
+    );
+    
 
   generate
     for (i = 0; i < NUM_RT; i++) begin: inst_const_memory
@@ -281,6 +287,7 @@ module rta
     .clk(clk),
     .rst_n(rst_n),
     .load_cp(load_cp_pd),
+    .load_done_cp(load_done_cp_pd),
     .pixel_id_cp(pixel_id_cp_pd),
     .task_done_rt(task_done_rt_pd),
     .context_switch_rt(context_switch_rt_pd),
@@ -302,6 +309,9 @@ module rta
     .q_en_ic2rt(q_en_ic2rt_pd_icm),
     .core_id_ic2rt(core_id_ic2rt_pd_icm)
     );
+
+
+  
 
   
 

@@ -314,16 +314,19 @@ module rta
   endgenerate
 
 
-  // mem_CP memory_command_processor
-  //  (
-  //   .clk(clk),
-  //   .rst_n(rst_n),
-  //   .re_CP(),
-  //   .data_MC(data_32_mc_x),
-  //   .ctrl_MC(we_mem_mc_x[0]),
-  //   .invalid_CP(),
-  //   .data_out_CP(data_out_cpm_pd)
-  //   );
+  CP command_processer
+   (
+    .clk(clk), 
+    .rst_n(rst_n),
+    .init_mem_fin_MC(cp_strt_mc_cp),
+    .patch_out_done_MC(wr_out_done_mc_cp),
+    .pixel_size_MC(data_32_mc_x),
+    .we_ps_MC(we_mem_mc_x[0]),
+    .load_start_PD(load_cp_pd),
+    .load_done_PD(load_done_cp_pd),
+    .pixel_id_PD(pixel_id_cp_pd)
+    );
+    
 
 
   generate
@@ -373,13 +376,14 @@ module rta
     .vertex2_IC(vertex_2_tri_ic),
     .sid_IC(sid_tri_ic)
     );
-    
+
   
   patch_dispatcher pd  
    (
     .clk(clk),
     .rst_n(rst_n),
     .load_cp(load_cp_pd),
+    .load_done_cp(load_done_cp_pd),
     .pixel_id_cp(pixel_id_cp_pd),
     .task_done_rt(task_done_rt_pd),
     .context_switch_rt(context_switch_rt_pd),
@@ -401,6 +405,7 @@ module rta
     .q_en_ic2rt(q_en_ic2rt_pd_icm),
     .core_id_ic2rt(core_id_ic2rt_pd_icm)
     );
+
 
      
 endmodule
