@@ -29,8 +29,8 @@ module mem_controller_dma_rd_128
             mem_wr_data_128_cnt <= mem_wr_data_128_cnt + 3'h1;
     end
     
-    typedef enum reg [2:0] {DMA_RD_128_IDLE, DMA_RD_128_GO, DMA_RD_128_WAIT, DMA_RD_128_HOLD, 
-                            DMA_RD_128_LOAD} t_state_dma_rd_128;
+    typedef enum reg [2:0] {DMA_RD_128_IDLE, DMA_RD_128_GO, DMA_RD_128_WAIT, DMA_RD_128_HOLD
+                            ,DMA_RD_128_EMPTY, DMA_RD_128_LOAD} t_state_dma_rd_128;
     t_state_dma_rd_128 state_dma_rd_128, nxt_state_dma_rd_128;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
@@ -67,11 +67,14 @@ module mem_controller_dma_rd_128
                     dma_rd_done_clr_128 = 1'h1;
                 end
                 else if (!dma_empty) begin
-                    nxt_state_dma_rd_128 = DMA_RD_128_HOLD;
-                    dma_rd_data_128_upd = 1'h1;
+                    nxt_state_dma_rd_128 = DMA_RD_128_EMPTY;
                 end
                 else
                     nxt_state_dma_rd_128 = DMA_RD_128_WAIT;
+            end
+            DMA_RD_128_EMPTY: begin
+                nxt_state_dma_rd_128 = DMA_RD_128_HOLD;
+                dma_rd_data_128_upd = 1'h1;
             end
             DMA_RD_128_HOLD: begin
                 nxt_state_dma_rd_128 = DMA_RD_128_LOAD;
