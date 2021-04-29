@@ -98,11 +98,6 @@ module rta
   logic [127:0] data_out_main_x[NUM_RT-1:0];
   // RT
   logic rd_rdy_main_rt[NUM_RT-1:0];
-
-
-  //////////////////// CP Memory /////////////////////
-  // PD
-  logic [31:0] data_out_cpm_pd;
   
 
   //////////////// Instruction Memory ////////////////
@@ -155,6 +150,8 @@ module rta
   //////////////////// RT CORE ////////////////////
   // MAIN
   logic [127:0] data_in_rt_main[NUM_RT-1:0];
+  logic we_rt_main[NUM_RT-1:0];
+  logic re_rt_main[NUM_RT-1:0];
   // INST
   logic [31:0] addr_rt_inst[NUM_RT-1:0];
   // MAIN || INST
@@ -165,10 +162,11 @@ module rta
   logic [BIT_THREAD-1:0] thread_id_in_rt_pd[NUM_RT-1:0];
   logic [31:0] pc_in_rt_pd[NUM_RT-1:0];
   logic [31:0] stack_ptr_in_rt_pd[NUM_RT-1:0];
-  // RT
-  logic we_rt_main[NUM_RT-1:0];
-  logic re_rt_main[NUM_RT-1:0];
-
+  // ICM
+  logic [127:0] ray_origin_rt_icm [NUM_RT-1:0];
+  logic [127:0] ray_direction_rt_icm [NUM_RT-1:0];
+  logic [BIT_THREAD-1:0] thread_id_rt_icm [NUM_RT-1:0];
+  logic dequeue_rt_icm;
 
   //////////////////// IC CORE ////////////////////
   // PD
@@ -177,7 +175,21 @@ module rta
   // TRI
   logic re_ic_tri;
   logic unsigned [BIT_TRI-1:0] tri_id_ic_tri;
+  // ICM
+  logic [127:0] shader_info_ic_rt [NUM_IC-1:0]; //(v0, v1, v2, sid)
+  logic [127:0] normal_ic_rt [NUM_IC-1:0];
+  logic [BIT_THREAD-1:0] thread_id_ic_rt [NUM_IC-1:0];
+  logic dequeue_ic_rt;
 
+  /////////////////// IC Memory ///////////////////
+  // IC
+  logic [127:0] ray_origin_icm_ic;
+  logic [127:0] ray_direction_icm_ic;
+  logic [BIT_THREAD-1:0] thread_id_icm_ic;
+  // RT​
+  logic [127:0] shader_info_icm_rt; //(v0, v1, v2, sid)
+  logic [127:0] normal_icm_rt;
+  logic [BIT_THREAD-1:0] thread_id_icm_rt;
 
   mem_controller memory_controller
    (
@@ -312,9 +324,31 @@ module rta
     );
 
 
-  
-
-  
+  mem_IC #(.NUM_RT(NUM_RT), NUM_IC(NUM_IC), .NUM_THREAD(NUM_THREAD)) mem_ic
+  (
+    //input
+    .clk(clk), 
+    .rst_n(rst_n), 
+    .q_en_rt2ic_PD(q_en_rt2ic_pd_icm), 
+    .core_id_rt2ic_PD(core_id_rt2ic_pd_icm), 
+    .q_en_ic2rt_PD(q_en_ic2rt_pd_icm), 
+    .core_id_ic2rt_PD(core_id_ic2rt_pd_icm),
+    .ray_origin_RT(ray_origin_rt_icm), 
+    .ray_direction_RT(ray_direction_rt_icm), 
+    .thread_id_RT_in(thread_id_rt_icm), 
+    .dequeue_RT(dequeue_rt_icm),
+    .shader_info_IC(shader_info_ic_rt), 
+    .normal_IC(normal_ic_rt), 
+    .thread_id_IC_in(thread_id_ic_rt), 
+    .dequeue_IC(dequeue_ic_rt),
+    //output
+    .ray_origin_IC(ray_origin_icm_ic), 
+    .ray_direction_IC(ray_direction_icm_ic), 
+    .thread_id_IC_out(thread_id_icm_ic),
+    .shader_info_RT(shader_info_icm_rt), 
+    .normal_RT(normal_icm_rt), 
+    .thread_id_RT_out(thread_id_icm_rt)
+    );
 
      
 endmodule
