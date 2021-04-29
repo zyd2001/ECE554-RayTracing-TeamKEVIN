@@ -156,6 +156,7 @@ module rta
   logic [31:0] addr_rt_inst[NUM_RT-1:0];
   // MAIN || INST
   logic [31:0] addr_rt_x[NUM_RT-1:0];
+  logic [127:0] mem_data_read_x_rt[NUM_RT-1:0];
   // PD
   logic task_done_rt_pd[NUM_RT-1:0];
   logic context_switch_rt_pd[NUM_RT-1:0];
@@ -322,6 +323,45 @@ module rta
     .q_en_ic2rt(q_en_ic2rt_pd_icm),
     .core_id_ic2rt(core_id_ic2rt_pd_icm)
     );
+
+
+  generate
+    for (i = 0; i < NUM_RT; i++) begin: RT_CORE
+      RT_core_single rt
+       (
+        .clk(clk),
+        .rst_n(rst_n),
+        .kernel_mode(job_dispatch_pd_rt[i]),
+        .PD_scalar_wen(),
+        .PD_vector_wen(),
+        .PD_scalar_wb_address(),
+        .PD_scalar_read_address1(),
+        .PD_scalar_read_address2(),
+        .PD_vector_wb_address(),
+        .PD_vector_read_address1(),
+        .PD_vector_read_address2(),
+        .PD_scalar_wb_data(),
+        .PD_vector_wb_data(),
+        .MRTI_data(data_out_inst_rt[i]),
+        .MEM_data_read(mem_data_read_x_rt[i]),
+        .MEM_done(rd_rdy_main_rt[i]),
+
+        .End_program(task_done_rt_pd[i]),
+        .Context_switch(context_switch_rt_pd[i]),
+        .PD_scalar_read1(),
+        .PD_scalar_read2(),
+        .PD_vector_read1(),
+        .PD_vector_read2(),
+        .MRTI_addr(addr_rt_inst[i]),
+        .MEM_addr(addr_rt_x[i]),
+        .MEM_data_write(data_in_rt_main[i]),
+        .MEM_read_en(re_rt_main[i]),
+        .MEM_write_en(we_rt_main[i])
+        );
+
+      assign mem_data_read_x_rt[i] = addr_rt_x[i][31] ? data_out_main_x[i] : data_out_const_rt[i];
+     end
+  endgenerate
 
 
   mem_IC #(.NUM_RT(NUM_RT), NUM_IC(NUM_IC), .NUM_THREAD(NUM_THREAD)) mem_ic
