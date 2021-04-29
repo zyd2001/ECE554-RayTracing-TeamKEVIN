@@ -30,6 +30,7 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <stdio.h>
 
 #include <opae/utils.h>
 
@@ -42,7 +43,7 @@
 
 using namespace std;
 
-void clearMem(dma_data_t * mem, int size)
+void clearMem(dma_data_t *mem, int size)
 {
     for (int i = 0; i < size; i++)
         mem[i] = 0;
@@ -51,8 +52,11 @@ void clearMem(dma_data_t * mem, int size)
 void readFile(dma_data_t *data, ifstream &f)
 {
     char ch;
-    while ((ch = f.get()))
+    while (true)
     {
+        f.read(&ch, 1);
+        if (f.eof())
+            break;
         *data = ch;
         data++;
     }
@@ -70,15 +74,15 @@ void getOutput(dma_data_t *data, ofstream &out)
 {
     for (int i = 0; i < OUTPUT_SIZE; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 4; j++)
         {
-            out << *((float *)data);
+            out << *((int *)data);
+            out << "\n";
             data += 4;
         }
-        data += 4;
+        // data += 4;
     }
 }
- 
 
 int main(int argc, char *argv[])
 {
@@ -101,19 +105,26 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp(argv[3]), rt(argv[4]), con(argv[5]), tri(argv[6]);
+        ifstream cp("CP.out", ios::binary), rt("main.asm.out", ios::binary),
+            con("Constant.out", ios::binary), tri("cylinder.obj.out", ios::binary);
 
-        ofstream out("output.pfm", ios::binary);
+        ofstream out("output.pfm");
         string str = "PF\n1280 720\n-1\n";
         out << str;
 
         cout << "Starting...\n";
 
         unsigned int CPInsSize, RTInsSize, constantSize, triangleSize;
+        unsigned int CPInsFileSize, RTInsFileSize, constantFileSize, triangleFileSize;
+        CPInsFileSize, RTInsFileSize, constantFileSize, triangleFileSize;
         CPInsSize = filesize(cp);
+        CPInsFileSize = CPInsSize;
         RTInsSize = filesize(rt);
+        RTInsFileSize = RTInsSize;
         constantSize = filesize(con);
+        constantFileSize = constantSize;
         triangleSize = filesize(tri);
+        triangleFileSize = triangleSize;
         CPInsSize = CPInsSize - CPInsSize % 64 + 64;
         RTInsSize = RTInsSize - RTInsSize % 64 + 64;
         constantSize = constantSize - constantSize % 64 + 64;
@@ -125,6 +136,9 @@ int main(int argc, char *argv[])
         auto triangle = afu.malloc<dma_data_t>(triangleSize);
         auto output = afu.malloc<dma_data_t>(OUTPUT_SIZE * 4);
 
+        printf("CP: %d\n RT: %d\n Con: %d\n Tri: %d\n", CPInsSize, RTInsSize, constantSize, triangleSize);
+        printf("CP: %p\n RT: %p\n Con: %p\n Tri: %p\n Out: %p\n", CPIns, RTIns, constant, triangle, output);
+
         int CPindex = 0;
 
         clearMem(CPIns, CPInsSize);
@@ -133,6 +147,10 @@ int main(int argc, char *argv[])
         clearMem(triangle, triangleSize);
         clearMem(output, OUTPUT_SIZE * 4);
 
+        // cp.read(CPIns, CPInsFileSize);
+        // rt.read(RTIns, RTInsFileSize);
+        // con.read(constant, constantFileSize);
+        // triangle.read(triangle, triangleFileSize);
         readFile(CPIns, cp);
         readFile(RTIns, rt);
         readFile(constant, con);
@@ -140,10 +158,10 @@ int main(int argc, char *argv[])
 
         // Inform the FPGA of the starting read and write address of the arrays.
         afu.write(LOAD, (uint64_t)CPIns);
-        afu.write(LOAD | ((RTInsSize / AFU::CL_BYTES) << 1), (uint64_t)RTIns);
-        afu.write(LOAD | ((constantSize / AFU::CL_BYTES) << 1), (uint64_t)constant);
-        afu.write(LOAD | ((triangleSize / AFU::CL_BYTES) << 1), (uint64_t)triangle);
-        afu.write(0, (uint64_t)output);
+        afu.write(LOAD | ((RTInsSize / AFU::CL_BYTES) << 2), (uint64_t)RTIns);
+        afu.write(LOAD | ((constantSize / AFU::CL_BYTES) << 2), (uint64_t)constant);
+        afu.write(LOAD | ((triangleSize / AFU::CL_BYTES) << 2), (uint64_t)triangle);
+        afu.write(80, (uint64_t)output);
         // The FPGA DMA only handles cache-line transfers, so we need to convert
         // the array size to cache lines.
 
@@ -152,36 +170,33 @@ int main(int argc, char *argv[])
         {
             while (true)
             {
-                auto ret = afu.read(0);
+                auto ret = afu.read(80);
+                printf("%d\n", ret);
                 if (ret == 0)
                 {
-                #ifdef SLEEP_WHILE_WAITING
+#ifdef SLEEP_WHILE_WAITING
                     this_thread::sleep_for(chrono::milliseconds(SLEEP_MS));
-                #endif
+#endif
                     continue;
                 }
                 else if (ret == 1)
                 {
+                    printf("get\n");
                     getOutput(output, out);
-                    afu.write(1, 0);
+                    afu.write(2, 0);
+                    printf("haha\n");
+                    break;
                 }
                 else
+                {
+                    printf("break\n");
                     break;
+                }
             }
-            CPindex += 65536 * 4; // to next CP patch, 65536 * 4 bytes
-            CPIns += 65536 * 4;
-            if (CPindex < CPInsSize)
-            {
-                afu.write(LOAD, (uint64_t)CPIns);
-                afu.write(0, (uint64_t)RTIns);
-                afu.write(0, (uint64_t)constant);
-                afu.write(0, (uint64_t)triangle);
-                afu.write(0, (uint64_t)output);
-            }
-            else
-                break;
+            break;
         }
 
+        printf("stop\n");
         // Free the allocated memory.
         afu.free(CPIns);
         afu.free(RTIns);
