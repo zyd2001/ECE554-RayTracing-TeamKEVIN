@@ -86,6 +86,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
         we_index = 1'b0;
         we_vertex = 1'b0;
         rdy_MC_index = 1'b0;
+        rdy_MC_vertex_in = 1'b0;
         rdy_ic = 1'b0;
         index_cnt = index_cnt_reg;
         mc_addr_cnt = mc_addr_cnt_reg;
