@@ -60,7 +60,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC, rdy
     logic start_mc_write;
     logic rdy_MC_vertex, rdy_MC_vertex_in, rdy_MC_index;
     assign not_valid_IC_in = (triangle_id > valid_triangle_max_reg) && re_IC;
-    assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index) && (state != mc_wr_done) 
+    assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index) && (state != mc_wr_done))
                         && (|data_MC[127:96]);
     assign rdy_MC = rdy_MC_index | rdy_MC_vertex;
     always_ff @(posedge clk, negedge rst_n) begin
