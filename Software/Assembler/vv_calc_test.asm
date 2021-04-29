@@ -1,3 +1,4 @@
+DON'T USE TEST RIGHT NOW, USES CMP_V WHICH NO LONGER EXISTS
 start:
     s_write_high r1 0
     s_write_low r1 1

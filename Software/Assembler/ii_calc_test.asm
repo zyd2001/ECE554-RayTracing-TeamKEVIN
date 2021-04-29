@@ -7,7 +7,7 @@ start:
     cmp_i r1 r2
     bne wrong1
     ii_subi r1 r1 1
-    s_write_low r2 1
+    s_write_low r2 0
     cmp_i r1 r2
     bne wrong2
     s_write_low r1 8
