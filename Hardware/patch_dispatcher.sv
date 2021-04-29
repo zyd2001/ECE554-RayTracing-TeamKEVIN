@@ -10,6 +10,7 @@ module patch_dispatcher
         input rst_n,
 
         input load_cp,
+        input load_done_cp,
         input [31:0] pixel_id_cp,
 
         input task_done_rt[NUM_RT-1:0],
@@ -46,6 +47,7 @@ module patch_dispatcher
 
     genvar i;
     integer j = 0;
+    integer k = 0;
 
 
     logic [BIT_THREAD:0] job_done;
@@ -129,7 +131,7 @@ module patch_dispatcher
                 end
             end
             default: begin
-               if (pixel_id_addr[BIT_THREAD] == 1'h1) begin
+               if (load_done_cp) begin
                    nxt_state_load = LOAD_IDLE;
                    pixel_id_addr_clr = 1'h1;
                end 
@@ -170,9 +172,9 @@ module patch_dispatcher
     
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
-            for (j = 0; j < NUM_THREAD; j = j + 1) begin
-                pc[j] <= 32'h0;
-                sp[j] <= 32'h0;
+            for (k = 0; k < NUM_THREAD; k = k + 1) begin
+                pc[k] <= 32'h0;
+                sp[k] <= 32'h0;
             end
         end
         else if (en_q_tid_rt2ic) begin

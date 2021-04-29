@@ -12,6 +12,7 @@ module mem_controller
         output [127:0] data_128,
         output reg cp_strt,
         output reg re_main,
+        output wr_out_done,
         output [31:0] addr_main[3:0],
         output reg term
         );
@@ -614,5 +615,7 @@ module mem_controller
             end
         endcase
     end
+
+    assign wr_out_done = dma_wr_done;
 
 endmodule
