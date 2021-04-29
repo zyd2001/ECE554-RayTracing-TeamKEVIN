@@ -23,7 +23,7 @@ module Register_file (
     // Scalar Block
     always @(posedge clk) begin
         if (scalar_wen)
-            scalar_ram[scalar_wb_address] <= scalar_wb_data;
+            scalar_ram[scalar_wb_address] = scalar_wb_data;
         scalar_read1 <= scalar_read_address1 == 5'h00 ? 32'h0 : scalar_ram[scalar_read_address1];
         scalar_read2 <= scalar_read_address2 == 5'h00 ? 32'h0 : scalar_ram[scalar_read_address2];
     end
@@ -31,7 +31,7 @@ module Register_file (
     // Vector Block
     always @(posedge clk) begin
         if (vector_wen)
-            vector_ram[vector_wb_address] <= vector_wb_data;
+            vector_ram[vector_wb_address] = vector_wb_data;
         vector_read1 <= vector_read_address1 == 4'h00 ? 128'h0 :vector_ram[vector_read_address1];
         vector_read2 <= vector_read_address2 == 4'h00 ? 128'h0 : vector_ram[vector_read_address2];
     end

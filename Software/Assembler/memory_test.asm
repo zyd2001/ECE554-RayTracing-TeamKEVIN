@@ -1,5 +1,5 @@
 start:
-    s_write_high r1 0
+    s_write_high r1 32768
     s_write_low r1 20
     s_write_high r2 0
     s_write_low r2 5

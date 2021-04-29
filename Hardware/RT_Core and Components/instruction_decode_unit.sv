@@ -79,7 +79,7 @@ module instruction_decode_unit (
         update_float_flag = 1'b0;
         update_int_flag = 1'b0;
         context_switch = 1'b0;
-        if (opcode[5:3] == 3'b011 | opcode[5:2] == 3'b0011) intALU_op2_select = 1'b0; // only Int int will use scalar 2
+        if (opcode[5:3] == 3'b011 | opcode[5:2] == 4'b0011) intALU_op2_select = 1'b0; // only Int int will use scalar 2
         
         // float float, sqrt, v get from s 
         if (opcode[5:3] == 3'b010 | opcode[5:0] == 6'b100110 
@@ -88,14 +88,14 @@ module instruction_decode_unit (
         // reduce, VF and FF
         if (opcode[5:0] == 6'b100100) 
             floatALU1_op2_select = 2'b10;
-        else if (opcode[5:3] == 3'b010 | opcode[5:3] == 6'b001)
+        else if (opcode[5:3] == 3'b010 | opcode[5:3] == 3'b001)
             floatALU1_op2_select = 2'b01; 
 
         // v get from s 
         if (opcode[5:0] == 6'b100111 & immediate == 2'b01)
             floatALU2_op1_select = 1'b1; 
         // VF and FF
-        if ( opcode[5:3] == 6'b001)
+        if ( opcode[5:3] == 3'b001)
             floatALU2_op2_select = 1'b1; 
         
         // v get from s 
@@ -103,23 +103,23 @@ module instruction_decode_unit (
             floatALU3_op1_select = 1'b1; 
         // reduce, VF and FF
         if (opcode[5:0] == 6'b100100) 
-            floatALU1_op2_select = 2'b10;
-        else if (opcode[5:3] == 6'b001)
+            floatALU3_op2_select = 2'b10;
+        else if (opcode[5:3] == 3'b001)
             floatALU3_op2_select = 2'b01; 
 
         // v get from s 
         if (opcode[5:0] == 6'b100111 & immediate == 2'b11)
             floatALU4_op1_select = 1'b1; 
         // VF and FF
-        if (opcode[5:3] == 6'b001)
+        if (opcode[5:3] == 3'b001)
             floatALU4_op2_select = 1'b1; 
 
         // NAOX, ASMD, Special, Memory, ASMD + imm, Memory
-        if (opcode[5:2] == 4'b0011 | opcode[5:3] == 4'b011 | opcode[5:2] == 4'b1000 | opcode[5:3] == 3'b101 | opcode[5:2] == 4'b1111)
+        if (opcode[5:2] == 4'b0011 | opcode[5:3] == 3'b011 | opcode[5:2] == 4'b1000 | opcode[5:3] == 3'b101 | opcode[5:2] == 4'b1111)
             intALU_en =  1'b1;
 
         // VV, VF, FF, V_special
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:3] == 3'b010 | opcode[5:2] == 3'b1001)
+        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:3] == 3'b010 | opcode[5:2] == 4'b1001)
             floatALU1_en = 1'b1;
 
         // VV, VF
@@ -127,7 +127,7 @@ module instruction_decode_unit (
             floatALU2_en = 1'b1;
 
         // VV, VF, reduce
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 3'b100100 | opcode[5:0] == 6'b100111)
+        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 6'b100100 | opcode[5:0] == 6'b100111)
             floatALU3_en = 1'b1;
 
         // VV, VF
