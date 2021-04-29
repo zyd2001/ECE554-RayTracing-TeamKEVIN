@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 rta.json
 
 C:${FPGA_BBB_CCI_SRC}/BBB_cci_mpf/hw/rtl/cci_mpf_sources.txt
@@ -22,12 +21,3 @@ mem_triangle.sv
 memory_map.sv
 
 QI:rta.qsf
-=======
-top_test.json
-
-mem_main.sv
-ram.sv
-top_test.sv
-ccip_std_afu.sv
-ccip_interface_reg.sv
->>>>>>> origin/RT-50_IC
