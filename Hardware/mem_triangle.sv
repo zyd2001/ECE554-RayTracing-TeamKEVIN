@@ -1,5 +1,5 @@
-module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC, rdy_MC,
-                rdy_IC, not_valid_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
+module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC, 
+                rdy_MC, rdy_IC, not_valid_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
 
     parameter NUM_TRIANGLE = 512;
     localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
@@ -246,11 +246,15 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC, rdy
             end
             rd_done: begin
                 // if prefetching a wrong triangle, restart
-                if(re_IC && is_prefetching_reg && !prefetch_match) begin
+                if(re_IC && !prefetch_match) begin
                     next = rd_0;
                     prefetch_triangle_id = triangle_id;
                 end
                 else begin
+                    if (re_IC && prefetch_match) begin
+                        out_prefetched_data = 1'b1;
+                        rdy_ic = 1'b1;
+                    end
                     next = idle;
                     // write sid to buffer
                     sid_buff_en = 1'b1;
