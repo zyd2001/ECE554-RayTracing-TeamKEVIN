@@ -155,7 +155,6 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                         mc_addr_cnt = '0;
                         index_cnt = '0;
                         valid_triangle_max = mc_addr_cnt_reg >> 2;
-                        rdy_MC_vertex_in = 1'b1;
                         next = mc_wr_vertex;
                     end
                 end
