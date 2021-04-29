@@ -31,8 +31,8 @@ module mem_controller_dma_rd_32
             mem_wr_data_32_cnt <= mem_wr_data_32_cnt + 5'h1;
     end
     
-    typedef enum reg [2:0] {DMA_RD_32_IDLE, DMA_RD_32_GO, DMA_RD_32_WAIT, DMA_RD_32_HOLD, 
-                            DMA_RD_32_LOAD} t_state_dma_rd_32;
+    typedef enum reg [2:0] {DMA_RD_32_IDLE, DMA_RD_32_GO, DMA_RD_32_WAIT, DMA_RD_32_HOLD
+                            ,DMA_RD_32_EMPTY, DMA_RD_32_LOAD} t_state_dma_rd_32;
     t_state_dma_rd_32 state_dma_rd_32, nxt_state_dma_rd_32;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
@@ -69,11 +69,14 @@ module mem_controller_dma_rd_32
                     dma_rd_done_clr_32 = 1'h1;
                 end
                 else if (!dma_empty) begin
-                    nxt_state_dma_rd_32 = DMA_RD_32_HOLD;
-                    dma_rd_data_32_upd = 1'h1;
+                    nxt_state_dma_rd_32 = DMA_RD_32_EMPTY;
                 end
                 else
                     nxt_state_dma_rd_32 = DMA_RD_32_WAIT;
+            end
+            DMA_RD_32_EMPTY: begin
+                nxt_state_dma_rd_32 = DMA_RD_32_HOLD;
+                dma_rd_data_32_upd = 1'h1;
             end
             DMA_RD_32_HOLD: begin
                 nxt_state_dma_rd_32 = DMA_RD_32_LOAD;
