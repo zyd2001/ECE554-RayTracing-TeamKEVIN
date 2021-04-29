@@ -1,14 +1,26 @@
 module itof (
-    in, out, clk, en, done, rst_n
+    in_in, out, clk, en, done, rst_n
 );
     input clk, en, rst_n;
-    input signed [31:0] in;
+    input signed [31:0] in_in;
     output logic [31:0] out; 
     output logic done;
 
     shortreal out_float;
     int in_integer;
+    reg [31:0] in_stored;
+    logic [31:0] in;
 
+    assign in = en ? in_in : in_stored;
+    
+    always_ff @( posedge clk, negedge rst_n ) begin : Pipeline_simulation  
+        if (!rst_n) begin
+            in_stored <= 32'b0;
+        end
+        else if (en) begin
+            in_stored <= in_in;
+        end
+    end
     reg [2:0] counter, next_counter; 
 
     always_comb begin 

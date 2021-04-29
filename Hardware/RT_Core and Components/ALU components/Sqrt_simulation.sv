@@ -1,13 +1,27 @@
 module Sqrt (
-    in, out, clk, en, done, rst_n
+    in_in, out, clk, en, done, rst_n
 );
     input clk, en, rst_n;
-    input [31:0] in;
+    input [31:0] in_in;
     output logic [31:0] out;
     output logic done;
     
     shortreal in_float, out_float;
     reg [4:0] counter, next_counter; 
+
+    reg [31:0] in_stored;
+    logic [31:0] in;
+
+    assign in = en ? in_in : in_stored;
+    
+    always_ff @( posedge clk, negedge rst_n ) begin : Pipeline_simulation  
+        if (!rst_n) begin
+            in_stored <= 32'b0;
+        end
+        else if (en) begin
+            in_stored <= in_in;
+        end
+    end
 
     always_comb begin
         in_float = $bitstoshortreal(in);

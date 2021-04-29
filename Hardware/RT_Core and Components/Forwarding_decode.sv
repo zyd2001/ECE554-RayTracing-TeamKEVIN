@@ -22,12 +22,18 @@ module Forwarding_decode (
     // and their data will be ready in MEM stage, we stall
     always_comb begin : memory_address_stall
         DE_stall = 1'b0;
-        if (DE_EX_MEM_read || DE_EX_V_reduce)
-            if (DE_S1_address == DE_EX_Swb_address || DE_S2_address == DE_EX_Swb_address)
+        if (DE_EX_MEM_read || DE_EX_V_reduce) begin
+            if (DE_S1_address == DE_EX_Swb_address && DE_EX_Swb_address != 5'b0)
                 DE_stall = 1'b1;
-        if (DE_EX_MEM_read)
-            if (DE_V1_address == DE_EX_Vwb_address || DE_V2_address == DE_EX_Vwb_address)
+            if (DE_S2_address == DE_EX_Swb_address && DE_EX_Swb_address != 5'b0) 
                 DE_stall = 1'b1;
+        end
+        if (DE_EX_MEM_read) begin
+            if (DE_V1_address == DE_EX_Vwb_address && DE_EX_Vwb_address != 4'b0)
+                DE_stall = 1'b1;
+            if (DE_V2_address == DE_EX_Vwb_address && DE_EX_Vwb_address != 4'b0)
+                DE_stall = 1'b1;
+        end
     end
 
     // By pass the write back value to

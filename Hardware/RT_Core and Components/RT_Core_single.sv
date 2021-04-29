@@ -173,6 +173,7 @@ module RT_core_single (
     logic [31:0] EX_MEM_s_out, EX_MEM_memory_data; // Address and data
     // control
     logic [2:0] EX_MEM_memory_op; 
+    logic [2:0] EX_MEM_memory_op_stay;
     logic EX_MEM_vector_reduce_en;
     logic EX_MEM_FIN, EX_MEM_context_switch;
 
@@ -277,6 +278,7 @@ module RT_core_single (
                 if (IF_next_pc_select != 2'b00) begin
                     IF_DE_instruction <= 32'h30000000;
                     IF_DE_current_PC_plus_four <= 32'h0000;
+                    IF_DE_current_PC <= PC_reg;
                     IF_DE_FIN <= 1'b0;
                 end else begin
                     IF_DE_FIN <= IF_FIN;
@@ -480,7 +482,7 @@ module RT_core_single (
                 DE_EX_update_int_flag <= DE_update_int_flag;
                 DE_EX_update_float_flag <= DE_update_float_flag;
                 // Int and float opcode is special designed 
-                DE_EX_integer_ALU_opcode <= {IF_DE_instruction[31:28] == 4'b1000 ? 1'b1:1'b0, IF_DE_instruction[30:28] == 3'b011 ? 1'b1 : 1'b0, IF_DE_instruction[27:26]};
+                DE_EX_integer_ALU_opcode <= {IF_DE_instruction[31:28] == 4'b1000 ? 1'b1:1'b0, IF_DE_instruction[31:28] == 4'b0011 ? 1'b1 : 1'b0, IF_DE_instruction[27:26]};
                 // memory needs integer ALU to do multiply
                 if (IF_DE_instruction[31] == 1'b1 && IF_DE_instruction[29:28] == 2'b11)
                     DE_EX_integer_ALU_opcode[1:0] <= 2'b0;
@@ -587,7 +589,7 @@ module RT_core_single (
         else if (DE_EX_S2_address == MEM_WB_Swb_address && DE_EX_S2_address != 5'b0)
             EX_forwarded_scalar2 = MEM_WB_scalar;
         else
-            EX_forwarded_scalar2 = DE_EX_scalar1;
+            EX_forwarded_scalar2 = DE_EX_scalar2;
 
         if (DE_EX_V1_address == EX_MEM_Vwb_address && DE_EX_V1_address != 4'b0) 
             EX_forwarded_vector1 = EX_MEM_v_out;
@@ -695,7 +697,7 @@ module RT_core_single (
 	logic [31:0] DEBUG_EX_MEM_RF_readS2;
 	logic [127:0] DEBUG_EX_MEM_RF_readV1;
 	logic [127:0] DEBUG_EX_MEM_RF_readV2;
-    logic [2:0] DEBUG_EX_MEM_op;
+    
 
     always_ff @( posedge clk, negedge rst_n ) begin : Debug_EX_MEM_pipeline
         if (!rst_n) begin 
@@ -733,7 +735,7 @@ module RT_core_single (
         end
         else begin
             if (!MEM_busy) begin
-                EX_MEM_memory_data <= DE_EX_scalar2;
+                EX_MEM_memory_data <= EX_forwarded_scalar2;
                 EX_MEM_v_out <= {EX_float_ALU4_out, EX_float_ALU3_out, EX_float_ALU2_out, EX_float_ALU1_out};
                 if (DE_EX_Scalar_out_select[2] == 1'b0)
                     EX_MEM_s_out <= EX_integer_ALU_out;
@@ -768,7 +770,7 @@ module RT_core_single (
     always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_control_pipeline
         if (!rst_n) begin
             EX_MEM_memory_op <= 3'b0;
-            DEBUG_EX_MEM_op <= 3'b0;
+            EX_MEM_memory_op_stay <= 3'b0;
             EX_MEM_vector_reduce_en <= 1'b0;
             EX_MEM_FIN <= 1'b1;
             EX_MEM_context_switch <= 1'b0;
@@ -790,7 +792,7 @@ module RT_core_single (
                 EX_MEM_memory_op <= 3'b0;
 
             if (!MEM_busy)
-                DEBUG_EX_MEM_op <= DE_EX_memory_op;
+                EX_MEM_memory_op_stay <= DE_EX_memory_op;
 
             if (!MEM_busy)
                 EX_MEM_vector_reduce_en <= (EX_busy || DE_EX_FIN) == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
@@ -803,17 +805,17 @@ module RT_core_single (
     // MEM Stage
     ////////////////////////// 
     
-    assign MEM_address_bypass = MEM_busy ? EX_MEM_s_out : EX_integer_ALU_out;
+    // assign MEM_address_bypass = EX_MEM_s_out[31:29] == 3'b100 ? EX_MEM_s_out : EX_integer_ALU_out;
     assign MEM_knockdown = EX_MEM_memory_op[2];
     assign MEM_v_reduce_knockdown = EX_MEM_vector_reduce_en;
     
-    assign MEM_addr = MEM_address_bypass;
+    assign MEM_addr = EX_MEM_s_out;
     assign MEM_data_write = EX_MEM_memory_op[0] == 1'b1 ? MEM_forwarded_v_data : {96'b0, MEM_forwarded_s_data};
 
     assign MEM_read_en = EX_MEM_memory_op[2:1] == 2'b10;
     assign MEM_write_en = EX_MEM_memory_op[2:1] == 2'b11;
 
-    FPU Reduce_adder(.op1(EX_MEM_v_out[31:0]), .op2(EX_MEM_v_out[95:64]), .operation(2'b00), .out(MEM_reduce_out), .en(EX_MEM_vector_reduce_en), 
+    FPU Reduce_adder(.op1_in(EX_MEM_v_out[31:0]), .op2_in(EX_MEM_v_out[95:64]), .operation(2'b00), .out(MEM_reduce_out), .en(EX_MEM_vector_reduce_en), 
         .clk(clk), .rst_n(rst_n), .done(MEM_V_reduce_done), .flag());
 
     always_ff @( posedge clk, negedge rst_n ) begin : MEM_waiting_update_state     
@@ -828,11 +830,16 @@ module RT_core_single (
         MEM_next_state = MEM_current_state;
         case (MEM_current_state)
             idle: begin
-                // Only reading Main memory need the waiting
-                if (EX_MEM_memory_op[2:1] == 2'b10 && EX_MEM_s_out[31:28] == 3'b100 && ~MEM_done) begin
+                // Reading Main memory need the waiting
+                if (EX_MEM_memory_op[2:1] == 2'b10 && EX_MEM_s_out[31:29] == 3'b100 && ~MEM_done) begin
                     MEM_next_state = waiting_int_MEM;
                     MEM_busy = 1'b1;
+                end 
+                // Reading constant memory need two cycles
+                else if (EX_MEM_memory_op[2:1] == 2'b10 && EX_MEM_s_out[31:29] == 3'b010) begin
+                    MEM_busy = 1'b1;
                 end
+                
                 if (EX_MEM_vector_reduce_en && ~MEM_V_reduce_done) begin
                     MEM_next_state = waiting_float;
                     MEM_busy = 1'b1;
@@ -859,7 +866,7 @@ module RT_core_single (
         if (EX_MEM_S_data_address == MEM_WB_Swb_address && EX_MEM_S_data_address != 5'b0) 
             MEM_forwarded_s_data = MEM_WB_scalar;
         else 
-            MEM_forwarded_s_data = EX_MEM_s_out;
+            MEM_forwarded_s_data = EX_MEM_memory_data;
 
         if (EX_MEM_V_data_address == MEM_WB_Vwb_address && EX_MEM_V_data_address != 4'b0) 
             MEM_forwarded_v_data = MEM_WB_vector;
@@ -891,11 +898,11 @@ module RT_core_single (
             MEM_WB_Swb_address <= MEM_busy ? 5'b0 : EX_MEM_Swb_address;
             MEM_WB_Vwb_address <= MEM_busy ? 4'b0 :EX_MEM_Vwb_address;
 
-            if (EX_MEM_memory_op == 3'b101) 
+            if (EX_MEM_memory_op_stay == 3'b101) 
                 MEM_WB_vector <= MEM_data_read;
             else MEM_WB_vector <= EX_MEM_v_out;
 
-            if (EX_MEM_memory_op == 3'b100) 
+            if (EX_MEM_memory_op_stay == 3'b100) 
                 MEM_WB_scalar <= MEM_data_read[31:0];
             else if (EX_MEM_vector_reduce_en) 
                 MEM_WB_scalar <= MEM_reduce_out;
@@ -947,8 +954,8 @@ module RT_core_single (
             DEBUG_MEM_WB_RF_readV1 <= DEBUG_EX_MEM_RF_readV1;
             DEBUG_MEM_WB_RF_readV2 <= DEBUG_EX_MEM_RF_readV2;
             DEBUG_MEM_WB_memory_address <= MEM_addr;
-            DEBUG_MEM_WB_memory_R_enable <= DEBUG_EX_MEM_op[2:1] == 2'b10;
-            DEBUG_MEM_WB_memory_W_enable <= DEBUG_EX_MEM_op[2:1] == 2'b11;
+            DEBUG_MEM_WB_memory_R_enable <= EX_MEM_memory_op_stay[2:1] == 2'b10;
+            DEBUG_MEM_WB_memory_W_enable <= EX_MEM_memory_op_stay[2:1] == 2'b11;
             DEBUG_MEM_WB_memory_R_data <= MEM_data_read;
             DEBUG_MEM_WB_memory_W_data <= MEM_data_write;
         end

@@ -90,8 +90,8 @@ module RT_Core_single_tb();
 	single_port_ram_inst #(.ADDR_WIDTH(9), .DATA_WIDTH(32)) inst_mem(.clk(clk), .addr(inst_address), .q(mem_inst_out), .we(1'b0), .data(32'b0));
 	single_port_ram_const #(.ADDR_WIDTH(9), .DATA_WIDTH(32)) const_mem(.clk(clk), .addr(const_address), .q(mem_const_out), .we(1'b0), .data(32'b0));
 
-	mem_main #(.NUM_RT(4), .NUM_THREAD(4)) main_mem(.clk(clk), .rst_n(rst_n), .we_RT(we_RT), .re_RT(re_RT), .addr_RT(addr_RT), 
-		.data_RT_in(data_RT_in), .data_RT_out(data_RT_out), .rd_rdy_RT(rd_rdy_RT));
+	mem_main #(.NUM_RT(4), .NUM_THREAD(32)) main_mem(.clk(clk), .rst_n(rst_n), .we(we_RT), .re(re_RT), .addr(addr_RT), 
+		.data_in(data_RT_in), .data_out(data_RT_out), .rd_rdy(rd_rdy_RT));
 	
 	RT_core_single rt_core(.clk(clk), .rst_n(rst_n),
 		.kernel_mode(kernel_mode), .End_program(End_program), .Context_switch(Context_switch),
@@ -130,7 +130,24 @@ module RT_Core_single_tb();
 		clk = 0;
 		clk_cnt = 0;
 		rst_n = 0;
+
+		we_RT[1] = 0;
+		we_RT[2] = 0;
+		we_RT[3] = 0;
+
+		re_RT[1] = 0;
+		re_RT[2] = 0;
+		re_RT[3] = 0;
+
+		addr_RT[1] = 32'b0;
+		addr_RT[2] = 32'b0;
+		addr_RT[3] = 32'b0;
+
+		data_RT_in[1] = 128'b0;
+		data_RT_in[2] = 128'b0;
+		data_RT_in[3] = 128'b0;
 		
+
 		kernel_mode = 1;
 		PD_scalar_wen = 0;
 		PD_vector_wen = 0;
