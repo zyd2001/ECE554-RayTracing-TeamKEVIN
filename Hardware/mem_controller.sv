@@ -144,7 +144,7 @@ module mem_controller
 
         case(state_mmio)
             CP_M: begin   
-                if (mmio.wr_en && !mmio.wr_addr[1] && !mmio_system) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && mmio.wr_addr[15]) begin
                     nxt_state_mmio = RT_M;
                     dma_rd_upd_cp = 1'b1;
                 end
