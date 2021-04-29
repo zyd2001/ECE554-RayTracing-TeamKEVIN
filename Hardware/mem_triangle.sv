@@ -57,8 +57,10 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     logic unsigned [BIT_TRIANGLE-1:0] valid_triangle_max_reg, valid_triangle_max;
     // state machine
     logic start_mc_write;
+    logic rdy_MC_vertex, rdy_MC_vertex_in, rdy_MC_index;
     assign not_valid_IC_in = (triangle_id > valid_triangle_max_reg) && re_IC;
     assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index));
+    assign rdy_MC = rdy_MC_index | rdy_MC_vertex;
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
             state <= idle;
@@ -67,6 +69,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
             out_prefetched_data_reg <= 1'b0;
             valid_triangle_max_reg <= 1'b0;
             not_valid_IC <= 1'b0;
+            rdy_MC_vertex <= 1'b0;
         end
         else begin
             state <= start_mc_write ? mc_wr_index : not_valid_IC_in ? idle : next;
@@ -75,13 +78,14 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
             rdy_ic_reg <= not_valid_IC_in ? '0 : rdy_ic;
             valid_triangle_max_reg <= valid_triangle_max;
             not_valid_IC <= not_valid_IC_in;
+            rdy_MC_vertex <= rdy_MC_vertex_in;
         end
     end
     always_comb begin
         next = state;
         we_index = 1'b0;
         we_vertex = 1'b0;
-        rdy_MC = 1'b0;
+        rdy_MC_index = 1'b0;
         rdy_ic = 1'b0;
         index_cnt = index_cnt_reg;
         mc_addr_cnt = mc_addr_cnt_reg;
@@ -126,7 +130,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     end
                     mc_addr_cnt = mc_addr_cnt_reg + 1;
                     // en_MC should arrive this cycle and clear counter
-                    rdy_MC = 1'b1;
+                    rdy_MC_index = 1'b1;
                     we_index = 1'b1;
                     index_data_in = mc_data[127:96];
                     // zero income id: switch
@@ -140,7 +144,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 else if (index_cnt_reg == 4) begin
                     index_cnt = index_cnt_reg;
                     // en_MC should arrive this cycle and clear counter
-                    rdy_MC = 1'b1;
+                    rdy_MC_index = 1'b1;
                     if(we_MC) begin
                         index_cnt = '0;
                     end
@@ -159,13 +163,13 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     if(~(|data_MC[127:96])) begin
                         next = idle;
                         prefetch_triangle_id = -1;
-                        rdy_MC = 1'b1;
+                        rdy_MC_vertex_in = 1'b1;
                     end
                     else begin
                         vertex_addr_in = mc_addr_cnt_reg;
                         mc_addr_cnt = mc_addr_cnt_reg + 1;  
                         we_vertex = 1'b1;
-                        rdy_MC = 1'b1;
+                        rdy_MC_vertex_in = 1'b1;
                     end                    
                 end
             end
