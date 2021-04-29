@@ -10,6 +10,7 @@ module mem_controller
         output reg [1:0] we_mem[3:0],
         output [31:0] data_32,
         output [127:0] data_128,
+        output reg cp_strt,
         output reg re_main,
         output [31:0] addr_main[3:0],
         output reg term
@@ -139,13 +140,13 @@ module mem_controller
 
         case(state_mmio)
             CP_M: begin   
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio.wr_addr[10]) begin
                     nxt_state_mmio = RT_M;
                     dma_rd_upd_cp = 1'b1;
                 end
             end
             RT_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio.wr_addr[10]) begin
                     nxt_state_mmio = CONST_M;
                     dma_rd_upd_rt = 1'b1;
                 end
@@ -153,7 +154,7 @@ module mem_controller
                     nxt_state_mmio = RT_M;
             end
             CONST_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio.wr_addr[10]) begin
                     nxt_state_mmio = TRI_M;
                     dma_rd_upd_const = 1'b1;
                 end
@@ -161,7 +162,7 @@ module mem_controller
                     nxt_state_mmio = CONST_M;
             end
             TRI_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio.wr_addr[10]) begin
                     nxt_state_mmio = OUT_M;
                     dma_rd_upd_tri = 1'b1;
                 end
@@ -169,7 +170,7 @@ module mem_controller
                     nxt_state_mmio = TRI_M;
             end
             default: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio.wr_addr[10]) begin
                     dma_wr_upd = 1'b1;
                     dma_rd_strt = 1'h1;
                 end
@@ -312,7 +313,7 @@ module mem_controller
         if (!rst_n) 
             dma_patch_size <= 0;
         else if (dma_rd_data_32_shft_cp)
-            dma_patch_size <= dma_rd_data_32 / 32;
+            dma_patch_size <= dma_rd_data_32[0] / 32;
     end
 
 
@@ -375,6 +376,8 @@ module mem_controller
         dma_rd_strt_const = 1'h0;
         dma_rd_strt_tri = 1'h0;
 
+        cp_strt = 1'h0;
+
         case(state_dma_rd)
             DMA_RD_IDLE: begin
                 if (dma_rd_strt)
@@ -414,6 +417,7 @@ module mem_controller
             default: begin
                 if (dma_rd_req_tri && dma_rd_end_tri) begin
                     nxt_state_dma_rd = DMA_RD_IDLE;
+                    cp_strt = 1'h1;
                 end
                 else if (dma_rd_req_tri) begin
                     nxt_state_dma_rd = DMA_RD_TRI;
