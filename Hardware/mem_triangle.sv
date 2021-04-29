@@ -1,4 +1,4 @@
-module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
+module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC, rdy_MC,
                 rdy_IC, not_valid_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
 
     parameter NUM_TRIANGLE = 512;
@@ -15,6 +15,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     // MC
     input [127:0] data_MC; // (sid vertex2 vertex1 vertex0) or (flag z y x)
     input we_MC;
+    input done_MC;
     /*
         Output
     */
@@ -29,7 +30,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     // Generate variable
     genvar i;
 
-    enum {idle, mc_wr_index, mc_wr_vertex, rd_0, rd_1, rd_2, rd_sid, rd_done} state, next;
+    enum {idle, mc_wr_index, mc_wr_vertex, mc_wr_done, rd_0, rd_1, rd_2, rd_sid, rd_done} state, next;
 
     // input buffer signal for index wr
     logic [127:0] mc_data;
@@ -59,7 +60,8 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
     logic start_mc_write;
     logic rdy_MC_vertex, rdy_MC_vertex_in, rdy_MC_index;
     assign not_valid_IC_in = (triangle_id > valid_triangle_max_reg) && re_IC;
-    assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index) && (|data_MC[127:96]));
+    assign start_mc_write = (we_MC && (state != mc_wr_vertex) && (state != mc_wr_index) 
+                        && (|data_MC[127:96]) && (state != mc_wr_done));
     assign rdy_MC = rdy_MC_index | rdy_MC_vertex;
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
@@ -164,7 +166,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 if(we_MC) begin
                     // zero id: end
                     if(~(|data_MC[127:96])) begin
-                        next = idle;
+                        next = mc_wr_done;
                         prefetch_triangle_id = -1;
                         rdy_MC_vertex_in = 1'b1;
                     end
@@ -174,6 +176,14 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                         we_vertex = 1'b1;
                         rdy_MC_vertex_in = 1'b1;
                     end                    
+                end
+            end
+            mc_wr_done: begin
+                if(we_MC) begin
+                    rdy_MC_vertex_in = 1'b1;
+                    if(done_MC) begin
+                        next = idle;
+                    end
                 end
             end
             rd_0: begin
