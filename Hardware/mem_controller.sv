@@ -64,7 +64,7 @@ module mem_controller
         end
         else if (dma_rd_upd_rt) begin
             dma_rd_addr_rt <= mmio.wr_data;
-            dma_rd_size_rt <= {{29'h0}, mmio.wr_addr[14:1]};
+            dma_rd_size_rt <= {{30'h0}, mmio.wr_addr[14:2]};
             dma_rd_req_rt <= mmio.wr_addr[15];
             
         end  
@@ -83,7 +83,7 @@ module mem_controller
         end
         else if (dma_rd_upd_const) begin
             dma_rd_addr_const <= mmio.wr_data;
-            dma_rd_size_const <= {{29'h0}, mmio.wr_addr[14:1]};
+            dma_rd_size_const <= {{30'h0}, mmio.wr_addr[14:2]};
             dma_rd_req_const <= mmio.wr_addr[15];
         end  
     end
@@ -101,7 +101,7 @@ module mem_controller
         end
         else if (dma_rd_upd_tri) begin
             dma_rd_addr_tri <= mmio.wr_data;
-            dma_rd_size_tri <= {{29'h0}, mmio.wr_addr[14:1]};
+            dma_rd_size_tri <= {{30'h0}, mmio.wr_addr[14:2]};
             dma_rd_req_tri <= mmio.wr_addr[15];
         end  
     end
@@ -144,13 +144,13 @@ module mem_controller
 
         case(state_mmio)
             CP_M: begin   
-                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio_system) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && !mmio_system) begin
                     nxt_state_mmio = RT_M;
                     dma_rd_upd_cp = 1'b1;
                 end
             end
             RT_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio_system) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && !mmio_system) begin
                     nxt_state_mmio = CONST_M;
                     dma_rd_upd_rt = 1'b1;
                 end
@@ -158,7 +158,7 @@ module mem_controller
                     nxt_state_mmio = RT_M;
             end
             CONST_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio_system) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && !mmio_system) begin
                     nxt_state_mmio = TRI_M;
                     dma_rd_upd_const = 1'b1;
                 end
@@ -166,7 +166,7 @@ module mem_controller
                     nxt_state_mmio = CONST_M;
             end
             TRI_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio_system) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && !mmio_system) begin
                     nxt_state_mmio = OUT_M;
                     dma_rd_upd_tri = 1'b1;
                 end
@@ -174,7 +174,7 @@ module mem_controller
                     nxt_state_mmio = TRI_M;
             end
             default: begin
-                if (mmio.wr_en && !mmio.wr_addr[0] && !mmio_system) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && !mmio_system) begin
                     dma_wr_upd = 1'b1;
                     dma_rd_strt = 1'h1;
                 end
@@ -458,7 +458,7 @@ module mem_controller
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
             mmio_rd_data <= 64'h0;
-        else if (mmio.wr_en && mmio.wr_addr[0] && mmio_system)
+        else if (mmio.wr_en && mmio.wr_addr[1] && !mmio_system)
             mmio_rd_data <= 64'h0;
         else if (term)
             mmio_rd_data <= 64'h2;
