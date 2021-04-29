@@ -135,10 +135,11 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     we_index = 1'b1;
                     index_data_in = mc_data[127:96];
                     // zero income id: switch
-                    if(~(|data_MC[127:96])) begin
+                    if(~(|data_MC[127:96]) & we_MC) begin
                         mc_addr_cnt = '0;
                         index_cnt = '0;
                         valid_triangle_max = mc_addr_cnt_reg >> 2;
+                        rdy_MC_vertex_in = 1'b1;
                         next = mc_wr_vertex;
                     end
                 end
@@ -150,10 +151,11 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                         index_cnt = '0;
                     end
                     // zero income id: switch
-                    if(~(|data_MC[127:96])) begin
+                    if(~(|data_MC[127:96]) & we_MC) begin
                         mc_addr_cnt = '0;
                         index_cnt = '0;
                         valid_triangle_max = mc_addr_cnt_reg >> 2;
+                        rdy_MC_vertex_in = 1'b1;
                         next = mc_wr_vertex;
                     end
                 end
