@@ -115,7 +115,7 @@ module rta
   logic rdy_tri_mc;
   // IC
   logic rdy_tri_ic;
-  logic unvalid_tri_ic;
+  logic invalid_tri_ic;
   logic [95:0] vertex_0_tri_ic;
   logic [95:0] vertex_1_tri_ic;
   logic [95:0] vertex_2_tri_ic;
@@ -166,7 +166,6 @@ module rta
   // ICM
   logic [127:0] ray_origin_rt_icm [NUM_RT-1:0];
   logic [127:0] ray_direction_rt_icm [NUM_RT-1:0];
-  logic [BIT_THREAD-1:0] thread_id_rt_icm [NUM_RT-1:0];
   logic dequeue_rt_icm;
 
   //////////////////// IC CORE ////////////////////
@@ -177,20 +176,17 @@ module rta
   logic re_ic_tri;
   logic unsigned [BIT_TRI-1:0] tri_id_ic_tri;
   // ICM
-  logic [127:0] shader_info_ic_rt [NUM_IC-1:0]; //(v0, v1, v2, sid)
-  logic [127:0] normal_ic_rt [NUM_IC-1:0];
-  logic [BIT_THREAD-1:0] thread_id_ic_rt [NUM_IC-1:0];
+  logic [127:0] shader_info_ic_icm [NUM_IC-1:0]; //(v0, v1, v2, sid)
+  logic [127:0] normal_ic_icm [NUM_IC-1:0];
   logic dequeue_ic_rt;
 
   /////////////////// IC Memory ///////////////////
   // IC
   logic [127:0] ray_origin_icm_ic;
   logic [127:0] ray_direction_icm_ic;
-  logic [BIT_THREAD-1:0] thread_id_icm_ic;
   // RT​
   logic [127:0] shader_info_icm_rt; //(v0, v1, v2, sid)
   logic [127:0] normal_icm_rt;
-  logic [BIT_THREAD-1:0] thread_id_icm_rt;
 
   mem_controller memory_controller
    (
@@ -288,7 +284,7 @@ module rta
     .done_MC(we_mem_mc_x[3][1]),
     .rdy_MC(rdy_tri_mc),
     .rdy_IC(rdy_tri_ic),
-    .not_valid_IC(unvalid_tri_ic),
+    .not_valid_IC(invalid_tri_ic),
     .vertex0_IC(vertex_0_tri_ic),
     .vertex1_IC(vertex_1_tri_ic),
     .vertex2_IC(vertex_2_tri_ic),
@@ -364,6 +360,38 @@ module rta
   endgenerate
 
 
+  generate;
+    for(i = 0; i < NUM_IC; i++) begin: IC_CORE
+      IC_v3 ic
+      (
+        .clk(clk), 
+        .rst(rst),
+        .Core_ID(Core_ID), 
+        // .thread_id_in(thread_id_in), 
+        // .thread_id_out(thread_id_out), 
+        .IntersectionPoint(shader_info_ic_icm[127:32]),
+        .sid_in(shader_info_ic_icm[31:0]), 
+        .sid_out(sid_tri_ic), 
+        .dir(ray_direction_icm_ic), 
+        .orig(ray_origin_icm_ic), 
+        .norm(normal_ic_icm), 
+        .IC_Mem_Rdy(dequeue_ic_rt),//dequeue_ic_rt?
+        .Mem_Rdy(rdy_tri_ic), 
+        .v0(vertex_0_tri_ic), 
+        .v1(vertex_1_tri_ic), 
+        .v2(vertex_2_tri_ic), 
+        .Mem_NotValid(invalid_tri_ic), 
+        .triangle_id(tri_id_ic_tri), 
+        .Mem_En(re_ic_tri)
+        // logic job_dispatch_pd_ic[NUM_IC-1:0];
+        // logic [BIT_THREAD-1:0] thread_id_out_pd_ic;
+        // logic context_switch_ic_pd[NUM_IC-1:0];
+        // logic [BIT_THREAD-1:0] thread_id_in_ic_pd[NUM_IC-1:0];
+    );
+    end
+  endgenerate
+  
+
   mem_IC #(.NUM_RT(NUM_RT), NUM_IC(NUM_IC), .NUM_THREAD(NUM_THREAD)) mem_ic
   (
     //input
@@ -375,19 +403,19 @@ module rta
     .core_id_ic2rt_PD(core_id_ic2rt_pd_icm),
     .ray_origin_RT(ray_origin_rt_icm), 
     .ray_direction_RT(ray_direction_rt_icm), 
-    .thread_id_RT_in(thread_id_rt_icm), 
+    // .thread_id_RT_in(), 
     .dequeue_RT(dequeue_rt_icm),
-    .shader_info_IC(shader_info_ic_rt), 
-    .normal_IC(normal_ic_rt), 
-    .thread_id_IC_in(thread_id_ic_rt), 
+    .shader_info_IC(shader_info_ic_icm), 
+    .normal_IC(normal_ic_icm), 
+    // .thread_id_IC_in(), 
     .dequeue_IC(dequeue_ic_rt),
     //output
     .ray_origin_IC(ray_origin_icm_ic), 
     .ray_direction_IC(ray_direction_icm_ic), 
-    .thread_id_IC_out(thread_id_icm_ic),
+    // .thread_id_IC_out(),
     .shader_info_RT(shader_info_icm_rt), 
     .normal_RT(normal_icm_rt), 
-    .thread_id_RT_out(thread_id_icm_rt)
+    // .thread_id_RT_out()
     );
 
      
