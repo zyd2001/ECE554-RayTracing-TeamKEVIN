@@ -211,18 +211,18 @@ module rta
     logic [3:0] cnt;
     logic cnt_clr, cnt_inc;
 
-    typedef enum reg {IDEL, LOAD} state_t;
+    typedef enum reg {IDLE, LOAD} state_t;
     state_t state, nxt_state;
     always_ff @(posedge clk or negedge rst_n) begin
       if (!rst_n)
-        state <= IDEL;
+        state <= IDLE;
       else begin
         state <= nxt_state;
       end
     end
 
     always_comb begin
-      nxt_state = IDEL;
+      nxt_state = IDLE;
       we_rt_main[0] = 0;
       we_rt_main[1] = 0;
       we_rt_main[2] = 0;
@@ -257,6 +257,7 @@ module rta
             cnt_inc = 1;
           end
         end
+      endcase
     end
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -313,16 +314,16 @@ module rta
   endgenerate
 
 
-  mem_CP memory_command_processor
-   (
-    .clk(clk),
-    .rst_n(rst_n),
-    .re_CP(),
-    .data_MC(data_32_mc_x),
-    .ctrl_MC(we_mem_mc_x[0]),
-    .invalid_CP(),
-    .data_out_CP(data_out_cpm_pd)
-    );
+  // mem_CP memory_command_processor
+  //  (
+  //   .clk(clk),
+  //   .rst_n(rst_n),
+  //   .re_CP(),
+  //   .data_MC(data_32_mc_x),
+  //   .ctrl_MC(we_mem_mc_x[0]),
+  //   .invalid_CP(),
+  //   .data_out_CP(data_out_cpm_pd)
+  //   );
 
 
   generate
