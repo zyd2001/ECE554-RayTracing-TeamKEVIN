@@ -160,6 +160,9 @@ module RT_core_single (
     logic EX_int_knockdown, EX_float1_knockdown, EX_float2_knockdown, EX_float3_knockdown, EX_float4_knockdown;
     logic EX_busy;
 
+    logic [31:0] EX_S_out;
+    logic [127:0] EX_V_out;
+
     waiting_state EX_current_state, EX_next_state;
     
     ///////////////////////////////////////////////////////////////////
@@ -175,6 +178,7 @@ module RT_core_single (
     logic [2:0] EX_MEM_memory_op; 
     logic [2:0] EX_MEM_memory_op_stay;
     logic EX_MEM_vector_reduce_en;
+    logic EX_MEM_vector_reduce_en_stay;
     logic EX_MEM_FIN, EX_MEM_context_switch;
 
     //////////////////////////////////////////////////////////////////
@@ -187,6 +191,9 @@ module RT_core_single (
     logic MEM_v_reduce_knockdown, MEM_knockdown;
     logic MEM_busy;
     logic MEM_V_reduce_done;
+
+    logic [31:0] MEM_S_out;
+    logic [127:0] MEM_V_out;
     waiting_state MEM_current_state, MEM_next_state;
 
     ///////////////////////////////////////////////////////////////////
@@ -411,10 +418,41 @@ module RT_core_single (
             DE_EX_immediate <= 16'b0;
         end else begin
             if (!EX_busy && !MEM_busy) begin
-                DE_EX_scalar1 <= DE_EX_S1_select ? MEM_WB_scalar : DE_scalar1;
-                DE_EX_scalar2 <= DE_EX_S2_select ? MEM_WB_scalar : DE_scalar2;
-                DE_EX_vector1 <= DE_EX_V1_select ? MEM_WB_vector : DE_vector1;
-                DE_EX_vector2 <= DE_EX_V2_select ? MEM_WB_vector : DE_vector2;
+                if (DE_S1_address == DE_EX_Swb_address && DE_S1_address != 5'b0 && DE_EX_memory_op[2:1] != 2'b10 && DE_EX_vector_reduce_en != 1'b1)
+                    DE_EX_scalar1 <= EX_S_out;
+                else if (DE_S1_address == EX_MEM_Swb_address && DE_S1_address != 5'b0)
+                    DE_EX_scalar1 <= MEM_S_out;
+                else if (DE_S1_address == MEM_WB_Swb_address && DE_S1_address != 5'b0)
+                    DE_EX_scalar1 <= MEM_WB_scalar;
+                else 
+                    DE_EX_scalar1 = DE_scalar1;
+
+                if (DE_S2_address == DE_EX_Swb_address && DE_S2_address != 5'b0 && DE_EX_memory_op[2:1] != 2'b10 && DE_EX_vector_reduce_en != 1'b1)
+                    DE_EX_scalar2 <= EX_S_out;
+                else if (DE_S2_address == EX_MEM_Swb_address && DE_S2_address != 5'b0)
+                    DE_EX_scalar2 <= MEM_S_out;
+                else if (DE_S2_address == MEM_WB_Swb_address && DE_S2_address != 5'b0)
+                    DE_EX_scalar2 <= MEM_WB_scalar;
+                else 
+                    DE_EX_scalar2 = DE_scalar2;
+                
+                if (DE_V1_address == DE_EX_Vwb_address && DE_V1_address != 4'b0 && DE_EX_memory_op[2:1] != 2'b10)
+                    DE_EX_vector1 <= EX_V_out;
+                else if (DE_V1_address == EX_MEM_Vwb_address && DE_V1_address != 5'b0)
+                    DE_EX_vector1 <= MEM_V_out;
+                else if (DE_V1_address == MEM_WB_Vwb_address && DE_V1_address != 5'b0)
+                    DE_EX_vector1 <= MEM_WB_vector;
+                else 
+                    DE_EX_vector1 = DE_vector1;
+
+                if (DE_V2_address == DE_EX_Vwb_address && DE_V2_address != 4'b0 && DE_EX_memory_op[2:1] != 2'b10)
+                    DE_EX_vector2 <= EX_V_out;
+                else if (DE_V2_address == EX_MEM_Vwb_address && DE_V2_address != 5'b0)
+                    DE_EX_vector2 <= MEM_V_out;
+                else if (DE_V2_address == MEM_WB_Vwb_address && DE_V2_address != 5'b0)
+                    DE_EX_vector2 <= MEM_WB_vector;
+                else 
+                    DE_EX_vector2 = DE_vector2;
                 DE_EX_immediate <= IF_DE_instruction[15:0];
             end
         end
@@ -577,32 +615,32 @@ module RT_core_single (
     end
 
     always_comb begin : EX_forwarding
-        if (DE_EX_S1_address == EX_MEM_Swb_address && DE_EX_S1_address != 5'b0) 
-            EX_forwarded_scalar1 = EX_MEM_s_out;
-        else if (DE_EX_S1_address == MEM_WB_Swb_address && DE_EX_S1_address != 5'b0)
-            EX_forwarded_scalar1 = MEM_WB_scalar;
-        else
+        // if (DE_EX_S1_address == EX_MEM_Swb_address && DE_EX_S1_address != 5'b0) 
+        //     EX_forwarded_scalar1 = EX_MEM_s_out;
+        // else if (DE_EX_S1_address == MEM_WB_Swb_address && DE_EX_S1_address != 5'b0)
+        //     EX_forwarded_scalar1 = MEM_WB_scalar;
+        // else
             EX_forwarded_scalar1 = DE_EX_scalar1;
 
-        if (DE_EX_S2_address == EX_MEM_Swb_address && DE_EX_S2_address != 5'b0) 
-            EX_forwarded_scalar2 = EX_MEM_s_out;
-        else if (DE_EX_S2_address == MEM_WB_Swb_address && DE_EX_S2_address != 5'b0)
-            EX_forwarded_scalar2 = MEM_WB_scalar;
-        else
+        // if (DE_EX_S2_address == EX_MEM_Swb_address && DE_EX_S2_address != 5'b0) 
+        //     EX_forwarded_scalar2 = EX_MEM_s_out;
+        // else if (DE_EX_S2_address == MEM_WB_Swb_address && DE_EX_S2_address != 5'b0)
+        //     EX_forwarded_scalar2 = MEM_WB_scalar;
+        // else
             EX_forwarded_scalar2 = DE_EX_scalar2;
 
-        if (DE_EX_V1_address == EX_MEM_Vwb_address && DE_EX_V1_address != 4'b0) 
-            EX_forwarded_vector1 = EX_MEM_v_out;
-        else if (DE_EX_V1_address == MEM_WB_Vwb_address && DE_EX_V1_address != 4'b0)
-            EX_forwarded_vector1 = MEM_WB_vector;
-        else
+        // if (DE_EX_V1_address == EX_MEM_Vwb_address && DE_EX_V1_address != 4'b0) 
+        //     EX_forwarded_vector1 = EX_MEM_v_out;
+        // else if (DE_EX_V1_address == MEM_WB_Vwb_address && DE_EX_V1_address != 4'b0)
+        //     EX_forwarded_vector1 = MEM_WB_vector;
+        // else
             EX_forwarded_vector1 = DE_EX_vector1;
 
-        if (DE_EX_V2_address == EX_MEM_Vwb_address && DE_EX_V2_address != 4'b0) 
-            EX_forwarded_vector2 = EX_MEM_v_out;
-        else if (DE_EX_V2_address == MEM_WB_Vwb_address && DE_EX_V2_address != 4'b0)
-            EX_forwarded_vector2 = MEM_WB_vector;
-        else
+        // if (DE_EX_V2_address == EX_MEM_Vwb_address && DE_EX_V2_address != 4'b0) 
+        //     EX_forwarded_vector2 = EX_MEM_v_out;
+        // else if (DE_EX_V2_address == MEM_WB_Vwb_address && DE_EX_V2_address != 4'b0)
+        //     EX_forwarded_vector2 = MEM_WB_vector;
+        // else
             EX_forwarded_vector2 = DE_EX_vector2;
     end
 
@@ -727,6 +765,22 @@ module RT_core_single (
         end
     end
 
+    always_comb begin : EX_select_output
+        EX_S_out = 32'b0;
+        EX_V_out = 128'b0;
+
+        EX_V_out = {EX_float_ALU4_out, EX_float_ALU3_out, EX_float_ALU2_out, EX_float_ALU1_out};
+        if (DE_EX_Scalar_out_select[2] == 1'b0)
+            EX_S_out = EX_integer_ALU_out;
+        else 
+            case (DE_EX_Scalar_out_select[1:0])
+                2'b00: EX_S_out = EX_float_ALU1_out;
+                2'b01: EX_S_out = EX_float_ALU2_out;
+                2'b10: EX_S_out = EX_float_ALU3_out;
+                default: EX_S_out = EX_float_ALU4_out;
+            endcase
+    end
+
     always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_data_pipeline
         if (!rst_n) begin
             EX_MEM_v_out <= 128'b0;
@@ -736,16 +790,8 @@ module RT_core_single (
         else begin
             if (!MEM_busy) begin
                 EX_MEM_memory_data <= EX_forwarded_scalar2;
-                EX_MEM_v_out <= {EX_float_ALU4_out, EX_float_ALU3_out, EX_float_ALU2_out, EX_float_ALU1_out};
-                if (DE_EX_Scalar_out_select[2] == 1'b0)
-                    EX_MEM_s_out <= EX_integer_ALU_out;
-                else 
-                    case (DE_EX_Scalar_out_select[1:0])
-                        2'b00: EX_MEM_s_out <= EX_float_ALU1_out;
-                        2'b01: EX_MEM_s_out <= EX_float_ALU2_out;
-                        2'b10: EX_MEM_s_out <= EX_float_ALU3_out;
-                        default: EX_MEM_s_out <= EX_float_ALU4_out;
-                    endcase
+                EX_MEM_v_out <= EX_V_out;
+                EX_MEM_s_out <= EX_S_out;
             end
         end
 
@@ -767,11 +813,14 @@ module RT_core_single (
         end
     end
 
+
     always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_control_pipeline
         if (!rst_n) begin
             EX_MEM_memory_op <= 3'b0;
             EX_MEM_memory_op_stay <= 3'b0;
             EX_MEM_vector_reduce_en <= 1'b0;
+            EX_MEM_vector_reduce_en_stay <= 1'b0;
+
             EX_MEM_FIN <= 1'b1;
             EX_MEM_context_switch <= 1'b0;
         end else begin
@@ -794,8 +843,10 @@ module RT_core_single (
             if (!MEM_busy)
                 EX_MEM_memory_op_stay <= DE_EX_memory_op;
 
-            if (!MEM_busy)
+            if (!MEM_busy) begin
                 EX_MEM_vector_reduce_en <= (EX_busy || DE_EX_FIN) == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
+                EX_MEM_vector_reduce_en_stay <= (EX_busy || DE_EX_FIN) == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
+            end
             else if (MEM_v_reduce_knockdown)
                 EX_MEM_vector_reduce_en <= 3'b0;
         end
@@ -875,6 +926,20 @@ module RT_core_single (
 
     end
 
+    always_comb begin : MEM_select_output
+        MEM_S_out = 32'b0;
+        MEM_V_out = 128'b0;
+        if (EX_MEM_memory_op_stay == 3'b101) 
+            MEM_V_out = MEM_data_read;
+        else MEM_V_out = EX_MEM_v_out;
+
+        if (EX_MEM_memory_op_stay == 3'b100) 
+            MEM_S_out = MEM_data_read[31:0];
+        else if (EX_MEM_vector_reduce_en_stay) 
+            MEM_S_out = MEM_reduce_out;
+        else MEM_S_out = EX_MEM_s_out;
+        
+    end
     //////////////////////////
     // MEM_WB Pipeline
     ////////////////////////// 
@@ -898,15 +963,8 @@ module RT_core_single (
             MEM_WB_Swb_address <= MEM_busy ? 5'b0 : EX_MEM_Swb_address;
             MEM_WB_Vwb_address <= MEM_busy ? 4'b0 :EX_MEM_Vwb_address;
 
-            if (EX_MEM_memory_op_stay == 3'b101) 
-                MEM_WB_vector <= MEM_data_read;
-            else MEM_WB_vector <= EX_MEM_v_out;
-
-            if (EX_MEM_memory_op_stay == 3'b100) 
-                MEM_WB_scalar <= MEM_data_read[31:0];
-            else if (EX_MEM_vector_reduce_en) 
-                MEM_WB_scalar <= MEM_reduce_out;
-            else MEM_WB_scalar <= EX_MEM_s_out;
+            MEM_WB_vector <= MEM_V_out;
+            MEM_WB_scalar <= MEM_S_out; 
         end
     end
 
