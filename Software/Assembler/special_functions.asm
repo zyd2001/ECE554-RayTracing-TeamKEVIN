@@ -33,7 +33,7 @@ start:
     cmp_i r4 r5
     bne wrong1
     v_reduce r8 r1
-    s_write_high r9 10
+    s_write_high r9 0
     s_write_low r9 10
     cmp_i r8 r9
     bne wrong2
