@@ -166,6 +166,7 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     if(~(|data_MC[127:96])) begin
                         next = idle;
                         prefetch_triangle_id = -1;
+                        rdy_MC_vertex_in = 1'b1;
                     end
                     else begin
                         vertex_addr_in = mc_addr_cnt_reg;
