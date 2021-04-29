@@ -13,7 +13,7 @@ module mem_triangle_full_tb();
     logic [BIT_TRIANGLE-1:0] triangle_id, index_0, index_1, index_2;
     // MC
     logic [127:0] data_MC; // (vertex0, vertex1, vertex2, sid) or (x, y, z, flag)
-    logic we_MC;
+    logic we_MC, done_MC;
     /*
         Output
     */
@@ -25,7 +25,7 @@ module mem_triangle_full_tb();
     // MC
     logic rdy_MC;
 
-    mem_triangle #(NUM_TRIANGLE) mem(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
+    mem_triangle #(NUM_TRIANGLE) mem(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC, rdy_MC,
                 rdy_IC, not_valid_IC, vertex0_IC, vertex1_IC, vertex2_IC, sid_IC);
 
     always #1 clk = ~clk;
@@ -45,6 +45,7 @@ module mem_triangle_full_tb();
         triangle_id = 0;
         data_MC = 0;
         we_MC = 0;
+        done_MC = 0;
         busy = 0;
         index_0 = 0;
         index_1 = 0;
@@ -88,6 +89,12 @@ module mem_triangle_full_tb();
                 end
                 @(posedge rdy_MC);
                 busy = 0;
+                // @(posedge clk);
+                // @(posedge clk);
+                // @(posedge clk);
+                // @(posedge clk);
+                // @(posedge clk);
+                // @(posedge clk);
                 if(&triangle_id || triangle_id+1 == 512-test) begin
                     data_MC = 0;
                     we_MC = 1;
@@ -113,6 +120,12 @@ module mem_triangle_full_tb();
                 end
                 if(rdy_MC) begin
                     busy = 0;
+                    // @(posedge clk);
+                    // @(posedge clk);
+                    // @(posedge clk);
+                    // @(posedge clk);
+                    // @(posedge clk);
+                    // @(posedge clk);
                 end
             end
             data_MC = 0;
@@ -123,6 +136,12 @@ module mem_triangle_full_tb();
 
 
             @(posedge clk);
+            @(posedge clk);
+            @(posedge clk);
+            @(posedge clk);
+            done_MC = 1;
+            @(posedge clk);
+            done_MC = 0;
             @(posedge clk);
             @(posedge clk);
             @(posedge clk);

@@ -4,6 +4,8 @@ synth/
 .venv/
 
 .venv/
+.vs/
+.qsys_edit/
 
 [_@]*
 
