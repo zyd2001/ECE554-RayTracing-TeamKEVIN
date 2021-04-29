@@ -20,7 +20,7 @@ module fifo
 
   integer i;
 
-  always_ff @(posedge clk, negedge rst)
+  always_ff @(posedge clk, posedge rst)
     if (rst) begin
       for (i=0; i<DEPTH; i=i+1) buffer[i] <= '0;
     end
