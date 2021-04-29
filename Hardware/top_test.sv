@@ -6,81 +6,91 @@ module top_test(clk, rst, rx, tx);
     input  t_if_ccip_Rx rx;
     output t_if_ccip_Tx tx;
 
-    logic Converter_mode, Fix_en, Float_en, Converter_en, Sqrt_en;
-    logic [1:0] Fix_mode, Float_mode;
-    logic [31:0] Fix_a, Fix_b, Float_a, Float_b, Converter_in, Sqrt_in;
+    parameter NUM_THREAD = 32;
+    parameter NUM_TRIANGLE = 512;
+    localparam BIT_THREAD = $clog2(NUM_THREAD);
+    localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
 
-    logic Fix_done, Float_done, Converter_done, Sqrt_done;
-    logic [31:0] Float_result, Converter_out, Sqrt_out;
-    logic [63:0] Fix_result;
+    // IC Mem
+    logic Core_ID;
+    logic [BIT_THREAD-1:0] thread_id_in;
+    logic [95:0] orig, dir;
     
-    logic Fix_done_reg, Float_done_reg, Converter_done_reg, Sqrt_done_reg;
-    logic [31:0] Float_result_reg, Converter_out_reg, Sqrt_out_reg;
-    logic [63:0] Fix_result_reg;
+    logic IC_Mem_Rdy;
+    logic [BIT_THREAD-1:0] thread_id_out;
+    logic [31:0] sid_out;
+    logic [95:0] norm, IntersectionPoint;
+    // Tri Mem
+    logic Mem_Rdy, Mem_NotValid;
+    logic [95:0] v1, v2, v0;
+    logic [31:0] sid_in;
     
-    logic done_signals;
-    logic [63:0] buffer_reg, buffer_reg_in, FaC1_reg, FaC2_reg;
+    logic Mem_En;
+    logic unsigned [BIT_TRIANGLE-1:0] triangle_id;
 
-    ALU iDUT(
+    // Regs
+    logic IC_Mem_Rdy_reg;
+    logic [BIT_THREAD-1:0] thread_id_out_reg;
+    logic [31:0] sid_out_reg;
+    logic [95:0] norm_reg, IntersectionPoint_reg;
+    
+    logic Mem_En_reg;
+    logic unsigned [BIT_TRIANGLE-1:0] triangle_id_reg;
+    
+    logic [63:0] buffer_reg, done_signals_buff, result_buff, norm_buff, inter_buff;
+    
+    IC_v3 iDUT(
       .clk(clk), .rst(rst),
-      .Fix_mode(Fix_mode), .Fix_en(Fix_en), .Fix_a(Fix_a), .Fix_b(Fix_b), .Fix_done(Fix_done), .Fix_result(Fix_result), 
-      .Float_mode(Float_mode), .Float_en(Float_en), .Float_a(Float_a), .Float_b(Float_b), .Float_done(Float_done), .Float_result(Float_result),
-      .Converter_mode(Converter_mode), .Converter_en(Converter_en), .Converter_in(Converter_in), .Converter_done(Converter_done), .Converter_out(Converter_out),
-      .Sqrt_in(Sqrt_in), .Sqrt_en(Sqrt_en), .Sqrt_done(Sqrt_done), .Sqrt_out(Sqrt_out));
+      .Core_ID(Core_ID), .thread_id_in(thread_id_in), .thread_id_out(thread_id_out), .IntersectionPoint(IntersectionPoint),
+      .sid_in(sid_in), .sid_out(sid_out), .dir(dir), .orig(orig), .norm(norm), .IC_Mem_Rdy(IC_Mem_Rdy),
+      .Mem_Rdy(Mem_Rdy), .v1(v1), .v2(v2), .v0(v0), .Mem_NotValid(Mem_NotValid), .triangle_id(triangle_id), .Mem_En(Mem_En)
+    );
   
     always_ff@(posedge clk or posedge rst) begin
       if (rst) begin
-        Converter_mode <= '0;
-        Fix_en <= '0;
-        Float_en <= '0;
-        Converter_en <= '0;
-        Sqrt_en <= '0;
-        Fix_mode <= '0;
-        Float_mode <= '0;
-        Fix_a <= '0;
-        Fix_b <= '0;
-        Float_a <= '0;
-        Float_b <= '0;
-        Converter_in <= '0;
-        Sqrt_in <= '0;
+        Core_ID <= '0;
+        thread_id_in <= '0;
+        orig <= '0;
+        dir <= '0;
+        Mem_Rdy <= '0;
+        Mem_NotValid <= '0;
+        v1 <= '0;
+        v2 <= '0;
+        v0 <= '0;
+        sid_in <= '0;
       end
       else begin
-        Converter_mode <= rx.c0.data[0];
-        Fix_en <= rx.c0.data[1];
-        Float_en <= rx.c0.data[2];
-        Converter_en <= rx.c0.data[3];
-        Sqrt_en <= rx.c0.data[4];
-        Fix_mode <= rx.c0.data[6:5];
-        Float_mode <= rx.c0.data[8:7];
-        Fix_a <= rx.c0.data[31:0];
-        Fix_b <= rx.c0.data[63:32];
-        Float_a <= rx.c0.data[95:64];
-        Float_b <= rx.c0.data[127:96];
-        Converter_in <= rx.c0.data[159:128];
-        Sqrt_in <= rx.c0.data[191:160];
+        Core_ID <= rx.c0.data[0];
+        thread_id_in <= rx.c0.data[31:0];
+        orig <= rx.c0.data[95:0];
+        dir <= rx.c0.data[191:96];
+        Mem_Rdy <= rx.c0.data[1];
+        Mem_NotValid <= rx.c0.data[2];
+        v1 <= rx.c0.data[31:0];
+        v2 <= rx.c0.data[63:32];
+        v0 <= rx.c0.data[95:64];
+        sid_in <= rx.c0.data[127:96];
       end
     end
     
     always_ff@(posedge clk or posedge rst) begin
       if (rst) begin
-        Fix_done_reg <= '0;
-        Float_done_reg <= '0;
-        Converter_done_reg <= '0;
-        Sqrt_done_reg <= '0;
-        Float_result_reg <= '0;
-        Converter_out_reg <= '0;
-        Fix_result_reg <= '0;
-        Sqrt_out_reg <= '0;
+        IC_Mem_Rdy_reg <= '0;
+        thread_id_out_reg <= '0;
+        sid_out_reg <= '0;
+        norm_reg <= '0;
+        IntersectionPoint_reg <= '0;
+        Mem_En_reg <= '0;
+        triangle_id_reg <= '0;
       end
       else begin
-        Fix_done_reg <= Fix_done;
-        Float_done_reg <= Float_done;
-        Converter_done_reg <= Converter_done;
-        Sqrt_done_reg <= Sqrt_done;
-        Float_result_reg <= Float_result;
-        Converter_out_reg <= Converter_out;
-        Fix_result_reg <= Fix_result;
-        Sqrt_out_reg <= Sqrt_out;
+        IC_Mem_Rdy_reg <= IC_Mem_Rdy;
+        thread_id_out_reg <= thread_id_out;
+        sid_out_reg <= sid_out;
+        norm_reg <= norm;
+        IntersectionPoint_reg <= IntersectionPoint;
+        Mem_En_reg <= Mem_En;
+        triangle_id_reg <= triangle_id;
       end
     end
     
@@ -93,10 +103,13 @@ module top_test(clk, rst, rx, tx);
       end
     end
     
-    assign done_signals = Fix_done_reg & Float_done_reg & Converter_done_reg & Sqrt_done_reg;
-    assign FaC1_reg = {Float_result_reg, Sqrt_out_reg};
-    assign FaC2_reg = {Sqrt_out_reg, Converter_out_reg};
-    assign buffer_reg_in = Fix_result_reg | FaC1_reg | FaC2_reg | done_signals;
+    assign done_signals_buff = IC_Mem_Rdy_reg & Mem_En_reg;
+    assign result_buff = {18'h0, sid_out_reg, thread_id_out_reg, triangle_id_reg};
+    assign norm_buff = norm_reg[63:0] | norm_reg[95:32];
+    assign inter_buff = IntersectionPoint_reg[63:0] | IntersectionPoint_reg[95:32];
+    
+    assign buffer_reg_in = done_signals_buff & result_buff & norm_buff & inter_buff;
+    
     
     assign tx.c2.data = buffer_reg;
 
