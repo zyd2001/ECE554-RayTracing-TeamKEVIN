@@ -123,6 +123,8 @@ module mem_controller_tb();
           end
         end        
 
+        dma_rd_data[0][0][31:0] = 32'h2;
+
         dma.empty = 1;
         dma.rd_done = 0;
         dma.rd_data = 512'h0;
@@ -170,7 +172,7 @@ module mem_controller_tb();
             $display("Error: dma.rd_go not incurred");
             $stop();
         end
-        if (dma.rd_size !== 43'h4) begin
+        if (dma.rd_size !== 43'h1) begin
             $display("Error: dma.rd_size incorrect");
             $stop();
         end
@@ -180,7 +182,7 @@ module mem_controller_tb();
         end
         repeat(4) @(negedge clk);
 
-        for (int i = 0; i < 4; i++) begin
+        for (int i = 0; i < 1; i++) begin
           dma.rd_data = dma_rd_data[0][i];
           dma.empty = 0;
           @(negedge clk);
@@ -190,7 +192,7 @@ module mem_controller_tb();
             $stop();
           end
           //@(negedge clk);
-          for (int j = 0; j < 16; j++) begin
+          for (int j = 0; j < 1; j++) begin
             if (mem_wr_data_32_MC_X !== dma_rd_data[0][i][j*32 +: 32]) begin
               $display("Error: data_out_32 incorrect");
               $stop();

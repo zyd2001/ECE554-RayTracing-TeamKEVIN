@@ -1,4 +1,7 @@
 module mem_controller_dma_rd_32 
+   #(
+        parameter SIZE_32 = 16
+        )
     (   
         input clk,
         input rst_n,
@@ -80,7 +83,7 @@ module mem_controller_dma_rd_32
                 mem_wr_en_32 = 2'b01;
             end
             default: begin
-                if (mem_wr_data_32_cnt[4]) begin
+                if (mem_wr_data_32_cnt == SIZE_32) begin
                     nxt_state_dma_rd_32 = DMA_RD_32_WAIT;
                     mem_wr_data_32_cnt_clr = 1'h1;
                 end
