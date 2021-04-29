@@ -483,7 +483,7 @@ module RT_core_single (
                 DE_EX_integer_ALU_opcode <= {IF_DE_instruction[31:28] == 4'b1000 ? 1'b1:1'b0, IF_DE_instruction[30:28] == 3'b011 ? 1'b1 : 1'b0, IF_DE_instruction[27:26]};
                 // memory needs integer ALU to do multiply
                 if (IF_DE_instruction[31] == 1'b1 && IF_DE_instruction[29:28] == 2'b11)
-                    DE_EX_integer_ALU_opcode[1:0] = 2'b0;
+                    DE_EX_integer_ALU_opcode[1:0] <= 2'b0;
                 
                 DE_EX_float_ALU_opcode <= {IF_DE_instruction[31:28] == 4'b1001 ? 1'b1 : 1'b0, IF_DE_instruction[27:26]};
 
@@ -776,7 +776,7 @@ module RT_core_single (
             if (!MEM_busy) begin
                 if (EX_busy) begin
                     EX_MEM_FIN <= EX_MEM_FIN;
-                    DE_EX_context_switch <= 1'b0;
+                    EX_MEM_context_switch <= 1'b0;
                 end
                 else begin
                     EX_MEM_FIN <= DE_EX_FIN;
