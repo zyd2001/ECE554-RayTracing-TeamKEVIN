@@ -98,8 +98,8 @@ module rta
 
 
   //////////////////// CP Memory /////////////////////
-  // CP
-  logic [31:0] data_out_cpm_cp;
+  // PD
+  logic [31:0] data_out_cpm_pd;
   
 
   //////////////// Instruction Memory ////////////////
@@ -221,7 +221,7 @@ module rta
     .data_MC(data_32_mc_x),
     .ctrl_MC(we_mem_mc_x[0]),
     .invalid_CP(),
-    .data_out_CP(data_out_cpm_cp)
+    .data_out_CP(data_out_cpm_pd)
     );
 
 
