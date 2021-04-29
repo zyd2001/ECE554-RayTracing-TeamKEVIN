@@ -1,14 +1,11 @@
 synth_1/
 synth/
 .vscode/
-<<<<<<< HEAD
 .venv/
 
 .venv/
-=======
 .vs/
 .qsys_edit/
->>>>>>> origin/RT-50_IC
 
 [_@]*
 
