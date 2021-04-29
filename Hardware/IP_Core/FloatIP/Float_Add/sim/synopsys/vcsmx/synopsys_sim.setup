@@ -1,0 +1,21 @@
+
+WORK > DEFAULT
+DEFAULT:                 ./libraries/work/                   
+work:                    ./libraries/work/                   
+altera_fp_functions_191: ./libraries/altera_fp_functions_191/
+Float_Add:               ./libraries/Float_Add/              
+altera_ver:              ./libraries/altera_ver/             
+lpm_ver:                 ./libraries/lpm_ver/                
+sgate_ver:               ./libraries/sgate_ver/              
+altera_mf_ver:           ./libraries/altera_mf_ver/          
+altera_lnsim_ver:        ./libraries/altera_lnsim_ver/       
+fourteennm_ver:          ./libraries/fourteennm_ver/         
+fourteennm_ct1_ver:      ./libraries/fourteennm_ct1_ver/     
+altera:                  ./libraries/altera/                 
+lpm:                     ./libraries/lpm/                    
+sgate:                   ./libraries/sgate/                  
+altera_mf:               ./libraries/altera_mf/              
+altera_lnsim:            ./libraries/altera_lnsim/           
+fourteennm:              ./libraries/fourteennm/             
+fourteennm_ct1:          ./libraries/fourteennm_ct1/         
+LIBRARY_SCAN = TRUE
