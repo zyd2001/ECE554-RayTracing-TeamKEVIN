@@ -215,16 +215,16 @@ module rta
   endgenerate
 
 
-  mem_CP memory_command_processor
-   (
-    .clk(clk),
-    .rst_n(rst_n),
-    .re_CP(),
-    .data_MC(data_32_mc_x),
-    .ctrl_MC(we_mem_mc_x[0]),
-    .invalid_CP(),
-    .data_out_CP(data_out_cpm_pd)
-    );
+  // mem_CP memory_command_processor
+  //  (
+  //   .clk(clk),
+  //   .rst_n(rst_n),
+  //   .re_CP(),
+  //   .data_MC(data_32_mc_x),
+  //   .ctrl_MC(we_mem_mc_x[0]),
+  //   .invalid_CP(),
+  //   .data_out_CP(data_out_cpm_pd)
+  //   );
 
 
   generate
@@ -273,6 +273,34 @@ module rta
     .vertex1_IC(vertex_1_tri_ic),
     .vertex2_IC(vertex_2_tri_ic),
     .sid_IC(sid_tri_ic)
+    );
+
+
+  patch_dispatcher pd  
+   (
+    .clk(clk),
+    .rst_n(rst_n),
+    .load_cp(load_cp_pd),
+    .pixel_id_cp(pixel_id_cp_pd),
+    .task_done_rt(task_done_rt_pd),
+    .context_switch_rt(context_switch_rt_pd),
+    .thread_id_in_rt(thread_id_in_rt_pd),
+    .pc_in_rt(pc_in_rt_pd),
+    .stack_ptr_in_rt(stack_ptr_in_rt_pd),
+    .context_switch_ic(context_switch_ic_pd),
+    .thread_id_in_ic(thread_id_in_ic_pd),
+    .patch_done(patch_done_pd_mc),
+    .job_dispatch_rt(job_dispatch_pd_rt),
+    .thread_id_out_rt(thread_id_out_pd_rt),
+    .pixel_id_rt(pixel_id_pd_rt),
+    .pc_out_rt(pc_out_pd_rt),
+    .sp_out_rt(sp_out_pd_rt),
+    .job_dispatch_ic(job_dispatch_pd_ic),
+    .thread_id_out_ic(thread_id_out_pd_ic),
+    .q_en_rt2ic(q_en_rt2ic_pd_icm),
+    .core_id_rt2ic(core_id_rt2ic_pd_icm),
+    .q_en_ic2rt(q_en_ic2rt_pd_icm),
+    .core_id_ic2rt(core_id_ic2rt_pd_icm)
     );
 
      

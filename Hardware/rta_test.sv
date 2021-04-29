@@ -237,7 +237,7 @@ module rta
 
       case(state)
         IDLE: begin
-          if (we_mem_mc_x[0] == 2'b01)
+          if (cp_strt_mc_cp)
             nxt_state = LOAD;
         end
         default: begin
