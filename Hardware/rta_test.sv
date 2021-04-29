@@ -78,7 +78,7 @@ module rta
   // MAIN
   logic re_mc_main;
   logic [31:0] addr_mc_main[NUM_RT-1:0];
-  // CP || INST || CONST
+  // CPM || INST || CONST
   logic [1:0] we_mem_mc_x[NUM_RT-1:0];
   logic [31:0] data_32_mc_x;
   logic cp_strt_mc_cp;
@@ -207,10 +207,108 @@ module rta
     .rd_rdy(rd_rdy_main_rt)
     );
 
+    logic clr, inc;
+    logic [3:0] cnt;
+    logic cnt_clr, cnt_inc;
+
+    typedef enum reg {IDEL, LOAD} state_t;
+    state_t state, nxt_state;
+    always_ff @(posedge clk or negedge rst_n) begin
+      if (!rst_n)
+        state <= IDEL;
+      else begin
+        state <= nxt_state;
+      end
+    end
+
+    always_comb begin
+      nxt_state = IDEL;
+      we_rt_main[0] = 0;
+      we_rt_main[1] = 0;
+      we_rt_main[2] = 0;
+      we_rt_main[3] = 0;
+
+      clr = 0;
+      inc = 0;
+      cnt_inc = 0;
+      cnt_clr = 0;
+
+      patch_done_pd_mc = 1'h0;
+
+      case(state)
+        IDLE: begin
+          if (we_mem_mc_x[0] == 2'b01)
+            nxt_state = LOAD;
+        end
+        default: begin
+          if (cnt == 4'h8) begin
+            patch_done_pd_mc = 1'h1;
+            clr = 1;
+            cnt_clr = 1;
+          end
+          else begin
+            nxt_state = LOAD;
+            we_rt_main[0] = 1;
+            we_rt_main[1] = 1;
+            we_rt_main[2] = 1;
+            we_rt_main[3] = 1;
+
+            inc = 1;
+            cnt_inc = 1;
+          end
+        end
+    end
+
+    always_ff @(posedge clk or negedge rst_n) begin
+      if (!rst_n)
+        cnt <= 0;
+      else if (cnt_clr)
+        cnt <= 0;
+      else if (cnt_inc)
+        cnt <= cnt + 4'h1;
+    end
+  
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+          addr_rt_x[0] <= 32'h0000FFF0;
+          addr_rt_x[1] <= 32'h0001FFF0;
+          addr_rt_x[2] <= 32'h0002FFF0;
+          addr_rt_x[3] <= 32'h0003FFF0;
+
+          data_in_rt_main[0] <= 128'h0;
+          data_in_rt_main[1] <= 128'h1;
+          data_in_rt_main[2] <= 128'h2;
+          data_in_rt_main[3] <= 128'h3;
+        end
+        else if (clr) begin
+          addr_rt_x[0] <= 32'h0000FFF0;
+          addr_rt_x[1] <= 32'h0001FFF0;
+          addr_rt_x[2] <= 32'h0002FFF0;
+          addr_rt_x[3] <= 32'h0003FFF0;
+
+          data_in_rt_main[0] <= 128'h0;
+          data_in_rt_main[1] <= 128'h1;
+          data_in_rt_main[2] <= 128'h2;
+          data_in_rt_main[3] <= 128'h3;
+        end
+        else if (inc) begin
+          addr_rt_x[0] <= addr_rt_x[0] + 32'h00040000;
+          addr_rt_x[1] <= addr_rt_x[1] + 32'h00040000;
+          addr_rt_x[2] <= addr_rt_x[2] + 32'h00040000;
+          addr_rt_x[3] <= addr_rt_x[3] + 32'h00040000;
+
+          data_in_rt_main[0] <= data_in_rt_main[0] + 128'h4;
+          data_in_rt_main[1] <= data_in_rt_main[1] + 128'h4;
+          data_in_rt_main[2] <= data_in_rt_main[2] + 128'h4;
+          data_in_rt_main[3] <= data_in_rt_main[3] + 128'h4;
+        end
+      end
+
   generate
     for (i = 0; i < NUM_RT; i++) begin
       assign re_x_main[i] = re_mc_main ? 1'h1 : re_rt_main[i];
       assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_x[i]; 
+
     end
   endgenerate
 
