@@ -458,7 +458,7 @@ module mem_controller
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
             mmio_rd_data <= 64'h0;
-        else if (mmio.wr_en && mmio.wr_addr[1] && !mmio_system)
+        else if (mmio.wr_en && mmio.wr_addr[1])
             mmio_rd_data <= 64'h0;
         else if (term)
             mmio_rd_data <= 64'h2;
