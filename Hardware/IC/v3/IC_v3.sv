@@ -1,4 +1,4 @@
-module IC_v2(
+module IC_v3(
   clk, rst,
   Core_ID, thread_id_in, thread_id_out, IntersectionPoint,
   sid_in, sid_out, dir, orig, norm, IC_Mem_Rdy,
@@ -28,10 +28,10 @@ module IC_v2(
   output Mem_En;
   output unsigned [BIT_TRIANGLE-1:0] triangle_id;
   
-  typedef enum reg [1:0] {FTCH, WAIT, IDLE} state_t;
+  typedef enum reg [1:0] {FTCH, WAIT, BUSY, IDLE} state_t;
   state_t state, nxt_state;
   
-  logic Fetch, Tri_Rdy, ld, ld_init, ld_better, better, done, cnt, clear, IC_Mem_Rdy_in;
+  logic Fetch, ld, ld_init, ld_better, better, done, cnt, clear, IC_Mem_Rdy_in;
   logic [BIT_THREAD-1:0] thread_id_reg;
   logic [95:0] v2_out, v1_out, v0_out;
   logic [95:0] orig_reg, dir_reg;
@@ -81,7 +81,7 @@ module IC_v2(
       state <= nxt_state;
   end
   
-  assign done = (counter == 6'd47);
+  assign done = (counter == 6'd48);
   
   always_comb begin
     Fetch = 1'b0;
@@ -95,21 +95,36 @@ module IC_v2(
     case(state)
       FTCH: 
         begin
-          if (sid_Calc_out == '0) begin
+          if (Mem_NotValid) begin
             IC_Mem_Rdy_in = 1'b1;
           end
-          else begin
+          else if (Mem_Rdy) begin
+            cnt = 1'b1;
+            nxt_state = BUSY;
+          end
+          else
             nxt_state = FTCH;
+        end 
+      BUSY:
+        begin
+          if (done) begin
             Fetch = 1'b1;
-            if (better) begin
+            clear = 1'b1;
+            nxt_state = FTCH;
+            if (better)
               ld_better = 1'b1;
-            end
+          end
+          else begin
+            cnt = 1'b1;
+            nxt_state = BUSY;
           end
         end
       WAIT:
         begin
           if (done) begin
             ld_init = 1'b1;
+            Fetch = 1'b1;
+            clear = 1'b1;
             nxt_state = FTCH;
           end
           else begin
@@ -129,30 +144,29 @@ module IC_v2(
     endcase
   end
   
-  Calculation Calc (
+  Calculation_v3 Calc (
     .clk(clk), .rst(rst), 
     .v0(v0_out), .v1(v1_out), .v2(v2_out), .orig(orig_reg), .dir(dir_reg), .sid_in(sid_Tri_out),
     .sid_out(sid_Calc_out), .Intersection_Point(Intersection_Point_in), .norm(norm_in), .t(t_in)
   );
   
-  TriManager_v2 TriMnger (
+  TriManager_v3 TriMnger (
     .clk(clk), .rst(rst),
-    .Mem_Rdy(Mem_Rdy), .Fetch(Fetch), .clear(clear),
+    .Mem_Rdy(Mem_Rdy), .Fetch(Fetch),
     .v1_in(v1), .v1_out(v1_out),
     .v2_in(v2), .v2_out(v2_out),
     .v0_in(v0), .v0_out(v0_out),
     .sid_in(sid_in), .sid_out(sid_Tri_out),
     .Mem_NotValid(Mem_NotValid), .Mem_En(Mem_En),
-    .triangle_id(triangle_id),
-    .Tri_Rdy(Tri_Rdy)
+    .triangle_id(triangle_id)
   );
   
   Float_Less btr (
-		.clk    (clk),    //   input,   width = 1,    clk.clk
-		.areset (rst), //   input,   width = 1, areset.reset
-		.a      (t_in),      //   input,  width = 32,      a.a
-		.b      (t_better),      //   input,  width = 32,      b.b
-		.q      (better)       //  output,   width = 1,      q.q
+		.clk    (clk),        //   input,   width = 1,    clk.clk
+		.areset (rst),        //   input,   width = 1, areset.reset
+		.a      (t_in),       //   input,  width = 32,      a.a
+		.b      (t_better),   //   input,  width = 32,      b.b
+		.q      (better)      //  output,   width = 1,      q.q
 	);
   
   assign IC_Mem_Rdy = IC_Mem_Rdy_in;
