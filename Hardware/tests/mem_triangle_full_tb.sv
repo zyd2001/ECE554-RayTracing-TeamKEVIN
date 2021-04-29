@@ -113,6 +113,12 @@ module mem_triangle_full_tb();
                 end
                 if(rdy_MC) begin
                     busy = 0;
+                    @(posedge clk);
+                    @(posedge clk);
+                    @(posedge clk);
+                    @(posedge clk);
+                    @(posedge clk);
+                    @(posedge clk);
                 end
             end
             data_MC = 0;

@@ -121,6 +121,9 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                 end 
                 // wirte sid
                 else if (index_cnt_reg == 3) begin
+                    if(we_MC) begin
+                        index_cnt = '0;
+                    end
                     mc_addr_cnt = mc_addr_cnt_reg + 1;
                     // en_MC should arrive this cycle and clear counter
                     rdy_MC = 1'b1;
@@ -129,6 +132,22 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, rdy_MC,
                     // zero income id: switch
                     if(~(|data_MC[127:96])) begin
                         mc_addr_cnt = '0;
+                        index_cnt = '0;
+                        valid_triangle_max = mc_addr_cnt_reg >> 2;
+                        next = mc_wr_vertex;
+                    end
+                end
+                else if (index_cnt_reg == 4) begin
+                    index_cnt = index_cnt_reg;
+                    // en_MC should arrive this cycle and clear counter
+                    rdy_MC = 1'b1;
+                    if(we_MC) begin
+                        index_cnt = '0;
+                    end
+                    // zero income id: switch
+                    if(~(|data_MC[127:96])) begin
+                        mc_addr_cnt = '0;
+                        index_cnt = '0;
                         valid_triangle_max = mc_addr_cnt_reg >> 2;
                         next = mc_wr_vertex;
                     end
