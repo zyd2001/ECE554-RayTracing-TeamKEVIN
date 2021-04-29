@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preferences>
+ <debug showDebugMenu="0" />
+ <window width="1100" height="800" x="0" y="31" />
+ <generation
+   path=""
+   ipxact="1"
+   greybox="1"
+   simulation="VERILOG"
+   clear_previous="1" />
+</preferences>

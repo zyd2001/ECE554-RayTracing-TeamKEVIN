@@ -10,6 +10,8 @@ Software/Simulator/SimulatorTest/bin/
 Software/Simulator/SimulatorTest/obj/
 
 .venv/
+.vs/
+.qsys_edit/
 
 [_@]*
 
