@@ -20,10 +20,10 @@
 
 
 module ICU (
-    op1, op2, out, operation, flag, clk, en, done, rst_n
+    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n
 );
     input clk, en, rst_n;
-    input signed [31:0] op1, op2;
+    input signed [31:0] op1_in, op2_in;
     input signed [1:0] operation;
     output logic signed [31:0] out;
     output logic [1:0] flag;
@@ -32,6 +32,24 @@ module ICU (
     reg [1:0] counter, next_counter; 
     int operand1, operand2, int_output;
 
+    reg [31:0] op1_stored, op2_stored;
+    logic [31:0] op1, op2;
+
+    always_ff @( posedge clk, negedge rst_n ) begin : Pipeline_simulation  
+        if (!rst_n) begin
+            op1_stored <= 32'b0;
+            op2_stored <= 32'b0;
+        end
+        else if (en) begin
+            op1_stored <= op1_in;
+            op2_stored <= op2_in;
+        end
+    end
+
+    assign op1 = en ? op1_in : op1_stored;
+    assign op2 = en ? op2_in : op2_stored;
+
+    
     always_comb begin 
         operand1 = op1;
         operand2 = op2;

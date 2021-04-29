@@ -20,9 +20,9 @@ module Float_alu (
     logic [31:0] FPU_out, Sqrt_out;
     logic FPU_en, Sqrt_en, FPU_done, Sqrt_done;
 
-    FPU floating_point_unit(.op1(op1), .op2(op2), .out(FPU_out), .operation(operation[1:0]), 
+    FPU floating_point_unit(.op1_in(op1), .op2_in(op2), .out(FPU_out), .operation(operation[1:0]), 
         .flag(flag), .clk(clk), .en(FPU_en), .done(FPU_done), .rst_n(rst_n));
-    Sqrt square_root_unit(.in(op1), .out(Sqrt_out), .clk(clk), .en(Sqrt_en), .done(Sqrt_done), .rst_n(rst_n));
+    Sqrt square_root_unit(.in_in(op1), .out(Sqrt_out), .clk(clk), .en(Sqrt_en), .done(Sqrt_done), .rst_n(rst_n));
 
     always_comb begin
         FPU_en = 1'b0;

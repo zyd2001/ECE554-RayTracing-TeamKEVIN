@@ -27,9 +27,9 @@ module Integer_alu (
     logic itof_done, ftoi_done, ICU_done;
     logic itof_en, ftoi_en, ICU_en;
 
-    itof itof_caster(.in(op1), .out(itof_out), .clk(clk), .en(itof_en), .done(itof_done), .rst_n(rst_n));
-    ftoi ftoi_caster(.in(op1), .out(ftoi_out), .clk(clk), .en(ftoi_en), .done(ftoi_done), .rst_n(rst_n));
-    ICU integer_unit(.op1(op1), .op2(op2), .out(ASMD_out), .operation(operation[1:0]), 
+    itof itof_caster(.in_in(op1), .out(itof_out), .clk(clk), .en(itof_en), .done(itof_done), .rst_n(rst_n));
+    ftoi ftoi_caster(.in_in(op1), .out(ftoi_out), .clk(clk), .en(ftoi_en), .done(ftoi_done), .rst_n(rst_n));
+    ICU integer_unit(.op1_in(op1), .op2_in(op2), .out(ASMD_out), .operation(operation[1:0]), 
         .flag(flag), .clk(clk), .en(ICU_en), .done(ICU_done), .rst_n(rst_n));
     
     always_comb begin 
