@@ -275,7 +275,7 @@ module mem_controller
     mem_controller_dma_rd_32 #(.SIZE_32(1)) dma_rd_cp 
                                         (.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_cp),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .dma_rd_end_32(dma_rd_end_cp),
                                         .dma_rd_go_32(dma_rd_go_cp),
@@ -288,7 +288,7 @@ module mem_controller
 
     mem_controller_dma_rd_32 dma_rd_rt(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_rt),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .dma_rd_end_32(dma_rd_end_rt),
                                         .dma_rd_go_32(dma_rd_go_rt),
@@ -301,7 +301,7 @@ module mem_controller
                                         
     mem_controller_dma_rd_32 dma_rd_const(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_const),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .dma_rd_end_32(dma_rd_end_const),
                                         .dma_rd_go_32(dma_rd_go_const),
@@ -349,7 +349,7 @@ module mem_controller
 
     mem_controller_dma_rd_128 dma_rd_tri(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_tri),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .mem_wr_rdy(rdy_tri),
                                         .dma_rd_end_128(dma_rd_end_tri),
