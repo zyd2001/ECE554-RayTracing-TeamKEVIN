@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="altera_fp_functions_191/sim/dspba_library_package.vhd"
+   type="VHDL"
+   library="altera_fp_functions_191" />
+ <file
+   path="altera_fp_functions_191/sim/dspba_library.vhd"
+   type="VHDL"
+   library="altera_fp_functions_191" />
+ <file
+   path="altera_fp_functions_191/sim/Float_Less_altera_fp_functions_191_zqh2ixy.vhd"
+   type="VHDL"
+   library="altera_fp_functions_191" />
+ <file
+   path="sim/Float_Less.v"
+   type="VERILOG"
+   library="Float_Less"
+   hasInlineConfiguration="true" />
+ <topLevel name="Float_Less.Float_Less" />
+ <deviceFamily name="stratix10" />
+</simPackage>
