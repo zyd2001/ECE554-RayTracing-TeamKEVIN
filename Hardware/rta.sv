@@ -62,6 +62,8 @@ module rta
   parameter NUM_IC = 4;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
+  parameter DEPTH_RT_CONST = 512;
+  parameter DEPTH_RT_INST = 4096;
 
   localparam BIT_RT = $clog2(NUM_RT);
   localparam BIT_IC = $clog2(NUM_IC);
@@ -244,29 +246,25 @@ module rta
 
   generate
     for (i = 0; i < NUM_RT; i++) begin: inst_const_memory
-      mem_simple memory_instruction
-       (
-        .clk(clk),
-        .rst_n(rst_n),
-        .we(),
-        .addr(addr_rt_inst[i]),
-        .data_in(),
-        .data_MC(data_32_mc_x),
-        .ctrl_MC(we_mem_mc_x[1]),
-        .busy(),
+      mem_inst_const #(.DEPTH(DEPTH_RT_)) memory_instruction 
+      (
+        .clk(clk), 
+        .rst_n(rst_n), 
+        .addr(addr_rt_inst[i]), 
+        .data_MC(data_32_mc_x), 
+        .ctrl_MC(we_mem_mc_x[1]), 
+        .busy(), 
         .data_out(data_out_inst_rt[i])
         );
 
-      mem_simple memory_constant
-       (
-        .clk(clk),
-        .rst_n(rst_n),
-        .we(),
-        .addr(addr_rt_x[i]),
-        .data_in(),
-        .data_MC(data_32_mc_x),
-        .ctrl_MC(we_mem_mc_x[2]),
-        .busy(),
+      mem_inst_const #(.DEPTH(DEPTH_RT_CONST)) memory_constant 
+      (
+        .clk(clk), 
+        .rst_n(rst_n), 
+        .addr(addr_rt_x[i]), 
+        .data_MC(data_32_mc_x), 
+        .ctrl_MC(we_mem_mc_x[2]), 
+        .busy(), 
         .data_out(data_out_const_rt[i])
         );
     end
