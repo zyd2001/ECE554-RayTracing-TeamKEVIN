@@ -62,6 +62,8 @@ module rta
   parameter NUM_IC = 4;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
+  parameter DEPTH_RT_CONST = 512;
+  parameter DEPTH_RT_INST = 4096;
 
   localparam BIT_RT = $clog2(NUM_RT);
   localparam BIT_IC = $clog2(NUM_IC);
@@ -115,7 +117,7 @@ module rta
   logic rdy_tri_mc;
   // IC
   logic rdy_tri_ic;
-  logic unvalid_tri_ic;
+  logic invalid_tri_ic;
   logic [95:0] vertex_0_tri_ic;
   logic [95:0] vertex_1_tri_ic;
   logic [95:0] vertex_2_tri_ic;
@@ -156,6 +158,7 @@ module rta
   logic [31:0] addr_rt_inst[NUM_RT-1:0];
   // MAIN || INST
   logic [31:0] addr_rt_x[NUM_RT-1:0];
+  logic [127:0] mem_data_read_x_rt[NUM_RT-1:0];
   // PD
   logic task_done_rt_pd[NUM_RT-1:0];
   logic context_switch_rt_pd[NUM_RT-1:0];
@@ -165,7 +168,6 @@ module rta
   // ICM
   logic [127:0] ray_origin_rt_icm [NUM_RT-1:0];
   logic [127:0] ray_direction_rt_icm [NUM_RT-1:0];
-  logic [BIT_THREAD-1:0] thread_id_rt_icm [NUM_RT-1:0];
   logic dequeue_rt_icm;
 
   //////////////////// IC CORE ////////////////////
@@ -176,20 +178,17 @@ module rta
   logic re_ic_tri;
   logic unsigned [BIT_TRI-1:0] tri_id_ic_tri;
   // ICM
-  logic [127:0] shader_info_ic_rt [NUM_IC-1:0]; //(v0, v1, v2, sid)
-  logic [127:0] normal_ic_rt [NUM_IC-1:0];
-  logic [BIT_THREAD-1:0] thread_id_ic_rt [NUM_IC-1:0];
+  logic [127:0] shader_info_ic_icm [NUM_IC-1:0]; //(v0, v1, v2, sid)
+  logic [127:0] normal_ic_icm [NUM_IC-1:0];
   logic dequeue_ic_rt;
 
   /////////////////// IC Memory ///////////////////
   // IC
   logic [127:0] ray_origin_icm_ic;
   logic [127:0] ray_direction_icm_ic;
-  logic [BIT_THREAD-1:0] thread_id_icm_ic;
   // RT​
   logic [127:0] shader_info_icm_rt; //(v0, v1, v2, sid)
   logic [127:0] normal_icm_rt;
-  logic [BIT_THREAD-1:0] thread_id_icm_rt;
 
   mem_controller memory_controller
    (
@@ -247,29 +246,25 @@ module rta
 
   generate
     for (i = 0; i < NUM_RT; i++) begin: inst_const_memory
-      mem_simple memory_instruction
-       (
-        .clk(clk),
-        .rst_n(rst_n),
-        .we(),
-        .addr(addr_rt_inst[i]),
-        .data_in(),
-        .data_MC(data_32_mc_x),
-        .ctrl_MC(we_mem_mc_x[1]),
-        .busy(),
+      mem_inst_const #(.DEPTH(DEPTH_RT_)) memory_instruction 
+      (
+        .clk(clk), 
+        .rst_n(rst_n), 
+        .addr(addr_rt_inst[i]), 
+        .data_MC(data_32_mc_x), 
+        .ctrl_MC(we_mem_mc_x[1]), 
+        .busy(), 
         .data_out(data_out_inst_rt[i])
         );
 
-      mem_simple memory_constant
-       (
-        .clk(clk),
-        .rst_n(rst_n),
-        .we(),
-        .addr(addr_rt_x[i]),
-        .data_in(),
-        .data_MC(data_32_mc_x),
-        .ctrl_MC(we_mem_mc_x[2]),
-        .busy(),
+      mem_inst_const #(.DEPTH(DEPTH_RT_CONST)) memory_constant 
+      (
+        .clk(clk), 
+        .rst_n(rst_n), 
+        .addr(addr_rt_x[i]), 
+        .data_MC(data_32_mc_x), 
+        .ctrl_MC(we_mem_mc_x[2]), 
+        .busy(), 
         .data_out(data_out_const_rt[i])
         );
     end
@@ -287,7 +282,7 @@ module rta
     .done_MC(we_mem_mc_x[3][1]),
     .rdy_MC(rdy_tri_mc),
     .rdy_IC(rdy_tri_ic),
-    .not_valid_IC(unvalid_tri_ic),
+    .not_valid_IC(invalid_tri_ic),
     .vertex0_IC(vertex_0_tri_ic),
     .vertex1_IC(vertex_1_tri_ic),
     .vertex2_IC(vertex_2_tri_ic),
@@ -324,6 +319,77 @@ module rta
     );
 
 
+  generate
+    for (i = 0; i < NUM_RT; i++) begin: RT_CORE
+      RT_core_single rt
+       (
+        .clk(clk),
+        .rst_n(rst_n),
+        .kernel_mode(job_dispatch_pd_rt[i]),
+        .PD_scalar_wen(),
+        .PD_vector_wen(),
+        .PD_scalar_wb_address(),
+        .PD_scalar_read_address1(),
+        .PD_scalar_read_address2(),
+        .PD_vector_wb_address(),
+        .PD_vector_read_address1(),
+        .PD_vector_read_address2(),
+        .PD_scalar_wb_data(),
+        .PD_vector_wb_data(),
+        .MRTI_data(data_out_inst_rt[i]),
+        .MEM_data_read(mem_data_read_x_rt[i]),
+        .MEM_done(rd_rdy_main_rt[i]),
+
+        .End_program(task_done_rt_pd[i]),
+        .Context_switch(context_switch_rt_pd[i]),
+        .PD_scalar_read1(),
+        .PD_scalar_read2(),
+        .PD_vector_read1(),
+        .PD_vector_read2(),
+        .MRTI_addr(addr_rt_inst[i]),
+        .MEM_addr(addr_rt_x[i]),
+        .MEM_data_write(data_in_rt_main[i]),
+        .MEM_read_en(re_rt_main[i]),
+        .MEM_write_en(we_rt_main[i])
+        );
+
+      assign mem_data_read_x_rt[i] = addr_rt_x[i][31] ? data_out_main_x[i] : data_out_const_rt[i];
+     end
+  endgenerate
+
+
+  generate;
+    for(i = 0; i < NUM_IC; i++) begin: IC_CORE
+      IC_v3 ic
+      (
+        .clk(clk), 
+        .rst(rst),
+        .Core_ID(Core_ID), 
+        // .thread_id_in(thread_id_in), 
+        // .thread_id_out(thread_id_out), 
+        .IntersectionPoint(shader_info_ic_icm[127:32]),
+        .sid_in(shader_info_ic_icm[31:0]), 
+        .sid_out(sid_tri_ic), 
+        .dir(ray_direction_icm_ic), 
+        .orig(ray_origin_icm_ic), 
+        .norm(normal_ic_icm), 
+        .IC_Mem_Rdy(dequeue_ic_rt),//dequeue_ic_rt?
+        .Mem_Rdy(rdy_tri_ic), 
+        .v0(vertex_0_tri_ic), 
+        .v1(vertex_1_tri_ic), 
+        .v2(vertex_2_tri_ic), 
+        .Mem_NotValid(invalid_tri_ic), 
+        .triangle_id(tri_id_ic_tri), 
+        .Mem_En(re_ic_tri)
+        // logic job_dispatch_pd_ic[NUM_IC-1:0];
+        // logic [BIT_THREAD-1:0] thread_id_out_pd_ic;
+        // logic context_switch_ic_pd[NUM_IC-1:0];
+        // logic [BIT_THREAD-1:0] thread_id_in_ic_pd[NUM_IC-1:0];
+    );
+    end
+  endgenerate
+  
+
   mem_IC #(.NUM_RT(NUM_RT), NUM_IC(NUM_IC), .NUM_THREAD(NUM_THREAD)) mem_ic
   (
     //input
@@ -335,19 +401,19 @@ module rta
     .core_id_ic2rt_PD(core_id_ic2rt_pd_icm),
     .ray_origin_RT(ray_origin_rt_icm), 
     .ray_direction_RT(ray_direction_rt_icm), 
-    .thread_id_RT_in(thread_id_rt_icm), 
+    // .thread_id_RT_in(), 
     .dequeue_RT(dequeue_rt_icm),
-    .shader_info_IC(shader_info_ic_rt), 
-    .normal_IC(normal_ic_rt), 
-    .thread_id_IC_in(thread_id_ic_rt), 
+    .shader_info_IC(shader_info_ic_icm), 
+    .normal_IC(normal_ic_icm), 
+    // .thread_id_IC_in(), 
     .dequeue_IC(dequeue_ic_rt),
     //output
     .ray_origin_IC(ray_origin_icm_ic), 
     .ray_direction_IC(ray_direction_icm_ic), 
-    .thread_id_IC_out(thread_id_icm_ic),
+    // .thread_id_IC_out(),
     .shader_info_RT(shader_info_icm_rt), 
     .normal_RT(normal_icm_rt), 
-    .thread_id_RT_out(thread_id_icm_rt)
+    // .thread_id_RT_out()
     );
 
      
