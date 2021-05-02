@@ -2,9 +2,9 @@ s_load_4byte r r i
 101100 5 5 16
 s_store_4byte r r i
 111100 5 5 16
-s_write_high r x ui
+s_write_high_real r r ui
 100000 5 5 16
-s_write_low r x ui
+s_write_low_real r r ui
 100001 5 5 16
 s_get_from_v r x r x ui
 100101 5 1 4 14 2
@@ -120,3 +120,7 @@ s_mov r r
 # ii_add $r0 $r1 R0
 v_mov r r
 # vv_add $r0 $r1 R0
+s_write_low r i
+# s_write_low_real $r0 $r0 $i
+s_write_high r i
+# s_write_high_real $r0 $r0 $i
