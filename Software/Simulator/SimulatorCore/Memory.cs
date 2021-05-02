@@ -43,5 +43,17 @@ namespace SimulatorCore
         {
             trace = false;
         }
+
+        internal (float r, float g, float b) getLast()
+        {
+            int index = Mem.Length - 16;
+            float a = BitConverter.ToSingle(Read(index));
+            index += 4;
+            float b = BitConverter.ToSingle(Read(index));
+            index += 4;
+            float c = BitConverter.ToSingle(Read(index));
+            index += 4;
+            return (a, b, c);
+        }
     }
 }

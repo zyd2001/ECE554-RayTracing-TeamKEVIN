@@ -1,16 +1,52 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
+using System.IO;
 
 namespace SimulatorCore
 {
+
+    class Triangle
+    {
+        internal Vector3 v0;
+        internal Vector3 v1;
+        internal Vector3 v2;
+        internal int id;
+    }
     class IntersectionCore
     {
         Memory Memory { get; }
+        List<Triangle> triangles = new List<Triangle>();
         const float Epsilon = 1e-8F;
 
         internal IntersectionCore(Memory mem)
         {
             Memory = mem;
+        }
+
+        internal IntersectionCore(TextReader t)
+        {
+            for (int k = 0; k < 320; k++)
+            {
+                Triangle tri = new Triangle();
+                tri.id = 1;
+                string str = t.ReadLine();
+                var s = str.Split();
+                tri.v0.X = float.Parse(s[0]);
+                tri.v0.Y = float.Parse(s[1]);
+                tri.v0.Z = float.Parse(s[2]);
+                str = t.ReadLine();
+                s = str.Split();
+                tri.v1.X = float.Parse(s[0]);
+                tri.v1.Y = float.Parse(s[1]);
+                tri.v1.Z = float.Parse(s[2]);
+                str = t.ReadLine();
+                s = str.Split();
+                tri.v2.X = float.Parse(s[0]);
+                tri.v2.Y = float.Parse(s[1]);
+                tri.v2.Z = float.Parse(s[2]);
+                triangles.Add(tri);
+            }
         }
 
         Vector3 VectorHelper(ref int address)
@@ -29,19 +65,23 @@ namespace SimulatorCore
             Vector3 dir = new Vector3(direction.X, direction.Y, direction.Z);
             Vector4 resultPoint = new Vector4(0, 0, 0, 0), resultNormal = new Vector4();
             float minDistance = float.MaxValue;
-            int id = 1;
-            for (int i = 0; i < Memory.Mem.Length; id++)
+            for (int i = 0; i < triangles.Count; i++)
             {
-                Vector3 v0 = VectorHelper(ref i);
-                Vector3 v1 = VectorHelper(ref i);
-                Vector3 v2 = VectorHelper(ref i);
-                i += 4;
+                // Vector3 v0 = VectorHelper(ref i);
+                // Vector3 v1 = VectorHelper(ref i);
+                // Vector3 v2 = VectorHelper(ref i);
+                // int id = BitConverter.ToInt32(Memory.Read(i));
+
+                Vector3 v0 = triangles[i].v0;
+                Vector3 v1 = triangles[i].v1;
+                Vector3 v2 = triangles[i].v2;
+                int id = triangles[i].id;
                 Vector3 v0v1 = v1 - v0;
                 Vector3 v0v2 = v2 - v0;
                 Vector3 pvec = Vector3.Cross(dir, v0v2);
                 float det = Vector3.Dot(v0v1, pvec);
 
-                if (det < Epsilon)
+                if (Math.Abs(det) < Epsilon)
                     continue;
 
                 float invDet = 1 / det;
@@ -63,7 +103,7 @@ namespace SimulatorCore
                 {
                     minDistance = t;
                     resultPoint = new Vector4(orig + t * dir, BitConverter.Int32BitsToSingle(id));
-                    resultNormal = new Vector4(Vector3.Cross(v0v1, v0v2), 0);
+                    resultNormal = new Vector4(Vector3.Normalize(Vector3.Cross(v0v1, v0v2)), 0);
                 }
             }
             return (resultPoint, resultNormal);
