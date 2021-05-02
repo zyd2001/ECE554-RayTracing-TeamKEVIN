@@ -32,6 +32,7 @@ namespace CompilerCore
             for (var node = List.First; node != null; node = node.Next)
             {
                 Assembly ins = node.Value;
+                ins.Successor = new HashSet<Assembly>();
                 // ins.Predecessor.Add(i - 1);
                 if (ins.OPCode == "ret" || ins.OPCode == "Fin")
                 {
@@ -171,7 +172,7 @@ namespace CompilerCore
                         {
                             if (OperandsCheck(ins.Operands))
                                 continue;
-                            if (ins.OPCode[0] == 'c' || ins.OPCode == "s_store_4byte" || ins.OPCode == "v_store_4byte")
+                            if (ins.OPCode[0] == 'c' || ins.OPCode == "s_store_4byte" || ins.OPCode == "v_store_16byte")
                                 continue;
                             something = true;
                             ins.Operands = new List<string>();
@@ -227,7 +228,7 @@ namespace CompilerCore
         internal (InferenceGraph sgraph, InferenceGraph vgraph) CreateInferenceGraph(HashSet<string> spre, HashSet<string> vpre)
         {
             ConstructFlowGraph();
-            do { CalculateLiveSpan(); }
+            do { CalculateLiveSpan2(); }
             while (DeleteStupidLine());
             InferenceGraph sgraph = new InferenceGraph(SIns, SOuts, spre);
             InferenceGraph vgraph = new InferenceGraph(VIns, VOuts, vpre);
@@ -260,11 +261,19 @@ namespace CompilerCore
                 if (ins.SDef.Overlaps(ins.SOut))
                     foreach (var a in ins.SDef)
                         foreach (var b in ins.SOut)
-                            sgraph.AddEdge(a, b);
+                        {
+                            bool aa = a[0] == 'R';
+                            bool bb = b[0] == 'R';
+                            sgraph.AddEdgeP(a, b, aa, bb);
+                        }
                 if (ins.VDef.Overlaps(ins.VOut))
                     foreach (var a in ins.VDef)
                         foreach (var b in ins.VOut)
-                            vgraph.AddEdge(a, b);
+                        {
+                            bool aa = a[0] == 'R';
+                            bool bb = b[0] == 'R';
+                            vgraph.AddEdgeP(a, b, aa, bb);
+                        }
             }
             return (sgraph, vgraph);
         }
