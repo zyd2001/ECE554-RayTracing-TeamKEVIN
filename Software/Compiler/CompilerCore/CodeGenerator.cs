@@ -19,7 +19,7 @@ namespace CompilerCore
         internal Set VDef { get; set; } = Set.Empty;
         internal string UsedLabel { get; set; } = null;
         // internal HashSet<int> Predecessor { get; } = new HashSet<int>();
-        internal HashSet<Assembly> Successor { get; } = new HashSet<Assembly>();
+        internal HashSet<Assembly> Successor { get; set; } = new HashSet<Assembly>();
         internal Set SIn { get; set; } = Set.Empty;
         internal Set VIn { get; set; } = Set.Empty;
         internal Set SOut { get; set; } = Set.Empty;
@@ -38,7 +38,7 @@ namespace CompilerCore
             this.UsedLabel = asm.UsedLabel;
             this.FunctionArgument = asm.FunctionArgument;
             this.FunctionType = asm.FunctionType;
-            this.Label = asm.Label;
+            // this.Label = asm.Label;
             this.SUse = asm.SUse;
             this.VUse = asm.VUse;
             this.SDef = asm.SDef;
@@ -113,7 +113,7 @@ namespace CompilerCore
                         sdef.Add(Operands[0]);
                         suse.Add(Operands[0]);
                     }
-                    else if (OPCode[0] == 'c' || OPCode == "s_store_4byte" || OPCode == "v_store_4byte")
+                    else if (OPCode[0] == 'c' || OPCode == "s_store_4byte" || OPCode == "v_store_16byte")
                     {
                         for (int i = 0; i < 2; i++)
                         {
