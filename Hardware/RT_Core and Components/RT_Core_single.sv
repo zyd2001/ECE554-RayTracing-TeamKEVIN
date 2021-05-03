@@ -19,7 +19,7 @@ module RT_core_single (
     DEBUG_memory_R_data, DEBUG_memory_W_data,
 
     MRTI_addr, MRTI_data,
-    MEM_addr, MEM_data_write, MEM_data_read, MEM_read_en, MEM_write_en, MEM_done
+    MEM_addr, MEM_data_write, MEM_data_read, MEM_read_en, MEM_write_en, MEM_done, MEM_s_or_v
 );
     // Control / Normal signals
     input clk, rst_n;
@@ -280,20 +280,28 @@ module RT_core_single (
             IF_DE_instruction <= 32'h30000000;
             IF_DE_current_PC_plus_four <= 32'h0000;
             IF_DE_FIN <= 1'b1;
-        end else if (~IF_DE_stall) begin
-            if (~(IF_DE_FIN && IF_FIN))
-                if (IF_next_pc_select != 2'b00) begin
-                    IF_DE_instruction <= 32'h30000000;
-                    IF_DE_current_PC_plus_four <= 32'h0000;
-                    IF_DE_current_PC <= PC_reg;
-                    IF_DE_FIN <= 1'b0;
-                end else begin
-                    IF_DE_FIN <= IF_FIN;
-                    IF_DE_current_PC <= PC_reg;
-                    IF_DE_instruction <= IF_instruction;
-                    IF_DE_current_PC_plus_four <= IF_PC_plus_four;
-                end
+        end else begin
+            if (~IF_DE_stall) begin
+                if (~(IF_DE_FIN && IF_FIN))
+                    if (IF_next_pc_select != 2'b00) begin
+                        IF_DE_instruction <= 32'h30000000;
+                        IF_DE_current_PC_plus_four <= 32'h0000;
+                        IF_DE_current_PC <= PC_reg;
+                        IF_DE_FIN <= 1'b0;
+                    end else begin
+                        IF_DE_FIN <= IF_FIN;
+                        IF_DE_current_PC <= PC_reg;
+                        IF_DE_instruction <= IF_instruction;
+                        IF_DE_current_PC_plus_four <= IF_PC_plus_four;
+                    end
+            end
+
+            if (kernel_mode) begin
+                IF_DE_FIN <= 1'b0;
+            end
         end
+
+
     end
 
     // make sure it arrives early for RF memory
@@ -530,7 +538,9 @@ module RT_core_single (
                 DE_EX_FIN <= IF_DE_FIN;
                 DE_EX_context_switch <= DE_context_switch;
             end
-
+            if (kernel_mode) begin
+                DE_EX_FIN <= 1'b0;
+            end
         end
     end
     
@@ -849,6 +859,10 @@ module RT_core_single (
             end
             else if (MEM_v_reduce_knockdown)
                 EX_MEM_vector_reduce_en <= 3'b0;
+
+            if (kernel_mode) begin
+                EX_MEM_FIN <= 1'b0;
+            end
         end
     end
 
@@ -954,6 +968,7 @@ module RT_core_single (
             MEM_WB_context_switch <= 1'b0;
         end
         else begin
+            
             if (!MEM_busy) begin
                 MEM_WB_FIN <= EX_MEM_FIN;
                 MEM_WB_context_switch <= EX_MEM_context_switch;
@@ -965,6 +980,9 @@ module RT_core_single (
 
             MEM_WB_vector <= MEM_V_out;
             MEM_WB_scalar <= MEM_S_out; 
+            if (kernel_mode) begin
+                MEM_WB_FIN <= 1'b0;
+            end
         end
     end
 

@@ -1,5 +1,8 @@
+import "DPI-C" function string getenv(input string env_name);
 module RT_PD_ICM_interface_tb ();
 
+    int rmtracefile;
+	string rmtracefilename;
 
     // input 
     logic clk;
@@ -137,7 +140,7 @@ module RT_PD_ICM_interface_tb ();
 	);
 
 
-    rt_pd_icm_interface iDUT(.clk(clk), .rst_n(rst_n), .job_assign(job_assign), .thread_id_in(thread_id_in), .pixel_id_in(pixel_id_in)
+    rt_pd_icm_interface iDUT(.clk(clk), .rst_n(rst_n), .job_assign(job_assign), .thread_id_in(thread_id_in), .pixel_id_in(pixel_id_in), .thread_id_out(thread_id_out),
         .program_counter_in(program_counter_in), .stack_ptr_in(stack_ptr_in), .context_switch_pd(context_switch_pd), .task_done_pd(task_done_pd),
         .program_counter_out(program_counter_out), .stack_ptr_out(stack_ptr_out), .shader_info(shader_info), .normal(normal), .de_q(de_q), .origin(origin),
         .direction(direction), .end_program(End_program), .context_switch_rt(Context_switch), 
@@ -147,8 +150,10 @@ module RT_PD_ICM_interface_tb ();
         .scalar_wb_addr(PD_scalar_wb_address), .vector_wb_addr(PD_vector_wb_address), .scalar_wb_data(PD_scalar_wb_data), .vector_wb_data(PD_vector_wb_data));
 
     initial begin
+        rmtracefilename = {getenv("PWD"), "/rmtrace.out"};
+		rmtracefile = $fopen(rmtracefilename, "w+");
         clk = 1'b0;
-        rst_n = 1'b1;
+        rst_n = 1'b0;
         job_assign = 0;
         thread_id_in = 0;
         pixel_id_in = 0;
@@ -159,25 +164,142 @@ module RT_PD_ICM_interface_tb ();
 
         // assigning the first job
         @(negedge clk)
-        rst_n = 1'b0;
+        rst_n = 1'b1;
         job_assign = 1;
         thread_id_in = 5'd10;
-        pixel_id_in = 32'd98498;
+        pixel_id_in = 32'h00000020;
         program_counter_in = 32'h4;
-        stack_ptr_in = 32'h778787;
-        shader_info = 128'h989498891965;
-        normal = 128'h5741918748;
+        stack_ptr_in = 32'h10000070;
+        shader_info = 128'h000098A7;
+        normal = 128'h00007748;
+        #1
+        if(de_q !== 1'b1) begin
+            $display("ICM does not dequeue correctly");
+            $stop();
+        end
 
         @(negedge clk)
         job_assign = 0;
 
-        @(context_switch_pd)
-        if (thread_id_in != 5'd10 || pixel_id_in != 32'd98498) begin
-            print("thread ID or pixel ID is wrong");
+        #1
+		fork
+        // we want to make sure that no more responses
+        begin: timeout
+	        repeat(500) @(posedge clk);
+            if(de_q !== 1'b0) begin
+                $display("ICM does not dequeue correctly");
+                $stop();
+            end
+            $display("Program does not correctly terminate");
+            $stop();
+	    end
+	    begin
+            while (context_switch_pd != 1'b1) begin
+				@(posedge clk);
+				print_output(rmtracefile);
+			end
+            
+            $display("First iteration correctly terminate");
+            disable timeout;
+	    end
+    	join
+
+        if (thread_id_out !== 5'd10) begin
+            $display("thread ID or pixel ID is wrong");
+            $stop();
         end
+
+        if (task_done_pd) begin
+            $display("only context switch should be high");
+            $stop();
+        end
+
+        if (program_counter_out !== 32'h00000024) begin
+            $display("return program counter is wrong");
+            $stop();
+        end
+
+        if (stack_ptr_out !== pixel_id_in + 32'h8) begin
+            $display("new stack pointer is wrong");
+            $stop();
+
+        end
+
+        if (origin[31:0] !== 128'h98A7 + 128'h40) begin
+            $display("origin is wrong");
+            $stop();
+        end
+
+        if (direction[31:0] !== 128'h7748 + 128'h400) begin
+            $display("direction is wrong");
+            $stop();
+        end
+        
+        repeat(4) @(negedge clk);
+        
+        job_assign = 1;
+        thread_id_in = 5'd10;
+        pixel_id_in = 32'h00000020;
+        program_counter_in = program_counter_out;
+        stack_ptr_in = 32'h10000070;
+        shader_info = 128'h007718877;
+        normal = 128'h0042188747;
+
+        @(negedge clk)
+        job_assign = 0;
+
+        #1
+		fork
+        // we want to make sure that no more responses
+        begin: timeout2
+	        repeat(500) @(posedge clk);
+            $display("Program does not correctly terminate");
+            $stop();
+	    end
+	    begin
+            while (task_done_pd != 1'b1) begin
+				@(posedge clk);
+				print_output(rmtracefile);
+			end
+            disable timeout2;
+	    end
+        join
+        $display("Test Passed. Please check log for more detail");
+        $stop();
+
     end
 
 
     always #2 clk = ~clk; 
+    
+	task print_output(int file);
+		if (Instruction != 32'hF8000000) begin
+			if (Instruction == 32'h30000000) begin
+				$fwrite(rmtracefile, "PC at %h, Flushed \n\n", PC);
+			end
+			else begin
+				$fwrite(rmtracefile, "PC at %h, instruction: %h \n", PC, Instruction);
+				$fwrite(rmtracefile, " Reading scalar %d: %h, Reading scalar %d: %h \n", DEBUG_scalar_read_address1, DEBUG_scalar_read1,DEBUG_scalar_read_address2, DEBUG_scalar_read2);
+				$fwrite(rmtracefile, " Reading vector %d: %h, Reading vector %d: %h \n", DEBUG_vector_read_address1, DEBUG_vector_read1,DEBUG_vector_read_address2, DEBUG_vector_read2);
+				if (memory_R_enable) 
+					$fwrite(rmtracefile, " Reading memory location %h: %h \n",memory_address, memory_R_data);
+				else if (memory_W_enable)
+					$fwrite(rmtracefile, " writing memory location %h: %h \n",memory_address, memory_W_data);
+				else 
+					$fwrite(rmtracefile, " No memory operations\n");
+
+				if (DEBUG_scalar_wb_address == 5'b0) 
+					$fwrite(rmtracefile, " No scalar write back. ");
+				else 
+					$fwrite(rmtracefile, " write back scalar %d: %h. ", DEBUG_scalar_wb_address, DEBUG_scalar_wb_data);
+
+
+				if (DEBUG_vector_wb_address == 4'b0) 
+					$fwrite(rmtracefile, " No vector write back. \n\n");
+				else 
+					$fwrite(rmtracefile, " write back vector %d: %h. \n\n", DEBUG_vector_wb_address, DEBUG_vector_wb_data);
+			end
+		end
+	endtask
 
 endmodule
