@@ -1,5 +1,5 @@
 module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_MC,
-        load_start_PD, load_done_PD, pixel_id_PD);
+        load_start_PD, load_done_PD, pixel_id_PD, load_done_term_MC);
     parameter NUM_THREAD = 32;
     localparam BIT_THREAD = $clog2(NUM_THREAD);
     /*
@@ -18,13 +18,14 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
     output logic load_start_PD;
     output load_done_PD;
     output [31:0] pixel_id_PD;
+    output load_done_term_MC;
     enum {idle, patching, patching_wait} state, next;
 
-    logic load_done_patch, load_done_patch_in, load_done_term;
+    logic load_done_patch, load_done_patch_in;
     logic [BIT_THREAD-1:0] thread_cnt, thread_cnt_in;
     logic [31:0] pixel_max, pixel_curr, pixel_curr_in;
     assign pixel_id_PD = pixel_curr;
-    assign load_done_PD = load_done_patch | load_done_term;
+    assign load_done_PD = load_done_patch | load_done_term_MC;
     always_ff @(posedge clk, negedge rst_n) begin
         if(!rst_n) begin
             pixel_max <= '0;
@@ -56,7 +57,7 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
         next = state;
         thread_cnt_in = thread_cnt;
         load_start_PD = 1'b0;
-        load_done_term = 1'b0;
+        load_done_term_MC = 1'b0;
         load_done_patch_in = 1'b0;
         pixel_curr_in = pixel_curr;
         case(state)
@@ -66,6 +67,7 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
                     thread_cnt_in = '0;
                     pixel_curr_in = '0;
                     load_done_patch_in = 1'b1;
+                    load_done_term_MC = 1'b1;
                 end
                 else begin
                     pixel_curr_in = pixel_curr + 1;
