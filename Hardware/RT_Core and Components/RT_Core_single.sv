@@ -42,7 +42,7 @@ module RT_core_single (
     // Main Memory + Const Memory related
     output [31:0] MEM_addr;
     output [127:0] MEM_data_write; 
-    output MEM_read_en, MEM_write_en;
+    output MEM_read_en, MEM_write_en, MEM_s_or_v;
     input [127:0] MEM_data_read;
     input MEM_done;    
     
@@ -282,18 +282,17 @@ module RT_core_single (
             IF_DE_FIN <= 1'b1;
         end else begin
             if (~IF_DE_stall) begin
-                if (~(IF_DE_FIN && IF_FIN))
-                    if (IF_next_pc_select != 2'b00) begin
-                        IF_DE_instruction <= 32'h30000000;
-                        IF_DE_current_PC_plus_four <= 32'h0000;
-                        IF_DE_current_PC <= PC_reg;
-                        IF_DE_FIN <= 1'b0;
-                    end else begin
-                        IF_DE_FIN <= IF_FIN;
-                        IF_DE_current_PC <= PC_reg;
-                        IF_DE_instruction <= IF_instruction;
-                        IF_DE_current_PC_plus_four <= IF_PC_plus_four;
-                    end
+                if (IF_next_pc_select != 2'b00) begin
+                    IF_DE_instruction <= 32'h30000000;
+                    IF_DE_current_PC_plus_four <= 32'h0000;
+                    IF_DE_current_PC <= PC_reg;
+                    IF_DE_FIN <= 1'b0;
+                end else begin
+                    IF_DE_FIN <= IF_FIN;
+                    IF_DE_current_PC <= PC_reg;
+                    IF_DE_instruction <= IF_instruction;
+                    IF_DE_current_PC_plus_four <= IF_PC_plus_four;
+                end
             end
 
             if (kernel_mode) begin
@@ -433,7 +432,7 @@ module RT_core_single (
                 else if (DE_S1_address == MEM_WB_Swb_address && DE_S1_address != 5'b0)
                     DE_EX_scalar1 <= MEM_WB_scalar;
                 else 
-                    DE_EX_scalar1 = DE_scalar1;
+                    DE_EX_scalar1 <= DE_scalar1;
 
                 if (DE_S2_address == DE_EX_Swb_address && DE_S2_address != 5'b0 && DE_EX_memory_op[2:1] != 2'b10 && DE_EX_vector_reduce_en != 1'b1)
                     DE_EX_scalar2 <= EX_S_out;
@@ -442,7 +441,7 @@ module RT_core_single (
                 else if (DE_S2_address == MEM_WB_Swb_address && DE_S2_address != 5'b0)
                     DE_EX_scalar2 <= MEM_WB_scalar;
                 else 
-                    DE_EX_scalar2 = DE_scalar2;
+                    DE_EX_scalar2 <= DE_scalar2;
                 
                 if (DE_V1_address == DE_EX_Vwb_address && DE_V1_address != 4'b0 && DE_EX_memory_op[2:1] != 2'b10)
                     DE_EX_vector1 <= EX_V_out;
@@ -451,7 +450,7 @@ module RT_core_single (
                 else if (DE_V1_address == MEM_WB_Vwb_address && DE_V1_address != 5'b0)
                     DE_EX_vector1 <= MEM_WB_vector;
                 else 
-                    DE_EX_vector1 = DE_vector1;
+                    DE_EX_vector1 <= DE_vector1;
 
                 if (DE_V2_address == DE_EX_Vwb_address && DE_V2_address != 4'b0 && DE_EX_memory_op[2:1] != 2'b10)
                     DE_EX_vector2 <= EX_V_out;
@@ -460,7 +459,7 @@ module RT_core_single (
                 else if (DE_V2_address == MEM_WB_Vwb_address && DE_V2_address != 5'b0)
                     DE_EX_vector2 <= MEM_WB_vector;
                 else 
-                    DE_EX_vector2 = DE_vector2;
+                    DE_EX_vector2 <= DE_vector2;
                 DE_EX_immediate <= IF_DE_instruction[15:0];
             end
         end
@@ -533,7 +532,7 @@ module RT_core_single (
                 if (IF_DE_instruction[31] == 1'b1 && IF_DE_instruction[29:28] == 2'b11)
                     DE_EX_integer_ALU_opcode[1:0] <= 2'b0;
                 
-                DE_EX_float_ALU_opcode <= {IF_DE_instruction[31:28] == 4'b1001 ? 1'b1 : 1'b0, IF_DE_instruction[27:26]};
+                DE_EX_float_ALU_opcode <= {IF_DE_instruction[31:28] == 4'b1001 || IF_DE_instruction[31:26] == 6'b111111 ? 1'b1 : 1'b0, IF_DE_instruction[27:26]};
 
                 DE_EX_FIN <= IF_DE_FIN;
                 DE_EX_context_switch <= DE_context_switch;
@@ -873,6 +872,7 @@ module RT_core_single (
     // assign MEM_address_bypass = EX_MEM_s_out[31:29] == 3'b100 ? EX_MEM_s_out : EX_integer_ALU_out;
     assign MEM_knockdown = EX_MEM_memory_op[2];
     assign MEM_v_reduce_knockdown = EX_MEM_vector_reduce_en;
+    assign MEM_s_or_v = EX_MEM_memory_op[0];
     
     assign MEM_addr = EX_MEM_s_out;
     assign MEM_data_write = EX_MEM_memory_op[0] == 1'b1 ? MEM_forwarded_v_data : {96'b0, MEM_forwarded_s_data};
@@ -1019,7 +1019,7 @@ module RT_core_single (
             DEBUG_MEM_WB_memory_R_data <= 128'b0;
             DEBUG_MEM_WB_memory_W_data <= 128'b0;
         end else begin
-            DEBUG_MEM_WB_inst <= MEM_busy ? 32'hF8000000 : DEBUG_EX_MEM_inst;
+            DEBUG_MEM_WB_inst <= (MEM_busy || kernel_mode) ? 32'hF8000000 : DEBUG_EX_MEM_inst;
             DEBUG_MEM_WB_PC <= DEBUG_EX_MEM_PC;
             DEBUG_MEM_WB_RF_AddressS1 <= DEBUG_EX_MEM_RF_AddressS1;
             DEBUG_MEM_WB_RF_AddressS2 <= DEBUG_EX_MEM_RF_AddressS2;
