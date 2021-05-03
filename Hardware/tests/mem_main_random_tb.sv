@@ -12,6 +12,7 @@ module mem_main_random_tb();
     logic rst_n;
     logic we_RT[NUM_RT-1:0];
     logic re_RT[NUM_RT-1:0];
+    logic mode[NUM_RT-1:0];
     logic [31:0] addr_RT[NUM_RT-1:0];
     logic [ADDRESS_BIT-1:0] addr_RT_rand[NUM_RT-1:0];
     
@@ -25,8 +26,17 @@ module mem_main_random_tb();
     always #1 clk = ~clk;
 
 
-    mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
-                  data_RT_out, rd_rdy_RT);
+    mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main
+                   (.clk(clk),
+                    .rst_n(rst_n),
+                    .we(we_RT),
+                    .re(re_RT),
+                    .addr(addr_RT),
+                    .data_in(data_RT_in),
+                    .data_out(data_RT_out),
+                    .rd_rdy(rd_rdy_RT),
+                    .mode(mode)
+                    );
     
     logic [127:0] data_RT_copy[NUM_RT+1:0];
     logic [31:0] addr_RT_copy[NUM_RT+1:0];
@@ -43,6 +53,7 @@ module mem_main_random_tb();
             we_RT = '{NUM_RT{1'b0}};
             re_RT = '{NUM_RT{1'b0}};
             RT_busy = '{NUM_RT{1'b0}};
+            mode = '{NUM_RT{1'b1}};
             for(int i=0;i<NUM_RT;++i) begin
                 addr_RT[i] = 32'b0;
                 data_RT_in[i] = 128'b0;

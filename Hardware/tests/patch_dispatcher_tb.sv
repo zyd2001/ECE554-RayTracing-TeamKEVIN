@@ -19,6 +19,7 @@ logic clk;
 logic rst_n;
 
 logic load_cp;
+logic load_done_cp;
 logic [31:0] pixel_id_cp;
 
 logic task_done_rt[NUM_RT-1:0];
@@ -177,6 +178,7 @@ initial begin
     rst_n = 1;
     load_cp = 0;
     pixel_id_cp = 32'h0;
+    load_done_cp = 1'h0;
 
     @(negedge clk);
     rst_n = 0;
@@ -189,7 +191,9 @@ initial begin
         @(negedge clk);
         load_cp = 0;
     end
-
+    load_done_cp = 1'h1;
+    @(negedge clk);
+    load_done_cp = 1'h0;
     @(posedge patch_done);
     @(negedge clk);
 
