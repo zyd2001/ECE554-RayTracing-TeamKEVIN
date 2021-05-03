@@ -7,13 +7,15 @@ namespace CompilerCore
     {
         public static void Main(string[] args)
         {
-            Scanner scanner = new Scanner(new FileStream("main.rt", FileMode.Open));
+            Scanner scanner = new Scanner(new FileStream("main.kpp", FileMode.Open));
             Parser parser = new Parser(scanner);
 
-            Console.WriteLine(parser.Parse());
-            Console.WriteLine(parser.AST.StaticCheck());
-            CodeGenerator generator = new CodeGenerator(parser.AST);
-            generator.generate();
+            if (parser.Parse())
+                if (parser.AST.StaticCheck())
+                {
+                    CodeGenerator generator = new CodeGenerator(parser.AST);
+                    generator.generate();
+                }
             // DirectTranslation d = new DirectTranslation();
             // d.AddAssembly("s_movi", ".a", "0");
             // d.AddLabel("L1");
