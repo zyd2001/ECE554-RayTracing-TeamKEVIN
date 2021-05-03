@@ -105,7 +105,7 @@ module rt_pd_icm_interface
     end
 
     typedef enum reg [2:0] {IDLE, LOADING0, LOADING1, LOADING2, LOADING_DONE, RUNNING, UNLOAD, UNLOAD_DONE} interface_state;
-    t_state_load state_load, nxt_state_load;
+    interface_state state_load, nxt_state_load;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n)
@@ -116,8 +116,8 @@ module rt_pd_icm_interface
 
     always_comb begin
         nxt_state_load = state_load;
-        upd_in = 1'h0
-        de_q = 1'h0
+        upd_in = 1'h0;
+        de_q = 1'h0;
         kernel_mode = 1'h0;
         scalar_we = 1'h0;
         vector_we = 1'h0;
@@ -125,12 +125,14 @@ module rt_pd_icm_interface
         vector_wb_addr = 4'h0;
         scalar_wb_data = 32'h0;
         vector_wb_data = 128'h0;
-
+        upd_out = 1'b0;
+        task_done_pd = 1'b0;
+        context_switch_pd = 1'b0;
         case(state_load)
-            IDLE_LOAD: begin
+            IDLE: begin
                 kernel_mode = 1'b1;
                 if (job_assign) begin
-                    nxt_state_load = LOADING1;
+                    nxt_state_load = LOADING0;
                     upd_in = 1'h1;
                     de_q = 1'h1;
                 end
@@ -146,7 +148,7 @@ module rt_pd_icm_interface
                 vector_wb_data = rv14;
             end
             LOADING1: begin
-                nxt_state_load = LOADING_LOAD_2;
+                nxt_state_load = LOADING2;
                 kernel_mode = 1'h1;
                 scalar_we = 1'h1;
                 scalar_wb_addr = 5'd31;
@@ -164,7 +166,7 @@ module rt_pd_icm_interface
             end
             LOADING_DONE: begin
                 nxt_state_load = RUNNING;
-                kernel_mode = 1'h1;
+                kernel_mode = 1'h0;
             end
             RUNNING: begin
                 if (end_program && context_switch_rt) begin
@@ -178,13 +180,14 @@ module rt_pd_icm_interface
                 end
             end
             UNLOAD: begin
-                nxt_state_unload = DONE_UNLOAD;
+                kernel_mode = 1'b1;
+                nxt_state_load = UNLOAD_DONE;
                 upd_out = 1'h1;
             end
             default: begin
+                kernel_mode = 1'b1;
                 context_switch_pd = 1;
-                nxt_state_unload = IDLE:
-                
+                nxt_state_load = IDLE;
             end
         endcase
     end
