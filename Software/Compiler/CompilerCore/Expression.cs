@@ -441,7 +441,7 @@ namespace CompilerCore
         internal override bool NameAnalysis(SymbolTable table)
         {
             func = table.GlobalSearch(identifier);
-            if (!func?.IsFunction ?? false)
+            if (!func?.IsFunction ?? true)
             {
                 Error($"Function {identifier} not found");
                 return false;
