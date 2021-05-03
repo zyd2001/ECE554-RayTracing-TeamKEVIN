@@ -1,19 +1,18 @@
 module mem_IC (
     //input
     clk, rst_n, q_en_rt2ic_PD, core_id_rt2ic_PD, q_en_ic2rt_PD, core_id_ic2rt_PD,
-    ray_origin_RT, ray_direction_RT, thread_id_RT_in, dequeue_RT,
-    shader_info_IC, normal_IC, thread_id_IC_in, dequeue_IC,
+    ray_origin_RT, ray_direction_RT, dequeue_RT,
+    shader_info_IC, normal_IC, dequeue_IC,
     //output
-    ray_origin_IC, ray_direction_IC, thread_id_IC_out,
-    shader_info_RT, normal_RT, thread_id_RT_out
+    ray_origin_IC, ray_direction_IC,
+    shader_info_RT, normal_RT
     );
 
     parameter NUM_RT = 4;
     parameter NUM_IC = 4;
     parameter NUM_THREAD = 32;
-    localparam BIT_THREAD = $clog2(NUM_THREAD);
-    localparam RT2IC_WIDTH = 256+BIT_THREAD;
-    localparam IC2RT_WIDTH = 256+BIT_THREAD;
+    localparam RT2IC_WIDTH = 192;
+    localparam IC2RT_WIDTH = 224;
     /*
         Input​
     */
@@ -24,14 +23,12 @@ module mem_IC (
     input q_en_ic2rt_PD;
     input core_id_ic2rt_PD[NUM_IC-1:0];
     // RT
-    input [127:0] ray_origin_RT [NUM_RT-1:0];
-    input [127:0] ray_direction_RT [NUM_RT-1:0];
-    input [BIT_THREAD-1:0] thread_id_RT_in [NUM_RT-1:0];
+    input [95:0] ray_origin_RT [NUM_RT-1:0];
+    input [95:0] ray_direction_RT [NUM_RT-1:0];
     input dequeue_RT;
     // IC​
     input [127:0] shader_info_IC [NUM_IC-1:0]; //(v0, v1, v2, sid)
-    input [127:0] normal_IC [NUM_IC-1:0];
-    input [BIT_THREAD-1:0] thread_id_IC_in [NUM_IC-1:0];
+    input [95:0] normal_IC [NUM_IC-1:0];
     input dequeue_IC;
     /*
         Output
@@ -39,11 +36,9 @@ module mem_IC (
     // IC
     output [127:0] ray_origin_IC;
     output [127:0] ray_direction_IC;
-    output [BIT_THREAD-1:0] thread_id_IC_out;
     // RT​
     output [127:0] shader_info_RT;
     output [127:0] normal_RT;
-    output [BIT_THREAD-1:0] thread_id_RT_out;
 
     genvar j;
     logic [RT2IC_WIDTH-1:0] data_in_RT2IC;
@@ -160,7 +155,7 @@ module mem_IC (
         data_in_RT2IC = {RT2IC_WIDTH{1'b0}};
         for(int i = 0; i < NUM_RT; ++i) begin
             if (core_id_rt2ic_PD[i]) begin
-                data_in_RT2IC = {thread_id_RT_in[i], ray_origin_RT[i], ray_direction_RT[i]};
+                data_in_RT2IC = {ray_origin_RT[i], ray_direction_RT[i]};
             end
             else begin end
         end
@@ -169,7 +164,7 @@ module mem_IC (
         data_in_IC2RT = {IC2RT_WIDTH{1'b0}};
         for(int i = 0; i < NUM_RT; ++i) begin
             if (core_id_ic2rt_PD[i]) begin
-                data_in_IC2RT = {thread_id_IC_in[i], shader_info_IC[i], normal_IC[i]};
+                data_in_IC2RT = {shader_info_IC[i], normal_IC[i]};
             end
             else begin end
         end
@@ -265,10 +260,8 @@ module mem_IC (
     endgenerate
 
     // output
-    assign ray_direction_IC = fifo_RT2IC[0][127:0];
-    assign ray_origin_IC = fifo_RT2IC[0][255:128];
-    assign thread_id_IC_out = fifo_RT2IC[0][255+BIT_THREAD:256];
-    assign normal_RT = fifo_IC2RT[0][127:0];
-    assign shader_info_RT = fifo_IC2RT[0][255:128];
-    assign thread_id_RT_out = fifo_IC2RT[0][255+BIT_THREAD:256];
+    assign ray_direction_IC = fifo_RT2IC[0][95:0];
+    assign ray_origin_IC = fifo_RT2IC[0][191:96];
+    assign normal_RT = fifo_IC2RT[0][95:0];
+    assign shader_info_RT = fifo_IC2RT[0][223:96];
 endmodule
