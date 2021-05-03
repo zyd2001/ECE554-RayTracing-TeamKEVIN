@@ -38,6 +38,8 @@ module Integer_alu (
         ICU_en = 1'b0;
         en_knock_down = 1'b0;
         done = 1'b0;
+        out = op1;
+        
         if (operation[3] === 1'b0) begin
             if (operation[2] === 1'b0) begin
                 out = ASMD_out;
@@ -82,6 +84,7 @@ module Integer_alu (
             endcase
 
         end
+        
     end
 
 endmodule
