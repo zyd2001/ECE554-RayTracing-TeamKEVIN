@@ -29,6 +29,8 @@ module Float_alu (
         Sqrt_en = 1'b0;
         en_knock_down = 1'b0;
         done = 1'b0;
+        out = op1;
+       
         // Float ALU
         if (operation[2] == 1'b0) begin
             out = FPU_out;
@@ -58,6 +60,7 @@ module Float_alu (
                 end
             endcase
         end
+        
     end
   
 

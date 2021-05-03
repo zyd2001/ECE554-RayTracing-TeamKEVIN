@@ -136,7 +136,7 @@ module RT_PD_ICM_interface_tb ();
 
 		.MRTI_addr(MRTI_addr_rd), .MRTI_data(mem_inst_out),
     	.MEM_addr(RT_MEM_addr), .MEM_data_write(RT_MEM_data_write), .MEM_data_read(RT_MEM_data_read),
-		.MEM_read_en(RT_MEM_read_en), .MEM_write_en(RT_MEM_write_en), .MEM_done(RT_MEM_done)
+		.MEM_read_en(RT_MEM_read_en), .MEM_write_en(RT_MEM_write_en), .MEM_done(RT_MEM_done), .MEM_s_or_v()
 	);
 
 
@@ -253,6 +253,7 @@ module RT_PD_ICM_interface_tb ();
         // we want to make sure that no more responses
         begin: timeout2
 	        repeat(500) @(posedge clk);
+            $fclose(rmtracefile);
             $display("Program does not correctly terminate");
             $stop();
 	    end
@@ -265,6 +266,7 @@ module RT_PD_ICM_interface_tb ();
 	    end
         join
         $display("Test Passed. Please check log for more detail");
+        $fclose(rmtracefile);
         $stop();
 
     end
