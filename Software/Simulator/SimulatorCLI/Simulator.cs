@@ -22,9 +22,9 @@ namespace SimulatorCLI
             FileInfo CPOutputFile, FileInfo RTOutputFile)
         {
             CPMem = new Memory(CPMemorySize);
-            traingleMem = new Memory(triangleFile == null ? 0 : (int)triangleFile.Length);
-            if (traingleMem != null)
-                traingleMem.LoadToMemory(triangleFile.OpenRead());
+            // traingleMem = new Memory(triangleFile == null ? 0 : (int)triangleFile.Length);
+            // if (traingleMem != null)
+            //     traingleMem.LoadToMemory(triangleFile.OpenRead());
             if (RTFile != null)
             {
                 RTMem = new Memory((int)RTFile.Length);
@@ -33,7 +33,7 @@ namespace SimulatorCLI
             if (CPFile != null)
                 CPMem.LoadToMemory(CPFile.OpenRead());
             CP = new CommandProcessor(CPMem);
-            RT = new RayTracing(RTMem, traingleMem, new Memory(RTMemorySize));
+            RT = new RayTracing(RTMem, triangleFile, new Memory(RTMemorySize));
             this.disableTrace = disableTrace;
             this.RTOutputFile = RTOutputFile?.CreateText() ?? Console.Out;
             this.CPOutputFile = CPOutputFile?.CreateText() ?? Console.Out;
@@ -98,7 +98,7 @@ namespace SimulatorCLI
             return v.ToString();
         }
 
-        internal void RunRT(int pixelID)
+        internal (float r, float g, float b) RunRT(int pixelID)
         {
             RT.ScalarRegisterFile[28] = 0; // set Stack Pointer
             RT.ScalarRegisterFile[31] = 0; // set PC
@@ -114,7 +114,7 @@ namespace SimulatorCLI
                     RTOutputFile.WriteLine(RT.LastInstruction);
                     RTOutputFile.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
-                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.Hex(), trace.after.Hex());
+                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.f, trace.after.f);
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
                         RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, Hex(trace.before), Hex(trace.after));
                     foreach (var trace in RT.DataMemory.TraceLog)
@@ -122,6 +122,7 @@ namespace SimulatorCLI
                     RTOutputFile.WriteLine();
                 }
             }
+            return RT.DataMemory.getLast();
         }
     }
 }

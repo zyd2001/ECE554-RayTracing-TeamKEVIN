@@ -82,6 +82,11 @@ namespace CompilerCore
             if (d == RegisterNumber)
             {
                 enableMoves(m, adjacent(m));
+                spillWorklist.Remove(m);
+                if (moveRelated(m))
+                    freezeWorklist.Add(m);
+                else
+                    simplifyWorklist.Add(m);
             }
         }
 
@@ -110,7 +115,6 @@ namespace CompilerCore
         void coalesce()
         {
             var m = getFirstInSet(worklistMoves);
-            worklistMoves.Remove(m);
             int x = getAlias(m.Item1);
             int y = getAlias(m.Item2);
             int u, v;
@@ -124,6 +128,7 @@ namespace CompilerCore
                 u = x;
                 v = y;
             }
+            worklistMoves.Remove(m);
             if (u == v)
             {
                 coalescedMoves.Add(m);
@@ -158,7 +163,9 @@ namespace CompilerCore
             enableMoves(v);
             foreach (var t in adjacent(v))
             {
-                graph.AddEdge(t, u);
+                bool aa = precolored.Contains(t);
+                bool bb = precolored.Contains(u);
+                graph.AddEdgeP(t, u, aa, bb);
                 for (int i = 0; i < graph.AdjacentListBuilder.Length; i++)
                     graph.AdjacentList[i] = graph.AdjacentListBuilder[i].ToImmutable();
                 decrementDegree(t);
@@ -188,7 +195,7 @@ namespace CompilerCore
         {
             int k = 0;
             foreach (var n in nodes)
-                if (graph.Degree[n] < RegisterNumber)
+                if (graph.Degree[n] >= RegisterNumber)
                     k++;
             return k < RegisterNumber;
         }
@@ -203,7 +210,7 @@ namespace CompilerCore
 
         void AddWorkList(int u)
         {
-            if (precolored.Contains(u) && !moveRelated(u) && graph.Degree[u] < RegisterNumber)
+            if (!precolored.Contains(u) && !moveRelated(u) && graph.Degree[u] < RegisterNumber)
             {
                 freezeWorklist.Remove(u);
                 simplifyWorklist.Add(u);
@@ -281,9 +288,17 @@ namespace CompilerCore
 
         void rewrite(FunctionTranslation translation, bool scalar)
         {
+            // throw new Exception("sble");
+            Dictionary<int, int> offsets = new Dictionary<int, int>();
+            foreach (var item in spilledNodes)
+            {
+                offsets[item] = translation.function.StackSize;
+                translation.function.StackSize += scalar ? 4 : 16;
+            }
             for (var node = translation.List.First; node != null; node = node.Next)
             {
                 Assembly ins = node.Value;
+                var thisNode = node;
                 if (scalar)
                 {
                     HashSet<int> defs = new HashSet<int>();
@@ -293,15 +308,17 @@ namespace CompilerCore
                             defs.Add(graph.Map[item]);
                     foreach (var item in ins.SUse)
                         uses.Add(graph.Map[item]);
-                    if (spilledNodes.Overlaps(defs))
+                    if (spilledNodes.Overlaps(defs)) // Trace defines physical register, should not be spilled
                     {
+                        defs.IntersectWith(spilledNodes);
+                        var i = getFirstInSet(defs);
                         if (defs.Count > 1)
                             throw new Exception("fv<k");
                         var tempVar = ".S" + Statement.VariableCounter;
                         ins.changeDef(tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddAfter(node, new Assembly("s_store_4byte",
-                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
+                        translation.List.AddAfter(thisNode, new Assembly("s_store_4byte",
+                            new List<string> { tempVar, "RS28", offsets[i].ToString() }));
                         node = node.Next;
                     }
                     uses.IntersectWith(spilledNodes);
@@ -310,10 +327,9 @@ namespace CompilerCore
                         var tempVar = ".S" + Statement.VariableCounter;
                         ins.changeUse(graph.ReverseMap[item], tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddBefore(node, new Assembly("s_load_4byte",
-                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
+                        translation.List.AddBefore(thisNode, new Assembly("s_load_4byte",
+                            new List<string> { tempVar, "RS28", offsets[item].ToString() }));
                     }
-                    translation.function.StackSize += 4;
                 }
                 else
                 {
@@ -326,13 +342,15 @@ namespace CompilerCore
                         uses.Add(graph.Map[item]);
                     if (spilledNodes.Overlaps(defs))
                     {
+                        defs.IntersectWith(spilledNodes);
+                        var i = getFirstInSet(defs);
                         if (defs.Count > 1)
                             throw new Exception("fv<k");
                         var tempVar = ".V" + Statement.VariableCounter;
                         ins.changeDef(tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddAfter(node, new Assembly("v_store_4byte",
-                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
+                        translation.List.AddAfter(thisNode, new Assembly("v_store_16byte",
+                            new List<string> { tempVar, "RS28", offsets[i].ToString() }));
                         node = node.Next;
                     }
                     uses.IntersectWith(spilledNodes);
@@ -341,10 +359,9 @@ namespace CompilerCore
                         var tempVar = ".V" + Statement.VariableCounter;
                         ins.changeUse(graph.ReverseMap[item], tempVar);
                         tempNodes.Add(tempVar);
-                        translation.List.AddBefore(node, new Assembly("v_load_4byte",
-                            new List<string> { tempVar, "RS28", translation.function.StackSize.ToString() }));
+                        translation.List.AddBefore(thisNode, new Assembly("v_load_16byte",
+                            new List<string> { tempVar, "RS28", offsets[item].ToString() }));
                     }
-                    translation.function.StackSize += 16;
                 }
             }
         }
@@ -381,14 +398,15 @@ namespace CompilerCore
 
         internal static (SortedSet<int> s, SortedSet<int> v) fk(FunctionTranslation translation)
         {
+            HashSet<string> spre = new HashSet<string>();
+            HashSet<string> vpre = new HashSet<string>();
+            for (int i = 1; i < 28; i++)
+                spre.Add($"RS{i}");
+            for (int i = 1; i < 16; i++)
+                vpre.Add($"RV{i}");
+            // int abc = 0;
             while (true)
             {
-                HashSet<string> spre = new HashSet<string>();
-                HashSet<string> vpre = new HashSet<string>();
-                for (int i = 1; i < 28; i++)
-                    spre.Add($"RS{i}");
-                for (int i = 1; i < 16; i++)
-                    vpre.Add($"RV{i}");
 
                 (var sgraph, var vgraph) = translation.CreateInferenceGraph(spre, vpre);
 
@@ -463,6 +481,7 @@ namespace CompilerCore
                     // translation.Output(Console.Out);
                     return (usedScalar, usedVector);
                 }
+                // abc++;
             }
         }
 

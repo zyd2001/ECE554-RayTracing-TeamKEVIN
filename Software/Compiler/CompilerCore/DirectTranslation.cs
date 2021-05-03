@@ -393,6 +393,7 @@ namespace CompilerCore
                     translation.AddAssembly("s_write_low", tempScalar, "0");
                     translation.AddAssembly("s_write_high", tempScalar, "8192");
                     translation.AddAssembly("v_load_16byte", tempVar, tempScalar, LinkedSymbol.Offset.ToString());
+                    return tempVar;
                 }
                 else
                 {
