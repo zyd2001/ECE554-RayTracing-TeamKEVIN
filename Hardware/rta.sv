@@ -121,10 +121,13 @@ module rta
   logic [95:0] vertex_0_tri_ic;
   logic [95:0] vertex_1_tri_ic;
   logic [95:0] vertex_2_tri_ic;
-  logic sid_tri_ic;
+  logic [31:0] sid_tri_ic;
 
 
   //////////////// Command Processor ////////////////
+  // MC
+  logic load_done_term_cp_mc;
+  // PD
   logic load_cp_pd;
   logic load_done_cp_pd;
   logic [31:0] pixel_id_cp_pd;
@@ -133,12 +136,12 @@ module rta
   //////////////// Patch Dispatcher ////////////////
   // MC
   logic patch_done_pd_mc;
-  // RT
-  logic job_dispatch_pd_rt[NUM_RT-1:0];
-  logic [BIT_THREAD-1:0] thread_id_out_pd_rt;
-  logic [31:0] pixel_id_pd_rt;
-  logic [31:0] pc_out_pd_rt;
-  logic [31:0] sp_out_pd_rt;
+  // RT_IF
+  logic job_dispatch_pd_rtif[NUM_RT-1:0];
+  logic [BIT_THREAD-1:0] thread_id_out_pd_rtif;
+  logic [31:0] pixel_id_pd_rtif;
+  logic [31:0] pc_out_pd_rtif;
+  logic [31:0] sp_out_pd_rtif;
   // IC
   logic job_dispatch_pd_ic[NUM_IC-1:0];
   logic [BIT_THREAD-1:0] thread_id_out_pd_ic;
@@ -149,22 +152,50 @@ module rta
   logic core_id_ic2rt_pd_icm[NUM_IC-1:0];
 
 
+  ////////////////// RT INTERFACE /////////////////
+  // PD
+  logic context_switch_rtif_pd[NUM_RT-1:0];
+  logic task_done_rtif_pd[NUM_Rt-1:0];
+  logic [BIT_THREAD-1:0] thread_id_rtif_pd[NUM_RT-1:0];
+  logic [31:0] program_counter_rtif_pd[NUM_RT-1:0];
+  logic [31:0] stack_ptr_rtif_pd[NUM_RT-1:0];
+  // RT
+  logic [4:0] scalar_rd_addr_0_rtif_rt[NUM_RT-1:0];
+  logic [4:0] scalar_rd_addr_1_rtif_rt[NUM_RT-1:0];
+  logic [3:0] vector_rd_addr_0_rtif_rt[NUM_RT-1:0];
+  logic [3:0] vector_rd_addr_1_rtif_rt[NUM_RT-1:0];
+  logic kernel_mode_rtif_rt[NUM_RT-1:0];
+  logic scalar_we_rtif_rt[NUM_RT-1:0];
+  logic vector_we_rtif_rt[NUM_RT-1:0];
+  logic [4:0] scalar_wb_addr_rtif_rt[NUM_RT-1:0];
+  logic [3:0] vector_wb_addr_rtif_rt[NUM_RT-1:0];
+  logic [31:0] scalar_wb_data_rtif_rt[NUM_RT-1:0];
+  logic [127:0] vector_wb_data_rtif_rt[NUM_RT-1:0];
+
+  // ICM
+  logic [NUM_RT-1:0] de_q_rtif_icm;
+  logic [95:0] origin_rtif_icm[NUM_RT-1:0];
+  logic [95:0] direction_rtif_icm[NUM_RT-1:0];
+
+
   //////////////////// RT CORE ////////////////////
   // MAIN
   logic [127:0] data_in_rt_main[NUM_RT-1:0];
   logic we_rt_main[NUM_RT-1:0];
   logic re_rt_main[NUM_RT-1:0];
+  logic mode_rt_main[NUM_RT-1:0];
   // INST
   logic [31:0] addr_rt_inst[NUM_RT-1:0];
   // MAIN || INST
   logic [31:0] addr_rt_x[NUM_RT-1:0];
   logic [127:0] mem_data_read_x_rt[NUM_RT-1:0];
-  // PD
-  logic task_done_rt_pd[NUM_RT-1:0];
-  logic context_switch_rt_pd[NUM_RT-1:0];
-  logic [BIT_THREAD-1:0] thread_id_in_rt_pd[NUM_RT-1:0];
-  logic [31:0] pc_in_rt_pd[NUM_RT-1:0];
-  logic [31:0] stack_ptr_in_rt_pd[NUM_RT-1:0];
+  // RT_IF
+  logic task_done_rt_rtif[NUM_RT-1:0];
+  logic context_switch_rt_rtif[NUM_RT-1:0];
+  logic [31:0] scalar_rd_data_0_rt_rtif[NUM_RT-1:0];
+  logic [31:0] scalar_rd_data_1_rt_rtif[NUM_RT-1:0];
+  logic [127:0] vector_rd_data_0_rt_rtif[NUM_RT-1:0];
+  logic [127:0] vector_rd_data_1_rt_rtif[NUM_RT-1:0];
   // ICM
   logic [127:0] ray_origin_rt_icm [NUM_RT-1:0];
   logic [127:0] ray_direction_rt_icm [NUM_RT-1:0];
@@ -179,16 +210,16 @@ module rta
   logic unsigned [BIT_TRI-1:0] tri_id_ic_tri;
   // ICM
   logic [127:0] shader_info_ic_icm [NUM_IC-1:0]; //(v0, v1, v2, sid)
-  logic [127:0] normal_ic_icm [NUM_IC-1:0];
-  logic dequeue_ic_rt;
+  logic [95:0] normal_ic_icm [NUM_IC-1:0];
+  logic [NUM_IC-1:0] dequeue_ic_icm;
 
   /////////////////// IC Memory ///////////////////
   // IC
-  logic [127:0] ray_origin_icm_ic;
-  logic [127:0] ray_direction_icm_ic;
-  // RT​
-  logic [127:0] shader_info_icm_rt; //(v0, v1, v2, sid)
-  logic [127:0] normal_icm_rt;
+  logic [95:0] ray_origin_icm_ic;
+  logic [95:0] ray_direction_icm_ic;
+  // RT​_IF
+  logic [127:0] shader_info_icm_rtif; //(v0, v1, v2, sid)
+  logic [95:0] normal_icm_rtif;
 
   mem_controller memory_controller
    (
@@ -198,6 +229,7 @@ module rta
     .mmio(mmio),
     .rdy_tri(rdy_tri_mc),
     .patch_done(patch_done_pd_mc),
+    .term_cp(load_done_term_cp_mc),
     .result(data_out_main_x),
     .we_mem(we_mem_mc_x),
     .data_32(data_32_mc_x),
@@ -216,6 +248,7 @@ module rta
     .rst_n(rst_n),
     .we(we_rt_main), 
     .re(re_x_main), 
+    .mode(mode_rt_main),
     .addr(addr_x_main), 
     .data_in(data_in_rt_main),
     .data_out(data_out_main_x), 
@@ -238,6 +271,7 @@ module rta
     .patch_out_done_MC(wr_out_done_mc_cp),
     .pixel_size_MC(data_32_mc_x),
     .we_ps_MC(we_mem_mc_x[0]),
+    .load_done_term_MC(load_done_term_cp_mc),
     .load_start_PD(load_cp_pd),
     .load_done_PD(load_done_cp_pd),
     .pixel_id_PD(pixel_id_cp_pd)
@@ -297,19 +331,19 @@ module rta
     .load_cp(load_cp_pd),
     .load_done_cp(load_done_cp_pd),
     .pixel_id_cp(pixel_id_cp_pd),
-    .task_done_rt(task_done_rt_pd),
-    .context_switch_rt(context_switch_rt_pd),
-    .thread_id_in_rt(thread_id_in_rt_pd),
-    .pc_in_rt(pc_in_rt_pd),
-    .stack_ptr_in_rt(stack_ptr_in_rt_pd),
+    .task_done_rt(task_done_rtif_pd),
+    .context_switch_rt(context_switch_rtif_pd),
+    .thread_id_in_rt(thread_id_rtif_pd),
+    .pc_in_rt(program_counter_rtif_pd),
+    .stack_ptr_in_rt(stack_ptr_rtif_pd),
     .context_switch_ic(context_switch_ic_pd),
     .thread_id_in_ic(thread_id_in_ic_pd),
     .patch_done(patch_done_pd_mc),
-    .job_dispatch_rt(job_dispatch_pd_rt),
-    .thread_id_out_rt(thread_id_out_pd_rt),
-    .pixel_id_rt(pixel_id_pd_rt),
-    .pc_out_rt(pc_out_pd_rt),
-    .sp_out_rt(sp_out_pd_rt),
+    .job_dispatch_rt(job_dispatch_pd_rtif),
+    .thread_id_out_rt(thread_id_out_pd_rtif),
+    .pixel_id_rt(pixel_id_pd_rtif),
+    .pc_out_rt(pc_out_pd_rtif),
+    .sp_out_rt(sp_out_pd_rtif),
     .job_dispatch_ic(job_dispatch_pd_ic),
     .thread_id_out_ic(thread_id_out_pd_ic),
     .q_en_rt2ic(q_en_rt2ic_pd_icm),
@@ -320,37 +354,83 @@ module rta
 
 
   generate
+    for (i = 0; i < NUM_RT; i++) begin: RT_IF
+      rt_pd_icm_interface rt_interface
+       (
+         .clk(clk),
+         .rst_n(rst_n),
+         // PD
+         .job_assign(job_dispatch_pd_rtif[i]),
+         .thread_id_in(thread_id_out_pd_rtif),
+         .pixel_id_in(pixel_id_pd_rtif),
+         .program_counter_in(pc_out_pd_rtif),
+         .stack_ptr_in(sp_out_pd_rtif),
+
+         .context_switch_pd(context_switch_rtif_pd[i]),
+         .task_done_pd(task_done_rtif_pd[i]),
+         .thread_id_out(thread_id_rtif_pd[i]),
+         .program_counter_out(program_counter_rtif_pd[i]),
+         .stack_ptr_out(stack_ptr_rtif_pd[i]),
+         // ICM
+         .shader_info(shader_info_icm_rtif),
+         .normal(normal_icm_rtif),
+
+         .de_q(de_q_rtif_icm[i]),
+         .origin(origin_rtif_icm[i]),
+         .direction(direction_rtif_icm[i]),
+         // RT
+         .end_program(task_done_rt_rtif[i]),
+         .context_switch_rt(context_switch_rt_rtif[i]),
+         .scalar_rd_data_0(scalar_rd_data_0_rt_rtif[i]),
+         .scalar_rd_data_1(scalar_rd_data_1_rt_rtif[i]),
+         .vector_rd_data_0(vector_rd_data_0_rt_rtif[i]),
+         .vector_rd_data_1(vector_rd_data_1_rt_rtif[i]),
+
+         .scalar_rd_addr_0(scalar_rd_addr_0_rtif_rt[i]),
+         .scalar_rd_addr_1(scalar_rd_addr_1_rtif_rt[i]),
+         .vector_rd_addr_0(vector_rd_addr_0_rtif_rt[i]),
+         .vector_rd_addr_1(vector_rd_addr_1_rtif_rt[i]),
+         .kernel_mode(kernel_mode_rtif_rt[i]),
+         .scalar_we(scalar_we_rtif_rt[i]),
+         .vector_we(vector_we_rtif_rt[i]),
+         .scalar_wb_addr(scalar_wb_addr_rtif_rt[i]),
+         .vector_wb_addr(vector_wb_addr_rtif_rt[i]),
+         .scalar_wb_data(scalar_wb_data_rtif_rt[i]),
+         .vector_wb_data(vector_wb_data_rtif_rt[i])
+        );
+    end
     for (i = 0; i < NUM_RT; i++) begin: RT_CORE
       RT_core_single rt
        (
         .clk(clk),
         .rst_n(rst_n),
-        .kernel_mode(job_dispatch_pd_rt[i]),
-        .PD_scalar_wen(),
-        .PD_vector_wen(),
-        .PD_scalar_wb_address(),
-        .PD_scalar_read_address1(),
-        .PD_scalar_read_address2(),
-        .PD_vector_wb_address(),
-        .PD_vector_read_address1(),
-        .PD_vector_read_address2(),
-        .PD_scalar_wb_data(),
-        .PD_vector_wb_data(),
+        .kernel_mode(kernel_mode_rtif_rt[i]),
+        .PD_scalar_wen(scalar_we_rtif_rt[i]),
+        .PD_vector_wen(vector_we_rtif_rt[i]),
+        .PD_scalar_wb_address(scalar_wb_addr_rtif_rt[i]),
+        .PD_scalar_read_address1(scalar_rd_addr_0_rtif_rt[i]),
+        .PD_scalar_read_address2(scalar_rd_addr_1_rtif_rt[i]),
+        .PD_vector_wb_address(vector_wb_addr_rtif_rt[i]),
+        .PD_vector_read_address1(vector_rd_addr_0_rtif_rt[i]),
+        .PD_vector_read_address2(vector_rd_addr_1_rtif_rt[i]),
+        .PD_scalar_wb_data(scalar_wb_data_rtif_rt[i]),
+        .PD_vector_wb_data(vector_wb_data_rtif_rt[i]),
         .MRTI_data(data_out_inst_rt[i]),
         .MEM_data_read(mem_data_read_x_rt[i]),
         .MEM_done(rd_rdy_main_rt[i]),
 
-        .End_program(task_done_rt_pd[i]),
-        .Context_switch(context_switch_rt_pd[i]),
-        .PD_scalar_read1(),
-        .PD_scalar_read2(),
-        .PD_vector_read1(),
-        .PD_vector_read2(),
+        .End_program(task_done_rt_rtif[i]),
+        .Context_switch(context_switch_rt_rtif[i]),
+        .PD_scalar_read1(scalar_rd_data_0_rt_rtif[i]),
+        .PD_scalar_read2(scalar_rd_data_1_rt_rtif[i]),
+        .PD_vector_read1(vector_rd_data_0_rt_rtif[i]),
+        .PD_vector_read2(vector_rd_data_1_rt_rtif[i]),
         .MRTI_addr(addr_rt_inst[i]),
         .MEM_addr(addr_rt_x[i]),
         .MEM_data_write(data_in_rt_main[i]),
         .MEM_read_en(re_rt_main[i]),
-        .MEM_write_en(we_rt_main[i])
+        .MEM_write_en(we_rt_main[i]),
+        .(mode_rt_main[i])
         );
 
       assign mem_data_read_x_rt[i] = addr_rt_x[i][31] ? data_out_main_x[i] : data_out_const_rt[i];
@@ -364,27 +444,27 @@ module rta
       (
         .clk(clk), 
         .rst(rst),
-        .Core_ID(Core_ID), 
-        // .thread_id_in(thread_id_in), 
-        // .thread_id_out(thread_id_out), 
-        .IntersectionPoint(shader_info_ic_icm[127:32]),
-        .sid_in(shader_info_ic_icm[31:0]), 
-        .sid_out(sid_tri_ic), 
+        // PD
+        .Core_ID(job_dispatch_pd_ic[i]), 
+        .thread_id_in(thread_id_out_pd_ic), 
+        .Context_Switch_PD(context_switch_ic_pd[i]),
+        .thread_id_out(thread_id_in_ic_pd[i]),
+        // ICM
         .dir(ray_direction_icm_ic), 
         .orig(ray_origin_icm_ic), 
+        .IC_Mem_Rdy(dequeue_ic_icm[i]),
         .norm(normal_ic_icm), 
-        .IC_Mem_Rdy(dequeue_ic_rt),//dequeue_ic_rt?
+        .sid_out(shader_info_ic_icm[31:0]), 
+        .IntersectionPoint(shader_info_ic_icm[127:32]),
+        // TRI
         .Mem_Rdy(rdy_tri_ic), 
+        .Mem_NotValid(invalid_tri_ic), 
         .v0(vertex_0_tri_ic), 
         .v1(vertex_1_tri_ic), 
         .v2(vertex_2_tri_ic), 
-        .Mem_NotValid(invalid_tri_ic), 
+        .sid_in(sid_tri_ic), 
         .triangle_id(tri_id_ic_tri), 
         .Mem_En(re_ic_tri)
-        // logic job_dispatch_pd_ic[NUM_IC-1:0];
-        // logic [BIT_THREAD-1:0] thread_id_out_pd_ic;
-        // logic context_switch_ic_pd[NUM_IC-1:0];
-        // logic [BIT_THREAD-1:0] thread_id_in_ic_pd[NUM_IC-1:0];
     );
     end
   endgenerate
@@ -395,25 +475,24 @@ module rta
     //input
     .clk(clk), 
     .rst_n(rst_n), 
+    // PD
     .q_en_rt2ic_PD(q_en_rt2ic_pd_icm), 
     .core_id_rt2ic_PD(core_id_rt2ic_pd_icm), 
     .q_en_ic2rt_PD(q_en_ic2rt_pd_icm), 
     .core_id_ic2rt_PD(core_id_ic2rt_pd_icm),
-    .ray_origin_RT(ray_origin_rt_icm), 
-    .ray_direction_RT(ray_direction_rt_icm), 
-    // .thread_id_RT_in(), 
-    .dequeue_RT(dequeue_rt_icm),
+    // RT_IF
+    .ray_origin_RT(origin_rtif_icm), 
+    .ray_direction_RT(direction_rtif_icm), 
+    .dequeue_RT(|de_q_rtif_icm),
+    // IC
     .shader_info_IC(shader_info_ic_icm), 
     .normal_IC(normal_ic_icm), 
-    // .thread_id_IC_in(), 
-    .dequeue_IC(dequeue_ic_rt),
+    .dequeue_IC(|dequeue_ic_icm),
     //output
     .ray_origin_IC(ray_origin_icm_ic), 
     .ray_direction_IC(ray_direction_icm_ic), 
-    // .thread_id_IC_out(),
-    .shader_info_RT(shader_info_icm_rt), 
-    .normal_RT(normal_icm_rt), 
-    // .thread_id_RT_out()
+    .shader_info_RT(shader_info_icm_rtif), 
+    .normal_RT(normal_icm_rtif), 
     );
 
      

@@ -6,6 +6,7 @@ module mem_controller
         dma_if.peripheral dma,
         input rdy_tri,
         input patch_done,
+        input term_cp,
         input [127:0] result[3:0], 
         output reg [1:0] we_mem[3:0],
         output [31:0] data_32,
@@ -27,6 +28,18 @@ module mem_controller
 
     logic mmio_system;
     assign mmio_system = mmio.wr_addr[10];
+
+
+    logic term_cp_reg;
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n)
+            term_cp_reg <= 1'h0;
+        else if (term)
+            term_cp_reg <= 1'h0;
+        else if (term_cp)
+            term_cp_reg <= 1'h1;
+    end
+
 
     /*
         Read from Host
@@ -318,7 +331,7 @@ module mem_controller
         if (!rst_n) 
             dma_patch_size <= 0;
         else if (dma_rd_data_32_shft_cp)
-            dma_patch_size <= dma_rd_data_32[0] / 32;
+            dma_patch_size <= (dma_rd_data_32[0]%32) == 0 ? (dma_rd_data_32[0]/32) : (dma_rd_data_32[0]/32+1);
     end
 
 
@@ -604,10 +617,11 @@ module mem_controller
                     nxt_state_dma_wr = DMA_WR_HOLD;
             end
             default: begin
-                if (dma.wr_done && (dma_patch_cnt == dma_patch_size))
-                    term = 1'h1;
+                if (dma.wr_done && term_cp_reg) begin
+                    term = 1'h1; 
+                    dma_wr_done = 1;
+                end
                 else if (dma.wr_done) begin
-                    nxt_state_dma_wr = DMA_WR_IDLE;
                     dma_wr_done = 1;
                 end
                 else 
