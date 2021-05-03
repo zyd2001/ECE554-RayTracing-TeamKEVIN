@@ -48,16 +48,32 @@ namespace CompilerCore
             MoveList = Enumerable.Range(0, ReverseMap.Count).Select((i) => new HashSet<Move>()).ToArray();
             Degree = new int[ReverseMap.Count];
         }
+        internal void AddEdgeP(string a, string b, bool aa, bool bb)
+        {
+            int ia = Map[a];
+            int ib = Map[b];
+            AddEdgeP(ia, ib, aa, bb);
+        }
+        internal void AddEdgeP(int a, int b, bool aa, bool bb)
+        {
+            AdjacentMatrix[a, b] = true;
+            AdjacentMatrix[b, a] = true;
+            if (!aa)
+            {
+                Degree[a]++;
+                AdjacentListBuilder[a].Add(b);
+            }
+            if (!bb)
+            {
+                Degree[b]++;
+                AdjacentListBuilder[b].Add(a);
+            }
+        }
         internal void AddEdge(string a, string b)
         {
             int ia = Map[a];
             int ib = Map[b];
-            Degree[ia]++;
-            AdjacentListBuilder[ia].Add(ib);
-            AdjacentMatrix[ia, ib] = true;
-            Degree[ib]++;
-            AdjacentMatrix[ib, ia] = true;
-            AdjacentListBuilder[ib].Add(ia);
+            AddEdge(ia, ib);
         }
         internal void AddEdge(int a, int b)
         {
