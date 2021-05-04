@@ -16,7 +16,7 @@ module Calculation_v3(
   logic [95:0] v0v2, v0v1, tvec,
                pvec, qvec;
 
-  fifo ff (
+  ic_fifo ff (
     .clk(clk), .rst(rst), .en(1'b1),
     .d(sid_in), .q(sid_out)
   );

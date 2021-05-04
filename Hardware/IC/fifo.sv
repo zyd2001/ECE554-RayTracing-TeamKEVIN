@@ -3,7 +3,7 @@
 // On reset all entries are set to 0
 // Shift causes fifo to shift out oldest entry to q, shift in d
 
-module fifo
+module ic_fifo
   #(
   parameter DEPTH=45,
   parameter BITS=32
