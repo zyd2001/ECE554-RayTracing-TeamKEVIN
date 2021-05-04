@@ -59,9 +59,9 @@ module patch_dispatcher
     logic [BIT_THREAD-1:0] data_in_tid_rt2ic;
     logic [BIT_THREAD-1:0] data_out_tid_rt2ic;
 
-    logic context_switch_rt2ic[NUM_RT-1:0];
-    logic en_q_sel_rt2ic[NUM_RT-1:0];
-    logic [31:0] data_sel_tid_rt2ic;
+    logic [NUM_RT-1:0] context_switch_rt2ic;
+    logic [NUM_RT-1:0] en_q_sel_rt2ic;
+    logic [BIT_THREAD-1:0] data_sel_tid_rt2ic;
     logic [31:0] pc_sel_rt2ic;
     logic [31:0] sp_sel_rt2ic;
 
@@ -73,8 +73,8 @@ module patch_dispatcher
     logic [BIT_THREAD-1:0] data_out_tid_ic2rt;
 
     logic [NUM_IC-1:0] context_switch_ic2rt;
-    logic en_q_sel_ic2rt[NUM_IC-1:0];
-    logic [31:0] data_sel_tid_ic2rt;
+    logic [NUM_IC-1:0] en_q_sel_ic2rt;
+    logic [BIT_THREAD-1:0] data_sel_tid_ic2rt;
 
 
 
@@ -146,7 +146,7 @@ module patch_dispatcher
 
     // Flag Register for availability of RT and IC
     logic [NUM_RT-1:0] busy_rt;
-    logic busy_ic[NUM_IC-1:0];
+    logic [NUM_IC-1:0] busy_ic;
 
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
@@ -167,7 +167,7 @@ module patch_dispatcher
         end
     endgenerate
 
-    logic [31:0] pc[NUM_THREAD-1:0];
+    logic [31:0] pc [NUM_THREAD-1:0];
     logic [31:0] sp [NUM_THREAD-1:0];
     
     always_ff @(posedge clk, negedge rst_n) begin
@@ -183,18 +183,35 @@ module patch_dispatcher
         end
     end
     
-    // Non Paramatrized
+
+    logic [BIT_THREAD:0] task_done_rt_sum;
+    always_comb begin
+        task_done_rt_sum = {(BIT_THREAD+1){1'h0}};
+        for (int a = 0; a < NUM_RT; a++) begin
+            task_done_rt_sum += {{BIT_THREAD{1'h0}}, task_done_rt[a]};
+        end
+    end
+
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n)
             job_done <= '0;
         else if (patch_done)
             job_done <= '0;
         else 
-            job_done <= job_done + {{BIT_THREAD{1'h0}}, task_done_rt[0]} 
-                                + {{BIT_THREAD{1'h0}}, task_done_rt[1]}
-                                + {{BIT_THREAD{1'h0}}, task_done_rt[2]} 
-                                + {{BIT_THREAD{1'h0}}, task_done_rt[3]};
+            job_done <= job_done + task_done_rt_sum;
     end 
+
+    // always_ff @(posedge clk, negedge rst_n) begin
+    //     if (!rst_n)
+    //         job_done <= '0;
+    //     else if (patch_done)
+    //         job_done <= '0;
+    //     else 
+    //         job_done <= job_done + {{BIT_THREAD{1'h0}}, task_done_rt[0]} 
+    //                             + {{BIT_THREAD{1'h0}}, task_done_rt[1]}
+    //                             + {{BIT_THREAD{1'h0}}, task_done_rt[2]} 
+    //                             + {{BIT_THREAD{1'h0}}, task_done_rt[3]};
+    // end 
 
     // assign patch_done = job_done[BIT_THREAD];
     assign patch_done = job_done != 0 && job_done == pixel_id_addr;
@@ -216,10 +233,18 @@ module patch_dispatcher
 
     // Input 
     // Non Paramatrized
-    assign en_q_sel_rt2ic[0] = context_switch_rt2ic[0];
-    assign en_q_sel_rt2ic[1] = !context_switch_rt2ic[0] && context_switch_rt2ic[1];
-    assign en_q_sel_rt2ic[2] = !context_switch_rt2ic[0] && !context_switch_rt2ic[1] && context_switch_rt2ic[2];
-    assign en_q_sel_rt2ic[3] = !context_switch_rt2ic[0] && !context_switch_rt2ic[1] && !context_switch_rt2ic[2] && context_switch_rt2ic[3];
+
+    generate
+        for (i = 1; i < NUM_RT; i++) begin
+            assign en_q_sel_rt2ic[i] = context_switch_rt2ic[i] && !(|context_switch_rt2ic[i-1:0]);
+        end
+        assign en_q_sel_rt2ic[0] = context_switch_rt2ic[0];
+    endgenerate
+
+    // assign en_q_sel_rt2ic[0] = context_switch_rt2ic[0];
+    // assign en_q_sel_rt2ic[1] = !context_switch_rt2ic[0] && context_switch_rt2ic[1];
+    // assign en_q_sel_rt2ic[2] = !context_switch_rt2ic[0] && !context_switch_rt2ic[1] && context_switch_rt2ic[2];
+    // assign en_q_sel_rt2ic[3] = !context_switch_rt2ic[0] && !context_switch_rt2ic[1] && !context_switch_rt2ic[2] && context_switch_rt2ic[3];
 
     generate
         for (i = 0; i < NUM_RT; i = i + 1) begin
@@ -228,22 +253,33 @@ module patch_dispatcher
     endgenerate
     
     // Non Paramatrized
-    assign en_q_tid_rt2ic = context_switch_rt2ic[0] || context_switch_rt2ic[1] || context_switch_rt2ic[2] || context_switch_rt2ic[3];
+    assign en_q_tid_rt2ic = |context_switch_rt2ic;
     assign q_en_rt2ic = en_q_tid_rt2ic;
 
-    assign data_in_tid_rt2ic = en_q_sel_rt2ic[0] ? thread_id_in_rt[0]   
-                                : en_q_sel_rt2ic[1] ? thread_id_in_rt[1]
-                                : en_q_sel_rt2ic[2] ? thread_id_in_rt[2]
-                                : thread_id_in_rt[3];
+    always_comb begin
+        data_in_tid_rt2ic = {BIT_THREAD{1'h0}};
+        pc_sel_rt2ic = {32'h0};
+        sp_sel_rt2ic = {32'h0};
+        for (int a = 0; a < NUM_RT; a++) begin
+            data_in_tid_rt2ic |= {BIT_THREAD{en_q_sel_rt2ic[a]}} & thread_id_in_rt[a];
+            pc_sel_rt2ic |= {32{en_q_sel_rt2ic[a]}} & pc_in_rt[a];
+            sp_sel_rt2ic |= {32{en_q_sel_rt2ic[a]}} & stack_ptr_in_rt[a];
+        end
+    end
+
+    // assign data_in_tid_rt2ic = en_q_sel_rt2ic[0] ? thread_id_in_rt[0]   
+    //                             : en_q_sel_rt2ic[1] ? thread_id_in_rt[1]
+    //                             : en_q_sel_rt2ic[2] ? thread_id_in_rt[2]
+    //                             : thread_id_in_rt[3];
     
-    assign pc_sel_rt2ic = en_q_sel_rt2ic[0] ? pc_in_rt[0]   
-                                : en_q_sel_rt2ic[1] ? pc_in_rt[1]
-                                : en_q_sel_rt2ic[2] ? pc_in_rt[2]
-                                : pc_in_rt[3];
-    assign sp_sel_rt2ic = en_q_sel_rt2ic[0] ? stack_ptr_in_rt[0]   
-                                : en_q_sel_rt2ic[1] ? stack_ptr_in_rt[1]
-                                : en_q_sel_rt2ic[2] ? stack_ptr_in_rt[2]
-                                : stack_ptr_in_rt[3];
+    // assign pc_sel_rt2ic = en_q_sel_rt2ic[0] ? pc_in_rt[0]   
+    //                             : en_q_sel_rt2ic[1] ? pc_in_rt[1]
+    //                             : en_q_sel_rt2ic[2] ? pc_in_rt[2]
+    //                             : pc_in_rt[3];
+    // assign sp_sel_rt2ic = en_q_sel_rt2ic[0] ? stack_ptr_in_rt[0]   
+    //                             : en_q_sel_rt2ic[1] ? stack_ptr_in_rt[1]
+    //                             : en_q_sel_rt2ic[2] ? stack_ptr_in_rt[2]
+    //                             : stack_ptr_in_rt[3];
 
 
     typedef enum reg {ENQ_IDLE_RT2IC, ENQ_WAIT_RT2IC} t_state_en_q_rt2ic;
@@ -279,15 +315,21 @@ module patch_dispatcher
         end 
     endgenerate
 
+    generate
+        for (i = 1; i < NUM_IC; i++) begin
+            assign job_dispatch_ic[i] = !empty_tid_rt2ic && !busy_ic[i] && (&busy_ic[i-1:0]);
+        end
+        assign job_dispatch_ic[0] = !empty_tid_rt2ic && !busy_ic[0];
+    endgenerate
 
     // Output 
     // Non Paramatrized
-    assign job_dispatch_ic[0] = !empty_tid_rt2ic && !busy_ic[0];
-    assign job_dispatch_ic[1] = !empty_tid_rt2ic && busy_ic[0] && !busy_ic[1];
-    assign job_dispatch_ic[2] = !empty_tid_rt2ic && busy_ic[0] && busy_ic[1] && !busy_ic[2];
-    assign job_dispatch_ic[3] = !empty_tid_rt2ic && busy_ic[0] && busy_ic[1] && busy_ic[2] && !busy_ic[3];
+    // assign job_dispatch_ic[0] = !empty_tid_rt2ic && !busy_ic[0];
+    // assign job_dispatch_ic[1] = !empty_tid_rt2ic && busy_ic[0] && !busy_ic[1];
+    // assign job_dispatch_ic[2] = !empty_tid_rt2ic && busy_ic[0] && busy_ic[1] && !busy_ic[2];
+    // assign job_dispatch_ic[3] = !empty_tid_rt2ic && busy_ic[0] && busy_ic[1] && busy_ic[2] && !busy_ic[3];
     // Non Paramatrized
-    assign de_q_tid_rt2ic = !empty_tid_rt2ic && !(busy_ic[0] && busy_ic[1] && busy_ic[2] && busy_ic[3]);
+    assign de_q_tid_rt2ic = !empty_tid_rt2ic && !(&busy_ic);
 
     assign thread_id_out_ic = data_out_tid_rt2ic;
 
@@ -295,7 +337,7 @@ module patch_dispatcher
         IC to RT
     */
 
-    patch_dispatcher_fifo thread_id_ic2rt
+    patch_dispatcher_fifo #(.DEPTH(NUM_THREAD),.WIDTH(BIT_THREAD)) thread_id_ic2rt
         (
             .clk(clk),
             .rst_n(rst_n),
@@ -308,10 +350,17 @@ module patch_dispatcher
 
     // Input 
     // Non Paramatrized
-    assign en_q_sel_ic2rt[0] = context_switch_ic2rt[0];
-    assign en_q_sel_ic2rt[1] = !context_switch_ic2rt[0] && context_switch_ic2rt[1];
-    assign en_q_sel_ic2rt[2] = !context_switch_ic2rt[0] && !context_switch_ic2rt[1] && context_switch_ic2rt[2];
-    assign en_q_sel_ic2rt[3] = !context_switch_ic2rt[0] && !context_switch_ic2rt[1] && !context_switch_ic2rt[2] && context_switch_ic2rt[3];
+    generate
+        for (i = 1; i < NUM_IC; i++) begin
+            assign en_q_sel_ic2rt[i] = context_switch_ic2rt[i] && !(|context_switch_ic2rt[i-1:0]);
+        end
+        assign en_q_sel_ic2rt[0] = context_switch_ic2rt[0];
+    endgenerate
+
+    // assign en_q_sel_ic2rt[0] = context_switch_ic2rt[0];
+    // assign en_q_sel_ic2rt[1] = !context_switch_ic2rt[0] && context_switch_ic2rt[1];
+    // assign en_q_sel_ic2rt[2] = !context_switch_ic2rt[0] && !context_switch_ic2rt[1] && context_switch_ic2rt[2];
+    // assign en_q_sel_ic2rt[3] = !context_switch_ic2rt[0] && !context_switch_ic2rt[1] && !context_switch_ic2rt[2] && context_switch_ic2rt[3];
 
     generate
         for (i = 0; i < NUM_IC; i = i + 1) begin
@@ -319,17 +368,22 @@ module patch_dispatcher
         end
     endgenerate
 
-    // Non Paramatrized
-    assign en_q_tid_ic2rt = context_switch_ic2rt[0] || context_switch_ic2rt[1] || context_switch_ic2rt[2] || context_switch_ic2rt[3];
+    assign en_q_tid_ic2rt = |context_switch_ic2rt;
     assign q_en_ic2rt = en_q_tid_ic2rt;
 
+    assign data_in_tid_ic2rt = en_q_load ? pixel_id_addr : data_sel_tid_ic2rt;
 
-    // Non Paramatrized
-    assign data_in_tid_ic2rt = en_q_load ? {{(31-BIT_THREAD){1'h0}}, pixel_id_addr} : data_sel_tid_ic2rt;
-    assign data_sel_tid_ic2rt = en_q_sel_ic2rt[0] ? thread_id_in_ic[0]   
-                                : en_q_sel_ic2rt[1] ? thread_id_in_ic[1]
-                                : en_q_sel_ic2rt[2] ? thread_id_in_ic[2]
-                                : thread_id_in_ic[3];
+    always_comb begin
+        data_sel_tid_ic2rt = {BIT_THREAD{1'h0}};
+        for (int a = 0; a < NUM_IC; a++) begin
+            data_sel_tid_ic2rt |= {BIT_THREAD{en_q_sel_ic2rt[a]}} & thread_id_in_ic[a];
+        end
+    end
+
+    // assign data_sel_tid_ic2rt = en_q_sel_ic2rt[0] ? thread_id_in_ic[0]   
+    //                             : en_q_sel_ic2rt[1] ? thread_id_in_ic[1]
+    //                             : en_q_sel_ic2rt[2] ? thread_id_in_ic[2]
+    //                             : thread_id_in_ic[3];
 
     typedef enum reg {ENQ_IDLE_IC2RT, ENQ_WAIT_IC2RT} t_state_en_q_ic2rt;
     t_state_en_q_ic2rt state_en_q_ic2rt[NUM_IC-1:0], nxt_state_en_q_ic2rt[NUM_IC-1:0];
@@ -365,10 +419,7 @@ module patch_dispatcher
     endgenerate
 
     // output 
-    // Non Paramatrized
     assign de_q_tid_ic2rt = !en_q_load && !empty_tid_ic2rt && !(&busy_rt);
-
-    // Non Paramatrized
 
     generate
         for (i = 1; i < NUM_RT; i++) begin
