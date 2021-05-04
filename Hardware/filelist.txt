@@ -19,6 +19,7 @@ mem_simple.sv
 mem_triangle.sv
 memory_map.sv
 patch_dispatcher_fifo.sv
+patch_dispatcher.sv
 ram_single_port.sv
 rt_pd_icm_interface.sv
 rta.sv

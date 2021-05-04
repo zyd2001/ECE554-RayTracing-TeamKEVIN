@@ -169,12 +169,26 @@ module patch_dispatcher
 
     logic [31:0] pc [NUM_THREAD-1:0];
     logic [31:0] sp [NUM_THREAD-1:0];
+
+    // reg [BIT_THREAD-1:0] b, c;
     
     always_ff @(posedge clk, negedge rst_n) begin
+        // if (!rst_n) begin
+        //     for (k = 0; k < NUM_THREAD; k++) begin
+        //         pc[k] <= 32'h0;
+        //         sp[k] <= 32'h0;
+        //     end
+        // end
         if (!rst_n) begin
-            for (k = 0; k < NUM_THREAD; k = k + 1) begin
-                pc[k] <= 32'h0;
-                sp[k] <= 32'h0;
+            for (int b = 0; b < NUM_THREAD; b++) begin
+                pc[b] <= 32'h0;
+                sp[b] <= {{1'h1}, {(15-BIT_THREAD){1'h0}}, b[BIT_THREAD-1:0], {16'h0}};
+            end
+        end
+        else if (load_cp) begin
+            for (int c = 0; c < NUM_THREAD; c++) begin
+                pc[c] <= 32'h0;
+                sp[c] <= {{1'h1}, {(15-BIT_THREAD){1'h0}}, c[BIT_THREAD-1:0], {16'h0}};
             end
         end
         else if (en_q_tid_rt2ic) begin

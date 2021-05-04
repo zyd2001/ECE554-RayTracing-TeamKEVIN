@@ -18,7 +18,7 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
     output logic load_start_PD;
     output load_done_PD;
     output [31:0] pixel_id_PD;
-    output load_done_term_MC;
+    output reg load_done_term_MC;
     enum {idle, patching, patching_wait} state, next;
 
     logic load_done_patch, load_done_patch_in;

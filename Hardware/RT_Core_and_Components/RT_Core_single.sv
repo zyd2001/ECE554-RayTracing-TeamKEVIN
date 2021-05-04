@@ -362,7 +362,7 @@ module RT_core_single (
 
     assign IF_DE_PC_plus_four_offset = IF_DE_current_PC_plus_four + {{17{IF_DE_instruction[15]}}, IF_DE_instruction[14:0]}; 
     assign IF_DE_link_address = DE_scalar1;
-
+    
     instruction_decode_unit IDU(.opcode(IF_DE_instruction[31:26]), .immediate(IF_DE_instruction[1:0]),
         .intALU_op2_select(DE_intALU_op2_select),
         .floatALU1_op1_select(DE_floatALU1_op1_select), .floatALU2_op1_select(DE_floatALU2_op1_select),
@@ -393,11 +393,12 @@ module RT_core_single (
         .DE_EX_Swb_address(DE_EX_Swb_address), .DE_EX_Vwb_address(DE_EX_Vwb_address), .MEM_WB_Swb_address(MEM_WB_Swb_address), .MEM_WB_Vwb_address(MEM_WB_Vwb_address), 
         .DE_EX_MEM_read(DE_EX_memory_op[2:1] == 2'b10), .DE_EX_V_reduce(DE_EX_vector_reduce_en), .DE_stall(DE_Mem_address_stall), 
         .DE_S1_address(DE_S1_address), .DE_S2_address(DE_S2_address), .DE_V1_address(DE_V1_address), .DE_V2_address(DE_V2_address),
-        .DE_EX_S1_select(DE_EX_S1_select), .DE_EX_S2_select(DE_EX_S2_select), .DE_EX_V1_select(DE_EX_V1_select), .DE_EX_V2_select(DE_EX_V2_select)
+        .DE_EX_S1_select(DE_EX_S1_select), .DE_EX_S2_select(DE_EX_S2_select), .DE_EX_V1_select(DE_EX_V1_select), .DE_EX_V2_select(DE_EX_V2_select), 
+        .EX_MEM_Swb_address(EX_MEM_Swb_address), .link_en(IF_next_pc_select == 2'b11)
     );
 
     assign IF_DE_stall = DE_Branch_stall | DE_Mem_address_stall;
-    
+
     //////////////////////////
     // DE EX Pipeline
     ////////////////////////// 

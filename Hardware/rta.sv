@@ -47,12 +47,11 @@ module rta
   // CP
   logic wr_out_done_mc_cp;
   // CP || INST || CONST
-  logic [1:0] we_mem_mc_x[NUM_RT-1:0];
+  logic [1:0] we_mem_mc_x[3:0];
   logic [31:0] data_32_mc_x;
   logic cp_strt_mc_cp;
   // TRI
   logic [127:0] data_128_mc_tri;
-  logic re_mc_main;
   logic term_mc_cp;
 
 
@@ -118,7 +117,7 @@ module rta
   ////////////////// RT INTERFACE /////////////////
   // PD
   logic context_switch_rtif_pd[NUM_RT-1:0];
-  logic task_done_rtif_pd[NUM_Rt-1:0];
+  logic task_done_rtif_pd[NUM_RT-1:0];
   logic [BIT_THREAD-1:0] thread_id_rtif_pd[NUM_RT-1:0];
   logic [31:0] program_counter_rtif_pd[NUM_RT-1:0];
   logic [31:0] stack_ptr_rtif_pd[NUM_RT-1:0];
@@ -249,7 +248,7 @@ module rta
     .init_mem_fin_MC(cp_strt_mc_cp),
     .patch_out_done_MC(wr_out_done_mc_cp),
     .pixel_size_MC(data_32_mc_x),
-    .we_ps_MC(we_mem_mc_x[0]),
+    .we_ps_MC(we_mem_mc_x[0][0]),
     .load_done_term_MC(load_done_term_cp_mc),
     .load_start_PD(load_cp_pd),
     .load_done_PD(load_done_cp_pd),
@@ -479,7 +478,7 @@ module rta
     .ray_origin_IC(ray_origin_icm_ic), 
     .ray_direction_IC(ray_direction_icm_ic), 
     .shader_info_RT(shader_info_icm_rtif), 
-    .normal_RT(normal_icm_rtif), 
+    .normal_RT(normal_icm_rtif) 
     );
 
      
