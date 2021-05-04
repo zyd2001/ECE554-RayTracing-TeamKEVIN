@@ -231,12 +231,15 @@ module rta
   assign re_rt_main[1] = 1'h0;
   assign re_rt_main[2] = 1'h0;
   assign re_rt_main[3] = 1'h0;
-  assign addr_rt_x[1] = 1'h0;
-  assign addr_rt_x[2] = 1'h0;
-  assign addr_rt_x[3] = 1'h0;
+  assign addr_rt_x[1] = 32'h0;
+  assign addr_rt_x[2] = 32'h0;
+  assign addr_rt_x[3] = 32'h0;
   assign mode_rt_main[1] = 1'h0;
   assign mode_rt_main[2] = 1'h0;
   assign mode_rt_main[3] = 1'h0;
+  assign data_in_rt_main[1] = 128'h0;
+  assign data_in_rt_main[2] = 128'h0;
+  assign data_in_rt_main[3] = 128'h0;
 
 
   CP command_processer
@@ -435,7 +438,7 @@ module rta
         // ICM
         .dir(ray_direction_icm_ic), 
         .orig(ray_origin_icm_ic), 
-        
+
         .IC_Mem_Rdy(dequeue_ic_icm[i]),
         .norm(normal_ic_icm[i]), 
         .sid_out(shader_info_ic_icm[i][31:0]), 
