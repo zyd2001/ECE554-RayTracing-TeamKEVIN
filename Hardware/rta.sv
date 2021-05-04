@@ -1,43 +1,7 @@
-// Module Name:  afu.sv
-// Project:      dma_loopback
-// Description:  This AFU provides a loopback DMA test that simply reads
-//               data from one array in the CPU's memory and writes the
-//               received data to a separate array. The AFU uses MMIO to
-//               receive the starting read adress, starting write address,
-//               size (# of cache lines to read/wite), and a go signal. The
-//               AFU asserts a done signal to tell software that the DMA
-//               transfer is complete.
+// Module Name:  rta.sv
+// Project:      ECE554-Ray-Tracing
+// Description:  
 //
-//               One key difference with this AFU is that it does not use
-//               CCI-P, which is abstracted away by a hardware abstraction
-//               layer (HAL). Instead, the AFU uses a simplified MMIO interface
-//               and DMA interface.
-//
-//               The MMIO interface is defined in mmio_if.vh. It behaves
-//               similarly to the CCI-P functionality, except only supports
-//               single-cycle MMIO read responses, which eliminates the need
-//               for transaction IDs. MMIO writes behave identically to
-//               CCI-P.
-//
-//               The DMA read interface takes a starting read address (rd_addr),
-//               and a read size (rd_size) (# of cache lines to read). The rd_go
-//               signal starts the transfer. When data is available from memory
-//               the empty signal is cleared (0 == data available) and the data
-//               is shown on the rd_data port. To read the data, the AFU should
-//               assert the read enable (rd_en) (active high) for one cycle.
-//               The rd_done signal is continuously asserted (active high) after
-//               the AFU reads "size" words from the DMA.
-//
-//               The DMA write interface is similar, again using a starting
-//               write address (wr_addr), write size (wr_size), and go signal.
-//               Before writing data, the AFU must ensure that the write
-//               interface is not full (full == 0). To write data, the AFU
-//               puts the corresponding data on wr_data and asserts wr_en
-//               (active high) for one cycle. The wr_done signal is continuosly
-//               asserted after size cache lines have been written to memory.
-//
-//               All addresses are virtual addresses provided by the software.
-//               All data elements are cachelines.
 //
 
 //===================================================================
@@ -58,8 +22,8 @@ module rta
    );
 
 
-  parameter NUM_RT = 4;
-  parameter NUM_IC = 4;
+  parameter NUM_RT = 1;
+  parameter NUM_IC = 1;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
@@ -79,7 +43,7 @@ module rta
   ///////////////// Memory Controller ////////////////
   // MAIN
   logic re_mc_main;
-  logic [31:0] addr_mc_main[NUM_RT-1:0];
+  logic [31:0] addr_mc_main[3:0];
   // CP
   logic wr_out_done_mc_cp;
   // CP || INST || CONST
@@ -89,17 +53,16 @@ module rta
   // TRI
   logic [127:0] data_128_mc_tri;
   logic re_mc_main;
-  logic [31:0] addr_mc_main[NUM_RT-1:0];
   logic term_mc_cp;
 
 
   /////////////////// Stack Memory ///////////////////
-  logic re_x_main[NUM_RT-1:0];
-  logic [31:0] addr_x_main[NUM_RT-1:0];
+  logic re_x_main[3:0];
+  logic [31:0] addr_x_main[3:0];
   // MC || RT
-  logic [127:0] data_out_main_x[NUM_RT-1:0];
+  logic [127:0] data_out_main_x[3:0];
   // RT
-  logic rd_rdy_main_rt[NUM_RT-1:0];
+  logic rd_rdy_main_rt[3:0];
   
 
   //////////////// Instruction Memory ////////////////
@@ -114,14 +77,14 @@ module rta
 
   ///////////////// Triangle Memory /////////////////
   // MC
-  logic rdy_tri_mc;
+  logic [NUM_IC-1:0]rdy_tri_mc;
   // IC
-  logic rdy_tri_ic;
-  logic invalid_tri_ic;
-  logic [95:0] vertex_0_tri_ic;
-  logic [95:0] vertex_1_tri_ic;
-  logic [95:0] vertex_2_tri_ic;
-  logic [31:0] sid_tri_ic;
+  logic rdy_tri_ic[NUM_IC-1:0];
+  logic invalid_tri_ic[NUM_IC-1:0];
+  logic [95:0] vertex_0_tri_ic[NUM_IC-1:0];
+  logic [95:0] vertex_1_tri_ic[NUM_IC-1:0];
+  logic [95:0] vertex_2_tri_ic[NUM_IC-1:0];
+  logic [31:0] sid_tri_ic[NUM_IC-1:0];
 
 
   //////////////// Command Processor ////////////////
@@ -180,14 +143,14 @@ module rta
 
   //////////////////// RT CORE ////////////////////
   // MAIN
-  logic [127:0] data_in_rt_main[NUM_RT-1:0];
-  logic we_rt_main[NUM_RT-1:0];
-  logic re_rt_main[NUM_RT-1:0];
-  logic mode_rt_main[NUM_RT-1:0];
+  logic [127:0] data_in_rt_main[3:0];
+  logic we_rt_main[3:0];
+  logic re_rt_main[3:0];
+  logic mode_rt_main[3:0];
   // INST
   logic [31:0] addr_rt_inst[NUM_RT-1:0];
   // MAIN || INST
-  logic [31:0] addr_rt_x[NUM_RT-1:0];
+  logic [31:0] addr_rt_x[3:0];
   logic [127:0] mem_data_read_x_rt[NUM_RT-1:0];
   // RT_IF
   logic task_done_rt_rtif[NUM_RT-1:0];
@@ -206,8 +169,8 @@ module rta
   logic context_switch_ic_pd[NUM_IC-1:0];
   logic [BIT_THREAD-1:0] thread_id_in_ic_pd[NUM_IC-1:0];
   // TRI
-  logic re_ic_tri;
-  logic unsigned [BIT_TRI-1:0] tri_id_ic_tri;
+  logic re_ic_tri[NUM_IC-1:0];
+  logic unsigned [BIT_TRI-1:0] tri_id_ic_tri[NUM_IC-1:0];
   // ICM
   logic [127:0] shader_info_ic_icm [NUM_IC-1:0]; //(v0, v1, v2, sid)
   logic [95:0] normal_ic_icm [NUM_IC-1:0];
@@ -227,7 +190,7 @@ module rta
     .rst_n(rst_n),
     .dma(dma),
     .mmio(mmio),
-    .rdy_tri(rdy_tri_mc),
+    .rdy_tri(&rdy_tri_mc),
     .patch_done(patch_done_pd_mc),
     .term_cp(load_done_term_cp_mc),
     .result(data_out_main_x),
@@ -256,11 +219,24 @@ module rta
     );
 
   generate
-    for (i = 0; i < NUM_RT; i++) begin
+    for (i = 0; i < 4; i++) begin
       assign re_x_main[i] = re_mc_main ? 1'h1 : re_rt_main[i];
       assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_x[i]; 
     end
   endgenerate
+
+  assign we_rt_main[1] = 1'h0;
+  assign we_rt_main[2] = 1'h0;
+  assign we_rt_main[3] = 1'h0;
+  assign re_rt_main[1] = 1'h0;
+  assign re_rt_main[2] = 1'h0;
+  assign re_rt_main[3] = 1'h0;
+  assign addr_rt_x[1] = 1'h0;
+  assign addr_rt_x[2] = 1'h0;
+  assign addr_rt_x[3] = 1'h0;
+  assign mode_rt_main[1] = 1'h0;
+  assign mode_rt_main[2] = 1'h0;
+  assign mode_rt_main[3] = 1'h0;
 
 
   CP command_processer
@@ -280,7 +256,7 @@ module rta
 
   generate
     for (i = 0; i < NUM_RT; i++) begin: inst_const_memory
-      mem_inst_const #(.DEPTH(DEPTH_RT_)) memory_instruction 
+      mem_inst_const #(.DEPTH(DEPTH_RT_INST)) memory_instruction 
       (
         .clk(clk), 
         .rst_n(rst_n), 
@@ -305,26 +281,33 @@ module rta
   endgenerate
 
 
-  mem_triangle memory_triangle
-   (
-    .clk(clk),
-    .rst_n(rst_n),
-    .re_IC(re_ic_tri),
-    .triangle_id(tri_id_ic_tri),
-    .data_MC(data_128_mc_tri),
-    .we_MC(we_mem_mc_x[3][0]),
-    .done_MC(we_mem_mc_x[3][1]),
-    .rdy_MC(rdy_tri_mc),
-    .rdy_IC(rdy_tri_ic),
-    .not_valid_IC(invalid_tri_ic),
-    .vertex0_IC(vertex_0_tri_ic),
-    .vertex1_IC(vertex_1_tri_ic),
-    .vertex2_IC(vertex_2_tri_ic),
-    .sid_IC(sid_tri_ic)
-    );
+  generate
+    for (i = 0; i < NUM_IC; i++) begin: triangle_memory
+      mem_triangle memory_triangle
+       (
+         .clk(clk),
+         .rst_n(rst_n),
+         // IC
+         .re_IC(re_ic_tri[i]),
+         .triangle_id(tri_id_ic_tri[i]),
+         .data_MC(data_128_mc_tri),
+         // MC
+         .we_MC(we_mem_mc_x[3][0]),
+         .done_MC(we_mem_mc_x[3][1]),
+         .rdy_MC(rdy_tri_mc[i]),
+         // TRI
+         .rdy_IC(rdy_tri_ic[i]),
+         .not_valid_IC(invalid_tri_ic[i]),
+         .vertex0_IC(vertex_0_tri_ic[i]),
+         .vertex1_IC(vertex_1_tri_ic[i]),
+         .vertex2_IC(vertex_2_tri_ic[i]),
+         .sid_IC(sid_tri_ic[i])
+         );
+    end
+  endgenerate
+  
 
-
-  patch_dispatcher pd  
+  patch_dispatcher #(.NUM_RT(NUM_RT),.NUM_IC(NUM_IC)) pd  
    (
     .clk(clk),
     .rst_n(rst_n),
@@ -430,7 +413,7 @@ module rta
         .MEM_data_write(data_in_rt_main[i]),
         .MEM_read_en(re_rt_main[i]),
         .MEM_write_en(we_rt_main[i]),
-        .(mode_rt_main[i])
+        .MEM_s_or_v(mode_rt_main[i])
         );
 
       assign mem_data_read_x_rt[i] = addr_rt_x[i][31] ? data_out_main_x[i] : data_out_const_rt[i];
@@ -457,20 +440,20 @@ module rta
         .sid_out(shader_info_ic_icm[31:0]), 
         .IntersectionPoint(shader_info_ic_icm[127:32]),
         // TRI
-        .Mem_Rdy(rdy_tri_ic), 
-        .Mem_NotValid(invalid_tri_ic), 
-        .v0(vertex_0_tri_ic), 
-        .v1(vertex_1_tri_ic), 
-        .v2(vertex_2_tri_ic), 
-        .sid_in(sid_tri_ic), 
-        .triangle_id(tri_id_ic_tri), 
-        .Mem_En(re_ic_tri)
+        .Mem_Rdy(rdy_tri_ic[i]), 
+        .Mem_NotValid(invalid_tri_ic[i]), 
+        .v0(vertex_0_tri_ic[i]), 
+        .v1(vertex_1_tri_ic[i]), 
+        .v2(vertex_2_tri_ic[i]), 
+        .sid_in(sid_tri_ic[i]), 
+        .triangle_id(tri_id_ic_tri[i]), 
+        .Mem_En(re_ic_tri[i])
     );
     end
   endgenerate
   
 
-  mem_IC #(.NUM_RT(NUM_RT), NUM_IC(NUM_IC), .NUM_THREAD(NUM_THREAD)) mem_ic
+  mem_IC #(.NUM_RT(NUM_RT), .NUM_IC(NUM_IC), .NUM_THREAD(NUM_THREAD)) mem_ic
   (
     //input
     .clk(clk), 
