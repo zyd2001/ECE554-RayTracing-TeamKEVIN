@@ -435,10 +435,11 @@ module rta
         // ICM
         .dir(ray_direction_icm_ic), 
         .orig(ray_origin_icm_ic), 
+        
         .IC_Mem_Rdy(dequeue_ic_icm[i]),
-        .norm(normal_ic_icm), 
-        .sid_out(shader_info_ic_icm[31:0]), 
-        .IntersectionPoint(shader_info_ic_icm[127:32]),
+        .norm(normal_ic_icm[i]), 
+        .sid_out(shader_info_ic_icm[i][31:0]), 
+        .IntersectionPoint(shader_info_ic_icm[i][127:32]),
         // TRI
         .Mem_Rdy(rdy_tri_ic[i]), 
         .Mem_NotValid(invalid_tri_ic[i]), 
