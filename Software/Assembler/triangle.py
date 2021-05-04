@@ -39,7 +39,8 @@ if (len(sys.argv) == 2):
     for v in vertex:
         # b = bytearray()
         # b.extend(struct.pack("i", 123))
-        for i in range(2,-1, -1):
+        for i in range(3):
+        # for i in range(2,-1, -1):
             # b.extend(struct.pack("f", v[i]))
             f.write(struct.pack("f", v[i]))
         f.write(struct.pack("i", 123))
