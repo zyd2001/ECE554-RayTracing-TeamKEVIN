@@ -105,7 +105,10 @@ module address_decode_unit (
                     DE_S1_address = instruction[20:16];
                     if (instruction[27:26] == 2'b11) DE_V1_address = instruction[24:21];
                     else DE_S2_address = instruction[25:21];
-
+                end
+                // for  link instructions
+                if (instruction[29:26] == 4'b0111) begin
+                    DE_S1_address = instruction[20:16];
                 end
             end
 

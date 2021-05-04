@@ -28,6 +28,9 @@ module branch (
     typedef enum logic { idle, waiting } branch_state;
     branch_state current_state, next_state;
     logic [1:0] flag;
+    logic link_en;
+
+  
 
     always_ff @( posedge clk, negedge rst_n ) begin 
         if (!rst_n) begin

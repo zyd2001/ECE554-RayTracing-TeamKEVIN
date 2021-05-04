@@ -34,11 +34,11 @@ module mem_IC (
         Output
     */
     // IC
-    output [127:0] ray_origin_IC;
-    output [127:0] ray_direction_IC;
+    output [95:0] ray_origin_IC;
+    output [95:0] ray_direction_IC;
     // RT​
     output [127:0] shader_info_RT;
-    output [127:0] normal_RT;
+    output [95:0] normal_RT;
 
     genvar j;
     logic [RT2IC_WIDTH-1:0] data_in_RT2IC;
