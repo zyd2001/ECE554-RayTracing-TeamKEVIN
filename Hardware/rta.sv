@@ -22,8 +22,10 @@ module rta
    );
 
 
-  parameter NUM_RT = 1;
-  parameter NUM_IC = 1;
+  // parameter NUM_RT = 1;
+  // parameter NUM_IC = 1;
+  parameter NUM_RT = 4;
+  parameter NUM_IC = 16;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
@@ -225,21 +227,21 @@ module rta
     end
   endgenerate
 
-  assign we_rt_main[1] = 1'h0;
-  assign we_rt_main[2] = 1'h0;
-  assign we_rt_main[3] = 1'h0;
-  assign re_rt_main[1] = 1'h0;
-  assign re_rt_main[2] = 1'h0;
-  assign re_rt_main[3] = 1'h0;
-  assign addr_rt_x[1] = 32'h0;
-  assign addr_rt_x[2] = 32'h0;
-  assign addr_rt_x[3] = 32'h0;
-  assign mode_rt_main[1] = 1'h0;
-  assign mode_rt_main[2] = 1'h0;
-  assign mode_rt_main[3] = 1'h0;
-  assign data_in_rt_main[1] = 128'h0;
-  assign data_in_rt_main[2] = 128'h0;
-  assign data_in_rt_main[3] = 128'h0;
+  // assign we_rt_main[1] = 1'h0;
+  // assign we_rt_main[2] = 1'h0;
+  // assign we_rt_main[3] = 1'h0;
+  // assign re_rt_main[1] = 1'h0;
+  // assign re_rt_main[2] = 1'h0;
+  // assign re_rt_main[3] = 1'h0;
+  // assign addr_rt_x[1] = 32'h0;
+  // assign addr_rt_x[2] = 32'h0;
+  // assign addr_rt_x[3] = 32'h0;
+  // assign mode_rt_main[1] = 1'h0;
+  // assign mode_rt_main[2] = 1'h0;
+  // assign mode_rt_main[3] = 1'h0;
+  // assign data_in_rt_main[1] = 128'h0;
+  // assign data_in_rt_main[2] = 128'h0;
+  // assign data_in_rt_main[3] = 128'h0;
 
 
   CP #(.NUM_THREAD(NUM_THREAD))command_processer
