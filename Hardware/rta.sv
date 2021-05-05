@@ -249,7 +249,7 @@ module rta
     .init_mem_fin_MC(cp_strt_mc_cp),
     .patch_out_done_MC(wr_out_done_mc_cp),
     .pixel_size_MC(data_32_mc_x),
-    .we_ps_MC(we_mem_mc_x[0][0]),
+    .we_pixel_size_MC(we_mem_mc_x[0][0]),
     .load_done_term_MC(load_done_term_cp_mc),
     .load_start_PD(load_cp_pd),
     .load_done_PD(load_done_cp_pd),
