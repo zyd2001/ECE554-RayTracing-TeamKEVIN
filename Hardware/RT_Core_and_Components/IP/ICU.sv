@@ -69,7 +69,7 @@ module ICU (
       DIV: 
         begin
           if (counter == DIV_LATENCY) begin
-            out = {32'h0, Divider_result};
+            out = {{32{Adder_result[31]}}, Divider_result};
             done = 1'b1;
           end
           else begin
@@ -93,7 +93,7 @@ module ICU (
       ADDSUB: 
         begin
           if (counter == ADD_LATENCY) begin
-            out = {31'h0, Adder_result};
+            out = {{31{Adder_result[32]}}, Adder_result};
             done = 1'b1;
           end
           else begin
