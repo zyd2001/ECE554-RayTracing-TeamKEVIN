@@ -1,4 +1,4 @@
-module ftoi (
+module fti (
     in_in, out, clk, en, done, rst_n
 );
     input clk, en, rst_n;
