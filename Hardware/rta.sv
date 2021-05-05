@@ -30,7 +30,6 @@ module rta
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
   parameter DEPTH_RT_INST = 4096;
-  parameter NUM_TRIANGLE = 512;
 
   localparam BIT_RT = $clog2(NUM_RT);
   localparam BIT_IC = $clog2(NUM_IC);
@@ -288,7 +287,7 @@ module rta
 
   generate
     for (i = 0; i < NUM_IC; i++) begin: triangle_memory
-      mem_triangle #(.NUM_TRIANGLE(NUM_TRIANGLE))memory_triangle
+      mem_triangle #(.NUM_TRIANGLE(NUM_TRI))memory_triangle
        (
          .clk(clk),
          .rst_n(rst_n),
