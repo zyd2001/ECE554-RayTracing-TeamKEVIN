@@ -458,23 +458,23 @@ namespace CompilerCore
                 {
                     SortedSet<int> usedScalar = sAllocator.finalRewrite(translation, true);
                     SortedSet<int> usedVector = vAllocator.finalRewrite(translation, false);
-                    var types = translation.function.parameterList.Types();
-                    HashSet<int> parameterScalar = new HashSet<int>();
-                    HashSet<int> parameterVector = new HashSet<int>();
-                    int vectors = 1, scalars = 1;
-                    for (int i = 0; i < types.Count; i++)
-                        if (types[i] == Type.VECTOR)
-                        {
-                            parameterVector.Add(vectors);
-                            vectors++;
-                        }
-                        else
-                        {
-                            parameterScalar.Add(scalars);
-                            scalars++;
-                        }
-                    usedScalar.ExceptWith(parameterScalar);
-                    usedVector.ExceptWith(parameterVector);
+                    // var types = translation.function.parameterList.Types();
+                    // HashSet<int> parameterScalar = new HashSet<int>();
+                    // HashSet<int> parameterVector = new HashSet<int>();
+                    // int vectors = 1, scalars = 1;
+                    // for (int i = 0; i < types.Count; i++)
+                    //     if (types[i] == Type.VECTOR)
+                    //     {
+                    //         parameterVector.Add(vectors);
+                    //         vectors++;
+                    //     }
+                    //     else
+                    //     {
+                    //         parameterScalar.Add(scalars);
+                    //         scalars++;
+                    //     }
+                    // usedScalar.ExceptWith(parameterScalar);
+                    // usedVector.ExceptWith(parameterVector);
                     // translation.ResolvePhysicalRegister();
                     translation.usedScalar = usedScalar;
                     translation.usedVector = usedVector;
