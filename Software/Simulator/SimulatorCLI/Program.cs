@@ -30,7 +30,7 @@ namespace SimulatorCLI
             FileInfo outFile = new FileInfo("output.ppm");
             var writer = outFile.CreateText();
             writer.WriteLine($"P3\n{320} {180}\n255");
-            FileInfo file = new FileInfo("cylinder.obj.out");
+            FileInfo file = new FileInfo("triangle.obj.out");
             Simulator sim = new Simulator(CP, RT, true, CPMSize, RTMSize, file, CPO, RTO);
             if (CP != null)
                 sim.Run();
@@ -45,6 +45,7 @@ namespace SimulatorCLI
                     b = (int)(color.b * 255);
                     writer.Write($"{r} {g} {b}\n");
                 }
+            writer.Close();
             //     FileInfo file = new FileInfo("triangle.obj.out");
             //     FileInfo outFile = new FileInfo("output.ppm");
             //     var writer = outFile.CreateText();

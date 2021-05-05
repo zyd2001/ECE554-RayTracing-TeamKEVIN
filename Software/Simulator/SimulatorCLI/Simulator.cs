@@ -100,7 +100,7 @@ namespace SimulatorCLI
 
         internal (float r, float g, float b) RunRT(int pixelID)
         {
-            RT.ScalarRegisterFile[28] = 0; // set Stack Pointer
+            RT.ScalarRegisterFile[29] = 0; // set Stack Pointer
             RT.ScalarRegisterFile[31] = 0; // set PC
             RT.ScalarRegisterFile[1] = pixelID;
             while (true)
@@ -114,7 +114,7 @@ namespace SimulatorCLI
                     RTOutputFile.WriteLine(RT.LastInstruction);
                     RTOutputFile.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
-                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.f, trace.after.f);
+                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.i, trace.after.i);
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
                         RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, Hex(trace.before), Hex(trace.after));
                     foreach (var trace in RT.DataMemory.TraceLog)
