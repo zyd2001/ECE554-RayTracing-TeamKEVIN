@@ -121,6 +121,15 @@ namespace CompilerCore
                 IndexExpression ie = (left as IndexExpression);
                 string pointer = ie.expression.Generate(translation);
                 string index = ie.indexExpression.Generate(translation);
+                string indexVar, pointerVar;
+                if (index[2] == '.') // index is not temporary
+                    indexVar = $".{index[1]}{VariableCounter}";
+                else
+                    indexVar = index;
+                if (pointer[2] == '.') // index is not temporary
+                    pointerVar = $".{pointer[1]}{VariableCounter}";
+                else
+                    pointerVar = pointer;
                 if (ie.valueType == Type.VECTOR)
                 {
                     translation.AddAssembly("v_get_from_s", pointer, rhsVar,
@@ -128,15 +137,15 @@ namespace CompilerCore
                 }
                 else if (ie.valueType == Type.VECTOR_POINTER)
                 {
-                    translation.AddAssembly("ii_muli", index, index, "16");
-                    translation.AddAssembly("ii_add", pointer, index, pointer);
-                    translation.AddAssembly("v_store_16byte", rhsVar, pointer, "0");
+                    translation.AddAssembly("ii_muli", indexVar, index, "16");
+                    translation.AddAssembly("ii_add", pointerVar, indexVar, pointer);
+                    translation.AddAssembly("v_store_16byte", rhsVar, pointerVar, "0");
                 }
                 else
                 {
-                    translation.AddAssembly("ii_muli", index, index, "4");
-                    translation.AddAssembly("ii_add", pointer, index, pointer);
-                    translation.AddAssembly("s_store_4byte", rhsVar, pointer, "0");
+                    translation.AddAssembly("ii_muli", indexVar, index, "4");
+                    translation.AddAssembly("ii_add", pointerVar, indexVar, pointer);
+                    translation.AddAssembly("s_store_4byte", rhsVar, pointerVar, "0");
                 }
             }
             return null;
@@ -799,6 +808,15 @@ namespace CompilerCore
             string index = indexExpression.Generate(translation);
             string tempVar = valueType == Type.VECTOR_POINTER ? $".V{VariableCounter}" :
                pointer[2] == '.' ? $".S{VariableCounter}" : pointer;
+            string indexVar, pointerVar;
+            if (index[2] == '.') // index is not temporary
+                indexVar = $".{index[1]}{VariableCounter}";
+            else
+                indexVar = index;
+            if (pointer[2] == '.') // index is not temporary
+                pointerVar = $".{pointer[1]}{VariableCounter}";
+            else
+                pointerVar = pointer;
             if (valueType == Type.VECTOR)
             {
                 translation.AddAssembly("s_get_from_v", tempVar, pointer,
@@ -806,15 +824,15 @@ namespace CompilerCore
             }
             else if (valueType == Type.VECTOR_POINTER)
             {
-                translation.AddAssembly("ii_muli", index, index, "16");
-                translation.AddAssembly("ii_add", pointer, index, pointer);
-                translation.AddAssembly("v_load_16byte", tempVar, pointer, "0");
+                translation.AddAssembly("ii_muli", indexVar, index, "16");
+                translation.AddAssembly("ii_add", pointerVar, indexVar, pointer);
+                translation.AddAssembly("v_load_16byte", tempVar, pointerVar, "0");
             }
             else
             {
-                translation.AddAssembly("ii_muli", index, index, "4");
-                translation.AddAssembly("ii_add", pointer, index, pointer);
-                translation.AddAssembly("s_load_4byte", tempVar, pointer, "0");
+                translation.AddAssembly("ii_muli", indexVar, index, "4");
+                translation.AddAssembly("ii_add", pointerVar, indexVar, pointer);
+                translation.AddAssembly("s_load_4byte", tempVar, pointerVar, "0");
             }
             return tempVar;
         }
