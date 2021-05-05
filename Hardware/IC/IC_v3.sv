@@ -31,7 +31,7 @@ module IC_v3(
   typedef enum reg [1:0] {FTCH, WAIT, BUSY, IDLE} state_t;
   state_t state, nxt_state;
   
-  logic Fetch, ld, ld_init, ld_better, better, done, cnt, clear, Context_Switch_PD_in, hit;
+  logic Fetch, ld, ld_init, ld_better, better, done, cnt, clear, Context_Switch_PD_in, hit, result_clear;
   logic [BIT_THREAD-1:0] thread_id_reg;
   logic [95:0] v2_out, v1_out, v0_out;
   logic [95:0] orig_reg, dir_reg;
@@ -54,6 +54,12 @@ module IC_v3(
   
   always_ff@(posedge clk or posedge rst) begin
     if (rst) begin
+      sid_better <= '0;
+      IntersectionPoint_better <= '0;
+      norm_better <= '0;
+      t_better <= '0;
+    end
+    else if (result_clear) begin
       sid_better <= '0;
       IntersectionPoint_better <= '0;
       norm_better <= '0;
@@ -91,6 +97,7 @@ module IC_v3(
     ld_init = 1'b0;
     cnt = 1'b0;
     Context_Switch_PD_in = 1'b0;
+    result_clear = 1'b0;
     nxt_state = IDLE;
     case(state)
       FTCH: 
@@ -142,6 +149,7 @@ module IC_v3(
       default: 
         begin
           if (Core_ID) begin
+            result_clear = 1'b1;
             Fetch = 1'b1;
             ld = 1'b1;
             clear = 1'b1;

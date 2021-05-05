@@ -3,8 +3,8 @@ module ContactDetect_v2(
   u, v, det, 
   result);
   
-  parameter KEPSILON = 32'h0x322bcc77;   //1e-8
-  localparam POSITIVEONE = 32'h0x3f800000; // 1
+  parameter KEPSILON = 32'h322bcc77;   //1e-8
+  localparam POSITIVEONE = 32'h3f800000; // 1
 
   input clk, rst;
   input [31:0] u, v, det;
