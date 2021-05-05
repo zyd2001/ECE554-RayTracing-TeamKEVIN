@@ -26,7 +26,7 @@ namespace SimulatorCore
 
         internal IntersectionCore(TextReader t)
         {
-            for (int k = 0; k < 320; k++)
+            for (int k = 0; k < 12; k++)
             {
                 Triangle tri = new Triangle();
                 tri.id = 1;
@@ -65,6 +65,8 @@ namespace SimulatorCore
             Vector3 dir = new Vector3(direction.X, direction.Y, direction.Z);
             Vector4 resultPoint = new Vector4(0, 0, 0, 0), resultNormal = new Vector4();
             float minDistance = float.MaxValue;
+            Console.WriteLine(origin);
+            Console.WriteLine(direction);
             for (int i = 0; i < triangles.Count; i++)
             {
                 // Vector3 v0 = VectorHelper(ref i);

@@ -4,12 +4,12 @@ using System.Numerics;
 
 namespace SimulatorCore
 {
-    class s_write_high : RTInstruction
+    class s_write_high_real : RTInstruction
     {
         int r0;
         int imm;
 
-        internal s_write_high(int r0, int imm)
+        internal s_write_high_real(int r0, int r1, int imm)
         {
             this.r0 = r0;
             this.imm = imm;
@@ -27,12 +27,12 @@ namespace SimulatorCore
         }
     }
 
-    class s_write_low : RTInstruction
+    class s_write_low_real : RTInstruction
     {
         int r0;
         int imm;
 
-        internal s_write_low(int r0, int imm)
+        internal s_write_low_real(int r0, int r1, int imm)
         {
             this.r0 = r0;
             this.imm = imm;
