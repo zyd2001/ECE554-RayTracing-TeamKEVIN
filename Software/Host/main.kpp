@@ -1,189 +1,268 @@
-const int width = 1280;
-const float epsilon = 0.001;
-const int height = 720;
-// Assume Horizontal Fov is 90 degree, so tan(90/2) = 1
-const float fov = 1;
-const vector camera_location = [0,0,0,0];
-const vector camera_lookat_pos = [0,0,-1,0];
-const vector camera_up = [0,1,0,1];
-const vector sky_horizon_color = [0.76, 0.765, 0.827, 1];
-const vector sky_top_color = [0.53, 0.808, 0.92, 1];
+const int width;
+const int height;
+const float epsilon;
+const float fov;
+const vector camera_location;
+const vector camera_lookat_pos;
+const vector camera_up;
+const vector sky_horizon_color;
+const vector sky_top_color;
+const vector ambient_light;
 
-const int light_start_address = 0x40000100;
-const int material_start_address = 0x40000200;
+const int light_start_address;
+const int material_address;
 
-// Lights data starts at 0x40000100
-// Lighting data mapping, assuming all lights are point light:
-// Each light takes two vectors, at most 8 lights
-// 0x40000100 Light1, 0x40000120 Light2
-// 0x40000100: Light1 Vector1 - position + range 
-// 0x40000110: Light1 Vector2 - Light color 
-// 0x40000120: Light2 ... 
-
-// for example
-0x40000100 = [100,100,100, 10000];
-0x40000110 = [1,1,1,1];
-
-// Material data starts at 0x40000200
-// Each material takes one vector and two scalar. 
-// 0x40000200: Material1 Vector1 - subsurface albedo (aka base color)
-// 0x40000210: Material1 Scalar1 Roughness
-// 0x40000214: Material1 Scalar1 Metallic
-// 0x40000218: Material2 ...
-// [0, 0, 1, 1]
-// 0
-// 1
-void main(int id, int stackBase)
-{   
-    float *result;
-    result = stackBase + 65520;
-    
-    int screen_y = id / width;
-    int screen_x = id % width;
-
-    float aspect_ratio_inverse = float(height) / float(width);
-
-    float camera_y = (1 - ((float(screen_y) + 0.5) / float(height)) * 2) * aspect_ratio_inverse;
-    float camera_x = 2 * ((float(screen_x) + 0.5) / float(width)) - 1;
-
-    float camera_y = camera_y * fov;
-    float camera_x = camera_x * fov;
-
-    vector forward = normalize(camera_location - camera_lookat_pos);
-    vector right = cross(camera_up, forward);
-    vector up = cross(forward, right);
-
-    vector camera_dir = -forward + right * camera_x + up * camera_y + camera_location;
-    camera_dir[3] = 0;
-    camera_dir = normalize(camera_dir);
-
-    vector hit, normal;
-    hit, normal = trace(orig, camera_dir);
-    vector shaded_color;
-
-
-    shaded_color[3] = 1;
-    result* = shaded_color;
+vector miss_shader(vector origin, vector dir, vector hit, vector normal)
+{
+    float mix = max(0, dir[1]);
+    return sky_top_color * mix + sky_horizon_color * (1.0 - mix);
 }
 
-vector hit_shader(vector origin, vector dir, vector hit, vector normal, int material_number) {
-    vector hit_color = [0, 0, 0, 0];
-    vector ambient_light = [0.2, 0.2, 0.2, 0.2];
-    vector *light_position;
-    light_position = light_start_address;
-    vector light_origin = light_position*;
-    vector one = [1, 1, 1, 1];
+vector hit_shader(vector origin, vector dir, vector hit, vector normal, int material_number)
+{
+    vector hit_color = [ 0, 0, 0, 0 ];
+    vector subsurface_albedo;
+    vector temp;
+    float roughness;
+    float metallic;
 
-    vector *material;
-    material = material_start_address + (material_number - 1) * 24;
-    vector subsurface_albedo = material*;
-    float *RM = material + 16;
-    float roughness = RM*;
-    RM = RM + 4;
-    float metallic = RM*;
+    vector *material_ptr;
+    material_ptr = material_address + (material_number - 1) * 32;
+    subsurface_albedo = material_ptr[0];
+    temp = material_ptr[1];
+    roughness = temp[0];
+    metallic = temp[1];
 
-    while (light_origin[3] > 0 && light_position <  0x40000200) {
-        vector light_color = (light_position+16)*;
-        light_position = light_position+32;
-        
+    vector *light_ptr;
+    light_ptr = light_start_address;
+    vector light_origin = light_ptr[0];
+    vector light_color = light_ptr[1];
+
+    while (light_origin[3] > 0)
+    {
         float light_range = light_origin[3];
         light_origin[3] = 0;
 
-        vector light_ray = (light_origin - hit);
-        float light_distance = sqrt(reduce(light_ray*light_ray));
-        vector light_center = light_origin;
-        light_origin = light_position*;
+        vector light_ray = light_origin - hit;
+        float light_distance = sqrt(reduce(light_ray * light_ray));
 
         light_ray = normalize(light_ray);
         float NdL = dot(normal, light_ray);
 
-        // if the light shine on the surface
-        if (NdL < 0 ) continue;
+        NdL = clamp(NdL, 0, 1.0);
+        if (NdL > 0)
+        {
+            // Check if there is any object occluding the light
+            vector shadow_hit, shadow_normal;
+            shadow_hit, shadow_normal = trace(hit + normal * 0.0001, light_ray);
 
-        vector shadow_hit, shadow_normal;
-        // make sure we can see the light
-        shadow_hit, shadow_normal = trace(hit+ normal * 0.0001, light_ray);
+            int shadow_hit_or_not = asInt(shadow_hit[3]);
+            shadow_hit[3] = 0;
+            // if (fvthek) {
+            //     std::cout << shadow_hit_or_not << std::endl;
+            // }
 
-        float hit_error = distance(shadow_hit, origin) + distance(shadow_hit, light_center);
-        
-        // If there is no hit, then we dont care
-        if (asInt(shadow_hit[3]) != 0 && (hit_error - light_distance > epsilon || hit_error - light_distance < -epsilon)) continue;
+            // If there is a object in the light path, check if it is behind the light.
+            if (shadow_hit_or_not != 0)
+            {
+                float hit_error = distance(shadow_hit, hit) + distance(shadow_hit, light_origin) - light_distance;
 
-        float point_light_falloff = (light_range * light_range / (light_distance * light_distance + light_range * light_range));
-        vector light_color = light_color * point_light_falloff;
+                if (hit_error > epsilon || hit_error < -epsilon)
+                    shadow_hit_or_not = 0;
+            }
 
-        vector halfway = normalize(light_ray - dir);
-        float NdV = dot(normal, -dir);
-        float NdH = dot(normal, halfway);
-        float VdH = dot(-dir, halfway);
+            if (shadow_hit_or_not == 0)
+            {
+                float point_light_falloff = (light_range * light_range / (light_distance * light_distance + light_range * light_range));
+                light_color = light_color * point_light_falloff * NdL;
 
+                vector halfway = normalize(light_ray - dir);
+                float NdV = dot(normal, -dir);
+                float NdH = dot(normal, halfway);
+                float VdH = dot(-dir, halfway);
 
-        vector default_dielectrics_F0 = [0.04, 0.04, 0.04, 1];
-        vector F = metallic * subsurface_albedo + (1 - metallic) * default_dielectrics_F0;
-        subsurface_albedo = (1 - metallic) * subsurface_albedo; 
-        
-        hit_color = hit_color + (one - F) * subsurface_albedo * light_color;
-        float D = NormalDist(NdH, roughness);        // 1/pi omitted
-        float G = HammonSmith(NdV, NdL, roughness);  // 4  * NdV * NdL omitted
-        vector f_ct = F * D * G;
-        hit_color = hit_color + f_ct * light_color;
+                vector default_dielectrics_F0 = [ 0.04, 0.04, 0.04, 1.0 ];
+                vector F = subsurface_albedo * metallic + default_dielectrics_F0 * (1.0 - metallic);
+                vector this_subsurface_albedo = subsurface_albedo * (1.0 - metallic);
+
+                hit_color = hit_color + (-F + 1.0) * this_subsurface_albedo * light_color;
+                // if (fvthek) {
+                //     std::cout<< "Diffuse" <<std::endl;
+                //     print(hit_color);
+                // }
+                float D = NormalDist(NdH, roughness);       // 1/pi omitted
+                float G = HammonSmith(NdV, NdL, roughness); // 4  * NdV * NdL omitted
+                vector f_ct = F * D * G;
+
+                hit_color = hit_color + f_ct * light_color;
+
+                // if (fvthek) {
+                //     std::cout<< "specualr" <<std::endl;
+                //     print(hit_color);
+                // }
+            }
+        }
+        light_ptr = asInt(light_ptr) + 32;
+        light_origin = light_ptr[0];
+        light_color = light_ptr[1];
     }
 
     float NdV = dot(normal, -dir);
+    NdV = clamp(NdV, 0.5, 1.0);
 
-    diffuse_color = diffuse_color + ambient_light * subsurface_albedo * NdV;
-                            
+    // Adding ambient light
+    hit_color = hit_color + ambient_light * subsurface_albedo * NdV;
 
+    // if (fvthek) {
+    //     std::cout<< "final" <<std::endl;
+    //     print(ambient_light * subsurface_albedo * NdV);
+    //     print(hit_color);
+    //     std::cout<< NdV <<std::endl;
+    //     // std::cout<< G <<std::endl;
+    // }
+    hit_color = clampv(hit_color, 0, 1.0);
+    return hit_color;
 }
-float NormalDist(float NdH, float roughness) {
+
+void main(int id, int stackBase)
+{
+    vector *result;
+    result = stackBase + 65520;
+
+    int screen_y = id / width;
+    int screen_x = mod(id, width);
+
+    float aspect_ratio_inverse = float(height) / float(width);
+
+    float camera_y = (1.0 - ((float(screen_y) + 0.5) / float(height)) * 2.0) * aspect_ratio_inverse;
+    float camera_x = 2.0 * ((float(screen_x) + 0.5) / float(width)) - 1.0;
+
+    camera_y = camera_y * fov;
+    camera_x = camera_x * fov;
+
+    vector forward = normalize(camera_location - camera_lookat_pos);
+    vector right = cross(camera_up, forward);
+    vector up = cross(forward, right);
+    // if (stackBase)
+    // {
+    //     print(forward);
+    //     print(right);
+    //     print(up);
+    // }
+
+    vector camera_dir = -forward + right * camera_x + up * camera_y;
+    camera_dir[3] = 0.0;
+    camera_dir = normalize(camera_dir);
+
+    // if (stackBase)
+    // {
+    //     print(camera_location);
+    //     print(camera_dir);
+    // }
+
+    vector hit, normal;
+    hit, normal = trace(camera_location, camera_dir);
+
+    if (asInt(hit[3]) == 0)
+        result[0] = miss_shader(camera_location, camera_dir, hit, normal);
+    else
+        result[0] = hit_shader(camera_location, camera_dir, hit, normal, asInt(hit[3]));
+    return;
+}
+
+int mod(int a, int b)
+{
+    int c = a / b;
+    c = c * b;
+    return a - c;
+}
+
+float NormalDist(float NdH, float roughness)
+{
     float rough_sqr = roughness * roughness;
-    float den_2 = NdH * NdH * (rough_sqr - 1) + 1;
+    float den_2 = NdH * NdH * (rough_sqr - 1.0) + 1.0;
     float denominator = den_2 * den_2;
     return rough_sqr / denominator;
 }
 
-float HammonSmith(float NdV, float NdL, float roughness) {
-    if (NdL < 0) NdL = -NdL;
-    if (NdV < 0) NdV = -NdV;
+float HammonSmith(float NdV, float NdL, float roughness)
+{
+    if (NdL < 0.0)
+        NdL = -NdL;
+    if (NdV < 0.0)
+        NdV = -NdV;
 
-    float denominator = 2 * NdV * NdL * (1-roughness) + roughness * ( NdL + NdV);
+    float denominator = 2.0 * NdV * NdL * (1.0 - roughness) + roughness * (NdL + NdV);
     return 0.5 / denominator;
 }
 
-
-float distance(vector v1, vector v2) {
-    return sqrt(reduce((v1-v2)*(v1-v2)));
+float distance(vector v1, vector v2)
+{
+    vector t = v1 - v2;
+    return sqrt(reduce(t * t));
 }
 
-vector miss_shader(vector origin, vector dir, vector hit, vector normal) {
-    float mix = max(0, dir[1]);
-    return (mix * sky_top_color + (1-mix) * sky_horizon_color)
+float max(float a, float b)
+{
+    if (a > b)
+        return a;
+    else
+        return b;
+    return a;
 }
-
-
-float max(float a, float b) {
-    if (a > b) return a;
-    else return b;
-
-}
-
 
 vector normalize(vector v)
 {
-    vector norm = sqrt(reduce(v*v));
+    float norm = sqrt(reduce(v * v));
     return v / norm;
 }
 
-
-float dot(vector v1, vector v2) {
+float dot(vector v1, vector v2)
+{
     return reduce(v1 * v2);
 }
 
 // Only the first three index matters
-vector cross(vector v1, vector v2) {
-    float x = v1[1] * v2[2] - v1[2] * v2[1];
-    float y = v1[2] * v2[0] - v1[0] * v2[2];
-    float z = v1[0] * v2[1] - v1[1] * v2[0];
-    vector result = [x, y, z, 0];
-    return result;
+vector cross(vector v1, vector v2)
+{
+    float v10 = v1[0], v11 = v1[1], v12 = v1[2];
+    float v20 = v2[0], v21 = v2[1], v22 = v2[2];
+
+    float x = v11 * v22 - v12 * v21;
+    float y = v12 * v20 - v10 * v22;
+    float z = v10 * v21 - v11 * v20;
+    return [ x, y, z, 0 ];
+}
+float clamp(float x, float min, float max)
+{
+    if (x < min)
+        x = min;
+    else if (x > max)
+        x = max;
+    return x;
+}
+
+vector clampv(vector x, float min, float max)
+{
+    if (x[0] < min)
+        x[0] = min;
+    else if (x[0] > max)
+        x[0] = max;
+
+    if (x[1] < min)
+        x[1] = min;
+    else if (x[1] > max)
+        x[1] = max;
+
+    if (x[2] < min)
+        x[2] = min;
+    else if (x[2] > max)
+        x[2] = max;
+
+    if (x[3] < min)
+        x[3] = min;
+    else if (x[3] > max)
+        x[3] = max;
+
+    return x;
 }
