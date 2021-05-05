@@ -1,6 +1,6 @@
 rta.json
 
-C:${FPGA_BBB_CCI_SRC}/BBB_cci_mpf/hw/rtl/cci_mpf_sources.txt
+C:/home/u59679/intel-fpga-bbb/BBB_cci_mpf/hw/rtl/cci_mpf_sources.txt
 
 +incdir+.
 fifo.sv
