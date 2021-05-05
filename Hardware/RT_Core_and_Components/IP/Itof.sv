@@ -1,12 +1,13 @@
 module itf (in_in, out, clk, en, done, rst_n);
 
-  parameter LATENCY = 9;
+  parameter LATENCY = 6;
 
   input clk, en, rst_n;
   input [31:0] in_in;
   output logic signed [31:0] out; 
   output logic done;
   
+  logic enable;
   logic [2:0] counter, counter_in;
   
   typedef enum reg {COUNT, IDLE} state_t;
@@ -26,6 +27,7 @@ module itf (in_in, out, clk, en, done, rst_n);
   always_comb begin
     counter_in = '0;
     done = 1'b0;
+    enable = 1'b0;
     nxt_state = IDLE;
     case(state)
       COUNT: 
@@ -35,18 +37,21 @@ module itf (in_in, out, clk, en, done, rst_n);
           else begin
             counter_in = counter + 1'b1;
             nxt_state = COUNT;
+            enable = 1'b1;
           end
         end
       default: 
-          if (en)
+          if (en) begin
             nxt_state = COUNT;
+            enable = 1'b1;
+          end
     endcase
   end
   
   ItoF ItF (
 		.clk    (clk),        //   input,   width = 1,    clk.clk
 		.areset (!rst_n),     //   input,   width = 1, areset.reset
-		.en     (en),         //   input,   width = 1,     en.en
+		.en     (enable),     //   input,   width = 1,     en.en
 		.a      (in_in),      //   input,  width = 32,      a.a
 		.q      (out)         //  output,  width = 32,      q.q
 	);
