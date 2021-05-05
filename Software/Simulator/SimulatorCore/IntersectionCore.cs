@@ -26,10 +26,15 @@ namespace SimulatorCore
 
         internal IntersectionCore(TextReader t)
         {
-            for (int k = 0; k < 12; k++)
+            for (int k = 0; k < 34; k++)
             {
                 Triangle tri = new Triangle();
-                tri.id = 1;
+                if (k == 31 || k == 26)
+                    tri.id = 2;
+                else if (k == 29 || k == 24)
+                    tri.id = 3;
+                else
+                    tri.id = 1;
                 string str = t.ReadLine();
                 var s = str.Split();
                 tri.v0.X = float.Parse(s[0]);
@@ -65,8 +70,8 @@ namespace SimulatorCore
             Vector3 dir = new Vector3(direction.X, direction.Y, direction.Z);
             Vector4 resultPoint = new Vector4(0, 0, 0, 0), resultNormal = new Vector4();
             float minDistance = float.MaxValue;
-            Console.WriteLine(origin);
-            Console.WriteLine(direction);
+            // Console.WriteLine(origin);
+            // Console.WriteLine(direction);
             for (int i = 0; i < triangles.Count; i++)
             {
                 // Vector3 v0 = VectorHelper(ref i);
@@ -83,7 +88,7 @@ namespace SimulatorCore
                 Vector3 pvec = Vector3.Cross(dir, v0v2);
                 float det = Vector3.Dot(v0v1, pvec);
 
-                if (Math.Abs(det) < Epsilon)
+                if (det < Epsilon)
                     continue;
 
                 float invDet = 1 / det;

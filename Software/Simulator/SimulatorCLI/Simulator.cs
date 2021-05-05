@@ -17,7 +17,7 @@ namespace SimulatorCLI
         bool disableTrace;
         TextWriter RTOutputFile;
         TextWriter CPOutputFile;
-        internal Simulator(FileInfo CPFile, FileInfo RTFile, bool disableTrace,
+        internal Simulator(FileInfo CPFile, FileInfo RTFile, FileInfo constant, bool disableTrace,
             int CPMemorySize, int RTMemorySize, FileInfo triangleFile,
             FileInfo CPOutputFile, FileInfo RTOutputFile)
         {
@@ -33,7 +33,7 @@ namespace SimulatorCLI
             if (CPFile != null)
                 CPMem.LoadToMemory(CPFile.OpenRead());
             CP = new CommandProcessor(CPMem);
-            RT = new RayTracing(RTMem, triangleFile, new Memory(RTMemorySize));
+            RT = new RayTracing(RTMem, triangleFile, new Memory(RTMemorySize, (int)constant.Length), constant.OpenRead());
             this.disableTrace = disableTrace;
             this.RTOutputFile = RTOutputFile?.CreateText() ?? Console.Out;
             this.CPOutputFile = CPOutputFile?.CreateText() ?? Console.Out;
@@ -84,12 +84,16 @@ namespace SimulatorCLI
 
         static string Hex(float f)
         {
-            return Convert.ToHexString(BitConverter.GetBytes(f));
+            var arr = BitConverter.GetBytes(f);
+            Array.Reverse(arr);
+            return Convert.ToHexString(arr);
         }
 
         static string Hex(int i)
         {
-            return Convert.ToHexString(BitConverter.GetBytes(i));
+            var arr = BitConverter.GetBytes(i);
+            Array.Reverse(arr);
+            return Convert.ToHexString(arr);
         }
 
         static string Hex(Vector4 v)
@@ -98,7 +102,7 @@ namespace SimulatorCLI
             return v.ToString();
         }
 
-        internal (float r, float g, float b) RunRT(int pixelID)
+        internal (float r, float g, float b, float w) RunRT(int pixelID)
         {
             RT.ScalarRegisterFile[29] = 0; // set Stack Pointer
             RT.ScalarRegisterFile[31] = 0; // set PC
@@ -114,7 +118,7 @@ namespace SimulatorCLI
                     RTOutputFile.WriteLine(RT.LastInstruction);
                     RTOutputFile.Write($"P{pixelID}: ");
                     foreach (var trace in RT.ScalarRegisterFile.TraceLog)
-                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.i, trace.after.i);
+                        RTOutputFile.Write("S{0} {1} => {2}; ", trace.id, trace.before.Hex(), trace.after.Hex());
                     foreach (var trace in RT.VectorRegisterFile.TraceLog)
                         RTOutputFile.Write("V{0} {1} => {2}; ", trace.id, Hex(trace.before), Hex(trace.after));
                     foreach (var trace in RT.DataMemory.TraceLog)
