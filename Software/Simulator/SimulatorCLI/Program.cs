@@ -28,22 +28,25 @@ namespace SimulatorCLI
                 return;
             }
             FileInfo outFile = new FileInfo("output.ppm");
+            FileInfo constant = new FileInfo("constant.dat.out");
             var writer = outFile.CreateText();
-            writer.WriteLine($"P3\n{320} {180}\n255");
-            FileInfo file = new FileInfo("triangle.obj.out");
-            Simulator sim = new Simulator(CP, RT, true, CPMSize, RTMSize, file, CPO, RTO);
+            writer.WriteLine($"P3\n{100} {75}\n255");
+            FileInfo file = new FileInfo("box.obj.out");
+            Simulator sim = new Simulator(CP, RT, constant, true, CPMSize, RTMSize, file, CPO, RTO);
             if (CP != null)
                 sim.Run();
             else
-                // sim.RunRT(160 * 180);
-                for (int i = 0; i < 320 * 180; i++)
+                // sim.RunRT(50 * 75);
+                for (int i = 0; i < 100 * 75; i++)
                 {
+                    // Console.WriteLine(i);
                     var color = sim.RunRT(i);
                     int r, g, b;
                     r = (int)(color.r * 255);
                     g = (int)(color.g * 255);
                     b = (int)(color.b * 255);
                     writer.Write($"{r} {g} {b}\n");
+                    // writer.Write($"{color.r} {color.g} {color.b} {color.w}\n");
                 }
             writer.Close();
             //     FileInfo file = new FileInfo("triangle.obj.out");
