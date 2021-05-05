@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         // {
 
         ifstream cp("CP.out", ios::binary), rt("main.asm.out", ios::binary),
-            con("Constant.out", ios::binary), tri("cylinder.obj.out", ios::binary);
+            con("Constant.out", ios::binary), tri("triangle.obj.out", ios::binary);
 
         ofstream out("output.pfm");
         string str = "PF\n1280 720\n-1\n";
@@ -190,6 +190,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     printf("break\n");
+                    getOutput(output, out);
                     break;
                 }
             }
