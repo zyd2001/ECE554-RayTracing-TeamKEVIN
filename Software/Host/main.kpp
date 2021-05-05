@@ -30,7 +30,9 @@ const int material_start_address = 0x40000200;
 // 0x40000210: Material1 Scalar1 Roughness
 // 0x40000214: Material1 Scalar1 Metallic
 // 0x40000218: Material2 ...
-
+// [0, 0, 1, 1]
+// 0
+// 1
 void main(int id, int stackBase)
 {   
     float *result;
@@ -100,7 +102,7 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
 
         vector shadow_hit, shadow_normal;
         // make sure we can see the light
-        shadow_hit, shadow_normal = trace(hit, light_ray);
+        shadow_hit, shadow_normal = trace(hit+ normal * 0.0001, light_ray);
 
         float hit_error = distance(shadow_hit, origin) + distance(shadow_hit, light_center);
         

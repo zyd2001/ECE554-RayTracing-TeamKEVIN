@@ -2,6 +2,8 @@
 #include <cmath>
 #include <vector>
 #include "geometry.h"
+#include <fstream>
+
 
 class vector
 {
@@ -94,7 +96,7 @@ struct Triangle
 
 std::vector<Triangle> triangles;
 
-std::tuple<vector, vector> trace(vector orig, vector dir)
+std::tuple<vector, vector> trace(vector orig, vector dir, int rayType)
 {
     float min = MAXFLOAT;
     vector hit(0,0,0,0), normal;
@@ -111,15 +113,110 @@ std::tuple<vector, vector> trace(vector orig, vector dir)
         Vec3f d(dir.x, dir.y, dir.z);
         if (rayTriangleIntersect(o, d, v0, v1, v2, t, u, v, n, h))
         {
-            if (t < min)
+            if (t < min && t >= 0)
             {
                 min = t;
                 normal = vector(n.normalize());
                 hit = vector(h);
                 id = triangles[i].id;
+                // if (rayType == 1) 
+                //     std::cout<< "Hit" << std::endl;
             }
         }
+        
     }
     hit.w = asFloat(id);
     return {hit, normal};
+}
+
+void print(vector v)
+{
+    printf("%f %f %f %f\n", v.x, v.y, v.z, v.w);
+}
+
+float NormalDist(float NdH, float roughness)
+{
+    float rough_sqr = roughness * roughness;
+    float den_2 = NdH * NdH * (rough_sqr - 1) + 1;
+    float denominator = den_2 * den_2;
+    return rough_sqr / denominator;
+}
+
+float HammonSmith(float NdV, float NdL, float roughness)
+{
+    if (NdL < 0)
+        NdL = -NdL;
+    if (NdV < 0)
+        NdV = -NdV;
+
+    float denominator = 2 * NdV * NdL * (1 - roughness) + roughness * (NdL + NdV);
+    return 0.5 / denominator;
+}
+
+float distance(vector v1, vector v2)
+{
+    return sqrt(reduce((v1 - v2) * (v1 - v2)));
+}
+
+float max(float a, float b)
+{
+    if (a > b)
+        return a;
+    else
+        return b;
+    return a;
+}
+
+vector normalize(vector v)
+{
+    float norm = sqrt(reduce(v * v));
+    return v / norm;
+}
+
+float dot(vector v1, vector v2)
+{
+    return reduce(v1 * v2);
+}
+
+// Only the first three index matters
+vector cross(vector v1, vector v2)
+{
+    float v10 = v1[0], v11 = v1[1], v12 = v1[2];
+    float v20 = v2[0], v21 = v2[1], v22 = v2[2];
+
+    float x = v11 * v22 - v12 * v21;
+    float y = v12 * v20 - v10 * v22;
+    float z = v10 * v21 - v11 * v20;
+    return vector(x, y, z, 0);
+}
+float clamp(float x, float min, float max) {
+    if (x < min) 
+        x = min;
+    else if (x > max) 
+        x = max;
+    return x;
+}
+
+vector clamp(vector x, float min, float max) {
+    if (x.x < min) 
+        x.x = min;
+    else if (x.x > max) 
+        x.x = max;
+
+    if (x.y < min) 
+        x.y = min;
+    else if (x.y > max) 
+        x.y = max;
+
+    if (x.z < min) 
+        x.z = min;
+    else if (x.z > max) 
+        x.z = max;
+
+    if (x.w < min) 
+        x.w = min;
+    else if (x.w > max) 
+        x.w = max;
+    
+    return x;
 }
