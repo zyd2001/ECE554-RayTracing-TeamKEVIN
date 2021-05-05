@@ -12,28 +12,30 @@
 // 11: negative
 //
 // Author: Kevin Ding
-// Last modify: 5/4
+// Last modify: 5/5
 ///////////////////////////////
 
 
 module ICU (
     op1_in, op2_in, out, operation, flag, clk, en, done, rst_n
 );
-  parameter ADD_LATENCY = 3,
-            MUL_LATENCY = 8,
-            DIV_LATENCY = 40;
+
+  parameter ADD_LATENCY = 0,
+            MUL_LATENCY = 5,
+            DIV_LATENCY = 37;
 
   input clk, en, rst_n;
   input [31:0] op1_in, op2_in;
   input [1:0] operation;
-  output logic [31:0] out;
+  output logic [63:0] out;
   output logic [1:0] flag;
   output logic done;
 
-  logic Adder_en, Multiplier_en, Divider_en;
-  logic [4:0] counter, counter_in;
-  logic [31:0] Multiplier_result, Divider_result, Adder_b;
-  logic [63:0] Adder_result;
+  logic Adder_en, Multiplier_en, Divider_en, Adder_enable, Multiplier_enable, Divider_enable;
+  logic [5:0] counter, counter_in;
+  logic [31:0] Divider_result, Adder_b;
+  logic [32:0] Adder_result;
+  logic [63:0] Multiplier_result;
   
   assign Adder_en = en & (!operation[1]);
   assign Multiplier_en = en & operation[1] & (!operation[0]);
@@ -59,17 +61,21 @@ module ICU (
     out = '0;
     done = 1'b0;
     counter_in = '0;
+    Adder_enable = 1'b0;
+    Multiplier_enable = 1'b0;
+    Divider_enable = 1'b0;
     nxt_state = IDLE;
     case(state)
       DIV: 
         begin
           if (counter == DIV_LATENCY) begin
-            out = Divider_result;
+            out = {32'h0, Divider_result};
             done = 1'b1;
           end
           else begin
             counter_in = counter + 1'b1;
             nxt_state = DIV;
+            Divider_enable = 1'b1;
           end
         end
       MUL: 
@@ -81,56 +87,64 @@ module ICU (
           else begin
             counter_in = counter + 1'b1;
             nxt_state = MUL;
+            Multiplier_enable = 1'b1;
           end
         end
       ADDSUB: 
         begin
           if (counter == ADD_LATENCY) begin
-            out = Adder_result;
+            out = {31'h0, Adder_result};
             done = 1'b1;
           end
           else begin
             counter_in = counter + 1'b1;
             nxt_state = ADDSUB;
+            Adder_enable = 1'b1;
           end
         end
       default: 
         begin
-          if (Adder_en)
+          if (Adder_en) begin
             nxt_state = ADDSUB;
-          else if (Multiplier_en)
+            Adder_enable = 1'b1;
+          end
+          else if (Multiplier_en) begin
             nxt_state = MUL;
-          else if (Divider_en)
+            Multiplier_enable = 1'b1;
+          end
+          else if (Divider_en) begin
             nxt_state = DIV;
+            Divider_enable = 1'b1;
+          end
         end
     endcase
   end
   
   Fix_Add Adder (
-		.clk    (clk),                //   input,   width = 1,    clk.clk
-		.rst    (!rst_n),             //   input,   width = 1,    rst.reset
-		.en     (Adder_en),           //   input,   width = 1,     en.en
-		.a0     (op1_in),             //   input,  width = 32,     a0.a0
-		.a1     (Adder_b),            //   input,  width = 32,     a1.a1
-		.result (Adder_result)        //  output,  width = 33, result.result
+		.clk    (clk),                  //   input,   width = 1,    clk.clk
+		.rst    (!rst_n),               //   input,   width = 1,    rst.reset
+		.en     (Adder_enable),         //   input,   width = 1,     en.en
+		.a0     (op1_in),               //   input,  width = 32,     a0.a0
+		.a1     (Adder_b),              //   input,  width = 32,     a1.a1
+		.result (Adder_result)          //  output,  width = 33, result.result
 	);
 
 	Fix_Mul Multiplier (
-		.clk    (clk),                //   input,   width = 1,    clk.clk
-		.rst    (!rst_n),             //   input,   width = 1,    rst.reset
-		.en     (Multiplier_en),      //   input,   width = 1,     en.en
-		.a      (op1_in),             //   input,  width = 32,      a.a
-		.b      (op2_in),             //   input,  width = 32,      b.b
-		.result (Multiplier_result)   //  output,  width = 64, result.result
+		.clk    (clk),                  //   input,   width = 1,    clk.clk
+		.rst    (!rst_n),               //   input,   width = 1,    rst.reset
+		.en     (Multiplier_enable),    //   input,   width = 1,     en.en
+		.a      (op1_in),               //   input,  width = 32,      a.a
+		.b      (op2_in),               //   input,  width = 32,      b.b
+		.result (Multiplier_result)     //  output,  width = 64, result.result
 	);
 
 	Fix_Div Divider (
-		.clk         (clk),           //   input,   width = 1,         clk.clk
-		.rst         (!rst_n),        //   input,   width = 1,         rst.reset
-		.en          (Divider_en),    //   input,   width = 1,          en.en
-		.numerator   (op1_in),        //   input,  width = 32,   numerator.numerator
-		.denominator (op2_in),        //   input,  width = 32, denominator.denominator
-		.result      (Divider_result) //  output,  width = 32,      result.result
+		.clk         (clk),             //   input,   width = 1,         clk.clk
+		.rst         (!rst_n),          //   input,   width = 1,         rst.reset
+		.en          (Divider_enable),  //   input,   width = 1,          en.en
+		.numerator   (op1_in),          //   input,  width = 32,   numerator.numerator
+		.denominator (op2_in),          //   input,  width = 32, denominator.denominator
+		.result      (Divider_result)   //  output,  width = 32,      result.result
 	);
 
   always_comb begin 
