@@ -1,8 +1,16 @@
+synth_1/
 synth/
 .vscode/
 .venv/
+Software/Simulator/SimulatorCLI/bin/
+Software/Simulator/SimulatorCLI/obj/
+Software/Simulator/SimulatorCore/bin/
+Software/Simulator/SimulatorCore/obj/
+Software/Simulator/SimulatorTest/bin/
+Software/Simulator/SimulatorTest/obj/
 
-.venv/
+.vs/
+.qsys_edit/
 
 [_@]*
 
