@@ -22,8 +22,10 @@ module rta
    );
 
 
-  parameter NUM_RT = 1;
-  parameter NUM_IC = 1;
+  // parameter NUM_RT = 1;
+  // parameter NUM_IC = 1;
+  parameter NUM_RT = 4;
+  parameter NUM_IC = 16;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
@@ -224,31 +226,31 @@ module rta
     end
   endgenerate
 
-  assign we_rt_main[1] = 1'h0;
-  assign we_rt_main[2] = 1'h0;
-  assign we_rt_main[3] = 1'h0;
-  assign re_rt_main[1] = 1'h0;
-  assign re_rt_main[2] = 1'h0;
-  assign re_rt_main[3] = 1'h0;
-  assign addr_rt_x[1] = 32'h0;
-  assign addr_rt_x[2] = 32'h0;
-  assign addr_rt_x[3] = 32'h0;
-  assign mode_rt_main[1] = 1'h0;
-  assign mode_rt_main[2] = 1'h0;
-  assign mode_rt_main[3] = 1'h0;
-  assign data_in_rt_main[1] = 128'h0;
-  assign data_in_rt_main[2] = 128'h0;
-  assign data_in_rt_main[3] = 128'h0;
+  // assign we_rt_main[1] = 1'h0;
+  // assign we_rt_main[2] = 1'h0;
+  // assign we_rt_main[3] = 1'h0;
+  // assign re_rt_main[1] = 1'h0;
+  // assign re_rt_main[2] = 1'h0;
+  // assign re_rt_main[3] = 1'h0;
+  // assign addr_rt_x[1] = 32'h0;
+  // assign addr_rt_x[2] = 32'h0;
+  // assign addr_rt_x[3] = 32'h0;
+  // assign mode_rt_main[1] = 1'h0;
+  // assign mode_rt_main[2] = 1'h0;
+  // assign mode_rt_main[3] = 1'h0;
+  // assign data_in_rt_main[1] = 128'h0;
+  // assign data_in_rt_main[2] = 128'h0;
+  // assign data_in_rt_main[3] = 128'h0;
 
 
-  CP command_processer
+  CP #(.NUM_THREAD(NUM_THREAD))command_processer
    (
     .clk(clk), 
     .rst_n(rst_n),
     .init_mem_fin_MC(cp_strt_mc_cp),
     .patch_out_done_MC(wr_out_done_mc_cp),
     .pixel_size_MC(data_32_mc_x),
-    .we_ps_MC(we_mem_mc_x[0][0]),
+    .we_pixel_size_MC(we_mem_mc_x[0][0]),
     .load_done_term_MC(load_done_term_cp_mc),
     .load_start_PD(load_cp_pd),
     .load_done_PD(load_done_cp_pd),
@@ -285,7 +287,7 @@ module rta
 
   generate
     for (i = 0; i < NUM_IC; i++) begin: triangle_memory
-      mem_triangle memory_triangle
+      mem_triangle #(.NUM_TRIANGLE(NUM_TRI))memory_triangle
        (
          .clk(clk),
          .rst_n(rst_n),

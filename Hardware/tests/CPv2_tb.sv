@@ -16,7 +16,7 @@ module CPv2_tb();
     logic init_mem_fin_MC;
     logic patch_out_done_MC;
     logic [31:0] pixel_size_MC;
-    logic we_ps_MC;
+    logic we_ps_MC, load_done_term_MC;
     /*
         output
     */
@@ -25,7 +25,7 @@ module CPv2_tb();
     logic load_done_PD;
     logic [31:0] pixel_id_PD;
     CP #(NUM_THREAD) cp(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_MC,
-        load_start_PD, load_done_PD, pixel_id_PD);
+        load_start_PD, load_done_PD, pixel_id_PD, load_done_term_MC);
     int error = 0;
     initial begin
         clk = 0;
@@ -57,7 +57,6 @@ module CPv2_tb();
                 end
                 if(pixel_id_PD !== j) begin
                     $display("Error! read at: %h, expacting: %h, got: %h", j, j, pixel_id_PD);
-                        $stop;
                     error ++;
                 end
                 if(j%NUM_THREAD==NUM_THREAD-1) begin
@@ -84,6 +83,10 @@ module CPv2_tb();
                     @(negedge clk);
                     if(!load_done_PD) begin
                         $display("Error! load_done_PD is low after finished final patch at: %d", j);
+                        error ++;
+                    end
+                    if(!load_done_term_MC) begin
+                        $display("Error! load_done_term_MC is low after finished final patch at: %d", j);
                         error ++;
                     end
                     @(posedge clk);

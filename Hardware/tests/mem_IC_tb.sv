@@ -3,8 +3,8 @@ module mem_IC_tb();
     parameter NUM_IC = 4;
     parameter NUM_THREAD = 32;
     localparam BIT_THREAD = $clog2(NUM_THREAD);
-    localparam RT2IC_WIDTH = 255+BIT_THREAD;
-    localparam IC2RT_WIDTH = 255+BIT_THREAD;
+    localparam RT2IC_WIDTH = 192;
+    localparam IC2RT_WIDTH = 224;
     /*
         input
     */
@@ -15,37 +15,33 @@ module mem_IC_tb();
     logic q_en_ic2rt_PD;
     logic core_id_ic2rt_PD[NUM_IC-1:0];
     // RT
-    logic [127:0] ray_origin_RT [NUM_RT-1:0];
-    logic [127:0] ray_direction_RT [NUM_RT-1:0];
-    logic [BIT_THREAD-1:0] thread_id_RT_in [NUM_RT-1:0];
+    logic [95:0] ray_origin_RT [NUM_RT-1:0];
+    logic [95:0] ray_direction_RT [NUM_RT-1:0];
     logic dequeue_RT;
     // IC​
     logic [127:0] shader_info_IC [NUM_IC-1:0]; //(v0, v1, v2, sid)
-    logic [127:0] normal_IC [NUM_IC-1:0];
-    logic [BIT_THREAD-1:0] thread_id_IC_in [NUM_IC-1:0];
+    logic [95:0] normal_IC [NUM_IC-1:0];
     logic dequeue_IC;
     /*
         output
     */
     // IC
-    logic [127:0] ray_origin_IC;
-    logic [127:0] ray_direction_IC;
-    logic [BIT_THREAD-1:0] thread_id_IC_out;
+    logic [95:0] ray_origin_IC;
+    logic [95:0] ray_direction_IC;
     // RT​
     logic [127:0] shader_info_RT;
-    logic [127:0] normal_RT;
-    logic [BIT_THREAD-1:0] thread_id_RT_out;
+    logic [95:0] normal_RT;
 
     always #1 clk = ~clk;
 
     mem_IC mem(
         //input
         clk, rst_n, q_en_rt2ic_PD, core_id_rt2ic_PD, q_en_ic2rt_PD, core_id_ic2rt_PD,
-        ray_origin_RT, ray_direction_RT, thread_id_RT_in, dequeue_RT,
-        shader_info_IC, normal_IC, thread_id_IC_in, dequeue_IC,
+        ray_origin_RT, ray_direction_RT, dequeue_RT,
+        shader_info_IC, normal_IC, dequeue_IC,
         //output
-        ray_origin_IC, ray_direction_IC, thread_id_IC_out,
-        shader_info_RT, normal_RT, thread_id_RT_out
+        ray_origin_IC, ray_direction_IC,
+        shader_info_RT, normal_RT
     );
 
     int error = 0;
@@ -58,7 +54,6 @@ module mem_IC_tb();
             core_id_rt2ic_PD[i] = 0;
             ray_origin_RT[i] = 0;
             ray_direction_RT[i] = 0;
-            thread_id_RT_in[i] = 0;
         end
         q_en_ic2rt_PD = 0;
         dequeue_IC = 0;
@@ -66,7 +61,6 @@ module mem_IC_tb();
             core_id_ic2rt_PD[i] = 0;
             shader_info_IC[i] = 0;
             normal_IC[i] = 0;
-            thread_id_IC_in[i] = 0;
         end
         // reset
         @(posedge clk) begin end
@@ -80,14 +74,12 @@ module mem_IC_tb();
         for(int j = 0; j < 3; j++) begin
             // init data
             for(int i = 0; i < NUM_RT; i++) begin
-                thread_id_RT_in[i] = i+j*NUM_RT;
-                ray_origin_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
-                ray_direction_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
+                ray_origin_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
+                ray_direction_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
             end
             for(int i = 0; i < NUM_IC; i++) begin
-                thread_id_IC_in[i] = i+j*NUM_IC;
                 shader_info_IC[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
-                normal_IC[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
+                normal_IC[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
             end
             // enqueue
             for(int i = 0; i < NUM_RT; i++) begin
@@ -111,24 +103,19 @@ module mem_IC_tb();
         for(int j = 3; j < 5; j++) begin
             // init data
             for(int i = 0; i < NUM_RT; i++) begin
-                thread_id_RT_in[i] = i+j*NUM_RT;
-                ray_origin_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
-                ray_direction_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
+                ray_origin_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
+                ray_direction_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
             end
             // en + de RT2IC
             for(int i = 0; i < NUM_RT; i++) begin
-                if(thread_id_IC_out !== i+(j-3)*NUM_RT) begin
-                    $display("Error en de RT2IC at thread: %d, got: %d", i+(j-3)*NUM_RT,thread_id_IC_out);    
-                    error++;
-                end
-                if(ray_origin_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}) begin
+                if(ray_origin_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}) begin
                     $display("Error en de RT2IC ray_origin_IC at thread: %d, expecting: %h got: %h", 
-                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT},ray_origin_IC);    
+                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT},ray_origin_IC);    
                     error++;
                 end
-                if (ray_direction_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1) begin
+                if (ray_direction_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1) begin
                     $display("Error en de RT2IC ray_direction_IC at thread: %d, expecting: %h got: %h", 
-                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1,ray_direction_IC);    
+                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1,ray_direction_IC);    
                     error++;
                 end
                 core_id_rt2ic_PD = '{NUM_RT{1'b0}};
@@ -142,24 +129,19 @@ module mem_IC_tb();
             dequeue_IC = 0;
             // init data
             for(int i = 0; i < NUM_IC; i++) begin
-                thread_id_IC_in[i] = i+j*NUM_IC;
                 shader_info_IC[i] = {i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC};
                 normal_IC[i] = {i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC}+1;
             end
             // en + de IC2RT
             for(int i = 0; i < NUM_IC; i++) begin
-                if(thread_id_RT_out !== i+(j-3)*NUM_RT) begin
-                    $display("Error en de IC2RT at thread: %d, got: %d", i+(j-3)*NUM_RT,thread_id_RT_out);    
-                    error++;
-                end
                 if(shader_info_RT !== {i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}) begin
                     $display("Error en de IC2RT shader_info_RT at thread: %d, expecting: %h got: %h", 
                             i+(j-3)*NUM_IC,{i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC},shader_info_RT);    
                     error++;
                 end
-                if (normal_RT !== {i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1) begin
+                if (normal_RT !== {i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1) begin
                     $display("Error en de IC2RT normal_RT at thread: %d, expecting: %h got: %h", 
-                            i+(j-3)*NUM_IC,{i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1,normal_RT);    
+                            i+(j-3)*NUM_IC,{i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1,normal_RT);    
                     error++;
                 end
                 core_id_ic2rt_PD = '{NUM_IC{1'b0}};
@@ -176,18 +158,14 @@ module mem_IC_tb();
         for(int j = 5; j < 8; j++) begin
             // de RT2IC
             for(int i = 0; i < NUM_RT; i++) begin
-                if(thread_id_IC_out !== i+(j-3)*NUM_RT) begin
-                    $display("Error de RT2IC at thread: %d, got: %d", i+(j-3)*NUM_RT,thread_id_IC_out);    
-                    error++;
-                end
-                if(ray_origin_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}) begin
+                if(ray_origin_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}) begin
                     $display("Error de RT2IC ray_origin_IC at thread: %d, expecting: %h got: %h", 
-                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT},ray_origin_IC);    
+                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT},ray_origin_IC);    
                     error++;
                 end
-                if (ray_direction_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1) begin
+                if (ray_direction_IC !== {i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1) begin
                     $display("Error de RT2IC ray_direction_IC at thread: %d, expecting: %h got: %h", 
-                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1,ray_direction_IC);    
+                            i+(j-3)*NUM_RT,{i+(j-3)*NUM_RT,i+(j-3)*NUM_RT,i+(j-3)*NUM_RT}+1,ray_direction_IC);    
                     error++;
                 end
                 dequeue_IC = 1;
@@ -197,18 +175,14 @@ module mem_IC_tb();
             dequeue_IC = 0;
             // de IC2RT
             for(int i = 0; i < NUM_IC; i++) begin
-                if(thread_id_RT_out !== i+(j-3)*NUM_RT) begin
-                    $display("Error de IC2RT at thread: %d, got: %d", i+(j-3)*NUM_RT,thread_id_RT_out);    
-                    error++;
-                end
                 if(shader_info_RT !== {i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}) begin
                     $display("Error de IC2RT shader_info_RT at thread: %d, expecting: %h got: %h", 
                             i+(j-3)*NUM_IC,{i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC},shader_info_RT);    
                     error++;
                 end
-                if (normal_RT !== {i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1) begin
+                if (normal_RT !== {i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1) begin
                     $display("Error de IC2RT normal_RT at thread: %d, expecting: %h got: %h", 
-                            i+(j-3)*NUM_IC,{i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1,normal_RT);    
+                            i+(j-3)*NUM_IC,{i+(j-3)*NUM_IC,i+(j-3)*NUM_IC,i+(j-3)*NUM_IC}+1,normal_RT);    
                     error++;
                 end
                 dequeue_RT = 1;
@@ -223,14 +197,12 @@ module mem_IC_tb();
         for(int j = 0; j < NUM_THREAD/NUM_RT; j++) begin
             // init data
             for(int i = 0; i < NUM_RT; i++) begin
-                thread_id_RT_in[i] = i+j*NUM_RT;
-                ray_origin_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
-                ray_direction_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
+                ray_origin_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
+                ray_direction_RT[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
             end
             for(int i = 0; i < NUM_IC; i++) begin
-                thread_id_IC_in[i] = i+j*NUM_IC;
                 shader_info_IC[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT};
-                normal_IC[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
+                normal_IC[i] = {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1;
             end
             // enqueue
             for(int i = 0; i < NUM_RT; i++) begin
@@ -252,18 +224,14 @@ module mem_IC_tb();
         for(int j = 0; j < NUM_THREAD/NUM_RT; j++) begin
             // de RT2IC
             for(int i = 0; i < NUM_RT; i++) begin
-                if(thread_id_IC_out !== i+j*NUM_RT) begin
-                    $display("Error de RT2IC at thread: %d, got: %d", i+j*NUM_RT,thread_id_IC_out);    
-                    error++;
-                end
-                if(ray_origin_IC !== {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}) begin
+                if(ray_origin_IC !== {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}) begin
                     $display("Error de RT2IC ray_origin_IC at thread: %d, expecting: %h got: %h", 
-                            i+j*NUM_RT,{i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT},ray_origin_IC);    
+                            i+j*NUM_RT,{i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT},ray_origin_IC);    
                     error++;
                 end
-                if (ray_direction_IC !== {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1) begin
+                if (ray_direction_IC !== {i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1) begin
                     $display("Error de RT2IC ray_direction_IC at thread: %d, expecting: %h got: %h", 
-                            i+j*NUM_RT,{i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1,ray_direction_IC);    
+                            i+j*NUM_RT,{i+j*NUM_RT,i+j*NUM_RT,i+j*NUM_RT}+1,ray_direction_IC);    
                     error++;
                 end
                 dequeue_IC = 1;
@@ -273,18 +241,14 @@ module mem_IC_tb();
             dequeue_IC = 0;
             // de IC2RT
             for(int i = 0; i < NUM_IC; i++) begin
-                if(thread_id_RT_out !== i+j*NUM_RT) begin
-                    $display("Error de IC2RT at thread: %d, got: %d", i+j*NUM_RT,thread_id_RT_out);    
-                    error++;
-                end
                 if(shader_info_RT !== {i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC}) begin
                     $display("Error de IC2RT shader_info_RT at thread: %d, expecting: %h got: %h", 
                             i+j*NUM_IC,{i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC},shader_info_RT);    
                     error++;
                 end
-                if (normal_RT !== {i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC}+1) begin
+                if (normal_RT !== {i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC}+1) begin
                     $display("Error de IC2RT normal_RT at thread: %d, expecting: %h got: %h", 
-                            i+j*NUM_IC,{i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC}+1,normal_RT);    
+                            i+j*NUM_IC,{i+j*NUM_IC,i+j*NUM_IC,i+j*NUM_IC}+1,normal_RT);    
                     error++;
                 end
                 dequeue_RT = 1;
