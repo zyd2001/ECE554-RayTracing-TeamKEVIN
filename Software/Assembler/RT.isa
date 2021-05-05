@@ -92,8 +92,8 @@ ble x l
 110101 10 16
 real_jmp x i
 110110 10 16
-ret x
-110111 26
+ret_real x r x
+110111 5 5 16
 fin x
 111011 26
 jmp l
@@ -111,7 +111,7 @@ s_push r
 v_pop r
 # ii_addi R29 R29 -16, v_load_16byte $r0 R29 0
 v_push r
-# v_store_4byte $r0 R29 0, ii_addi R29 R29 16
+# v_store_16byte $r0 R29 0, ii_addi R29 R29 16
 v_get_from_s_d r r i
 # v_get_from_s $r0 $r1 $i
 s_setzero r
@@ -124,3 +124,5 @@ s_write_low r i
 # s_write_low_real $r0 $r0 $i
 s_write_high r i
 # s_write_high_real $r0 $r0 $i
+ret
+# ret_real R30
