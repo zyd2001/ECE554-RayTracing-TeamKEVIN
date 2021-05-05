@@ -1,4 +1,4 @@
-module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_MC,
+module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_pixel_size_MC,
         load_start_PD, load_done_PD, pixel_id_PD, load_done_term_MC);
     parameter NUM_THREAD = 32;
     localparam BIT_THREAD = $clog2(NUM_THREAD);
@@ -7,7 +7,7 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
     */
     input clk, rst_n;
     // MC
-    input we_ps_MC;
+    input we_pixel_size_MC;
     input init_mem_fin_MC;
     input patch_out_done_MC;
     input [31:0] pixel_size_MC;
@@ -18,10 +18,10 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
     output logic load_start_PD;
     output load_done_PD;
     output [31:0] pixel_id_PD;
-    output reg load_done_term_MC;
+    output logic load_done_term_MC;
     enum {idle, patching, patching_wait} state, next;
 
-    logic load_done_patch, load_done_patch_in;
+    logic load_done_patch, load_done_patch_in, load_done_term_in;
     logic [BIT_THREAD-1:0] thread_cnt, thread_cnt_in;
     logic [31:0] pixel_max, pixel_curr, pixel_curr_in;
     assign pixel_id_PD = pixel_curr;
@@ -30,8 +30,8 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
         if(!rst_n) begin
             pixel_max <= '0;
         end
-        else if(we_ps_MC) begin
-            pixel_max <= pixel_size_MC - 1;
+        else if(we_pixel_size_MC) begin
+            pixel_max <= pixel_size_MC;
         end
         else begin
             pixel_max <= pixel_max;
@@ -43,12 +43,14 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
             state <= idle;
             thread_cnt <= '0;
             load_done_patch <= 1'b0;
+            load_done_term_MC <= 1'b0;
             pixel_curr <= '0;
         end
         else begin
             state <= next;
             thread_cnt <= thread_cnt_in;
             load_done_patch <= load_done_patch_in;
+            load_done_term_MC <= load_done_term_in;
             pixel_curr <= pixel_curr_in;
         end
     end
@@ -57,17 +59,16 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_ps_M
         next = state;
         thread_cnt_in = thread_cnt;
         load_start_PD = 1'b0;
-        load_done_term_MC = 1'b0;
+        load_done_term_in = 1'b0;
         load_done_patch_in = 1'b0;
         pixel_curr_in = pixel_curr;
         case(state)
             patching: begin
-                if(pixel_curr == pixel_max) begin
+                if(pixel_curr >= pixel_max - 1) begin
                     next = idle;
                     thread_cnt_in = '0;
                     pixel_curr_in = '0;
-                    load_done_patch_in = 1'b1;
-                    load_done_term_MC = 1'b1;
+                    load_done_term_in = 1'b1;
                 end
                 else begin
                     pixel_curr_in = pixel_curr + 1;
