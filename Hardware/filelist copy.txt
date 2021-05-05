@@ -35,7 +35,9 @@ rta.sv
 ./RT_Core_and_Components/IP/Fix_Div.ip
 ./RT_Core_and_Components/IP/Fix_Mul.ip
 ./RT_Core_and_Components/IP/Fix_Sqrt.ip
+./RT_Core_and_Components/IP/Float_Add.ip
 ./RT_Core_and_Components/IP/Float_Div.ip
+./RT_Core_and_Components/IP/Float_Mul.ip
 ./RT_Core_and_Components/IP/Float_Sqrt.ip
 ./RT_Core_and_Components/IP/FPU.sv
 ./RT_Core_and_Components/IP/FtoI.ip
