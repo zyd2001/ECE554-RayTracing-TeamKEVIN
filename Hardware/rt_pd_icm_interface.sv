@@ -22,10 +22,10 @@ module rt_pd_icm_interface
     
     // IC MEM
     input [127:0] shader_info,
-    input [127:0] normal,
+    input [95:0] normal,
     output reg de_q,
-    output [127:0] origin,
-    output [127:0] direction,
+    output [95:0] origin,
+    output [95:0] direction,
 
     // RT
     input end_program,
@@ -70,8 +70,8 @@ module rt_pd_icm_interface
     assign program_counter_out = pc;
     assign stack_ptr_out = sp;
     // IC MEM
-    assign origin = rv14;
-    assign direction = rv15;
+    assign origin = rv14[95:0];
+    assign direction = rv15[95:0];
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -94,7 +94,7 @@ module rt_pd_icm_interface
             pc <= program_counter_in;
             sp <= stack_ptr_in;
             rv14 <= shader_info;
-            rv15 <= normal;
+            rv15 <= {{32'h0},normal};
         end
         else if (upd_out) begin
             pc <= scalar_rd_data_0;
