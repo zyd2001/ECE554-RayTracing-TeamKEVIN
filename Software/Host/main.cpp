@@ -72,15 +72,17 @@ ifstream::pos_type filesize(ifstream &f)
 
 void getOutput(dma_data_t *data, ofstream &out)
 {
-    for (int i = 0; i < OUTPUT_SIZE; i++)
+    volatile float *ptr = (volatile float *)data;
+    for (int i = 0; i < OUTPUT_SIZE / 4; i++)
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < 3; j++)
         {
-            out << *((int *)data);
-            out << "\n";
-            data += 4;
+            out << *ptr * 255;
+            out << " ";
+            ptr++;
         }
-        // data += 4;
+        ptr++;
+        out << "\n";
     }
 }
 
@@ -105,11 +107,11 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp("CP.out", ios::binary), rt("main.asm.out", ios::binary),
+        ifstream cp("CP.out", ios::binary), rt("realthing.asm.out", ios::binary),
             con("Constant.out", ios::binary), tri("triangle.obj.out", ios::binary);
 
         ofstream out("output.pfm");
-        string str = "PF\n1280 720\n-1\n";
+        string str = "P3\n16 12\n255\n";
         out << str;
 
         cout << "Starting...\n";
@@ -185,7 +187,7 @@ int main(int argc, char *argv[])
                     getOutput(output, out);
                     afu.write(2, 0);
                     printf("haha\n");
-                    break;
+                    // break;
                 }
                 else
                 {
@@ -197,6 +199,7 @@ int main(int argc, char *argv[])
             break;
         }
 
+        out.close();
         printf("stop\n");
         // Free the allocated memory.
         afu.free(CPIns);

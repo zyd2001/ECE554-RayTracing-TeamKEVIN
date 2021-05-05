@@ -23,7 +23,7 @@ module rt_pd_icm_interface
     // IC MEM
     input [127:0] shader_info,
     input [95:0] normal,
-    output reg de_q,
+    output de_q,
     output [95:0] origin,
     output [95:0] direction,
 
@@ -52,6 +52,7 @@ module rt_pd_icm_interface
     
     );
 
+    logic dequeue;
     logic upd_in;
     logic upd_out;
     logic [31:0] pid;
@@ -72,6 +73,7 @@ module rt_pd_icm_interface
     // IC MEM
     assign origin = rv14[95:0];
     assign direction = rv15[95:0];
+    assign de_q = dequeue && (program_counter_in != 32'h0);
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -114,10 +116,11 @@ module rt_pd_icm_interface
             state_load <= nxt_state_load;
     end
 
+
     always_comb begin
         nxt_state_load = state_load;
         upd_in = 1'h0;
-        de_q = 1'h0;
+        dequeue = 1'h0;
         kernel_mode = 1'h0;
         scalar_we = 1'h0;
         vector_we = 1'h0;
@@ -134,7 +137,7 @@ module rt_pd_icm_interface
                 if (job_assign) begin
                     nxt_state_load = LOADING0;
                     upd_in = 1'h1;
-                    de_q = 1'h1;
+                    dequeue = 1'h1;
                 end
             end
             LOADING0: begin

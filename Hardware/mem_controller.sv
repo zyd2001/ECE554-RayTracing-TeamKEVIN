@@ -617,8 +617,8 @@ module mem_controller
                     nxt_state_dma_wr = DMA_WR_HOLD;
             end
             default: begin
-                // if (dma.wr_done && term_cp_reg) begin
-                if (dma.wr_done && dma_patch_cnt == dma_patch_size) begin
+                if (dma.wr_done && term_cp_reg) begin
+                // if (dma.wr_done && dma_patch_cnt == dma_patch_size) begin
                     term = 1'h1; 
                     dma_wr_done = 1;
                 end

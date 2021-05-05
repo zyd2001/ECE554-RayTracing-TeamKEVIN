@@ -64,7 +64,7 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_pixe
         pixel_curr_in = pixel_curr;
         case(state)
             patching: begin
-                if(pixel_curr >= pixel_max - 1) begin
+                if(pixel_curr + 1 >= pixel_max) begin
                     next = idle;
                     thread_cnt_in = '0;
                     pixel_curr_in = '0;
@@ -84,18 +84,33 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_pixe
             end
             patching_wait: begin
                 if(patch_out_done_MC) begin
-                    next = patching;
-                    thread_cnt_in = thread_cnt + 1;
                     load_start_PD = 1'b1;
-                    pixel_curr_in = pixel_curr + 1;
+                    if(pixel_curr + 1 >= pixel_max) begin
+                        next = idle;
+                        thread_cnt_in = '0;
+                        pixel_curr_in = '0;
+                        load_done_term_in = 1'b1;
+                    end
+                    else begin
+                        next = patching;
+                        thread_cnt_in = thread_cnt + 1;
+                        pixel_curr_in = pixel_curr + 1;
+                    end
                 end
             end
             default: begin
                 if(init_mem_fin_MC) begin
-                    next = patching;
-                    thread_cnt_in = thread_cnt + 1;
-                    load_start_PD = 1'b1;
-                    pixel_curr_in = pixel_curr + 1;
+                    if(pixel_curr + 1 >= pixel_max) begin
+                        load_done_term_in = 1'b1;
+                        thread_cnt_in = '0;
+                        pixel_curr_in = '0;
+                    end
+                    else begin
+                        next = patching;
+                        thread_cnt_in = thread_cnt + 1;
+                        load_start_PD = 1'b1;
+                        pixel_curr_in = pixel_curr + 1;
+                    end
                 end
             end
         endcase
