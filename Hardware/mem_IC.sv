@@ -110,7 +110,7 @@ module mem_IC (
             end
         end
         else begin
-            enqueue_IC2RT[NUM_THREAD-1] <= enqueue_IC2RT[0];
+            enqueue_IC2RT[NUM_THREAD-1] <= enqueue_IC2RT[NUM_THREAD-1];
         end
     end
     // enable queue

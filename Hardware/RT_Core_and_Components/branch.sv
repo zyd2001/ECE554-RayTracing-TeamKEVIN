@@ -53,7 +53,7 @@ module branch (
                 3'b001: next_pc_select = flag[1] == 1'b1 ? 2'b10 : 2'b00;
                 3'b010: next_pc_select = flag == 2'b11 ? 2'b10 : 2'b00;
                 3'b011: next_pc_select = flag == 2'b11 ? 2'b00 : 2'b10;
-                3'b100: next_pc_select = flag == 2'b10 ? 2'b10 : 2'b10;
+                3'b100: next_pc_select = flag == 2'b10 ? 2'b10 : 2'b00;
                 3'b101: next_pc_select = flag == 2'b10 ? 2'b00 : 2'b10;
                 3'b110: next_pc_select = 2'b10;
                 default: next_pc_select = 2'b11;
