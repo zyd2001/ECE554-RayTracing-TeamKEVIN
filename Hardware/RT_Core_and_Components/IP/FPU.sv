@@ -12,7 +12,7 @@
 // 11: negative
 //
 // Author: Kevin Ding
-// Last modify: 5/4
+// Last modify: 5/5
 ///////////////////////////////
 
 
@@ -20,9 +20,9 @@ module FPU (
     op1_in, op2_in, out, operation, flag, clk, en, done, rst_n
   );
   
-  parameter ADD_LATENCY = 5,
-            MUL_LATENCY = 5,
-            DIV_LATENCY = 27;
+  parameter ADD_LATENCY = 2,
+            MUL_LATENCY = 2,
+            DIV_LATENCY = 24;
 
   input clk, en, rst_n;
   input [31:0] op1_in, op2_in;
@@ -31,7 +31,7 @@ module FPU (
   output logic [1:0] flag;
   output logic done;
 
-  logic Adder_en, Multiplier_en, Divider_en;
+  logic Adder_en, Multiplier_en, Divider_en, Adder_enable, Multiplier_enable, Divider_enable;
   logic [4:0] counter, counter_in;
   logic [31:0] Adder_result, Multiplier_result, Divider_result;
   
@@ -57,6 +57,9 @@ module FPU (
     out = '0;
     done = 1'b0;
     counter_in = '0;
+    Adder_enable = 1'b0;
+    Multiplier_enable = 1'b0;
+    Divider_enable = 1'b0;
     nxt_state = IDLE;
     case(state)
       DIV: 
@@ -68,6 +71,7 @@ module FPU (
           else begin
             counter_in = counter + 1'b1;
             nxt_state = DIV;
+            Divider_enable = 1'b1;
           end
         end
       MUL: 
@@ -79,6 +83,7 @@ module FPU (
           else begin
             counter_in = counter + 1'b1;
             nxt_state = MUL;
+            Multiplier_enable = 1'b1;
           end
         end
       ADDSUB: 
@@ -90,43 +95,50 @@ module FPU (
           else begin
             counter_in = counter + 1'b1;
             nxt_state = ADDSUB;
+            Adder_enable = 1'b1;
           end
         end
       default: 
         begin
-          if (Adder_en)
+          if (Adder_en) begin
             nxt_state = ADDSUB;
-          else if (Multiplier_en)
+            Adder_enable = 1'b1;
+          end
+          else if (Multiplier_en) begin
             nxt_state = MUL;
-          else if (Divider_en)
+            Multiplier_enable = 1'b1;
+          end
+          else if (Divider_en) begin
             nxt_state = DIV;
+            Divider_enable = 1'b1;
+          end
         end
     endcase
   end
   
   Float_Add Adder (
-		.clk    (clk),               //   input,   width = 1,    clk.clk
-		.areset (!rst_n),            //   input,   width = 1, areset.reset
-		.en     (Adder_en),          //   input,   width = 1,     en.en
-		.a      (op1_in),            //   input,  width = 32,      a.a
-		.b      (op2_in),            //   input,  width = 32,      b.b
-		.q      (Adder_result),      //  output,  width = 32,      q.q
-		.opSel  (!operation[0])      //   input,   width = 1,  opSel.opSel
+		.clk    (clk),                //   input,   width = 1,    clk.clk
+		.areset (!rst_n),             //   input,   width = 1, areset.reset
+		.en     (Adder_enable),       //   input,   width = 1,     en.en
+		.a      (op1_in),             //   input,  width = 32,      a.a
+		.b      (op2_in),             //   input,  width = 32,      b.b
+		.q      (Adder_result),       //  output,  width = 32,      q.q
+		.opSel  (!operation[0])       //   input,   width = 1,  opSel.opSel
 	);
 
 	Float_Mul Multiplier (
-		.clk    (clk),               //   input,   width = 1,    clk.clk
-		.areset (!rst_n),            //   input,   width = 1, areset.reset
-		.en     (Multiplier_en),     //   input,   width = 1,     en.en
-		.a      (op1_in),            //   input,  width = 32,      a.a
-		.b      (op2_in),            //   input,  width = 32,      b.b
-		.q      (Multiplier_result)  //  output,  width = 32,      q.q
+		.clk    (clk),                //   input,   width = 1,    clk.clk
+		.areset (!rst_n),             //   input,   width = 1, areset.reset
+		.en     (Multiplier_enable),  //   input,   width = 1,     en.en
+		.a      (op1_in),             //   input,  width = 32,      a.a
+		.b      (op2_in),             //   input,  width = 32,      b.b
+		.q      (Multiplier_result)   //  output,  width = 32,      q.q
 	);
 
 	Float_Div Divider (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (!rst_n),             //   input,   width = 1, areset.reset
-		.en     (Divider_en),         //   input,   width = 1,     en.en
+		.en     (Divider_enable),     //   input,   width = 1,     en.en
 		.a      (op1_in),             //   input,  width = 32,      a.a
 		.b      (op2_in),             //   input,  width = 32,      b.b
 		.q      (Divider_result)      //  output,  width = 32,      q.q
