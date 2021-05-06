@@ -17,7 +17,7 @@ module single_port_ram_inst
 	// always_comb foreach (ram_inverse[i]) ram[i] = ~ram_inverse[i];
 
 	initial begin
-		$readmemb({getenv("PWD"), "/RT_Core TB/Data_instruction_interface.in"}, ram);
+		$readmemb({getenv("PWD"), "/RT_Core TB/Data_instruction_main.in"}, ram);
 		// filename = {getenv("PWD"), "/RT_Core TB/Data_instruction.in"};
 		// file = $fopen(filename, "rb");
 		// $fread(ram, file);
