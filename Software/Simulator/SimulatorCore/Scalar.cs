@@ -32,7 +32,9 @@ namespace SimulatorCore
 
         public string Hex()
         {
-            return Convert.ToHexString(BitConverter.GetBytes(i));
+            var arr = BitConverter.GetBytes(i);
+            Array.Reverse(arr);
+            return Convert.ToHexString(arr);
         }
     }
 }

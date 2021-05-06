@@ -7,7 +7,7 @@ namespace CompilerCore
     {
         public static void Main(string[] args)
         {
-            Scanner scanner = new Scanner(new FileStream("main.kpp", FileMode.Open));
+            Scanner scanner = new Scanner(new FileStream("main.rt", FileMode.Open));
             Parser parser = new Parser(scanner);
 
             if (parser.Parse())
