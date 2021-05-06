@@ -79,12 +79,26 @@ main:	s_push R28
 	s_load_4byte R3 R3 12
 	ff_mul R2 R2 R3
 
-	s_write_low R3 0
-	s_write_high R3 8192
-	v_load_16byte R1 R3 16
-	s_write_low R3 0
-	s_write_high R3 8192
-	v_load_16byte R2 R3 32
+	s_write_low R4 0
+	s_write_high R4 8192
+	s_load_4byte R3 R4 16
+	v_get_from_s_d R1 R3 0
+	s_load_4byte R3 R4 20
+	v_get_from_s R1 R3 1
+	s_load_4byte R3 R4 24
+	v_get_from_s R1 R3 2
+	s_load_4byte R3 R4 28
+	v_get_from_s R1 R3 3
+	s_write_low R4 0
+	s_write_high R4 8192
+	s_load_4byte R3 R4 32
+	v_get_from_s_d R2 R3 0
+	s_load_4byte R3 R4 36
+	v_get_from_s R2 R3 1
+	s_load_4byte R3 R4 40
+	v_get_from_s R2 R3 2
+	s_load_4byte R3 R4 44
+	v_get_from_s R2 R3 3
 	vv_sub R1 R1 R2
 
 	s_push R30
@@ -96,9 +110,16 @@ main:	s_push R28
 	s_pop R30
 
 	v_mov R3 R1
-	s_write_low R3 0
-	s_write_high R3 8192
-	v_load_16byte R1 R3 48
+	s_write_low R4 0
+	s_write_high R4 8192
+	s_load_4byte R3 R4 48
+	v_get_from_s_d R1 R3 0
+	s_load_4byte R3 R4 52
+	v_get_from_s R1 R3 1
+	s_load_4byte R3 R4 56
+	v_get_from_s R1 R3 2
+	s_load_4byte R3 R4 60
+	v_get_from_s R1 R3 3
 
 	v_mov R2 R3
 	s_push R30
@@ -131,54 +152,68 @@ main:	s_push R28
 	s_pop R30
 
 
-	vv_sub R3 R0 R3
+	vv_sub R5 R0 R3
 	vf_mul R2 R2 R2
-	vv_add R3 R3 R2
+	vv_add R5 R5 R2
 	vf_mul R1 R1 R1
-	vv_add R3 R3 R1
+	vv_add R5 R5 R1
 
 	s_setzero R1
 	
 	
-	v_get_from_s R3 R1 3
-	v_mov R1 R3
+	v_get_from_s R5 R1 3
+	v_mov R1 R5
 	s_push R30
 	
 	jmp_link normalize
 	
 	s_pop R30
 
-	v_mov R3 R1
-	s_write_low R1 0
-	s_write_high R1 8192
-	v_load_16byte R14 R1 16
+	v_mov R5 R1
+	s_write_low R2 0
+	s_write_high R2 8192
+	s_load_4byte R1 R2 16
+	v_get_from_s_d R14 R1 0
+	s_load_4byte R1 R2 20
+	v_get_from_s R14 R1 1
+	s_load_4byte R1 R2 24
+	v_get_from_s R14 R1 2
+	s_load_4byte R1 R2 28
+	v_get_from_s R14 R1 3
 
-	v_mov R15 R3
+	v_mov R15 R5
 	
-	v_push R3
+	v_push R5
 	s_push R5
 	Trace
 	
 	s_pop R5
-	v_pop R3
-
-
-	
-	
-	s_get_from_v R2 R14 3
-	s_setzero R1
-	cmp_i R2 R1
-	be L0
-	s_write_low R1 0
-	s_write_high R1 8192
-	v_load_16byte R1 R1 16
-
-	v_mov R2 R3
+	v_pop R5
 	v_mov R3 R14
 	v_mov R4 R15
 	
 	
-	s_get_from_v R1 R14 3
+	s_get_from_v R2 R3 3
+	s_setzero R1
+	cmp_i R2 R1
+	be L0
+	s_write_low R2 0
+	s_write_high R2 8192
+	s_load_4byte R1 R2 16
+	v_get_from_s_d R1 R1 0
+	s_load_4byte R1 R2 20
+	v_get_from_s R1 R1 1
+	s_load_4byte R1 R2 24
+	v_get_from_s R1 R1 2
+	s_load_4byte R1 R2 28
+	v_get_from_s R1 R1 3
+
+	v_mov R2 R5
+
+
+	
+	
+	s_get_from_v R1 R3 3
 
 	s_push R30
 	
@@ -193,13 +228,20 @@ main:	s_push R28
 	ii_add R1 R1 R5
 	v_store_16byte R1 R1 0
 	jmp L1
-L0:	s_write_low R1 0
-	s_write_high R1 8192
-	v_load_16byte R1 R1 16
+L0:	s_write_low R2 0
+	s_write_high R2 8192
+	s_load_4byte R1 R2 16
+	v_get_from_s_d R1 R1 0
+	s_load_4byte R1 R2 20
+	v_get_from_s R1 R1 1
+	s_load_4byte R1 R2 24
+	v_get_from_s R1 R1 2
+	s_load_4byte R1 R2 28
+	v_get_from_s R1 R1 3
 
-	v_mov R2 R3
-	v_mov R3 R14
-	v_mov R4 R15
+	v_mov R2 R5
+
+
 	s_push R30
 	
 	jmp_link miss_shader
@@ -231,19 +273,33 @@ miss_shader:	s_push R28
 	s_pop R30
 
 
-	s_write_low R2 0
-	s_write_high R2 8192
-	v_load_16byte R1 R2 80
-	vf_mul R1 R1 R1
-	s_write_low R2 0
-	s_write_high R2 8192
-	v_load_16byte R2 R2 64
+	s_write_low R3 0
+	s_write_high R3 8192
+	s_load_4byte R2 R3 80
+	v_get_from_s_d R2 R2 0
+	s_load_4byte R2 R3 84
+	v_get_from_s R2 R2 1
+	s_load_4byte R2 R3 88
+	v_get_from_s R2 R2 2
+	s_load_4byte R2 R3 92
+	v_get_from_s R2 R2 3
+	vf_mul R2 R2 R1
+	s_write_low R3 0
+	s_write_high R3 8192
+	s_load_4byte R2 R3 64
+	v_get_from_s_d R1 R2 0
+	s_load_4byte R2 R3 68
+	v_get_from_s R1 R2 1
+	s_load_4byte R2 R3 72
+	v_get_from_s R1 R2 2
+	s_load_4byte R2 R3 76
+	v_get_from_s R1 R2 3
 	s_write_low R2 0
 	s_write_high R2 16256
 	ff_sub R2 R2 R1
-	vf_mul R2 R2 R2
-	vv_add R1 R1 R2
-
+	vf_mul R1 R1 R2
+	vv_add R2 R2 R1
+	v_mov R1 R2
 	s_mov R29 R28
 	s_pop R28
 	ret
@@ -276,38 +332,94 @@ hit_shader:	s_push R28
 	ii_add R2 R2 R3
 
 	s_setzero R1
-	ii_muli R1 R1 16
+	ii_muli R1 R1 4
 	ii_add R1 R1 R2
-	v_load_16byte R1 R1 0
-	v_mov R6 R1
+	s_load_4byte R1 R1 0
+	v_get_from_s_d R6 R1 0
 	s_write_low R1 1
 	s_write_high R1 0
-	ii_muli R1 R1 16
+	ii_muli R1 R1 4
 	ii_add R1 R1 R2
-	v_load_16byte R1 R1 0
+	s_load_4byte R1 R1 0
+	v_get_from_s R6 R1 1
+	s_write_low R1 2
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R2
+	s_load_4byte R1 R1 0
+	v_get_from_s R6 R1 2
+	s_write_low R1 3
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R2
+	s_load_4byte R1 R1 0
+	v_get_from_s R6 R1 3
 
-	
-	s_get_from_v R9 R1 0
+	s_write_low R1 4
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R2
+	s_load_4byte R9 R1 0
 
-	
-	
-	s_get_from_v R8 R1 1
+	s_write_low R1 5
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R2
+	s_load_4byte R8 R1 0
 
 	s_write_low R7 0
 	s_write_high R7 8192
 	s_load_4byte R7 R7 112
 
 	s_setzero R1
-	ii_muli R1 R1 16
+	ii_muli R1 R1 4
 	ii_add R1 R1 R7
-	v_load_16byte R5 R1 0
-
+	s_load_4byte R1 R1 0
+	v_get_from_s_d R5 R1 0
 	s_write_low R1 1
 	s_write_high R1 0
-	ii_muli R1 R1 16
+	ii_muli R1 R1 4
 	ii_add R1 R1 R7
-	v_load_16byte R1 R1 0
-	v_mov R4 R1
+	s_load_4byte R1 R1 0
+	v_get_from_s R5 R1 1
+	s_write_low R1 2
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R5 R1 2
+	s_write_low R1 3
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R5 R1 3
+
+	s_write_low R1 4
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s_d R4 R1 0
+	s_write_low R1 5
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R4 R1 1
+	s_write_low R1 6
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R4 R1 2
+	s_write_low R1 7
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R4 R1 3
+
 	
 	
 	s_get_from_v R2 R5 3
@@ -568,22 +680,60 @@ L13:	ff_mul R1 R6 R6
 	vf_mul R1 R1 R1
 
 	vv_mul_ele R1 R1 R4
-	vv_add R7 R7 R1
-
+	vv_add R1 R7 R1
+	v_mov R7 R1
 L14:	s_write_low R1 32
 	s_write_high R1 0
 	ii_add R7 R7 R1
 
 	s_setzero R1
-	ii_muli R1 R1 16
+	ii_muli R1 R1 4
 	ii_add R1 R1 R7
-	v_load_16byte R5 R1 0
-
+	s_load_4byte R1 R1 0
+	v_get_from_s_d R5 R1 0
 	s_write_low R1 1
 	s_write_high R1 0
-	ii_muli R1 R1 16
+	ii_muli R1 R1 4
 	ii_add R1 R1 R7
-	v_load_16byte R4 R1 0
+	s_load_4byte R1 R1 0
+	v_get_from_s R5 R1 1
+	s_write_low R1 2
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R5 R1 2
+	s_write_low R1 3
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R5 R1 3
+
+	s_write_low R1 4
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s_d R4 R1 0
+	s_write_low R1 5
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R4 R1 1
+	s_write_low R1 6
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R4 R1 2
+	s_write_low R1 7
+	s_write_high R1 0
+	ii_muli R1 R1 4
+	ii_add R1 R1 R7
+	s_load_4byte R1 R1 0
+	v_get_from_s R4 R1 3
 
 	
 	
@@ -616,13 +766,20 @@ L3:	v_mov R1 R8
 	s_pop R30
 
 
-	s_write_low R2 0
-	s_write_high R2 8192
-	v_load_16byte R1 R2 96
+	s_write_low R3 0
+	s_write_high R3 8192
+	s_load_4byte R2 R3 96
+	v_get_from_s_d R1 R2 0
+	s_load_4byte R2 R3 100
+	v_get_from_s R1 R2 1
+	s_load_4byte R2 R3 104
+	v_get_from_s R1 R2 2
+	s_load_4byte R2 R3 108
+	v_get_from_s R1 R2 3
 	vv_mul_ele R1 R1 R6
 	vf_mul R1 R1 R1
-	vv_add R7 R7 R1
-
+	vv_add R1 R7 R1
+	v_mov R7 R1
 	v_mov R1 R7
 	s_setzero R1
 
