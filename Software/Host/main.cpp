@@ -113,11 +113,11 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp("CP.out1", ios::binary), rt("main.asm.out1", ios::binary),
-            con("constant.dat.out1", ios::binary), tri("box.obj.out1", ios::binary);
+        ifstream cp("CP.out1", ios::binary), rt("realthing.asm.out", ios::binary),
+            con("constant.dat.out1", ios::binary), tri("triangle.obj.out", ios::binary);
 
         ofstream out("output.pfm");
-        string str = "P3\n32 24\n255\n";
+        string str = "P3\n16 12\n255\n";
         out << str;
 
         cout << "Starting...\n";
