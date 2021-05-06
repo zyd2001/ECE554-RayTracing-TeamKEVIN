@@ -25,7 +25,7 @@ module rta
   // parameter NUM_RT = 1;
   // parameter NUM_IC = 1;
   parameter NUM_RT = 4;
-  parameter NUM_IC = 16;
+  parameter NUM_IC = 8;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
