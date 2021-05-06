@@ -80,9 +80,10 @@ module rt_pd_icm_interface
             thread_id_out <= '0;
             pid <= 32'h0;
         end
-        else if (upd_in)
+        else if (upd_in) begin
             thread_id_out <= thread_id_in;
             pid <= pixel_id_in;
+        end
     end
 
     always_ff @(posedge clk or negedge rst_n) begin
