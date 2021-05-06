@@ -1,7 +1,7 @@
 #include "software.hpp"
 
-const int width = 1280;
-const int height = 720;
+const int width = 320;
+const int height = 180;
 const float epsilon = 0.001;
 // Assume Horizontal Fov is 90 degree, so tan(90/2) = 1
 const float fov = 1;
@@ -158,11 +158,11 @@ vector run(int id, bool stackBase)
     camera_dir[3] = 0;
     camera_dir = normalize(camera_dir);
 
-    // if (stackBase)
-    // {
-    //     print(camera_location);
-    //     print(camera_dir);
-    // }
+    if (stackBase)
+    {
+        print(camera_location);
+        print(camera_dir);
+    }
 
     vector hit, normal;
     std::tie(hit, normal) = trace(camera_location, camera_dir, 0);
@@ -201,7 +201,7 @@ int main()
     
     for (int i = 0; i < width * height; i++)
     {
-        auto color = run(i, i == 153960);
+        auto color = run(i, i == 0);
         ofs << color.x * 255 << " " << color.y * 255 << " " << color.z * 255 << "\n";
     }
     ofs.close();
