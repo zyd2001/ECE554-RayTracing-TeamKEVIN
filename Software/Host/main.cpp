@@ -83,6 +83,12 @@ void getOutput(dma_data_t *data, ofstream &out)
         }
         ptr++;
         out << "\n";
+        // for (int j = 0; j < 4; j++, ptr++)
+        // {
+        //     out << *ptr;
+        //     out << " ";
+        // }
+        // out << "\n";
     }
 }
 
@@ -107,11 +113,11 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp("CP.out", ios::binary), rt("realthing.asm.out", ios::binary),
-            con("Constant.out", ios::binary), tri("triangle.obj.out", ios::binary);
+        ifstream cp("CP.out1", ios::binary), rt("main.asm.out1", ios::binary),
+            con("constant.dat.out1", ios::binary), tri("box.obj.out1", ios::binary);
 
         ofstream out("output.pfm");
-        string str = "P3\n16 12\n255\n";
+        string str = "P3\n32 24\n255\n";
         out << str;
 
         cout << "Starting...\n";
@@ -173,7 +179,7 @@ int main(int argc, char *argv[])
             while (true)
             {
                 auto ret = afu.read(80);
-                printf("%d\n", ret);
+                // printf("%d\n", ret);
                 if (ret == 0)
                 {
 #ifdef SLEEP_WHILE_WAITING
