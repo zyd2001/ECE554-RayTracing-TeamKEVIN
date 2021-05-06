@@ -16,14 +16,22 @@ namespace SimulatorCore
 
         internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm)),
-            MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 4)),
-            MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 8)),
-            MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 12)));
-            vRF[r0] = vec;
-
-
-
+            if (sRF[r1] >= 0x20000000)
+            {
+                Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm, true)),
+                MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 4, true)),
+                MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 8, true)),
+                MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 12, true)));
+                vRF[r0] = vec;
+            }
+            else
+            {
+                Vector4 vec = new Vector4(MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm)),
+                MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 4)),
+                MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 8)),
+                MemoryMarshal.Read<float>(mem.Read(sRF[r1].i + imm + 12)));
+                vRF[r0] = vec;
+            }
         }
 
         public override string ToString()

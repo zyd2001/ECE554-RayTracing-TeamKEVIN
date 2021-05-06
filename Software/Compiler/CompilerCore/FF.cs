@@ -320,6 +320,7 @@ namespace CompilerCore
                         ss.IntersectWith(s);
                         vv.IntersectWith(v);
                     }
+                    // stack base
                     foreach (var item in ss)
                         List.AddAfter(node, new Assembly("s_push", new List<string> { $"RS{item}" }));
                     foreach (var item in vv)

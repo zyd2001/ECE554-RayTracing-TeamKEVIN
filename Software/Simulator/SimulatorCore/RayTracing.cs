@@ -26,10 +26,11 @@ namespace SimulatorCore
             decoder = new Decoder(File.OpenText("RT.isa"), 6);
         }
 
-        public RayTracing(Memory insMem, FileInfo triangle, Memory dataMem)
+        public RayTracing(Memory insMem, FileInfo triangle, Memory dataMem, FileStream constant)
         {
             ScalarRegisterFile = new RegisterFile<Scalar>(33);
             VectorRegisterFile = new RegisterFile<Vector4>(16);
+            dataMem.LoadToMemory(constant, true);
             InstructionMemory = insMem;
             DataMemory = dataMem;
             IC = new IntersectionCore(triangle.OpenText());
