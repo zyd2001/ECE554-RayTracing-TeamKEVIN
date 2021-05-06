@@ -22,21 +22,19 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
 {
     vector hit_color = [ 0, 0, 0, 0 ];
     vector subsurface_albedo;
-    vector temp;
     float roughness;
     float metallic;
 
-    vector *material_ptr;
+    float *material_ptr;
     material_ptr = material_address + (material_number - 1) * 32;
-    subsurface_albedo = material_ptr[0];
-    temp = material_ptr[1];
-    roughness = temp[0];
-    metallic = temp[1];
+    subsurface_albedo = [ material_ptr[0], material_ptr[1], material_ptr[2], material_ptr[3] ];
+    roughness = material_ptr[4];
+    metallic = material_ptr[5];
 
-    vector *light_ptr;
+    float *light_ptr;
     light_ptr = light_start_address;
-    vector light_origin = light_ptr[0];
-    vector light_color = light_ptr[1];
+    vector light_origin = [ light_ptr[0], light_ptr[1], light_ptr[2], light_ptr[3] ];
+    vector light_color = [ light_ptr[4], light_ptr[5], light_ptr[6], light_ptr[7] ];
 
     while (light_origin[3] > 0)
     {
@@ -103,8 +101,8 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
             }
         }
         light_ptr = asInt(light_ptr) + 32;
-        light_origin = light_ptr[0];
-        light_color = light_ptr[1];
+        light_origin = [ light_ptr[0], light_ptr[1], light_ptr[2], light_ptr[3] ];
+        light_color = [ light_ptr[4], light_ptr[5], light_ptr[6], light_ptr[7] ];
     }
 
     float NdV = dot(normal, -dir);
