@@ -1,0 +1,21 @@
+const int width = 32;
+const int height = 24;
+const float epsilon = 0.001;
+const float fov = 1.0;
+const vector camera_location(0, 1.0, 7.5, 0);
+const vector camera_lookat_pos(0, 1.0, 0, 0);
+const vector camera_up(0, 1.0, 0, 1.0);
+const vector sky_horizon_color(0.76, 0.765, 0.827, 1.0);
+const vector sky_top_color(0.53, 0.808, 0.92, 1.0);
+const vector ambient_light(0.3, 0.3, 0.3, 1.0);
+
+#
+{vector(4.0, 0, 5.0, 6.0), vector(1.0, 0.5, 0.5, 1.0), vector(-4.0, 0, 5.0, 6.0), vector(0.5, 0.5, 1.0, 1.0), vector(0, 0, 0, 0)};
+vector(0, 0, 0, 0)
+#
+Material one subsurface albedo(1.0, 1.0, 1.0, 1.0);
+Material one roughness metallic(1.0, 0, 0, 0)
+Material two subsurface albedo(0.09, 0.647, 0.537, 1.0);
+Material two roughness metallic(0.1, 1.0, 0, 0);
+Material three subsurface albedo(0.796, 0.2627, 0.2078, 1.0);
+Material three roughness metallic(1.0, 0, 0, 0)
