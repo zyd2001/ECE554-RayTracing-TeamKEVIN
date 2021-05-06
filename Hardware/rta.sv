@@ -22,10 +22,10 @@ module rta
    );
 
 
-  // parameter NUM_RT = 1;
-  // parameter NUM_IC = 1;
-  parameter NUM_RT = 4;
-  parameter NUM_IC = 8;
+  parameter NUM_RT = 1;
+  parameter NUM_IC = 1;
+//   parameter NUM_RT = 4;
+//   parameter NUM_IC = 8;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
@@ -173,7 +173,7 @@ module rta
   logic re_ic_tri[NUM_IC-1:0];
   logic unsigned [BIT_TRI-1:0] tri_id_ic_tri[NUM_IC-1:0];
   // ICM
-  logic [127:0] shader_info_ic_icm [NUM_IC-1:0]; //(v0, v1, v2, sid)
+  logic [127:0] shader_info_ic_icm [NUM_IC-1:0]; //(sid, v2, v1, v0)
   logic [95:0] normal_ic_icm [NUM_IC-1:0];
   logic [NUM_IC-1:0] dequeue_ic_icm;
 
@@ -182,7 +182,7 @@ module rta
   logic [95:0] ray_origin_icm_ic;
   logic [95:0] ray_direction_icm_ic;
   // RT​_IF
-  logic [127:0] shader_info_icm_rtif; //(v0, v1, v2, sid)
+  logic [127:0] shader_info_icm_rtif; //(sid, v2, v1, v0)
   logic [95:0] normal_icm_rtif;
 
   mem_controller memory_controller
@@ -424,9 +424,15 @@ module rta
      end
   endgenerate
 
+  // logic [127:0] reverse[NUM_IC-1:0];
 
   generate;
     for(i = 0; i < NUM_IC; i++) begin: IC_CORE
+      // assign reverse[i][127:96] = shader_info_ic_icm[i][127:96];
+      // assign reverse[i][95:0] = {shader_info_ic_icm[i][31:0]
+      //                           ,shader_info_ic_icm[i][63:32]
+      //                           ,shader_info_ic_icm[i][95:64]
+      //                           };
       IC_v3 ic
       (
         .clk(clk), 
@@ -442,8 +448,8 @@ module rta
 
         .IC_Mem_Rdy(dequeue_ic_icm[i]),
         .norm(normal_ic_icm[i]), 
-        .sid_out(shader_info_ic_icm[i][31:0]), 
-        .IntersectionPoint(shader_info_ic_icm[i][127:32]),
+        .sid_out(shader_info_ic_icm[i][127:96]), 
+        .IntersectionPoint(shader_info_ic_icm[i][95:0]),
         // TRI
         .Mem_Rdy(rdy_tri_ic[i]), 
         .Mem_NotValid(invalid_tri_ic[i]), 
