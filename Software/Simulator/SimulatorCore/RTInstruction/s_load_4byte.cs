@@ -16,7 +16,10 @@ namespace SimulatorCore
 
         internal override void Process(RegisterFile<Vector4> vRF, RegisterFile<Scalar> sRF, Memory mem, IntersectionCore ic)
         {
-            sRF[r0] = MemoryMarshal.Read<int>(mem.Read(sRF[r1].i + imm));
+            if (sRF[r1] >= 0x20000000)
+                sRF[r0] = MemoryMarshal.Read<int>(mem.Read(sRF[r1].i + imm, true));
+            else
+                sRF[r0] = MemoryMarshal.Read<int>(mem.Read(sRF[r1].i + imm));
 
 
         }
