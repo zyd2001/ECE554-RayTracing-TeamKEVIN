@@ -399,9 +399,18 @@ namespace CompilerCore
                 if (id[1] == 'V')
                 {
                     string tempVar = $".V{VariableCounter}";
+                    string tempScalar2 = $".S{VariableCounter}";
                     translation.AddAssembly("s_write_low", tempScalar, "0");
                     translation.AddAssembly("s_write_high", tempScalar, "8192");
-                    translation.AddAssembly("v_load_16byte", tempVar, tempScalar, LinkedSymbol.Offset.ToString());
+                    translation.AddAssembly("s_load_4byte", tempScalar2, tempScalar, LinkedSymbol.Offset.ToString());
+                    translation.AddAssembly("v_get_from_s_d", tempVar, tempScalar2, "0");
+                    translation.AddAssembly("s_load_4byte", tempScalar2, tempScalar, (LinkedSymbol.Offset + 4).ToString());
+                    translation.AddAssembly("v_get_from_s", tempVar, tempScalar2, "1");
+                    translation.AddAssembly("s_load_4byte", tempScalar2, tempScalar, (LinkedSymbol.Offset + 8).ToString());
+                    translation.AddAssembly("v_get_from_s", tempVar, tempScalar2, "2");
+                    translation.AddAssembly("s_load_4byte", tempScalar2, tempScalar, (LinkedSymbol.Offset + 12).ToString());
+                    translation.AddAssembly("v_get_from_s", tempVar, tempScalar2, "3");
+                    // translation.AddAssembly("v_load_16byte", tempVar, tempScalar, LinkedSymbol.Offset.ToString());
                     return tempVar;
                 }
                 else
