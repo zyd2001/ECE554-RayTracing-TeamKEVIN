@@ -9,6 +9,23 @@ Software/Simulator/SimulatorCore/obj/
 Software/Simulator/SimulatorTest/bin/
 Software/Simulator/SimulatorTest/obj/
 
+Hardware/RT_Core_and_Components/IP/Fix_Add
+Hardware/RT_Core_and_Components/IP/Fix_Div
+Hardware/RT_Core_and_Components/IP/Fix_Mul
+Hardware/RT_Core_and_Components/IP/Fix_Sqrt
+Hardware/RT_Core_and_Components/IP/Float_Add
+Hardware/RT_Core_and_Components/IP/Float_Div
+Hardware/RT_Core_and_Components/IP/Float_Mul
+Hardware/RT_Core_and_Components/IP/Float_Sqrt
+Hardware/RT_Core_and_Components/IP/FtoI
+Hardware/RT_Core_and_Components/IP/ItoF
+
+Hardware/IC/Float_Add
+Hardware/IC/Float_Inv
+Hardware/IC/Float_Grtr
+Hardware/IC/Float_Less
+Hardware/IC/Float_Mul
+
 .venv/
 .vs/
 .qsys_edit/

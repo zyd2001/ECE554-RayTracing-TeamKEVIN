@@ -103,6 +103,7 @@ module CP(clk, rst_n, init_mem_fin_MC, patch_out_done_MC, pixel_size_MC, we_pixe
                     if(pixel_curr + 1 >= pixel_max) begin
                         load_done_term_in = 1'b1;
                         thread_cnt_in = '0;
+						load_start_PD = 1'b1;
                         pixel_curr_in = '0;
                     end
                     else begin

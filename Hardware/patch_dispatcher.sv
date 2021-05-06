@@ -24,11 +24,11 @@ module patch_dispatcher
 
         output patch_done,
 
-        output job_dispatch_rt[NUM_RT-1:0],
-        output [BIT_THREAD-1:0] thread_id_out_rt,
-        output [31:0] pixel_id_rt,
-        output [31:0] pc_out_rt,
-        output [31:0] sp_out_rt,
+        output reg job_dispatch_rt[NUM_RT-1:0],
+        output reg [BIT_THREAD-1:0] thread_id_out_rt,
+        output reg [31:0] pixel_id_rt,
+        output reg [31:0] pc_out_rt,
+        output reg [31:0] sp_out_rt,
 
         output job_dispatch_ic[NUM_IC-1:0],
         output [BIT_THREAD-1:0] thread_id_out_ic,
@@ -76,6 +76,7 @@ module patch_dispatcher
     logic [NUM_IC-1:0] en_q_sel_ic2rt;
     logic [BIT_THREAD-1:0] data_sel_tid_ic2rt;
 
+    logic job_dispatch_rt_wire[NUM_RT-1:0];
 
 
     /*
@@ -153,7 +154,7 @@ module patch_dispatcher
             always_ff @(posedge clk, negedge rst_n) begin
                 if (!rst_n)
                     busy_rt[i] <= 1'h0;
-                else if (en_q_sel_rt2ic[i] || job_dispatch_rt[i] || task_done_rt[i])
+                else if (en_q_sel_rt2ic[i] || job_dispatch_rt_wire[i] || task_done_rt[i])
                     busy_rt[i] <= ~busy_rt[i];
             end
         end
@@ -437,19 +438,42 @@ module patch_dispatcher
 
     generate
         for (i = 1; i < NUM_RT; i++) begin
-            assign job_dispatch_rt[i] = !en_q_load && !empty_tid_ic2rt && !busy_rt[i] && (&busy_rt[i-1:0]);
+            always_ff @(posedge clk, negedge rst_n) begin
+                if (!rst_n) 
+                    job_dispatch_rt[i] <= '0;
+                else 
+                    job_dispatch_rt[i] <= job_dispatch_rt_wire[i];
+            end
+            assign job_dispatch_rt_wire[i] = !en_q_load && !empty_tid_ic2rt && !busy_rt[i] && (&busy_rt[i-1:0]);
         end
-        assign job_dispatch_rt[0] = !en_q_load && !empty_tid_ic2rt && !busy_rt[0];
+        always_ff @(posedge clk, negedge rst_n) begin
+            if (!rst_n) 
+                job_dispatch_rt[0] <= '0;
+            else 
+                job_dispatch_rt[0] <= job_dispatch_rt_wire[0];
+        end
+        assign job_dispatch_rt_wire[0] = !en_q_load && !empty_tid_ic2rt && !busy_rt[0];
     endgenerate
 
-    // assign job_dispatch_rt[0] = !en_q_load && !empty_tid_ic2rt && !busy_rt[0];
-    // assign job_dispatch_rt[1] = !en_q_load && !empty_tid_ic2rt && busy_rt[0] && !busy_rt[1];
-    // assign job_dispatch_rt[2] = !en_q_load && !empty_tid_ic2rt && busy_rt[0] && busy_rt[1] && !busy_rt[2];
-    // assign job_dispatch_rt[3] = !en_q_load && !empty_tid_ic2rt && busy_rt[0] && busy_rt[1] && busy_rt[2] && !busy_rt[3];
 
-    assign thread_id_out_rt = data_out_tid_ic2rt;
-    assign pixel_id_rt = pixel_id[data_out_tid_ic2rt];
-    assign pc_out_rt = pc[data_out_tid_ic2rt];
-    assign sp_out_rt = sp[data_out_tid_ic2rt];
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            thread_id_out_rt <= '0;
+            pixel_id_rt <= '0;
+            pc_out_rt <= '0;
+            sp_out_rt <= '0;
+        end
+        else begin
+            thread_id_out_rt <= data_out_tid_ic2rt;
+            pixel_id_rt <= pixel_id[data_out_tid_ic2rt];
+            pc_out_rt <= pc[data_out_tid_ic2rt];
+            sp_out_rt <= sp[data_out_tid_ic2rt];
+        end
+    end
+
+    // assign thread_id_out_rt = data_out_tid_ic2rt;
+    // assign pixel_id_rt = pixel_id[data_out_tid_ic2rt];
+    // assign pc_out_rt = pc[data_out_tid_ic2rt];
+    // assign sp_out_rt = sp[data_out_tid_ic2rt];
 
 endmodule
