@@ -13,7 +13,7 @@ module mem_controller
         output [127:0] data_128,
         output reg cp_strt,
         output reg re_main,
-        output wr_out_done,
+        output reg wr_out_done,
         output [31:0] addr_main[3:0],
         output reg term
         );
@@ -630,7 +630,13 @@ module mem_controller
             end
         endcase
     end
-
-    assign wr_out_done = dma_wr_done;
+	 
+	 always_ff @(posedge clk, negedge rst_n) begin
+		if (!rst_n)
+			wr_out_done <= 1'h0;
+		else 
+			wr_out_done <= dma_wr_done;
+	 end
+   
 
 endmodule
