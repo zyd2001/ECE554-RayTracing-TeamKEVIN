@@ -106,6 +106,19 @@ module rt_pd_icm_interface
         end
     end
 
+    logic context_switch_reg, end_program_reg;
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            context_switch_reg <= 1'h0;
+            end_program_reg  <= 1'h0;
+        end
+        else begin
+            context_switch_reg <= context_switch_rt;
+            end_program_reg <= end_program;
+        end
+    end
+
+
     typedef enum reg [2:0] {IDLE, LOADING0, LOADING1, LOADING2, LOADING_DONE, RUNNING, UNLOAD, UNLOAD_DONE} interface_state;
     interface_state state_load, nxt_state_load;
 
@@ -172,11 +185,11 @@ module rt_pd_icm_interface
                 kernel_mode = 1'h0;
             end
             RUNNING: begin
-                if (end_program && context_switch_rt) begin
+                if (end_program_reg && context_switch_reg) begin
                     kernel_mode = 1'b1;
                     nxt_state_load = UNLOAD;
                 end
-                else if (end_program) begin
+                else if (end_program_reg) begin
                     kernel_mode = 1'b1;
                     task_done_pd = 1'h1;
                     nxt_state_load = IDLE;
