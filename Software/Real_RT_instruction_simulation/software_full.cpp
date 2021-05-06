@@ -1,7 +1,7 @@
 #include "software.hpp"
 
-const int width = 320;
-const int height = 180;
+const int width = 32;
+const int height = 24;
 const float epsilon = 0.001;
 // Assume Horizontal Fov is 90 degree, so tan(90/2) = 1
 const float fov = 1;
@@ -63,8 +63,17 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
         if (NdL > 0) {
             // Check if there is any object occluding the light 
             vector shadow_hit, shadow_normal;
+            if (fvthek) {
+                std::cout<< "shadow ray" <<std::endl;
+                print(hit + normal * 0.0001);
+                print(light_ray);
+            }
             std::tie(shadow_hit, shadow_normal) = trace(hit + normal * 0.0001, light_ray, 1);
-
+            if (fvthek) {
+                std::cout<< "shadow hit" <<std::endl;
+                print(shadow_hit);
+                print(shadow_normal);
+            }
             int shadow_hit_or_not = asInt(shadow_hit[3]); 
             shadow_hit[3] = 0;
             // if (fvthek) {
@@ -82,7 +91,11 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
             if (shadow_hit_or_not == 0) {
                 float point_light_falloff = (light_range * light_range / (light_distance * light_distance + light_range * light_range));
                 light_color = light_color * point_light_falloff * NdL;
-
+                if (fvthek) {
+                    std::cout<< "light color" <<std::endl;
+                    std::cout<< point_light_falloff <<std::endl;
+                    std::cout<< NdL <<std::endl;
+                }
                 vector halfway = normalize(light_ray - dir);
                 float NdV = dot(normal, -dir);
                 float NdH = dot(normal, halfway);
@@ -91,7 +104,11 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
                 vector default_dielectrics_F0(0.04, 0.04, 0.04, 1);
                 vector F = subsurface_albedo * metallic + default_dielectrics_F0 * (1 - metallic);
                 vector this_subsurface_albedo = subsurface_albedo * (1 - metallic);
-                
+                if (fvthek) {
+                    std::cout<< "f and ssab" <<std::endl;
+                    print(F);
+                    print(this_subsurface_albedo);
+                }
                 hit_color = hit_color + (-F + 1) * this_subsurface_albedo * light_color;
                 // if (fvthek) {
                 //     std::cout<< "Diffuse" <<std::endl;
@@ -160,6 +177,7 @@ vector run(int id, bool stackBase)
 
     if (stackBase)
     {
+        std::cout<< "camera location" <<std::endl;
         print(camera_location);
         print(camera_dir);
     }
@@ -167,6 +185,13 @@ vector run(int id, bool stackBase)
     vector hit, normal;
     std::tie(hit, normal) = trace(camera_location, camera_dir, 0);
     
+    if (stackBase)
+    {
+        std::cout<< "First hit" <<std::endl;
+        print(hit);
+        print(normal);
+    }
+
     if (asInt(hit[3]) == 0)
         return miss_shader(camera_location, camera_dir, hit, normal);
     else
@@ -201,7 +226,7 @@ int main()
     
     for (int i = 0; i < width * height; i++)
     {
-        auto color = run(i, i == 0);
+        auto color = run(i, i == 37);
         ofs << color.x * 255 << " " << color.y * 255 << " " << color.z * 255 << "\n";
     }
     ofs.close();
