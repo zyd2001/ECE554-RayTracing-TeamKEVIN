@@ -1,0 +1,30 @@
+100Hz
+  Add  - 3  cycles
+  Mul  - 3  cycles
+  Div  - 17 cycles
+  Sqrt - 12 cycles
+  FtoI - 1  cycles
+  ItoF - 2  cycles
+  Inv  - 12 cycles
+  Less - 0  cycles
+  Grtr - 0  cycles
+150Hz
+  Add  - 3  cycles
+  Mul  - 3  cycles
+  Div  - 18 cycles
+  Sqrt - 12 cycles
+  FtoI - 2  cycles
+  ItoF - 3  cycles
+  Inv  - 12 cycles
+  Less - 1  cycles
+  Grtr - 1  cycles
+200Hz
+  Add  - 3  cycles
+  Mul  - 3  cycles
+  Div  - 19 cycles
+  Sqrt - 12 cycles
+  FtoI - 2  cycles
+  ItoF - 5  cycles
+  Inv  - 12 cycles
+  Less - 1  cycles
+  Grtr - 1  cycles
