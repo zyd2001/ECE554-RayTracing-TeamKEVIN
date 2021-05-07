@@ -20,7 +20,7 @@ module ICU (
     op1_in, op2_in, out, operation, flag, clk, en, done, rst_n, rst
 );
 
-  parameter LATENCY = 0;
+  parameter LATENCY = 1;
 
   input clk, en, rst_n, rst;
   input [31:0] op1_in, op2_in;
@@ -85,7 +85,7 @@ module ICU (
       DIV: 
         begin
           if (counter == LATENCY) begin
-            out = {{32{Divider_result[31]}}, Divider_result};
+            out = {{32{Divider_result_reg[31]}}, Divider_result_reg};
             done = 1'b1;
           end
           else begin
@@ -97,7 +97,7 @@ module ICU (
       MUL: 
         begin
           if (counter == LATENCY) begin
-            out = Multiplier_result;
+            out = Multiplier_result_reg;
             done = 1'b1;
           end
           else begin
@@ -109,7 +109,7 @@ module ICU (
       ADDSUB: 
         begin
           if (counter == LATENCY) begin
-            out = {{31{Adder_result[32]}}, Adder_result};
+            out = {{31{Adder_result_reg[32]}}, Adder_result_reg};
             done = 1'b1;
           end
           else begin
@@ -136,9 +136,9 @@ module ICU (
     endcase
   end
   
-  assign Adder_result = Adder_en ? (op1_reg + Adder_b) : Adder_result_reg;
-  assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg) : Multiplier_result_reg;
-  assign Divider_result = Divider_en ? (op1_reg / op2_reg) : Divider_result_reg;
+  assign Adder_result = Adder_enable ? (op1_reg + Adder_b) : Adder_result_reg;
+  assign Multiplier_result = Multiplier_enable ? (op1_reg * op2_reg) : Multiplier_result_reg;
+  assign Divider_result = Divider_enable ? (op1_reg / op2_reg) : Divider_result_reg;
   
   always_comb begin 
     if (out == 0)
