@@ -201,9 +201,9 @@ module mem_main(clk, rst_n, we, re, mode, addr, data_in,
                     if (!rst_n)
                         addr_bank_1[i][j] <= 12'b0;
                     else begin
-                        addr_bank_1[i][j] <= (i == thread_id_0[0] && rd_rdy_0[0]) ? addr_bank_0[0][j]
-                                            : (i == thread_id_0[1] && rd_rdy_0[1]) ? addr_bank_0[1][j]
-                                            : (i == thread_id_0[2] && rd_rdy_0[2]) ? addr_bank_0[2][j]
+                        addr_bank_1[i][j] <= (i == thread_id_0[0] && (rd_rdy_0[0] || we_bank_0[i][j])) ? addr_bank_0[0][j]
+                                            : (i == thread_id_0[1] && (rd_rdy_0[1] || we_bank_0[i][j])) ? addr_bank_0[1][j]
+                                            : (i == thread_id_0[2] && (rd_rdy_0[2] || we_bank_0[i][j])) ? addr_bank_0[2][j]
                                             : addr_bank_0[3][j];
                     end
                 end
