@@ -1,5 +1,5 @@
 module RT_core_single (
-    clk, rst_n,
+    clk, rst_n, rst,
     kernel_mode, End_program, Context_switch, 
 
     PD_scalar_wen, PD_scalar_wb_address, PD_scalar_wb_data,
@@ -22,7 +22,7 @@ module RT_core_single (
     MEM_addr, MEM_data_write, MEM_data_read, MEM_read_en, MEM_write_en, MEM_done, MEM_s_or_v
 );
     // Control / Normal signals
-    input clk, rst_n;
+    input clk, rst_n, rst;;
     input kernel_mode;
     output End_program, Context_switch;
 
@@ -718,16 +718,16 @@ module RT_core_single (
     end
 
     Integer_alu IALU(.op1(EX_integer_ALU_OP1), .op2(EX_integer_ALU_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_intALU_en), .en_knock_down(EX_int_knockdown),
-        .out(EX_integer_ALU_out), .done(EX_integer_done), .operation(DE_EX_integer_ALU_opcode), .flag(EX_int_flag));
+        .out(EX_integer_ALU_out), .done(EX_integer_done), .operation(DE_EX_integer_ALU_opcode), .flag(EX_int_flag), .rst(rst));
     
     Float_alu FALU1(.op1(EX_float_ALU1_OP1), .op2(EX_float_ALU1_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU1_en), .en_knock_down(EX_float1_knockdown),
-        .out(EX_float_ALU1_out), .done(EX_float_done), .operation(DE_EX_float_ALU_opcode), .flag(EX_float_flag));
+        .out(EX_float_ALU1_out), .done(EX_float_done), .operation(DE_EX_float_ALU_opcode), .flag(EX_float_flag), .rst(rst));
     Float_alu FALU2(.op1(EX_float_ALU2_OP1), .op2(EX_float_ALU2_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU2_en), .en_knock_down(EX_float2_knockdown),
-        .out(EX_float_ALU2_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag());
+        .out(EX_float_ALU2_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
     Float_alu FALU3(.op1(EX_float_ALU3_OP1), .op2(EX_float_ALU3_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU3_en), .en_knock_down(EX_float3_knockdown),
-        .out(EX_float_ALU3_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag());
+        .out(EX_float_ALU3_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
     Float_alu FALU4(.op1(EX_float_ALU4_OP1), .op2(EX_float_ALU4_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU4_en), .en_knock_down(EX_float4_knockdown),
-        .out(EX_float_ALU4_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag());
+        .out(EX_float_ALU4_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
 
     assign EX_int_flag_en = EX_integer_done & DE_EX_update_int_flag;
     assign EX_float_flag_en = EX_float_done & DE_EX_update_float_flag;
@@ -882,7 +882,7 @@ module RT_core_single (
     assign MEM_write_en = EX_MEM_memory_op[2:1] == 2'b11;
 
     FPU Reduce_adder(.op1_in(EX_MEM_v_out[31:0]), .op2_in(EX_MEM_v_out[95:64]), .operation(2'b00), .out(MEM_reduce_out), .en(EX_MEM_vector_reduce_en), 
-        .clk(clk), .rst_n(rst_n), .done(MEM_V_reduce_done), .flag());
+        .clk(clk), .rst_n(rst_n), .done(MEM_V_reduce_done), .flag(), .rst(rst));
 
     always_ff @( posedge clk, negedge rst_n ) begin : MEM_waiting_update_state     
         if (!rst_n)

@@ -17,14 +17,14 @@
 
 
 module FPU (
-    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n
+    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n, rst
   );
   
   parameter ADD_LATENCY = 2,
             MUL_LATENCY = 2,
             DIV_LATENCY = 24;
 
-  input clk, en, rst_n;
+  input clk, en, rst_n, rst;
   input [31:0] op1_in, op2_in;
   input [1:0] operation;
   output logic [31:0] out;
@@ -118,7 +118,7 @@ module FPU (
   
   Float_Add Adder (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
-		.areset (!rst_n),             //   input,   width = 1, areset.reset
+		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Adder_enable),       //   input,   width = 1,     en.en
 		.a      (op1_in),             //   input,  width = 32,      a.a
 		.b      (op2_in),             //   input,  width = 32,      b.b
@@ -128,7 +128,7 @@ module FPU (
 
 	Float_Mul Multiplier (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
-		.areset (!rst_n),             //   input,   width = 1, areset.reset
+		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Multiplier_enable),  //   input,   width = 1,     en.en
 		.a      (op1_in),             //   input,  width = 32,      a.a
 		.b      (op2_in),             //   input,  width = 32,      b.b
@@ -137,7 +137,7 @@ module FPU (
 
 	Float_Div Divider (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
-		.areset (!rst_n),             //   input,   width = 1, areset.reset
+		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Divider_enable),     //   input,   width = 1,     en.en
 		.a      (op1_in),             //   input,  width = 32,      a.a
 		.b      (op2_in),             //   input,  width = 32,      b.b

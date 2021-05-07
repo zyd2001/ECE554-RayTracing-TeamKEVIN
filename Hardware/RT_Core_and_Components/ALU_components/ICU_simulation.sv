@@ -20,18 +20,17 @@
 
 
 module ICU (
-    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n
+    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n, rst
 );
-    input clk, en, rst_n;
+    input clk, en, rst_n, rst;
     input signed [31:0] op1_in, op2_in;
     input signed [1:0] operation;
-    output logic signed [31:0] out;
+    output logic signed [63:0] out;
     output logic [1:0] flag;
     output logic done;
 
     reg [1:0] counter, next_counter; 
-    int operand1, operand2, int_output;
-
+    longint operand1, operand2, int_output;
     reg [31:0] op1_stored, op2_stored;
     logic [31:0] op1, op2;
 
@@ -64,7 +63,7 @@ module ICU (
             flag[1] = 0;
         else 
             flag[1] = 1;
-        flag[0] = out[31];      
+        flag[0] = out[63];      
 
     end
 
