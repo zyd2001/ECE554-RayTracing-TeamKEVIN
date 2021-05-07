@@ -181,7 +181,7 @@ module rta
   // IC
   logic [95:0] ray_origin_icm_ic;
   logic [95:0] ray_direction_icm_ic;
-  // RT​_IF
+  // RT_IF
   logic [127:0] shader_info_icm_rtif; //(sid, v2, v1, v0)
   logic [95:0] normal_icm_rtif;
 
@@ -225,23 +225,27 @@ module rta
       assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_x[i]; 
     end
   endgenerate
-
-  // assign we_rt_main[1] = 1'h0;
-  // assign we_rt_main[2] = 1'h0;
-  // assign we_rt_main[3] = 1'h0;
-  // assign re_rt_main[1] = 1'h0;
-  // assign re_rt_main[2] = 1'h0;
-  // assign re_rt_main[3] = 1'h0;
-  // assign addr_rt_x[1] = 32'h0;
-  // assign addr_rt_x[2] = 32'h0;
-  // assign addr_rt_x[3] = 32'h0;
-  // assign mode_rt_main[1] = 1'h0;
-  // assign mode_rt_main[2] = 1'h0;
-  // assign mode_rt_main[3] = 1'h0;
-  // assign data_in_rt_main[1] = 128'h0;
-  // assign data_in_rt_main[2] = 128'h0;
-  // assign data_in_rt_main[3] = 128'h0;
-
+/*
+  assign we_rt_main[1] = 1'h0;
+  assign re_rt_main[1] = 1'h0;
+  assign addr_rt_x[1] = 32'h0;
+  assign mode_rt_main[1] = 1'h0;
+  assign data_in_rt_main[1] = 128'h0;
+*/
+/*
+  assign we_rt_main[2] = 1'h0;
+  assign re_rt_main[2] = 1'h0;
+  assign addr_rt_x[2] = 32'h0;
+  assign mode_rt_main[2] = 1'h0;
+  assign data_in_rt_main[2] = 128'h0;
+*/
+/*
+  assign we_rt_main[3] = 1'h0;
+  assign re_rt_main[3] = 1'h0;
+  assign addr_rt_x[3] = 32'h0;
+  assign mode_rt_main[3] = 1'h0;
+  assign data_in_rt_main[3] = 128'h0;
+*/
 
   CP #(.NUM_THREAD(NUM_THREAD))command_processer
    (

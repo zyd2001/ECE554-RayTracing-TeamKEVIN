@@ -374,7 +374,7 @@ module mem_controller
                                         .dma_rd_done_clr_128(dma_rd_done_clr_tri),
                                         .mem_wr_en_128(we_mem[3])
                                         );
-
+    
     //Central Control Logic
     typedef enum reg [2:0] {DMA_RD_IDLE, DMA_RD_CP, DMA_RD_RT, DMA_RD_CONST, DMA_RD_TRI} t_state_dma_rd;
     t_state_dma_rd state_dma_rd, nxt_state_dma_rd;
@@ -386,6 +386,8 @@ module mem_controller
             state_dma_rd <= nxt_state_dma_rd;
     end
 
+    logic cp_strt_reg;
+
     always_comb begin 
         nxt_state_dma_rd = DMA_RD_IDLE;
 
@@ -394,7 +396,7 @@ module mem_controller
         dma_rd_strt_const = 1'h0;
         dma_rd_strt_tri = 1'h0;
 
-        cp_strt = 1'h0;
+        cp_strt_reg = 1'h0;
 
         case(state_dma_rd)
             DMA_RD_IDLE: begin
@@ -435,7 +437,7 @@ module mem_controller
             default: begin
                 if (dma_rd_req_tri && dma_rd_end_tri) begin
                     nxt_state_dma_rd = DMA_RD_IDLE;
-                    cp_strt = 1'h1;
+                    cp_strt_reg = 1'h1;
                 end
                 else if (dma_rd_req_tri) begin
                     nxt_state_dma_rd = DMA_RD_TRI;
@@ -443,11 +445,19 @@ module mem_controller
                 end
                 else begin
                     nxt_state_dma_rd = DMA_RD_IDLE; 
+                    cp_strt_reg = 1'h1;
                 end
             end
 	endcase
     end
 
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n)
+            cp_strt <= 1'h0;
+        else 
+            cp_strt <= cp_strt_reg;
+    end
 
     /*
         Write to Host
@@ -604,7 +614,7 @@ module mem_controller
                     re_main = 1'h1;
                     if (dma_write_cnt == DMA_WRITE_SIZE) begin
                         nxt_state_dma_wr = DMA_WR_DONE;
-                        dma_wr_addr_inc = 1'h1;
+                        // dma_wr_addr_inc = 1'h1;
                         dma_wr_clr = 1'h1;
                         dma_patch_inc = 1'h1;
                         thread_MC_clr = 1'h1;
