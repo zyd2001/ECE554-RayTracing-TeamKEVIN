@@ -1,16 +1,16 @@
 `timescale 1ns / 1ps
 module FPU_tb ();
 
-  logic clk, rst_n, en, done;
+  logic clk, rst_n, en, done, rst;
   logic [31:0] op1, op2, out;
   logic [1:0] operation, flag;
 
   shortreal op1sr, op2sr, outsr;
   
-  FPU iDUT (.op1_in(op1), .op2_in(op2), .out(out), .operation(operation), .flag(flag), .clk(clk), .en(en), .done(done), .rst_n(rst_n));
+  //FPU iDUT (.op1_in(op1), .op2_in(op2), .out(out), .operation(operation), .flag(flag), .clk(clk), .en(en), .done(done), .rst_n(rst_n));
   //ICU iDUT (.op1_in(op1), .op2_in(op2), .out(out), .operation(operation), .flag(flag), .clk(clk), .en(en), .done(done), .rst_n(rst_n));
   //itf iDUT(.in_in(op1), .out(out), .clk(clk), .en(en), .done(done), .rst_n(rst_n));
-  //fti iDUT_2(.in_in(op1), .out(out), .clk(clk), .en(en), .done(done), .rst_n(rst_n));
+  fti iDUT_2(.in_in(op1), .out(out), .clk(clk), .en(en), .done(done), .rst_n(rst_n), .rst(rst));
   //itf iDUT_3(.in_in(op1), .out(out), .clk(clk), .en(en), .done(done), .rst_n(rst_n));
   
   initial begin
@@ -91,7 +91,9 @@ module FPU_tb ();
     $stop();
 
   end
-
+  
+  assign rst = ~rst_n;
+ 
   always #2 clk = ~clk;
 
 endmodule

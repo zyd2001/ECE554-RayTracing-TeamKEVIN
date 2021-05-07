@@ -137,7 +137,7 @@ module ICU (
   end
   
   assign Adder_result = Adder_en ? (op1_reg + Adder_b) : Adder_result_reg;
-  assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg); Multiplier_result_reg;
+  assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg) : Multiplier_result_reg;
   assign Divider_result = Divider_en ? (op1_reg / op2_reg) : Divider_result_reg;
   
   always_comb begin 
