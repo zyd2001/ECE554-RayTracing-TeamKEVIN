@@ -53,6 +53,7 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
             // Check if there is any object occluding the light
             vector shadow_hit, shadow_normal;
             shadow_hit, shadow_normal = trace(hit + normal * 0.0001, light_ray);
+            shadow_normal = normalize(shadow_normal);
 
             int shadow_hit_or_not = asInt(shadow_hit[3]);
             shadow_hit[3] = 0;
@@ -160,6 +161,7 @@ void main(int id, int stackBase)
 
     vector hit, normal;
     hit, normal = trace(camera_location, camera_dir);
+    normal = normalize(normal);
 
     if (asInt(hit[3]) == 0)
         result[0] = miss_shader(camera_location, camera_dir, hit, normal);

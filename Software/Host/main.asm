@@ -183,8 +183,12 @@ main:	s_push R28
 	
 	v_push R2
 	s_push R5
+	s_push R30
+	s_push R28
 	Trace
 	
+	s_pop R28
+	s_pop R30
 	s_pop R5
 	v_pop R2
 	v_mov R3 R14
@@ -505,8 +509,12 @@ L5:	s_write_low R1 46871
 	s_push R6
 	s_push R5
 	s_push R4
+	s_push R30
+	s_push R28
 	Trace
 	
+	s_pop R28
+	s_pop R30
 	s_pop R4
 	s_pop R5
 	s_pop R6
