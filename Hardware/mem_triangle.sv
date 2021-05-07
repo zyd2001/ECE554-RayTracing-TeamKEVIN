@@ -237,6 +237,9 @@ module mem_triangle(clk, rst_n, re_IC, triangle_id, data_MC, we_MC, done_MC,
                     vertices_buff_en[1] = 1'b1;
                     if(is_prefetching_reg) begin
                         next = rd_done;
+                        if(re_IC) begin
+                            rdy_ic = 1'b1;
+                        end
                     end
                     else begin
                         next = idle;
