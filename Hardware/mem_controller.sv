@@ -613,7 +613,7 @@ module mem_controller
                     re_main = 1'h1;
                     if (dma_write_cnt == DMA_WRITE_SIZE) begin
                         nxt_state_dma_wr = DMA_WR_DONE;
-                        dma_wr_addr_inc = 1'h1;
+                        // dma_wr_addr_inc = 1'h1;
                         dma_wr_clr = 1'h1;
                         dma_patch_inc = 1'h1;
                         thread_MC_clr = 1'h1;
