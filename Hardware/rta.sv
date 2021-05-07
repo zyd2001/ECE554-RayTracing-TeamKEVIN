@@ -350,7 +350,6 @@ module rta
        (
          .clk(clk),
          .rst_n(rst_n),
-         .rst(rst),
          // PD
          .job_assign(job_dispatch_pd_rtif[i]),
          .thread_id_in(thread_id_out_pd_rtif),
@@ -394,6 +393,7 @@ module rta
     for (i = 0; i < NUM_RT; i++) begin: RT_CORE
       RT_core_single rt
        (
+        .rst(rst),
         .clk(clk),
         .rst_n(rst_n),
         .kernel_mode(kernel_mode_rtif_rt[i]),
