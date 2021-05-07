@@ -14,9 +14,9 @@
 ///////////////////////////////
 
 module Integer_alu (
-    op1, op2, clk, out, done, operation, flag, en, rst_n, en_knock_down
+    op1, op2, clk, out, done, operation, flag, en, rst_n, en_knock_down, rst
 );
-    input clk, en, rst_n;
+    input clk, en, rst_n, rst;
     input signed [31:0] op1, op2;
     input [3:0] operation;
     output logic signed [31:0] out;
@@ -27,10 +27,10 @@ module Integer_alu (
     logic itof_done, ftoi_done, ICU_done;
     logic itof_en, ftoi_en, ICU_en;
 
-    itf itof(.in_in(op1), .out(itof_out), .clk(clk), .en(itof_en), .done(itof_done), .rst_n(rst_n));
-    fti ftoi(.in_in(op1), .out(ftoi_out), .clk(clk), .en(ftoi_en), .done(ftoi_done), .rst_n(rst_n));
+    itf itof(.in_in(op1), .out(itof_out), .clk(clk), .en(itof_en), .done(itof_done), .rst_n(rst_n), .rst(rst));
+    fti ftoi(.in_in(op1), .out(ftoi_out), .clk(clk), .en(ftoi_en), .done(ftoi_done), .rst_n(rst_n), .rst(rst));
     ICU integer_unit(.op1_in(op1), .op2_in(op2), .out(ASMD_out), .operation(operation[1:0]), 
-        .flag(flag), .clk(clk), .en(ICU_en), .done(ICU_done), .rst_n(rst_n));
+        .flag(flag), .clk(clk), .en(ICU_en), .done(ICU_done), .rst_n(rst_n), .rst(rst));
     
     always_comb begin 
         itof_en = 1'b0;

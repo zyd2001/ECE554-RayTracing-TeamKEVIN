@@ -8,9 +8,9 @@
 ///////////////////////////////
 
 module Float_alu (
-    op1, op2, clk, out, done, operation, flag, en, rst_n, en_knock_down
+    op1, op2, clk, out, done, operation, flag, en, rst_n, en_knock_down, rst
 );
-    input clk, en, rst_n;
+    input clk, en, rst_n, rst;
     input [31:0] op1, op2;
     input [2:0] operation;
     output logic [31:0] out;
@@ -21,8 +21,8 @@ module Float_alu (
     logic FPU_en, Sqrt_en, FPU_done, Sqrt_done;
 
     FPU floating_point_unit(.op1_in(op1), .op2_in(op2), .out(FPU_out), .operation(operation[1:0]), 
-        .flag(flag), .clk(clk), .en(FPU_en), .done(FPU_done), .rst_n(rst_n));
-    Sqrt square_root_unit(.in_in(op1), .out(Sqrt_out), .clk(clk), .en(Sqrt_en), .done(Sqrt_done), .rst_n(rst_n));
+        .flag(flag), .clk(clk), .en(FPU_en), .done(FPU_done), .rst_n(rst_n), .rst(rst));
+    Sqrt square_root_unit(.in_in(op1), .out(Sqrt_out), .clk(clk), .en(Sqrt_en), .done(Sqrt_done), .rst_n(rst_n), .rst(rst));
 
     always_comb begin
         FPU_en = 1'b0;
