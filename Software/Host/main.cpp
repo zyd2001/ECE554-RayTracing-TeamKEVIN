@@ -113,8 +113,8 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp("CP.out1", ios::binary), rt("realthing.asm.out", ios::binary),
-            con("constant.dat.out1", ios::binary), tri("triangle.obj.out", ios::binary);
+        ifstream cp("CP.out1", ios::binary), rt("finalmain.asm.out", ios::binary),
+            con("constant.dat.out1", ios::binary), tri("box.obj.out", ios::binary);
 
         ofstream out("output.pfm");
         string str = "P3\n16 12\n255\n";
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
                 }
                 else if (ret == 1)
                 {
-                    printf("get\n");
+                    fprintf(stderr, "get\n");
                     getOutput(output, out);
                     afu.write(2, 0);
                     printf("haha\n");
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    printf("break\n");
+                    fprintf(stderr, "break\n");
                     getOutput(output, out);
                     break;
                 }

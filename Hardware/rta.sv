@@ -22,10 +22,10 @@ module rta
    );
 
 
-  parameter NUM_RT = 1;
-  parameter NUM_IC = 1;
-//   parameter NUM_RT = 4;
-//   parameter NUM_IC = 8;
+  // parameter NUM_RT = 1;
+  // parameter NUM_IC = 1;
+  parameter NUM_RT = 4;
+  parameter NUM_IC = 8;
   parameter NUM_THREAD = 32;
   parameter NUM_TRI = 512;
   parameter DEPTH_RT_CONST = 512;
@@ -222,30 +222,29 @@ module rta
   generate
     for (i = 0; i < 4; i++) begin
       assign re_x_main[i] = re_mc_main ? 1'h1 : re_rt_main[i];
-      assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_x[i]; 
+      assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : {addr_rt_x[i][31:21],thread_id_rtif_pd[i][4:0],addr_rt_x[i][15:0]}; 
+      // assign addr_x_main[i] = re_mc_main ? addr_mc_main[i] : addr_rt_x[i];
     end
   endgenerate
-/*
-  assign we_rt_main[1] = 1'h0;
-  assign re_rt_main[1] = 1'h0;
-  assign addr_rt_x[1] = 32'h0;
-  assign mode_rt_main[1] = 1'h0;
-  assign data_in_rt_main[1] = 128'h0;
-*/
-/*
-  assign we_rt_main[2] = 1'h0;
-  assign re_rt_main[2] = 1'h0;
-  assign addr_rt_x[2] = 32'h0;
-  assign mode_rt_main[2] = 1'h0;
-  assign data_in_rt_main[2] = 128'h0;
-*/
-/*
-  assign we_rt_main[3] = 1'h0;
-  assign re_rt_main[3] = 1'h0;
-  assign addr_rt_x[3] = 32'h0;
-  assign mode_rt_main[3] = 1'h0;
-  assign data_in_rt_main[3] = 128'h0;
-*/
+
+  // assign we_rt_main[1] = 1'h0;
+  // assign re_rt_main[1] = 1'h0;
+  // assign addr_rt_x[1] = 32'h0;
+  // assign mode_rt_main[1] = 1'h0;
+  // assign data_in_rt_main[1] = 128'h0;
+
+  // assign we_rt_main[2] = 1'h0;
+  // assign re_rt_main[2] = 1'h0;
+  // assign addr_rt_x[2] = 32'h0;
+  // assign mode_rt_main[2] = 1'h0;
+  // assign data_in_rt_main[2] = 128'h0;
+
+  // assign we_rt_main[3] = 1'h0;
+  // assign re_rt_main[3] = 1'h0;
+  // assign addr_rt_x[3] = 32'h0;
+  // assign mode_rt_main[3] = 1'h0;
+  // assign data_in_rt_main[3] = 128'h0;
+
 
   CP #(.NUM_THREAD(NUM_THREAD))command_processer
    (
@@ -393,7 +392,6 @@ module rta
     for (i = 0; i < NUM_RT; i++) begin: RT_CORE
       RT_core_single rt
        (
-        .rst(rst),
         .clk(clk),
         .rst_n(rst_n),
         .kernel_mode(kernel_mode_rtif_rt[i]),
