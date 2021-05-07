@@ -350,6 +350,7 @@ module rta
        (
          .clk(clk),
          .rst_n(rst_n),
+         .rst(rst),
          // PD
          .job_assign(job_dispatch_pd_rtif[i]),
          .thread_id_in(thread_id_out_pd_rtif),
