@@ -267,9 +267,9 @@ module mem_main(clk, rst_n, we, re, mode, addr, data_in,
                     if (!rst_n)
                         data_bank_1[i][j] <= 32'b0;
                     else begin
-                        data_bank_1[i][j] <= (i == thread_id_0[0]) ? data_bank_0[0][j]
-                                            : (i == thread_id_0[1]) ? data_bank_0[1][j]
-                                            : (i == thread_id_0[2]) ? data_bank_0[2][j]
+                        data_bank_1[i][j] <= (i == thread_id_0[0] && we_0[0]) ? data_bank_0[0][j]
+                                            : (i == thread_id_0[1] && we_0[1]) ? data_bank_0[1][j]
+                                            : (i == thread_id_0[2] && we_0[2]) ? data_bank_0[2][j]
                                             : data_bank_0[3][j];
                     end
                 end
