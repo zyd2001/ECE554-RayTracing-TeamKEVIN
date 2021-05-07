@@ -162,7 +162,7 @@ module mem_IC (
     end
     always_comb begin
         data_in_IC2RT = {IC2RT_WIDTH{1'b0}};
-        for(int i = 0; i < NUM_RT; ++i) begin
+        for(int i = 0; i < NUM_IC; ++i) begin
             if (core_id_ic2rt_PD[i]) begin
                 data_in_IC2RT = {shader_info_IC[i], normal_IC[i]};
             end
