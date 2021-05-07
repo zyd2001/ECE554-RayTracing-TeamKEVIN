@@ -6,12 +6,16 @@ module mem_controller
         dma_if.peripheral dma,
         input rdy_tri,
         input patch_done,
+        input term_cp,
         input [127:0] result[3:0], 
         output reg [1:0] we_mem[3:0],
         output [31:0] data_32,
         output [127:0] data_128,
+        output reg cp_strt,
         output reg re_main,
-        output [31:0] addr_main[3:0]
+        output reg wr_out_done,
+        output [31:0] addr_main[3:0],
+        output reg term
         );
 
     
@@ -19,9 +23,22 @@ module mem_controller
     parameter BIT_THREAD = $clog2(NUM_THREAD);
     parameter DMA_WRITE_SIZE = NUM_THREAD / 4;
     parameter DMA_WRITE_BIT = $clog2(DMA_WRITE_SIZE);
-    parameter DMA_PATCH_SIZE = 2;
-    parameter DMA_PATCH_BIT = $clog2(DMA_PATCH_SIZE);
 
+
+
+    logic mmio_system;
+    assign mmio_system = mmio.wr_addr[10];
+
+
+    logic term_cp_reg;
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n)
+            term_cp_reg <= 1'h0;
+        else if (term)
+            term_cp_reg <= 1'h0;
+        else if (term_cp)
+            term_cp_reg <= 1'h1;
+    end
 
 
     /*
@@ -43,8 +60,8 @@ module mem_controller
         end
         else if (dma_rd_upd_cp) begin
             dma_rd_addr_cp <= mmio.wr_data;
-            dma_rd_size_cp <= {{13'h0}, mmio.wr_addr[30:1]};
-            dma_rd_req_cp <= mmio.wr_addr[31];
+            dma_rd_size_cp <= 43'h1;
+            dma_rd_req_cp <= mmio.wr_addr[15];
         end
     end
 
@@ -61,8 +78,8 @@ module mem_controller
         end
         else if (dma_rd_upd_rt) begin
             dma_rd_addr_rt <= mmio.wr_data;
-            dma_rd_size_rt <= {{13'h0}, mmio.wr_addr[30:1]};
-            dma_rd_req_rt <= mmio.wr_addr[31];
+            dma_rd_size_rt <= {{30'h0}, mmio.wr_addr[14:2]};
+            dma_rd_req_rt <= mmio.wr_addr[15];
             
         end  
     end
@@ -80,8 +97,8 @@ module mem_controller
         end
         else if (dma_rd_upd_const) begin
             dma_rd_addr_const <= mmio.wr_data;
-            dma_rd_size_const <= {{13'h0}, mmio.wr_addr[30:1]};
-            dma_rd_req_const <= mmio.wr_addr[31];
+            dma_rd_size_const <= {{30'h0}, mmio.wr_addr[14:2]};
+            dma_rd_req_const <= mmio.wr_addr[15];
         end  
     end
 
@@ -98,8 +115,8 @@ module mem_controller
         end
         else if (dma_rd_upd_tri) begin
             dma_rd_addr_tri <= mmio.wr_data;
-            dma_rd_size_tri <= {{13'h0}, mmio.wr_addr[30:1]};
-            dma_rd_req_tri <= mmio.wr_addr[31];
+            dma_rd_size_tri <= {{30'h0}, mmio.wr_addr[14:2]};
+            dma_rd_req_tri <= mmio.wr_addr[15];
         end  
     end
 
@@ -141,13 +158,13 @@ module mem_controller
 
         case(state_mmio)
             CP_M: begin   
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[1] && mmio.wr_addr[15]) begin
                     nxt_state_mmio = RT_M;
                     dma_rd_upd_cp = 1'b1;
                 end
             end
             RT_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[1]) begin
                     nxt_state_mmio = CONST_M;
                     dma_rd_upd_rt = 1'b1;
                 end
@@ -155,7 +172,7 @@ module mem_controller
                     nxt_state_mmio = RT_M;
             end
             CONST_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[1]) begin
                     nxt_state_mmio = TRI_M;
                     dma_rd_upd_const = 1'b1;
                 end
@@ -163,7 +180,7 @@ module mem_controller
                     nxt_state_mmio = CONST_M;
             end
             TRI_M: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[1]) begin
                     nxt_state_mmio = OUT_M;
                     dma_rd_upd_tri = 1'b1;
                 end
@@ -171,7 +188,7 @@ module mem_controller
                     nxt_state_mmio = TRI_M;
             end
             default: begin
-                if (mmio.wr_en && !mmio.wr_addr[0]) begin
+                if (mmio.wr_en && !mmio.wr_addr[1]) begin
                     dma_wr_upd = 1'b1;
                     dma_rd_strt = 1'h1;
                 end
@@ -269,9 +286,10 @@ module mem_controller
     assign dma_rd_data_32_upd = dma_rd_data_32_upd_cp || dma_rd_data_32_upd_rt || dma_rd_data_32_upd_const;
     assign dma_rd_data_32_shft = dma_rd_data_32_shft_cp || dma_rd_data_32_shft_rt || dma_rd_data_32_shft_const;
 
-    mem_controller_dma_rd_32 dma_rd_cp(.clk(clk),.rst_n(rst_n),
+    mem_controller_dma_rd_32 #(.SIZE_32(1)) dma_rd_cp 
+                                        (.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_cp),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .dma_rd_end_32(dma_rd_end_cp),
                                         .dma_rd_go_32(dma_rd_go_cp),
@@ -284,7 +302,7 @@ module mem_controller
 
     mem_controller_dma_rd_32 dma_rd_rt(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_rt),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .dma_rd_end_32(dma_rd_end_rt),
                                         .dma_rd_go_32(dma_rd_go_rt),
@@ -297,7 +315,7 @@ module mem_controller
                                         
     mem_controller_dma_rd_32 dma_rd_const(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_const),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .dma_rd_end_32(dma_rd_end_const),
                                         .dma_rd_go_32(dma_rd_go_const),
@@ -307,6 +325,14 @@ module mem_controller
                                         .dma_rd_done_clr_32(dma_rd_done_clr_const),
                                         .mem_wr_en_32(we_mem[2])
                                         );
+
+    logic [31:0] dma_patch_size;
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) 
+            dma_patch_size <= 0;
+        else if (dma_rd_data_32_shft_cp)
+            dma_patch_size <= (dma_rd_data_32[0]%32) == 0 ? (dma_rd_data_32[0]/32) : (dma_rd_data_32[0]/32+1);
+    end
 
 
     // TRI
@@ -337,7 +363,7 @@ module mem_controller
 
     mem_controller_dma_rd_128 dma_rd_tri(.clk(clk),.rst_n(rst_n),
                                         .dma_rd_strt(dma_rd_strt_tri),
-                                        .dma_rd_done(dma_rd_done),
+                                        .dma_rd_done(dma.rd_done),
                                         .dma_empty(dma.empty),
                                         .mem_wr_rdy(rdy_tri),
                                         .dma_rd_end_128(dma_rd_end_tri),
@@ -348,7 +374,7 @@ module mem_controller
                                         .dma_rd_done_clr_128(dma_rd_done_clr_tri),
                                         .mem_wr_en_128(we_mem[3])
                                         );
-
+    
     //Central Control Logic
     typedef enum reg [2:0] {DMA_RD_IDLE, DMA_RD_CP, DMA_RD_RT, DMA_RD_CONST, DMA_RD_TRI} t_state_dma_rd;
     t_state_dma_rd state_dma_rd, nxt_state_dma_rd;
@@ -360,6 +386,8 @@ module mem_controller
             state_dma_rd <= nxt_state_dma_rd;
     end
 
+    logic cp_strt_reg;
+
     always_comb begin 
         nxt_state_dma_rd = DMA_RD_IDLE;
 
@@ -367,6 +395,8 @@ module mem_controller
         dma_rd_strt_rt = 1'h0;
         dma_rd_strt_const = 1'h0;
         dma_rd_strt_tri = 1'h0;
+
+        cp_strt_reg = 1'h0;
 
         case(state_dma_rd)
             DMA_RD_IDLE: begin
@@ -407,6 +437,7 @@ module mem_controller
             default: begin
                 if (dma_rd_req_tri && dma_rd_end_tri) begin
                     nxt_state_dma_rd = DMA_RD_IDLE;
+                    cp_strt_reg = 1'h1;
                 end
                 else if (dma_rd_req_tri) begin
                     nxt_state_dma_rd = DMA_RD_TRI;
@@ -414,20 +445,28 @@ module mem_controller
                 end
                 else begin
                     nxt_state_dma_rd = DMA_RD_IDLE; 
+                    cp_strt_reg = 1'h1;
                 end
             end
 	endcase
     end
 
 
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n)
+            cp_strt <= 1'h0;
+        else 
+            cp_strt <= cp_strt_reg;
+    end
+
     /*
         Write to Host
     */
 
     // Patch Counter
-    logic [DMA_PATCH_BIT:0] dma_patch_cnt;
+    logic [31:0] dma_patch_cnt;
     logic dma_patch_inc;
-    logic term;
+
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
             dma_patch_cnt <= '0;
@@ -439,14 +478,15 @@ module mem_controller
 
     //MMIO read data
     logic [63:0] mmio_rd_data;
+    logic dma_wr_done;
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n)
             mmio_rd_data <= 64'h0;
-        else if (mmio.wr_en && mmio.wr_addr[0])
+        else if (mmio.wr_en && mmio.wr_addr[1])
             mmio_rd_data <= 64'h0;
         else if (term)
             mmio_rd_data <= 64'h2;
-        else if (dma.wr_done)
+        else if (dma_wr_done)
             mmio_rd_data <= 64'h1;
     end
 
@@ -545,6 +585,7 @@ module mem_controller
         thread_MC_inc = 1'h0;  
         dma_patch_inc = 1'h0; 
         term = 1'h0;
+        dma_wr_done = 1'h0;
 
         case(state_dma_wr)
             DMA_WR_IDLE: begin
@@ -573,7 +614,7 @@ module mem_controller
                     re_main = 1'h1;
                     if (dma_write_cnt == DMA_WRITE_SIZE) begin
                         nxt_state_dma_wr = DMA_WR_DONE;
-                        dma_wr_addr_inc = 1'h1;
+                        // dma_wr_addr_inc = 1'h1;
                         dma_wr_clr = 1'h1;
                         dma_patch_inc = 1'h1;
                         thread_MC_clr = 1'h1;
@@ -586,14 +627,26 @@ module mem_controller
                     nxt_state_dma_wr = DMA_WR_HOLD;
             end
             default: begin
-                if (dma.wr_done && (dma_patch_cnt == DMA_PATCH_SIZE))
-                    term = 1'h1;
-                else if (dma.wr_done)
-                    nxt_state_dma_wr = DMA_WR_IDLE;
+                if (dma.wr_done && term_cp_reg) begin
+                // if (dma.wr_done && dma_patch_cnt == dma_patch_size) begin
+                    term = 1'h1; 
+                    dma_wr_done = 1;
+                end
+                else if (dma.wr_done) begin
+                    dma_wr_done = 1;
+                end
                 else 
                     nxt_state_dma_wr = DMA_WR_DONE;
             end
         endcase
     end
+	 
+	 always_ff @(posedge clk, negedge rst_n) begin
+		if (!rst_n)
+			wr_out_done <= 1'h0;
+		else 
+			wr_out_done <= dma_wr_done;
+	 end
+   
 
 endmodule

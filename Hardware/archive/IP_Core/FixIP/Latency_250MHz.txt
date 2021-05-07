@@ -1,0 +1,4 @@
+Add - 1 cycles
+Mul - 6 cycles
+Div - 38 cycles
+Sqrt - 15 cycles
