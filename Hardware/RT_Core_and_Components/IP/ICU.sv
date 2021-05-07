@@ -32,7 +32,8 @@ module ICU (
   logic Adder_en, Multiplier_en, Divider_en, Adder_enable, Multiplier_enable, Divider_enable;
   logic [5:0] counter, counter_in;
   logic [31:0] op1_reg, op2_reg;
-  logic [31:0] Divider_result, Divider_result_reg, Adder_b;
+  logic [31:0] Divider_result, Divider_result_reg;
+  logic [32:0] Adder_a, Adder_b;
   logic [32:0] Adder_result, Adder_result_reg;
   logic [63:0] Multiplier_result, Multiplier_result_reg;
   
@@ -40,7 +41,8 @@ module ICU (
   assign Multiplier_en = en & operation[1] & (!operation[0]);
   assign Divider_en = en & operation[1] & operation[0];
   
-  assign Adder_b = operation[0] ? (~op2_in + 1'b1) : op2_in;
+  assign Adder_a = {op1_reg[31], op1_reg};
+  assign Adder_b = operation[0] ? (~{op2_reg[31], op2_reg} + 1'b1) : {op2_reg[31], op2_reg};
   
   typedef enum reg [1:0] {ADDSUB, MUL, DIV, IDLE} state_t;
   state_t state, nxt_state;
