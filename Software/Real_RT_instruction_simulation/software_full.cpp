@@ -1,7 +1,7 @@
 #include "software.hpp"
 
-const int width = 32;
-const int height = 24;
+const int width = 1280;
+const int height = 760;
 const float epsilon = 0.001;
 // Assume Horizontal Fov is 90 degree, so tan(90/2) = 1
 const float fov = 1;
@@ -200,7 +200,7 @@ vector run(int id, bool stackBase)
 
 int main()
 {
-    std::ifstream ifs("box.obj.out"); // model 8, triangle 12, cylinder 320
+    std::ifstream ifs("box.obj.converted"); // model 8, triangle 12, cylinder 320
     std::ofstream ofs("./out.ppm", std::ios::out);
     ofs << "P3\n" << width << " " << height << "\n255\n";
     float t1, t2, t3;

@@ -155,7 +155,7 @@ vector run(int id, bool stackBase)
 
 int main()
 {
-    std::ifstream ifs("box.obj.out"); // model 8, triangle 12, cylinder 320
+    std::ifstream ifs("box.obj.converted"); // model 8, triangle 12, cylinder 320
     std::ofstream ofs("./out.ppm", std::ios::out);
     ofs << "P3\n" << width << " " << height << "\n255\n";
     float t1, t2, t3;
