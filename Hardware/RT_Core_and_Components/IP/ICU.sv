@@ -69,7 +69,7 @@ module ICU (
       DIV: 
         begin
           if (counter == DIV_LATENCY) begin
-            out = {{32{Adder_result[31]}}, Divider_result};
+            out = {{32{Divider_result[31]}}, Divider_result};
             done = 1'b1;
           end
           else begin
