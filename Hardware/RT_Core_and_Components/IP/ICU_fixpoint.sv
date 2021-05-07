@@ -138,9 +138,9 @@ module ICU (
     endcase
   end
   
-  assign Adder_result = Adder_en ? (op1_reg + Adder_b) : Adder_result_reg;
-  assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg);
-  assign Divider_result = op1_reg / op2_reg;
+  // assign Adder_result = Adder_en ? (op1_reg + Adder_b) : Adder_result_reg;
+  // assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg);
+  // assign Divider_result = op1_reg / op2_reg;
   
   Fix_Add Adder (
 		.clk    (clk),                  //   input,   width = 1,    clk.clk
@@ -174,7 +174,7 @@ module ICU (
       flag[1] = 0;
     else 
       flag[1] = 1;
-    flag[0] = out[31];      
+    flag[0] = out[63];      
   end
   
 endmodule
