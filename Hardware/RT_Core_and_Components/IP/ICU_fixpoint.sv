@@ -174,7 +174,7 @@ module ICU (
       flag[1] = 0;
     else 
       flag[1] = 1;
-    flag[0] = out[31];      
+    flag[0] = out[63];      
   end
   
 endmodule

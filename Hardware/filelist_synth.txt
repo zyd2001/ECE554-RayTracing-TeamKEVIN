@@ -40,7 +40,7 @@ rta.sv
 ./RT_Core_and_Components/IP/FPU.sv
 ./RT_Core_and_Components/IP/FtoI.ip
 ./RT_Core_and_Components/IP/Ftoi.sv
-./RT_Core_and_Components/IP/ICU.sv
+./RT_Core_and_Components/IP/ICU_fixpoint.sv
 ./RT_Core_and_Components/IP/ItoF.ip
 ./RT_Core_and_Components/IP/Itof.sv
 ./RT_Core_and_Components/IP/Sqrt.sv
