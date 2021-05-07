@@ -33,6 +33,7 @@ module FPU (
 
   logic Adder_en, Multiplier_en, Divider_en, Adder_enable, Multiplier_enable, Divider_enable;
   logic [4:0] counter, counter_in;
+  logic [31:0] op1_reg, op2_reg;
   logic [31:0] Adder_result, Multiplier_result, Divider_result;
   
   assign Adder_en = en & (!operation[1]);
@@ -41,6 +42,17 @@ module FPU (
   
   typedef enum reg [1:0] {ADDSUB, MUL, DIV, IDLE} state_t;
   state_t state, nxt_state;
+  
+  always_ff@(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      op1_reg <= '0;
+      op2_reg <= '0;
+    end
+    else if (en) begin
+      op1_reg <= op1_in;
+      op2_reg <= op2_in;
+    end
+  end
   
   always_ff@(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -120,8 +132,8 @@ module FPU (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Adder_enable),       //   input,   width = 1,     en.en
-		.a      (op1_in),             //   input,  width = 32,      a.a
-		.b      (op2_in),             //   input,  width = 32,      b.b
+		.a      (op1_reg),             //   input,  width = 32,      a.a
+		.b      (op2_reg),             //   input,  width = 32,      b.b
 		.q      (Adder_result),       //  output,  width = 32,      q.q
 		.opSel  (!operation[0])       //   input,   width = 1,  opSel.opSel
 	);
@@ -130,8 +142,8 @@ module FPU (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Multiplier_enable),  //   input,   width = 1,     en.en
-		.a      (op1_in),             //   input,  width = 32,      a.a
-		.b      (op2_in),             //   input,  width = 32,      b.b
+		.a      (op1_reg),             //   input,  width = 32,      a.a
+		.b      (op2_reg),             //   input,  width = 32,      b.b
 		.q      (Multiplier_result)   //  output,  width = 32,      q.q
 	);
 
@@ -139,8 +151,8 @@ module FPU (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
 		.en     (Divider_enable),     //   input,   width = 1,     en.en
-		.a      (op1_in),             //   input,  width = 32,      a.a
-		.b      (op2_in),             //   input,  width = 32,      b.b
+		.a      (op1_reg),             //   input,  width = 32,      a.a
+		.b      (op2_reg),             //   input,  width = 32,      b.b
 		.q      (Divider_result)      //  output,  width = 32,      q.q
 	);
 
