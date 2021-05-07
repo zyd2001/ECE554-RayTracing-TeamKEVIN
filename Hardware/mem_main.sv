@@ -1,4 +1,4 @@
-module mem_main(clk, rst_n, we, re, addr, data_in,
+module mem_main(clk, rst_n, we, re, mode, addr, data_in,
                 data_out, rd_rdy);
 
     parameter NUM_RT = 4;
@@ -14,6 +14,7 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
     //RT
     input we[NUM_RT-1:0];
     input re[NUM_RT-1:0];
+    input mode[NUM_RT-1:0];
     input [31:0] addr[NUM_RT-1:0];
     input [127:0] data_in[NUM_RT-1:0];
 
@@ -52,36 +53,6 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
         end
     endgenerate
 
-    //Write Enable (we) per bank pipeline
-    //Pipeline 0
-    logic we_bank_0[NUM_THREAD-1:0];
-    generate
-        for (i = 0; i < NUM_THREAD; i = i + 1) begin
-            always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
-                    we_bank_0[i] <= 1'b0;
-                else begin
-                    we_bank_0[i] <= ((addr[0][BIT_THREAD+15:16] == i) && we[0])
-                                 || ((addr[1][BIT_THREAD+15:16] == i) && we[1])
-                                 || ((addr[2][BIT_THREAD+15:16] == i) && we[2])
-                                 || ((addr[3][BIT_THREAD+15:16] == i) && we[3]);
-                end
-            end
-        end
-    endgenerate
-    //Pipeline 1
-    logic we_bank_1[NUM_THREAD-1:0];
-    generate
-        for (i = 0; i < NUM_THREAD; i = i + 1) begin
-            always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
-                    we_bank_1[i] <= 1'b0;
-                else
-                    we_bank_1[i] <= we_bank_0[i];
-            end
-        end
-    endgenerate
-
     //RAM Addr Calculate for each bank
     //Pipeline 0
     logic [5:0] thread_id_pre[NUM_RT-1:0];
@@ -99,6 +70,41 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
             for (j = 0; j < 4; j = j + 1) begin
                 assign bank_id_pre[i][j] = addr_RT_pre[i][j][1:0];
                 assign addr_pre[i][j] = addr_RT_pre[i][j][13:2];
+            end
+        end
+    endgenerate
+
+    
+
+    //Write Enable (we) per bank pipeline
+    //Pipeline 0
+    logic we_bank_0[NUM_THREAD-1:0][NUM_BANK_PTHREAD-1:0];
+    generate
+        for (i = 0; i < NUM_THREAD; i = i + 1) begin
+            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
+                always_ff @(posedge clk, negedge rst_n) begin
+                    if (!rst_n) 
+                        we_bank_0[i][j] <= 1'b0;
+                    else 
+                        we_bank_0[i][j] <= (i == thread_id_pre[0] && we[0] && (mode[0] || j == bank_id_pre[0][0]))
+                                        || (i == thread_id_pre[1] && we[1] && (mode[1] || j == bank_id_pre[1][0]))
+                                        || (i == thread_id_pre[2] && we[2] && (mode[2] || j == bank_id_pre[2][0]))
+                                        || (i == thread_id_pre[3] && we[3] && (mode[3] || j == bank_id_pre[3][0]));
+                end
+            end
+        end
+    endgenerate
+    //Pipeline 1
+    logic we_bank_1[NUM_THREAD-1:0][NUM_BANK_PTHREAD-1:0];
+    generate
+        for (i = 0; i < NUM_THREAD; i = i + 1) begin
+            for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
+                always_ff @(posedge clk, negedge rst_n) begin
+                    if (!rst_n)
+                        we_bank_1[i][j] <= 1'b0;
+                    else
+                        we_bank_1[i][j] <= we_bank_0[i][j];
+                end
             end
         end
     endgenerate
@@ -187,7 +193,7 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
         end
     endgenerate
     //Pipeline 1
-    logic [11:0] addr_bank_1[NUM_THREAD-1:0][3:0];
+    logic [11:0] addr_bank_1[NUM_THREAD-1:0][NUM_BANK_PTHREAD-1:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
@@ -240,7 +246,7 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
     endgenerate
 
     //Pipeline 1
-    logic [31:0] data_bank_1[NUM_THREAD-1:0][3:0];
+    logic [31:0] data_bank_1[NUM_THREAD-1:0][NUM_BANK_PTHREAD-1:0];
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin
@@ -264,7 +270,7 @@ module mem_main(clk, rst_n, we, re, addr, data_in,
     generate
         for (i = 0; i < NUM_THREAD; i = i + 1) begin: main_memory_thread
             for (j = 0; j < NUM_BANK_PTHREAD; j = j + 1) begin: main_memory_bank
-                single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank_1[i]),
+                single_port_ram #(.ADDR_WIDTH(12), .DATA_WIDTH(32)) bank(.clk(clk), .we(we_bank_1[i][j]),
                 .data(data_bank_1[i][j]),.addr(addr_bank_1[i][j]), .q(q_bank_2[i][j]));
             end
         end
