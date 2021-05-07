@@ -181,7 +181,7 @@ module rta
   // IC
   logic [95:0] ray_origin_icm_ic;
   logic [95:0] ray_direction_icm_ic;
-  // RT​_IF
+  // RT_IF
   logic [127:0] shader_info_icm_rtif; //(sid, v2, v1, v0)
   logic [95:0] normal_icm_rtif;
 
