@@ -222,8 +222,8 @@ module patch_dispatcher
         RT to IC
     */
 
-    en_q_sel_rt2ic_reg[NUM_RT-1:0];
-    en_q_tid_rt2ic_reg[NUM_RT-1:0];
+    logic en_q_sel_rt2ic_reg[NUM_RT-1:0];
+    logic en_q_tid_rt2ic_reg[NUM_RT-1:0];
 
     patch_dispatcher_fifo thread_id_rt2ic
         (
