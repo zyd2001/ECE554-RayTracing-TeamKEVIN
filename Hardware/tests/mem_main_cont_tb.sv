@@ -26,7 +26,7 @@ module mem_main_cont_tb();
     always #1 clk = ~clk;
 
 
-    mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, addr_RT, data_RT_in,
+    mem_main #(NUM_RT, NUM_THREAD, NUM_BANK_PTHREAD) main(clk, rst_n, we_RT, re_RT, '{1'b1,1'b1,1'b1,1'b1}, addr_RT, data_RT_in,
                   data_RT_out, rd_rdy_RT);
     
     int error = 0;
