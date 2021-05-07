@@ -72,7 +72,6 @@ module Calculation_v3(
   Float_Inv inverse (
 		.clk    (clk),      //   input,   width = 1,    clk.clk
 		.areset (rst),      //   input,   width = 1, areset.reset
-    .en     (1'b1),
 		.a      (det),      //   input,  width = 32,      a.a
 		.q      (invDet)    //  output,  width = 32,      q.q
 	);
