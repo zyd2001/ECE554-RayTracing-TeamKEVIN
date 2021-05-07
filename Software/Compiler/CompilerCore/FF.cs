@@ -321,7 +321,10 @@ namespace CompilerCore
                         vv.IntersectWith(v);
                     }
                     if (nextIns.OPCode == "Trace")
+                    {
                         List.AddAfter(node, new Assembly("s_push", new List<string> { "RS28" }));
+                        List.AddAfter(node, new Assembly("s_push", new List<string> { "RS30" }));
+                    }
                     foreach (var item in ss)
                         List.AddAfter(node, new Assembly("s_push", new List<string> { $"RS{item}" }));
                     foreach (var item in vv)
@@ -348,7 +351,10 @@ namespace CompilerCore
                     foreach (var item in ss.Reverse())
                         List.AddAfter(node, new Assembly("s_pop", new List<string> { $"RS{item}" }));
                     if (previousIns.OPCode == "Trace")
+                    {
+                        List.AddAfter(node, new Assembly("s_pop", new List<string> { "RS30" }));
                         List.AddAfter(node, new Assembly("s_pop", new List<string> { "RS28" }));
+                    }
                 }
             }
         }
