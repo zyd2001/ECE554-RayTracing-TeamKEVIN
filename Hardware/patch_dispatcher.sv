@@ -65,6 +65,9 @@ module patch_dispatcher
     logic [31:0] pc_sel_rt2ic;
     logic [31:0] sp_sel_rt2ic;
 
+    logic en_q_sel_rt2ic_reg[NUM_RT-1:0];
+    logic en_q_tid_rt2ic_reg[NUM_RT-1:0];
+
     //IC to RT
     logic empty_tid_ic2rt;
     logic en_q_tid_ic2rt;
@@ -77,6 +80,8 @@ module patch_dispatcher
     logic [BIT_THREAD-1:0] data_sel_tid_ic2rt;
 
     logic job_dispatch_rt_wire[NUM_RT-1:0];
+
+    
 
 
     /*
@@ -222,8 +227,6 @@ module patch_dispatcher
         RT to IC
     */
 
-    logic en_q_sel_rt2ic_reg[NUM_RT-1:0];
-    logic en_q_tid_rt2ic_reg[NUM_RT-1:0];
 
     patch_dispatcher_fifo thread_id_rt2ic
         (
