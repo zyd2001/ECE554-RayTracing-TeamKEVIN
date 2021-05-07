@@ -66,7 +66,7 @@ module patch_dispatcher
     logic [31:0] sp_sel_rt2ic;
 
     logic en_q_sel_rt2ic_reg[NUM_RT-1:0];
-    logic en_q_tid_rt2ic_reg[NUM_RT-1:0];
+    logic en_q_tid_rt2ic_reg;
 
     //IC to RT
     logic empty_tid_ic2rt;
