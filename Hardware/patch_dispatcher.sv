@@ -281,9 +281,9 @@ module patch_dispatcher
         pc_sel_rt2ic = {32'h0};
         sp_sel_rt2ic = {32'h0};
         for (int a = 0; a < NUM_RT; a++) begin
-            data_in_tid_rt2ic |= {BIT_THREAD{en_q_tid_rt2ic_reg[a]}} & thread_id_in_rt[a];
-            pc_sel_rt2ic |= {32{en_q_tid_rt2ic_reg[a]}} & pc_in_rt[a];
-            sp_sel_rt2ic |= {32{en_q_tid_rt2ic_reg[a]}} & stack_ptr_in_rt[a];
+            data_in_tid_rt2ic |= {BIT_THREAD{en_q_sel_rt2ic_reg[a]}} & thread_id_in_rt[a];
+            pc_sel_rt2ic |= {32{en_q_sel_rt2ic_reg[a]}} & pc_in_rt[a];
+            sp_sel_rt2ic |= {32{en_q_sel_rt2ic_reg[a]}} & stack_ptr_in_rt[a];
         end
     end
 
