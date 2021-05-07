@@ -179,7 +179,6 @@ module IC_v3(
   Float_Less btr (
 		.clk    (clk),        //   input,   width = 1,    clk.clk
 		.areset (rst),        //   input,   width = 1, areset.reset
-    .en     (1'b1),
 		.a      (t_in),       //   input,  width = 32,      a.a
 		.b      (t_better),   //   input,  width = 32,      b.b
 		.q      (better)      //  output,   width = 1,      q.q
