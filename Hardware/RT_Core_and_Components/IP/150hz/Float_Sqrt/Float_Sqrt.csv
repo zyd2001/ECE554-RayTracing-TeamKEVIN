@@ -1,0 +1,23 @@
+# system info Float_Sqrt on 2021.05.07.03:53:00
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Float_Sqrt on 2021.05.07.03:53:00
+files:
+filepath,kind,attributes,module,is_top
+sim/Float_Sqrt.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Float_Sqrt,true
+altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_5lz3pka_memoryC2_uid68_sqrtTables_lutmem.hex,HEX,,Float_Sqrt_altera_fp_functions_191_5lz3pka,false
+altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_5lz3pka_memoryC1_uid65_sqrtTables_lutmem.hex,HEX,,Float_Sqrt_altera_fp_functions_191_5lz3pka,false
+altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_5lz3pka_memoryC0_uid62_sqrtTables_lutmem.hex,HEX,,Float_Sqrt_altera_fp_functions_191_5lz3pka,false
+altera_fp_functions_191/sim/dspba_library_package.vhd,VHDL,,Float_Sqrt_altera_fp_functions_191_5lz3pka,false
+altera_fp_functions_191/sim/dspba_library.vhd,VHDL,,Float_Sqrt_altera_fp_functions_191_5lz3pka,false
+altera_fp_functions_191/sim/Float_Sqrt_altera_fp_functions_191_5lz3pka.vhd,VHDL,,Float_Sqrt_altera_fp_functions_191_5lz3pka,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Float_Sqrt.fp_functions_0,Float_Sqrt_altera_fp_functions_191_5lz3pka

@@ -1,0 +1,23 @@
+# system info Float_Inv on 2021.05.07.03:42:23
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Float_Inv on 2021.05.07.03:42:23
+files:
+filepath,kind,attributes,module,is_top
+sim/Float_Inv.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Float_Inv,true
+altera_fp_functions_191/sim/Float_Inv_altera_fp_functions_191_evggsgy_memoryC0_uid60_inverseTables_lutmem.hex,HEX,,Float_Inv_altera_fp_functions_191_evggsgy,false
+altera_fp_functions_191/sim/Float_Inv_altera_fp_functions_191_evggsgy_memoryC1_uid63_inverseTables_lutmem.hex,HEX,,Float_Inv_altera_fp_functions_191_evggsgy,false
+altera_fp_functions_191/sim/Float_Inv_altera_fp_functions_191_evggsgy_memoryC2_uid66_inverseTables_lutmem.hex,HEX,,Float_Inv_altera_fp_functions_191_evggsgy,false
+altera_fp_functions_191/sim/dspba_library_package.vhd,VHDL,,Float_Inv_altera_fp_functions_191_evggsgy,false
+altera_fp_functions_191/sim/dspba_library.vhd,VHDL,,Float_Inv_altera_fp_functions_191_evggsgy,false
+altera_fp_functions_191/sim/Float_Inv_altera_fp_functions_191_evggsgy.vhd,VHDL,,Float_Inv_altera_fp_functions_191_evggsgy,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Float_Inv.fp_functions_0,Float_Inv_altera_fp_functions_191_evggsgy
