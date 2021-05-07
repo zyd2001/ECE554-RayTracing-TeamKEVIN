@@ -445,6 +445,7 @@ module mem_controller
                 end
                 else begin
                     nxt_state_dma_rd = DMA_RD_IDLE; 
+                    cp_strt_reg = 1'h1;
                 end
             end
 	endcase
