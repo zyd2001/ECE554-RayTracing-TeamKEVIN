@@ -12,7 +12,7 @@
 // 11: negative
 //
 // Author: Kevin Ding
-// Last modify: 5/5
+// Last modify: 5/7
 ///////////////////////////////
 
 
@@ -20,9 +20,7 @@ module ICU (
     op1_in, op2_in, out, operation, flag, clk, en, done, rst_n, rst
 );
 
-  parameter ADD_LATENCY = 0,
-            MUL_LATENCY = 5,
-            DIV_LATENCY = 37;
+  parameter LATENCY = 0;
 
   input clk, en, rst_n, rst;
   input [31:0] op1_in, op2_in;
@@ -33,9 +31,10 @@ module ICU (
 
   logic Adder_en, Multiplier_en, Divider_en, Adder_enable, Multiplier_enable, Divider_enable;
   logic [5:0] counter, counter_in;
-  logic [31:0] Divider_result, Adder_b;
-  logic [32:0] Adder_result;
-  logic [63:0] Multiplier_result;
+  logic [31:0] op1_reg, op2_reg;
+  logic [31:0] Divider_result, Divider_result_reg, Adder_b;
+  logic [32:0] Adder_result, Adder_result_reg;
+  logic [63:0] Multiplier_result, Multiplier_result_reg;
   
   assign Adder_en = en & (!operation[1]);
   assign Multiplier_en = en & operation[1] & (!operation[0]);
@@ -48,12 +47,29 @@ module ICU (
   
   always_ff@(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
+      op1_reg <= '0;
+      op2_reg <= '0;
+    end
+    else if (en) begin
+      op1_reg <= op1_in;
+      op2_reg <= op2_in;
+    end
+  end
+  
+  always_ff@(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
       counter <= '0;
       state <= IDLE;
+      Divider_result_reg <= '0;
+      Adder_result_reg <= '0;
+      Multiplier_result_reg <= '0;
     end
     else begin
       counter <= counter_in;
       state <= nxt_state;
+      Divider_result_reg <= Divider_result;
+      Adder_result_reg <= Adder_result;
+      Multiplier_result_reg <= Multiplier_result;
     end
   end
   
@@ -68,8 +84,8 @@ module ICU (
     case(state)
       DIV: 
         begin
-          if (counter == DIV_LATENCY) begin
-            out = {{32{Adder_result[31]}}, Divider_result};
+          if (counter == LATENCY) begin
+            out = {{32{Divider_result[31]}}, Divider_result};
             done = 1'b1;
           end
           else begin
@@ -80,7 +96,7 @@ module ICU (
         end
       MUL: 
         begin
-          if (counter == MUL_LATENCY) begin
+          if (counter == LATENCY) begin
             out = Multiplier_result;
             done = 1'b1;
           end
@@ -92,7 +108,7 @@ module ICU (
         end
       ADDSUB: 
         begin
-          if (counter == ADD_LATENCY) begin
+          if (counter == LATENCY) begin
             out = {{31{Adder_result[32]}}, Adder_result};
             done = 1'b1;
           end
@@ -120,39 +136,16 @@ module ICU (
     endcase
   end
   
-  Fix_Add Adder (
-		.clk    (clk),                  //   input,   width = 1,    clk.clk
-		.rst    (rst),               //   input,   width = 1,    rst.reset
-		.en     (Adder_enable),         //   input,   width = 1,     en.en
-		.a0     (op1_in),               //   input,  width = 32,     a0.a0
-		.a1     (Adder_b),              //   input,  width = 32,     a1.a1
-		.result (Adder_result)          //  output,  width = 33, result.result
-	);
-
-	Fix_Mul Multiplier (
-		.clk    (clk),                  //   input,   width = 1,    clk.clk
-		.rst    (rst),               //   input,   width = 1,    rst.reset
-		.en     (Multiplier_enable),    //   input,   width = 1,     en.en
-		.a      (op1_in),               //   input,  width = 32,      a.a
-		.b      (op2_in),               //   input,  width = 32,      b.b
-		.result (Multiplier_result)     //  output,  width = 64, result.result
-	);
-
-	Fix_Div Divider (
-		.clk         (clk),             //   input,   width = 1,         clk.clk
-		.rst         (rst),          //   input,   width = 1,         rst.reset
-		.en          (Divider_enable),  //   input,   width = 1,          en.en
-		.numerator   (op1_in),          //   input,  width = 32,   numerator.numerator
-		.denominator (op2_in),          //   input,  width = 32, denominator.denominator
-		.result      (Divider_result)   //  output,  width = 32,      result.result
-	);
-
+  assign Adder_result = Adder_en ? (op1_reg + Adder_b) : Adder_result_reg;
+  assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg); Multiplier_result_reg;
+  assign Divider_result = Divider_en ? (op1_reg / op2_reg) : Divider_result_reg;
+  
   always_comb begin 
     if (out == 0)
       flag[1] = 0;
     else 
       flag[1] = 1;
-    flag[0] = out[31];      
+    flag[0] = out[63];      
   end
   
 endmodule
