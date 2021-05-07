@@ -33,9 +33,10 @@ module ICU (
 
   logic Adder_en, Multiplier_en, Divider_en, Adder_enable, Multiplier_enable, Divider_enable;
   logic [5:0] counter, counter_in;
-  logic [31:0] Divider_result, Adder_b;
-  logic [32:0] Adder_result;
-  logic [63:0] Multiplier_result;
+  logic [31:0] op1_reg, op2_reg;
+  logic [31:0] Divider_result, Divider_result_reg, Adder_b;
+  logic [32:0] Adder_result, Adder_result_reg;
+  logic [63:0] Multiplier_result, Multiplier_result_reg;
   
   assign Adder_en = en & (!operation[1]);
   assign Multiplier_en = en & operation[1] & (!operation[0]);
@@ -48,12 +49,29 @@ module ICU (
   
   always_ff@(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
+      op1_reg <= '0;
+      op2_reg <= '0;
+    end
+    else if (en) begin
+      op1_reg <= op1_in;
+      op2_reg <= op2_in;
+    end
+  end
+  
+  always_ff@(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
       counter <= '0;
       state <= IDLE;
+      Divider_result_reg <= '0;
+      Adder_result_reg <= '0;
+      Multiplier_result_reg <= '0;
     end
     else begin
       counter <= counter_in;
       state <= nxt_state;
+      Divider_result_reg <= Divider_result;
+      Adder_result_reg <= Adder_result;
+      Multiplier_result_reg <= Multiplier_result;
     end
   end
   
@@ -119,6 +137,10 @@ module ICU (
         end
     endcase
   end
+  
+  assign Adder_result = Adder_en ? (op1_reg + Adder_b) : Adder_result_reg;
+  assign Multiplier_result = Multiplier_en ? (op1_reg * op2_reg);
+  assign Divider_result = op1_reg / op2_reg;
   
   Fix_Add Adder (
 		.clk    (clk),                  //   input,   width = 1,    clk.clk
