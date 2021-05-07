@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2021.05.07.04:22:13"
+ outputDirectory="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="Stratix 10"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="1SX280HN2F43E2VG"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="2"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="clk" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clk" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="areset" kind="reset" start="0">
+   <property name="associatedClock" value="clk" />
+   <property name="synchronousEdges" value="DEASSERT" />
+   <port name="areset" direction="input" role="reset" width="1" />
+  </interface>
+  <interface name="en" kind="conduit" start="0">
+   <property name="associatedClock" value="clk" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="en" direction="input" role="en" width="1" />
+  </interface>
+  <interface name="a" kind="conduit" start="0">
+   <property name="associatedClock" value="clk" />
+   <property name="associatedReset" value="areset" />
+   <property name="prSafe" value="false" />
+   <port name="a" direction="input" role="a" width="32" />
+  </interface>
+  <interface name="b" kind="conduit" start="0">
+   <property name="associatedClock" value="clk" />
+   <property name="associatedReset" value="areset" />
+   <property name="prSafe" value="false" />
+   <port name="b" direction="input" role="b" width="32" />
+  </interface>
+  <interface name="q" kind="conduit" start="0">
+   <property name="associatedClock" value="clk" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="q" direction="output" role="q" width="1" />
+  </interface>
+ </perimeter>
+ <entity kind="Float_Less" version="1.0" name="Float_Less">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_GENERATION_ID" value="0" />
+  <parameter name="AUTO_DEVICE" value="1SX280HN2F43E2VG" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Stratix 10" />
+  <parameter name="AUTO_CLK_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="2" />
+  <generatedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/synth/Float_Less.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/synth/Float_Less.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less.ip" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source/altera_fp_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Info" culprit="Float_Less">"Generating: Float_Less"</message>
+   <message level="Info" culprit="Float_Less">"Generating: Float_Less_altera_fp_functions_191_5zbvj3y"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 150 -name Float_Less_altera_fp_functions_191_5zbvj3y -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FPCompare 8 23 -2</message>
+   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 1 cycle</message>
+   <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 0</message>
+   <message level="Info" culprit="fp_functions_0">LUTs Used: 153</message>
+   <message level="Info" culprit="fp_functions_0">Memory Bits Used: 0</message>
+   <message level="Info" culprit="fp_functions_0">Memory Blocks Used: 0</message>
+  </messages>
+ </entity>
+ <entity
+   kind="altera_fp_functions"
+   version="19.1"
+   name="Float_Less_altera_fp_functions_191_5zbvj3y">
+  <parameter name="fp_man" value="23" />
+  <parameter name="gen_enable" value="true" />
+  <parameter name="fp_exp_derived" value="8" />
+  <parameter name="use_rounding_mode" value="false" />
+  <parameter name="fp_in_exp" value="8" />
+  <parameter name="validation_failed" value="false" />
+  <parameter name="fxpt_width" value="32" />
+  <parameter name="manual_dsp_planning" value="true" />
+  <parameter name="force_elaborate" value="0" />
+  <parameter name="EXP_LOG_function" value="EXPE" />
+  <parameter name="fp_format" value="single" />
+  <parameter name="fp_out_man_derived" value="8" />
+  <parameter name="latency_target" value="2" />
+  <parameter name="frequency_target" value="150" />
+  <parameter name="number_of_inputs" value="2" />
+  <parameter name="fp_in_format" value="single" />
+  <parameter name="select_signal_enable" value="false" />
+  <parameter name="derivedfunction" value="LT" />
+  <parameter name="scale_by_pi" value="false" />
+  <parameter name="TRIG_function" value="SIN" />
+  <parameter name="performance_goal" value="frequency" />
+  <parameter name="frequency_feedback" value="0" />
+  <parameter name="fp_out_man" value="23" />
+  <parameter
+     name="rounding_mode_derived"
+     value="nearest with tie breaking away from zero" />
+  <parameter name="fp_in_man_derived" value="8" />
+  <parameter name="faithful_rounding" value="false" />
+  <parameter name="rounding_mode" value="nearest with tie breaking away from zero" />
+  <parameter name="fp_man_derived" value="23" />
+  <parameter name="fp_in_man" value="23" />
+  <parameter name="selected_device_family" value="Stratix 10" />
+  <parameter name="fp_exp" value="8" />
+  <parameter name="fp_out_exp_derived" value="8" />
+  <parameter name="ALL_function" value="ADD" />
+  <parameter name="trig_no_range_reduction" value="false" />
+  <parameter name="divide_type" value="0" />
+  <parameter name="forceRegisters" value="1111" />
+  <parameter name="enable_hard_fp" value="true" />
+  <parameter name="ARITH_function" value="ADD" />
+  <parameter name="fp_out_format" value="single" />
+  <parameter name="fxpt_fraction" value="0" />
+  <parameter name="fxpt_sign" value="1" />
+  <parameter name="selected_device_speedgrade" value="2" />
+  <parameter name="CONVERT_function" value="FXP_FP" />
+  <parameter name="report_resources_to_xml" value="false" />
+  <parameter name="latency_feedback" value="1" />
+  <parameter name="fp_in_exp_derived" value="8" />
+  <parameter name="COMPARE_function" value="LT" />
+  <parameter name="FUNCTION_FAMILY" value="COMPARE" />
+  <parameter name="fp_out_exp" value="8" />
+  <parameter name="ROOTS_function" value="SQRT" />
+  <parameter name="exponent_width" value="23" />
+  <generatedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/altera_fp_functions_191/synth/dspba_library_package.vhd"
+       attributes="" />
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/altera_fp_functions_191/synth/dspba_library.vhd"
+       attributes="" />
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/altera_fp_functions_191/synth/Float_Less_altera_fp_functions_191_5zbvj3y.vhd"
+       attributes="" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/altera_fp_functions_191/synth/dspba_library_package.vhd"
+       attributes="" />
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/altera_fp_functions_191/synth/dspba_library.vhd"
+       attributes="" />
+   <file
+       path="/home/u59671/project/ECE554-RayTracing-TeamKEVIN/Hardware/RT_Core_and_Components/IP/150hz/Float_Less/altera_fp_functions_191/synth/Float_Less_altera_fp_functions_191_5zbvj3y.vhd"
+       attributes="" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source/altera_fp_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="Float_Less" as="fp_functions_0" />
+  <messages>
+   <message level="Info" culprit="Float_Less">"Generating: Float_Less_altera_fp_functions_191_5zbvj3y"</message>
+   <message level="Info" culprit="fp_functions_0">/glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/ip/altera/dsp/altera_fp_functions/source//cmdPolyEval.sh /glob/development-tools/versions/fpgasupportstack/d5005/2.0.1/inteldevstack/quartus/dspba/backend/linux64 -target Stratix10 -frequency 150 -name Float_Less_altera_fp_functions_191_5zbvj3y -noChanValid -enable -enableHardFP 1 -printMachineReadable -lang VHDL -speedgrade 2 FPCompare 8 23 -2</message>
+   <message level="Info" culprit="fp_functions_0">Latency on Stratix 10 is 1 cycle</message>
+   <message level="Info" culprit="fp_functions_0">DSP Blocks Used: 0</message>
+   <message level="Info" culprit="fp_functions_0">LUTs Used: 153</message>
+   <message level="Info" culprit="fp_functions_0">Memory Bits Used: 0</message>
+   <message level="Info" culprit="fp_functions_0">Memory Blocks Used: 0</message>
+  </messages>
+ </entity>
+</deploy>
