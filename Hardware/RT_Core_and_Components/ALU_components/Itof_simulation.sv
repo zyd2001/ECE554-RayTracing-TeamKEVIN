@@ -1,7 +1,7 @@
 module itf (
-    in_in, out, clk, en, done, rst_n
+    in_in, out, clk, en, done, rst_n, rst
 );
-    input clk, en, rst_n;
+    input clk, en, rst_n, rst;
     input signed [31:0] in_in;
     output logic [31:0] out; 
     output logic done;

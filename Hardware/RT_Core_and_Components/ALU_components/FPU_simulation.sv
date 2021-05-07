@@ -20,9 +20,9 @@
 
 
 module FPU (
-    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n
+    op1_in, op2_in, out, operation, flag, clk, en, done, rst_n, rst
 );
-    input clk, en, rst_n;
+    input clk, en, rst_n, rst;
     input [31:0] op1_in, op2_in;
     input [1:0] operation;
     output logic [31:0] out;

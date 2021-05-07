@@ -1,8 +1,8 @@
-module fti (in_in, out, clk, en, done, rst_n);
+module fti (in_in, out, clk, en, done, rst_n, rst);
 
   parameter LATENCY = 2;
 
-  input clk, en, rst_n;
+  input clk, en, rst_n, rst;
   input [31:0] in_in;
   output logic signed [31:0] out; 
   output logic done;
@@ -50,7 +50,7 @@ module fti (in_in, out, clk, en, done, rst_n);
   
   FtoI F2I (
 		.clk    (clk),       //   input,   width = 1,    clk.clk
-		.areset (!rst_n),    //   input,   width = 1, areset.reset
+		.areset (rst),    //   input,   width = 1, areset.reset
 		.en     (enable),    //   input,   width = 1,     en.en
 		.a      (in_in),     //   input,  width = 32,      a.a
 		.q      (out)        //  output,  width = 32,      q.q
