@@ -1,0 +1,23 @@
+# system info Float_Div on 2021.05.07.04:00:37
+system_info:
+name,value
+DEVICE,1SX280HN2F43E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for Float_Div on 2021.05.07.04:00:37
+files:
+filepath,kind,attributes,module,is_top
+sim/Float_Div.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,Float_Div,true
+altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda_memoryC1_uid115_invTables_lutmem.hex,HEX,,Float_Div_altera_fp_functions_191_psv3jda,false
+altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda_memoryC0_uid112_invTables_lutmem.hex,HEX,,Float_Div_altera_fp_functions_191_psv3jda,false
+altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda_memoryC2_uid118_invTables_lutmem.hex,HEX,,Float_Div_altera_fp_functions_191_psv3jda,false
+altera_fp_functions_191/sim/dspba_library_package.vhd,VHDL,,Float_Div_altera_fp_functions_191_psv3jda,false
+altera_fp_functions_191/sim/dspba_library.vhd,VHDL,,Float_Div_altera_fp_functions_191_psv3jda,false
+altera_fp_functions_191/sim/Float_Div_altera_fp_functions_191_psv3jda.vhd,VHDL,,Float_Div_altera_fp_functions_191_psv3jda,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+Float_Div.fp_functions_0,Float_Div_altera_fp_functions_191_psv3jda
