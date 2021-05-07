@@ -43,7 +43,6 @@ module ContactDetect_v2(
 	Float_Less Less3 (
 		.clk    (clk),            //   input,   width = 1,    clk.clk
 		.areset (rst),            //   input,   width = 1, areset.reset
-    .en     (1'b1),
 		.a      (det),            //   input,  width = 32,      a.a
 		.b      (KEPSILON),       //   input,  width = 32,      b.b
 		.q      (Less3_out)       //  output,   width = 1,      q.q
@@ -52,7 +51,6 @@ module ContactDetect_v2(
 	Float_Grtr Greater1 (
 		.clk    (clk),            //   input,   width = 1,    clk.clk
 		.areset (rst),            //   input,   width = 1, areset.reset
-    .en     (1'b1),
 		.a      (u),              //   input,  width = 32,      a.a
 		.b      (POSITIVEONE),    //   input,  width = 32,      b.b
 		.q      (Greater1_out)    //  output,   width = 1,      q.q
@@ -61,7 +59,6 @@ module ContactDetect_v2(
   Float_Grtr Greater2 (
 		.clk    (clk),            //   input,   width = 1,    clk.clk
 		.areset (rst),            //   input,   width = 1, areset.reset
-    .en     (1'b1),
 		.a      (Add_out),        //   input,  width = 32,      a.a
 		.b      (POSITIVEONE),    //   input,  width = 32,      b.b
 		.q      (Greater2_out)    //  output,   width = 1,      q.q
