@@ -1,6 +1,0 @@
-Add - 3 cycles
-Mul - 3 cycles
-Div - 25 cycles
-Sqrt - 17 cycles
-FtoI - 3 cycles
-ItoF - 7 cycles
