@@ -113,8 +113,8 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp("CP.out1", ios::binary), rt("finalmain.asm.out", ios::binary),
-            con("constant.dat.out1", ios::binary), tri("box.obj.out", ios::binary);
+        ifstream cp("CP.binary", ios::binary), rt("main.asm.out", ios::binary),
+            con("constant.binary", ios::binary), tri("box.binary", ios::binary);
 
         ofstream out("output.pfm");
         string str = "P3\n16 12\n255\n";
