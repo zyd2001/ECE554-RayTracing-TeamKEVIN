@@ -232,6 +232,43 @@
         </altera:altera_assignments>
       </ipxact:vendorExtensions>
     </ipxact:busInterface>
+    <ipxact:busInterface>
+      <ipxact:name>opSel</ipxact:name>
+      <ipxact:busType vendor="altera" library="altera" name="conduit" version="19.2"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="altera" library="altera" name="conduit" version="19.2"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>opSel</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>opSel</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:slave></ipxact:slave>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="associatedClock" type="string">
+          <ipxact:name>associatedClock</ipxact:name>
+          <ipxact:displayName>associatedClock</ipxact:displayName>
+          <ipxact:value>clk</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="associatedReset" type="string">
+          <ipxact:name>associatedReset</ipxact:name>
+          <ipxact:displayName>associatedReset</ipxact:displayName>
+          <ipxact:value>areset</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="prSafe" type="bit">
+          <ipxact:name>prSafe</ipxact:name>
+          <ipxact:displayName>Partial Reconfiguration Safe</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+    </ipxact:busInterface>
   </ipxact:busInterfaces>
   <ipxact:model>
     <ipxact:views>
@@ -341,6 +378,18 @@
           </ipxact:wireTypeDefs>
         </ipxact:wire>
       </ipxact:port>
+      <ipxact:port>
+        <ipxact:name>opSel</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>in</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC_VECTOR</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
     </ipxact:ports>
   </ipxact:model>
   <ipxact:vendorExtensions>
@@ -360,7 +409,7 @@
         <ipxact:parameter parameterId="ARITH_function" type="string">
           <ipxact:name>ARITH_function</ipxact:name>
           <ipxact:displayName>Name</ipxact:displayName>
-          <ipxact:value>ADD</ipxact:value>
+          <ipxact:value>ADDSUB</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="CONVERT_function" type="string">
           <ipxact:name>CONVERT_function</ipxact:name>
@@ -395,7 +444,7 @@
         <ipxact:parameter parameterId="derivedfunction" type="string">
           <ipxact:name>derivedfunction</ipxact:name>
           <ipxact:displayName>derivedfunction</ipxact:displayName>
-          <ipxact:value>ADD</ipxact:value>
+          <ipxact:value>ADDSUB</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="fp_format" type="string">
           <ipxact:name>fp_format</ipxact:name>
@@ -475,7 +524,7 @@
         <ipxact:parameter parameterId="select_signal_enable" type="bit">
           <ipxact:name>select_signal_enable</ipxact:name>
           <ipxact:displayName>Use Select Signal</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="scale_by_pi" type="bit">
           <ipxact:name>scale_by_pi</ipxact:name>
@@ -600,7 +649,7 @@
         <ipxact:parameter parameterId="RES_LUT_param" type="int">
           <ipxact:name>RES_LUT_param</ipxact:name>
           <ipxact:displayName>LUTs</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="RES_MBIT_param" type="int">
           <ipxact:name>RES_MBIT_param</ipxact:name>
@@ -702,9 +751,13 @@
       <altera:interface_mapping altera:name="en" altera:internal="fp_functions_0.en" altera:type="conduit" altera:dir="end">
         <altera:port_mapping altera:name="en" altera:internal="en"></altera:port_mapping>
       </altera:interface_mapping>
+      <altera:interface_mapping altera:name="opSel" altera:internal="fp_functions_0.opSel" altera:type="conduit" altera:dir="end">
+        <altera:port_mapping altera:name="opSel" altera:internal="opSel"></altera:port_mapping>
+      </altera:interface_mapping>
       <altera:interface_mapping altera:name="q" altera:internal="fp_functions_0.q" altera:type="conduit" altera:dir="end">
         <altera:port_mapping altera:name="q" altera:internal="q"></altera:port_mapping>
       </altera:interface_mapping>
+      <altera:interface_mapping altera:name="s" altera:internal="fp_functions_0.s"></altera:interface_mapping>
     </altera:altera_interface_boundary>
     <altera:altera_has_warnings>false</altera:altera_has_warnings>
     <altera:altera_has_errors>false</altera:altera_has_errors>
