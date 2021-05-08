@@ -29,12 +29,6 @@ namespace SimulatorCore
             for (int k = 0; k < 34; k++)
             {
                 Triangle tri = new Triangle();
-                if (k == 31 || k == 26)
-                    tri.id = 2;
-                else if (k == 29 || k == 24)
-                    tri.id = 3;
-                else
-                    tri.id = 1;
                 string str = t.ReadLine();
                 var s = str.Split();
                 tri.v0.X = float.Parse(s[0]);
@@ -50,6 +44,8 @@ namespace SimulatorCore
                 tri.v2.X = float.Parse(s[0]);
                 tri.v2.Y = float.Parse(s[1]);
                 tri.v2.Z = float.Parse(s[2]);
+                str = t.ReadLine();
+                tri.id = int.Parse(str);
                 triangles.Add(tri);
             }
         }
@@ -88,7 +84,7 @@ namespace SimulatorCore
                 Vector3 pvec = Vector3.Cross(dir, v0v2);
                 float det = Vector3.Dot(v0v1, pvec);
 
-                if (det < Epsilon)
+                if (Math.Abs(det) < Epsilon)
                     continue;
 
                 float invDet = 1 / det;
@@ -106,11 +102,11 @@ namespace SimulatorCore
 
                 t = Vector3.Dot(v0v2, qvec) * invDet;
 
-                if (t < minDistance)
+                if (t < minDistance && t >= 0)
                 {
                     minDistance = t;
                     resultPoint = new Vector4(orig + t * dir, BitConverter.Int32BitsToSingle(id));
-                    resultNormal = new Vector4(Vector3.Normalize(Vector3.Cross(v0v1, v0v2)), 0);
+                    resultNormal = new Vector4(Vector3.Cross(v0v1, v0v2), 0);
                 }
             }
             return (resultPoint, resultNormal);
