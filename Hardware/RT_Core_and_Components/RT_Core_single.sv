@@ -60,7 +60,7 @@ module RT_core_single (
 	output [127:0] DEBUG_memory_R_data;
 	output [127:0] DEBUG_memory_W_data;
 
-    typedef enum logic [1:0] { idle, waiting_int_MEM, waiting_float } waiting_state;
+    typedef enum logic [1:0] { idle, waiting_int_MEM, waiting_float, waiting_done } waiting_state;
     typedef enum logic[1:0] { running, done, kernel_mode_wait } FIN_state;
 
     //////////////////////////////////////////////////////////////////
@@ -522,8 +522,8 @@ module RT_core_single (
                 DE_EX_floatALU3_op2_select <= DE_floatALU3_op2_select;
 
                 DE_EX_Scalar_out_select <= DE_Scalar_out_select;
-                DE_EX_memory_op<= DE_memory_op;
-                DE_EX_vector_reduce_en <= DE_vector_reduce_en;
+                DE_EX_memory_op<= IF_DE_stall ? 3'b0 : DE_memory_op;
+                DE_EX_vector_reduce_en <= IF_DE_stall ? 1'b0 :DE_vector_reduce_en;
 
                 DE_EX_update_int_flag <= DE_update_int_flag;
                 DE_EX_update_float_flag <= DE_update_float_flag;
@@ -598,11 +598,11 @@ module RT_core_single (
         EX_next_state = EX_current_state;
         case (EX_current_state)
             idle: begin
-                if (DE_EX_intALU_en && ~EX_integer_done) begin
+                if (DE_EX_intALU_en && (DE_EX_integer_ALU_opcode[3:2] == 2'b00 || (DE_EX_integer_ALU_opcode[3] == 1'b1 && DE_EX_integer_ALU_opcode[1] == 1'b1))) begin
                     EX_next_state = waiting_int_MEM;
                     EX_busy = 1'b1;
                 end
-                if (DE_EX_floatALU1_en && ~EX_float_done) begin
+                if (DE_EX_floatALU1_en && (DE_EX_float_ALU_opcode[2] == 1'b0 || (DE_EX_float_ALU_opcode[2] == 1'b1 && DE_EX_float_ALU_opcode[0] == 1'b0))) begin
                     EX_next_state = waiting_float;
                     EX_busy = 1'b1;
                 end
@@ -610,16 +610,17 @@ module RT_core_single (
             waiting_int_MEM: begin
                 EX_busy = 1'b1;
                 if (EX_integer_done) begin
-                    EX_next_state = idle; 
-                    EX_busy = 1'b0;
+                    EX_next_state = waiting_done; 
                 end
             end
-            default: begin
+            waiting_float: begin
                 EX_busy = 1'b1;
                 if (EX_float_done) begin
-                    EX_next_state = idle; 
-                    EX_busy = 1'b0;
+                    EX_next_state = waiting_done; 
                 end
+            end
+            default:begin
+                EX_next_state = idle;
             end
         endcase
     end
@@ -897,7 +898,7 @@ module RT_core_single (
         case (MEM_current_state)
             idle: begin
                 // Reading Main memory need the waiting
-                if (EX_MEM_memory_op[2:1] == 2'b10 && EX_MEM_s_out[31:29] == 3'b100 && ~MEM_done) begin
+                if (EX_MEM_memory_op[2:1] == 2'b10 && EX_MEM_s_out[31:29] == 3'b100) begin
                     MEM_next_state = waiting_int_MEM;
                     MEM_busy = 1'b1;
                 end 
@@ -906,7 +907,7 @@ module RT_core_single (
                     MEM_busy = 1'b1;
                 end
                 
-                if (EX_MEM_vector_reduce_en && ~MEM_V_reduce_done) begin
+                if (EX_MEM_vector_reduce_en) begin
                     MEM_next_state = waiting_float;
                     MEM_busy = 1'b1;
                 end
@@ -914,16 +915,17 @@ module RT_core_single (
             waiting_int_MEM: begin
                 MEM_busy = 1'b1;
                 if (MEM_done) begin
-                    MEM_next_state = idle; 
-                    MEM_busy = 1'b0;
+                    MEM_next_state = waiting_done; 
                 end
             end
-            default: begin
+            waiting_float: begin
                 MEM_busy = 1'b1;
                 if (MEM_V_reduce_done) begin
-                    MEM_next_state = idle; 
-                    MEM_busy = 1'b0;
+                    MEM_next_state = waiting_done; 
                 end
+            end
+            default:begin
+                MEM_next_state = idle;
             end
         endcase
     end
@@ -1038,7 +1040,7 @@ module RT_core_single (
         end
     end
 
-    assign End_program = MEM_WB_FIN & IF_FIN;
+    assign End_program = MEM_WB_FIN;
     assign Context_switch = MEM_WB_context_switch;
 
     assign DEBUG_scalar_read_address1 = DEBUG_MEM_WB_RF_AddressS1;

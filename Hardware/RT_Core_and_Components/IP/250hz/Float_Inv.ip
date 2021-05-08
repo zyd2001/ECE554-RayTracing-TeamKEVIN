@@ -75,6 +75,43 @@
       </ipxact:parameters>
     </ipxact:busInterface>
     <ipxact:busInterface>
+      <ipxact:name>en</ipxact:name>
+      <ipxact:busType vendor="altera" library="altera" name="conduit" version="19.2"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="altera" library="altera" name="conduit" version="19.2"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>en</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>en</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:slave></ipxact:slave>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="associatedClock" type="string">
+          <ipxact:name>associatedClock</ipxact:name>
+          <ipxact:displayName>associatedClock</ipxact:displayName>
+          <ipxact:value>clk</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="associatedReset" type="string">
+          <ipxact:name>associatedReset</ipxact:name>
+          <ipxact:displayName>associatedReset</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="prSafe" type="bit">
+          <ipxact:name>prSafe</ipxact:name>
+          <ipxact:displayName>Partial Reconfiguration Safe</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+    </ipxact:busInterface>
+    <ipxact:busInterface>
       <ipxact:name>a</ipxact:name>
       <ipxact:busType vendor="altera" library="altera" name="conduit" version="19.2"></ipxact:busType>
       <ipxact:abstractionTypes>
@@ -196,6 +233,18 @@
           <ipxact:wireTypeDefs>
             <ipxact:wireTypeDef>
               <ipxact:typeName>STD_LOGIC</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
+      <ipxact:port>
+        <ipxact:name>en</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>in</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC_VECTOR</ipxact:typeName>
               <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
             </ipxact:wireTypeDef>
           </ipxact:wireTypeDefs>
@@ -361,7 +410,7 @@
         <ipxact:parameter parameterId="gen_enable" type="bit">
           <ipxact:name>gen_enable</ipxact:name>
           <ipxact:displayName>Generate an enable port</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="divide_type" type="string">
           <ipxact:name>divide_type</ipxact:name>
@@ -496,7 +545,7 @@
         <ipxact:parameter parameterId="RES_LUT_param" type="int">
           <ipxact:name>RES_LUT_param</ipxact:name>
           <ipxact:displayName>LUTs</ipxact:displayName>
-          <ipxact:value>344</ipxact:value>
+          <ipxact:value>368</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="RES_MBIT_param" type="int">
           <ipxact:name>RES_MBIT_param</ipxact:name>
@@ -592,6 +641,9 @@
       <altera:interface_mapping altera:name="b" altera:internal="fp_functions_0.b"></altera:interface_mapping>
       <altera:interface_mapping altera:name="clk" altera:internal="fp_functions_0.clk" altera:type="clock" altera:dir="end">
         <altera:port_mapping altera:name="clk" altera:internal="clk"></altera:port_mapping>
+      </altera:interface_mapping>
+      <altera:interface_mapping altera:name="en" altera:internal="fp_functions_0.en" altera:type="conduit" altera:dir="end">
+        <altera:port_mapping altera:name="en" altera:internal="en"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="q" altera:internal="fp_functions_0.q" altera:type="conduit" altera:dir="end">
         <altera:port_mapping altera:name="q" altera:internal="q"></altera:port_mapping>
