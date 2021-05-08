@@ -31,7 +31,7 @@ module IC_v3(
   typedef enum reg [1:0] {FTCH, WAIT, BUSY, IDLE} state_t;
   state_t state, nxt_state;
   
-  logic Fetch, ld, ld_init, ld_better, better, done, cnt, clear, Context_Switch_PD_in, hit, result_clear;
+  logic Fetch, ld, ld_init, ld_better, better, better_g, better_l, done, cnt, clear, Context_Switch_PD_in, hit, result_clear;
   logic [BIT_THREAD-1:0] thread_id_reg;
   logic [95:0] v2_out, v1_out, v0_out;
   logic [95:0] orig_reg, dir_reg;
@@ -130,7 +130,7 @@ module IC_v3(
         begin
           if (Mem_NotValid)
             Context_Switch_PD_in = 1'b1;
-          else if (done & hit) begin
+          else if (done & hit & better_g) begin
             ld_init = 1'b1;
             Fetch = 1'b1;
             clear = 1'b1;
@@ -181,8 +181,17 @@ module IC_v3(
 		.areset (rst),        //   input,   width = 1, areset.reset
 		.a      (t_in),       //   input,  width = 32,      a.a
 		.b      (t_better),   //   input,  width = 32,      b.b
-		.q      (better)      //  output,   width = 1,      q.q
+		.q      (better_l)      //  output,   width = 1,      q.q
 	);
+
+      Float_Grtr ggg (
+		.clk    (clk),        //   input,   width = 1,    clk.clk
+		.areset (rst),        //   input,   width = 1, areset.reset
+		.a      (t_in),       //   input,  width = 32,      a.a
+		.b      (32'b0),   //   input,  width = 32,      b.b
+		.q      (better_g)      //  output,   width = 1,      q.q
+	);
+    assign better = better_l & better_g;
   
   assign Context_Switch_PD = Context_Switch_PD_in;
   assign thread_id_out = thread_id_reg;
