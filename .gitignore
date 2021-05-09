@@ -1,4 +1,8 @@
 synth_1/
+synth_250hz/
+synth_200hz/
+synth_150hz/
+synth_100hz/
 synth/
 .vscode/
 .venv/
@@ -9,22 +13,22 @@ Software/Simulator/SimulatorCore/obj/
 Software/Simulator/SimulatorTest/bin/
 Software/Simulator/SimulatorTest/obj/
 
-Fix_Add
-Fix_Div
-Fix_Mul
-Fix_Sqrt
-Float_Add
-Float_Div
-Float_Mul
-Float_Sqrt
-FtoI
-ItoF
+Fix_Add/
+Fix_Div/
+Fix_Mul/
+Fix_Sqrt/
+Float_Add/
+Float_Div/
+Float_Mul/
+Float_Sqrt/
+FtoI/
+ItoF/
 
-Float_Add
-Float_Inv
-Float_Grtr
-Float_Less
-Float_Mul
+Float_Add/
+Float_Inv/
+Float_Grtr/
+Float_Less/
+Float_Mul/
 
 .venv/
 .vs/
