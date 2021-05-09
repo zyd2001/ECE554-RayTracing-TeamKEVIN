@@ -13,7 +13,7 @@
                      "class": "cci-p",
                      "params":
                         {
-                           "clock": "pClkDiv4"
+                           "clock": "pClkDiv2"
                         }
                   }
                ]
