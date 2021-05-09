@@ -2,8 +2,8 @@
    "version": 1,
    "afu-image": {
       "power": 0,
-      "clock-frequency-high": 150,
-      "clock-frequency-low": 75,
+      "clock-frequency-high": 200,
+      "clock-frequency-low": 100,
       "afu-top-interface":
          {
             "class": "ccip_std_afu",
@@ -13,7 +13,7 @@
                      "class": "cci-p",
                      "params":
                         {
-                           "clock": "uClk_usr"
+                           "clock": "pClkDiv4"
                         }
                   }
                ]
