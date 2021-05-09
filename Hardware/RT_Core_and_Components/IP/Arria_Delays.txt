@@ -1,0 +1,45 @@
+150Hz
+  Float
+  Add  - 3  cycles
+  Mul  - 3  cycles
+  Div  - 12 cycles
+  Sqrt - 8  cycles
+  FtoI - 1  cycles
+  ItoF - 3  cycles
+  Inv  - 8  cycles
+  Less - 0  cycles
+  Grtr - 0  cycles
+  Fix
+  Add  - 1  cycles
+  Mul  - 3  cycles
+  Div  - 19 cycles
+200Hz
+  Float
+  Add  - 3  cycles
+  Mul  - 3  cycles
+  Div  - 12 cycles
+  Sqrt - 8  cycles
+  FtoI - 2  cycles
+  ItoF - 4  cycles
+  Inv  - 8  cycles
+  Less - 1  cycles
+  Grtr - 1  cycles
+  Fix
+  Add  - 1  cycles
+  Mul  - 3  cycles
+  Div  - 22 cycles
+250Hz
+  Float
+  Add  - 3  cycles
+  Mul  - 3  cycles
+  Div  - 15 cycles
+  Sqrt - 10 cycles
+  FtoI - 3  cycles
+  ItoF - 6  cycles
+  Inv  - 9  cycles
+  Less - 1  cycles
+  Grtr - 1  cycles
+  Fix
+  Add  - 1  cycles
+  Mul  - 3  cycles
+  Div  - 27 cycles

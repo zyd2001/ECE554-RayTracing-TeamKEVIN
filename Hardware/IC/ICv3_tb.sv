@@ -6,6 +6,8 @@ module ICv3_tb();
   localparam BIT_THREAD = $clog2(NUM_THREAD);
   localparam BIT_TRIANGLE = $clog2(NUM_TRIANGLE);
 
+  logic [31:0] st1, st2, st3;
+  
   logic clk, rst;
   // IC Mem
   logic Core_ID;
@@ -44,13 +46,32 @@ module ICv3_tb();
     thread_id_in = 32'h00000010;
     sid_in = 32'h00000001;
     
-    v1   = 96'h3f800000_bf800000_3f800000; //1, -1, 1
-    v2   = 96'h3f800000_3f800000_3f800000; //1, 1, 1
-    v0   = 96'h3f800000_3f800000_bf800000; //-1, 1, 1
+    st1 = $shortrealtobits(-2.629945);
+    st2 = $shortrealtobits(2.029912);
+    st3 = $shortrealtobits(-0.538251);
+    v0 = {st3, st2, st1};
+    //v1   = 96'h3f800000_bf800000_3f800000; //1, -1, 1
+    st1 = $shortrealtobits(-1.595768);
+    st2 = $shortrealtobits(-1.885577);
+    st3 = $shortrealtobits(-1.842825);
+    v1 = {st3, st2, st1};
+    //v2   = 96'h3f800000_3f800000_3f800000; //1, 1, 1
+    st1 = $shortrealtobits(-2.629945);
+    st2 = $shortrealtobits(-1.885577);
+    st3 = $shortrealtobits(-0.538251);
+    v2 = {st3, st2, st1};
+    //v0   = 96'h3f800000_3f800000_bf800000; //-1, 1, 1
    
-    
-    orig = 96'h40c00000_00000000_00000000; //0, 0, 6
-    dir  = 96'h3f800000_bcf5c28f_bdcccccd; //-0.1, -0.03, 1
+    st1 = $shortrealtobits(-2.473160);
+    st2 = $shortrealtobits(1.494620);
+    st3 = $shortrealtobits(-0.413834);
+    orig = {st3, st2, st1};
+    //orig = 96'h40c00000_00000000_00000000; //0, 0, 6
+    st1 = $shortrealtobits(0.755318 );
+    st2 = $shortrealtobits(-0.174401);
+    st3 = $shortrealtobits(0.631727);
+    dir = {st3, st2, st1};
+    //dir  = 96'h3f800000_bcf5c28f_bdcccccd; //-0.1, -0.03, 1
     //dir  = 96'hbf800000_3cf5c28f_3dcccccd; //0.1, 0.03, -1
     
     #4
