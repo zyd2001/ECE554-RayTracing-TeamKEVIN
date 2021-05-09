@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         ifstream cp("CP.binary", ios::binary), rt("main.asm.out", ios::binary),
             con("constant.binary", ios::binary), tri("box.binary", ios::binary);
 
-        ofstream out("output.pfm");
+        ofstream out("output.ppm");
         string str = "P3\n16 12\n255\n";
         out << str;
 
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
             while (true)
             {
                 auto ret = afu.read(80);
-                // printf("%d\n", ret);
+                printf("%d\n", ret);
                 if (ret == 0)
                 {
 #ifdef SLEEP_WHILE_WAITING
