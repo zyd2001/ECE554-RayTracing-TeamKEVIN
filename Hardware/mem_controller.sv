@@ -105,7 +105,7 @@ module mem_controller
             endcase
         end
         else if (term)
-            condition <= 2'b00;
+            condition <= 2'b01;
         else if (dma_wr_done)
             condition <= 2'b10;
     end
