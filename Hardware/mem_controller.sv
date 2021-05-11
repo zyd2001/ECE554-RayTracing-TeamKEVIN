@@ -466,7 +466,7 @@ module mem_controller
     assign addr_main[2] = {{(16-BIT_THREAD){1'h0}}, thread_MC[2], {16'hFFF0}};
     assign addr_main[3] = {{(16-BIT_THREAD){1'h0}}, thread_MC[3], {16'hFFF0}};
     
-    typedef enum reg [1:0] {DMA_WR_IDLE, DMA_WR_WAIT, DMA_WR_HOLD, DMA_WR_LOAD, DMA_WR_DONE} t_state_DMA_wr;
+    typedef enum reg [2:0] {DMA_WR_IDLE, DMA_WR_WAIT, DMA_WR_HOLD, DMA_WR_LOAD, DMA_WR_DONE} t_state_DMA_wr;
     t_state_DMA_wr state_dma_wr, nxt_state_dma_wr;
     
     always_ff @( posedge clk, negedge rst_n ) begin
