@@ -193,13 +193,14 @@ int main(int argc, char *argv[])
             {
                 fprintf(stderr, "get\n");
                 getOutput(output, out);
+                afu.write(0x6a, 3);
             }
             if (all_done)
             {
                 fprintf(stderr, "done\n");
+                getOutput(output, out);
                 break;
             }
-            afu.write(0x6a, 3);
         }
 
         out.close();
