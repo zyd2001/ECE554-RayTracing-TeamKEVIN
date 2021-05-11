@@ -1,2 +1,0 @@
-set_global_assignment -name auto_parallel_synthesis on
-set_global_assignment -name NUM_PARALLEL_PROCESSORS 16
