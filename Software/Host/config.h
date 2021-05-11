@@ -28,7 +28,7 @@ typedef volatile char dma_data_t;
 #define SLEEP_WHILE_WAITING
 
 // The number of milliseconds to sleep when SLEEP_WHILE_WAITING is defined.
-const unsigned SLEEP_MS = 1;
+const unsigned SLEEP_MS = 10;
 
 const int OUTPUT_SIZE = 32 * 4;
 
@@ -37,8 +37,20 @@ const int OUTPUT_SIZE = 32 * 4;
 
 enum MmioAddr
 {
-    LOAD = 0x8000,
-    WRITE_BACK = 0x1,
+    CP_ADDR = 0x50,
+    CP_SIZE = 0x52,
+    CP_LOAD = 0x54,
+    RT_ADDR = 0x56,
+    RT_SIZE = 0x58,
+    RT_LOAD = 0x5a,
+    CON_ADDR = 0x5c,
+    CON_SIZE = 0x5e,
+    CON_LOAD = 0x60,
+    TRI_ADDR = 0x62,
+    TRI_SIZE = 0x64,
+    TRI_LOAD = 0x66,
+    OUT_ADDR = 0x68,
+    CONDITION = 0x6a,
 };
 
 #endif

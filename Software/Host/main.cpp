@@ -92,16 +92,39 @@ void getOutput(dma_data_t *data, ofstream &out)
     }
 }
 
+void run(AFU &afu, dma_data_t *data, ofstream &out)
+{
+    afu.write(CONDITION, (uint64_t)3);
+    while (true)
+    {
+        this_thread::sleep_for(chrono::milliseconds(SLEEP_MS));
+        auto ret = afu.read(CONDITION);
+        bool patch_done = !(ret & 1);
+        bool all_done = !(ret & 2);
+        if (patch_done)
+        {
+            fprintf(stderr, "get\n");
+            getOutput(data, out);
+            afu.write(CONDITION, 3);
+        }
+        if (all_done)
+        {
+            fprintf(stderr, "done\n");
+            getOutput(data, out);
+            break;
+        }
+    }
+}
+
+void changeConstant(dma_data_t *data, float value, int offset)
+{
+    data += offset;
+    volatile float *ptr = (volatile float *)data;
+    *ptr = value;
+}
+
 int main(int argc, char *argv[])
 {
-
-    // unsigned long size, num_tests;
-    // if (!checkUsage(argc, argv, size, num_tests))
-    // {
-    //     printUsage(argv[0]);
-    //     return EXIT_FAILURE;
-    // }
-
     try
     {
         // Create an AFU object to provide basic services for the FPGA. The
@@ -155,52 +178,42 @@ int main(int argc, char *argv[])
         clearMem(triangle, triangleSize);
         clearMem(output, OUTPUT_SIZE * 4);
 
-        // cp.read(CPIns, CPInsFileSize);
-        // rt.read(RTIns, RTInsFileSize);
-        // con.read(constant, constantFileSize);
-        // triangle.read(triangle, triangleFileSize);
         readFile(CPIns, cp);
         readFile(RTIns, rt);
         readFile(constant, con);
         readFile(triangle, tri);
 
         // Inform the FPGA of the starting read and write address of the arrays.
-        afu.write(0x50, (uint64_t)CPIns);
-        afu.write(0x52, (uint64_t)1);
-        afu.write(0x54, (uint64_t)1);
-        afu.write(0x56, (uint64_t)RTIns);
-        afu.write(0x58, (uint64_t)(RTInsSize / AFU::CL_BYTES));
-        afu.write(0x5a, (uint64_t)1);
-        afu.write(0x5c, (uint64_t)constant);
-        afu.write(0x5e, (uint64_t)(constantSize / AFU::CL_BYTES));
-        afu.write(0x60, (uint64_t)1);
-        afu.write(0x62, (uint64_t)triangle);
-        afu.write(0x64, (uint64_t)(triangleSize / AFU::CL_BYTES));
-        afu.write(0x66, (uint64_t)1);
-        afu.write(0x68, (uint64_t)output);
-        afu.write(0x6a, (uint64_t)3);
+        afu.write(CP_ADDR, (uint64_t)CPIns);
+        afu.write(CP_SIZE, (uint64_t)1);
+        afu.write(CP_LOAD, (uint64_t)1);
+        afu.write(RT_ADDR, (uint64_t)RTIns);
+        afu.write(RT_SIZE, (uint64_t)(RTInsSize / AFU::CL_BYTES));
+        afu.write(RT_LOAD, (uint64_t)1);
+        afu.write(CON_ADDR, (uint64_t)constant);
+        afu.write(CON_SIZE, (uint64_t)(constantSize / AFU::CL_BYTES));
+        afu.write(CON_LOAD, (uint64_t)1);
+        afu.write(TRI_ADDR, (uint64_t)triangle);
+        afu.write(TRI_SIZE, (uint64_t)(triangleSize / AFU::CL_BYTES));
+        afu.write(TRI_LOAD, (uint64_t)1);
+        afu.write(OUT_ADDR, (uint64_t)output);
+        run(afu, output, out);
 
         // The FPGA DMA only handles cache-line transfers, so we need to convert
         // the array size to cache lines.
+        afu.write(CP_LOAD, (uint64_t)0);
+        afu.write(RT_LOAD, (uint64_t)0);
+        afu.write(CON_LOAD, (uint64_t)0);
+        afu.write(TRI_LOAD, (uint64_t)0);
 
         // Wait until the FPGA is done.
-        while (true)
+        for (int i = 0; i < 2; i++)
         {
-            auto ret = afu.read(0x6a);
-            bool patch_done = !(ret & 1);
-            bool all_done = !(ret & 2);
-            if (patch_done)
-            {
-                fprintf(stderr, "get\n");
-                getOutput(output, out);
-                afu.write(0x6a, 3);
-            }
-            if (all_done)
-            {
-                fprintf(stderr, "done\n");
-                getOutput(output, out);
-                break;
-            }
+            std::string filename = "output";
+            out = ofstream(filename + std::to_string(i));
+            changeConstant(constant, i + 2, 16);
+            afu.write(CON_LOAD, 1);
+            run(afu, output, out);
         }
 
         out.close();
