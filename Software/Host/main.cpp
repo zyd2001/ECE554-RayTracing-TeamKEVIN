@@ -187,8 +187,8 @@ int main(int argc, char *argv[])
         while (true)
         {
             auto ret = afu.read(0x6a);
-            bool patch_done = ret & 1;
-            bool all_done = ret & 2;
+            bool patch_done = !(ret & 1);
+            bool all_done = !(ret & 2);
             if (patch_done)
             {
                 fprintf(stderr, "get\n");
