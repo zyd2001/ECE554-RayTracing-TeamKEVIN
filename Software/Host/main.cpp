@@ -165,48 +165,44 @@ int main(int argc, char *argv[])
         readFile(triangle, tri);
 
         // Inform the FPGA of the starting read and write address of the arrays.
-        afu.write(LOAD, (uint64_t)CPIns);
-        afu.write(LOAD | ((RTInsSize / AFU::CL_BYTES) << 2), (uint64_t)RTIns);
-        afu.write(LOAD | ((constantSize / AFU::CL_BYTES) << 2), (uint64_t)constant);
-        afu.write(LOAD | ((triangleSize / AFU::CL_BYTES) << 2), (uint64_t)triangle);
-        afu.write(80, (uint64_t)output);
+        afu.write(0x50, (uint64_t)CPIns);
+        afu.write(0x52, (uint64_t)1);
+        afu.write(0x54, (uint64_t)1);
+        afu.write(0x56, (uint64_t)RTIns);
+        afu.write(0x58, (uint64_t)(RTInsSize / AFU::CL_BYTES));
+        afu.write(0x5a, (uint64_t)1);
+        afu.write(0x5c, (uint64_t)constant);
+        afu.write(0x5e, (uint64_t)(constantSize / AFU::CL_BYTES));
+        afu.write(0x60, (uint64_t)1);
+        afu.write(0x62, (uint64_t)triangle);
+        afu.write(0x64, (uint64_t)(triangleSize / AFU::CL_BYTES));
+        afu.write(0x66, (uint64_t)1);
+        afu.write(0x68, (uint64_t)output);
+        afu.write(0x6a, (uint64_t)3);
+
         // The FPGA DMA only handles cache-line transfers, so we need to convert
         // the array size to cache lines.
 
         // Wait until the FPGA is done.
         while (true)
         {
-            while (true)
+            auto ret = afu.read(0x6a);
+            bool patch_done = ret & 1;
+            bool all_done = ret & 2;
+            if (patch_done)
             {
-                auto ret = afu.read(80);
-                printf("%d\n", ret);
-                if (ret == 0)
-                {
-#ifdef SLEEP_WHILE_WAITING
-                    this_thread::sleep_for(chrono::milliseconds(SLEEP_MS));
-#endif
-                    continue;
-                }
-                else if (ret == 1)
-                {
-                    fprintf(stderr, "get\n");
-                    getOutput(output, out);
-                    afu.write(2, 0);
-                    printf("haha\n");
-                    // break;
-                }
-                else
-                {
-                    fprintf(stderr, "break\n");
-                    getOutput(output, out);
-                    break;
-                }
+                fprintf(stderr, "get\n");
+                getOutput(output, out);
             }
-            break;
+            if (all_done)
+            {
+                fprintf(stderr, "done\n");
+                break;
+            }
+            afu.write(0x6a, 3);
         }
 
         out.close();
-        printf("stop\n");
         // Free the allocated memory.
         afu.free(CPIns);
         afu.free(RTIns);
