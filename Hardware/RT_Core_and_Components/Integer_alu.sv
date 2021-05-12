@@ -23,7 +23,8 @@ module Integer_alu (
     output [1:0]flag;
     output logic en_knock_down, done;
 
-    logic [31:0] ASMD_out, itof_out, ftoi_out;
+    logic [63:0] ASMD_out;
+    logic [31:0] itof_out, ftoi_out;
     logic itof_done, ftoi_done, ICU_done;
     logic itof_en, ftoi_en, ICU_en;
 
@@ -42,7 +43,7 @@ module Integer_alu (
         
         if (operation[3] === 1'b0) begin
             if (operation[2] === 1'b0) begin
-                out = ASMD_out;
+                out = ASMD_out[31:0];
                 ICU_en = en;
                 en_knock_down = en;
                 done = ICU_done;

@@ -1,3 +1,32 @@
+///////////////////////////////
+// This is the five-stage single execution core in 
+// our Multi-processor design. It can run one
+// thread at a time. More detail will be 
+// provided in README file.
+// 
+// Context_switch will be high with End_program only.
+// The instructions evoke context switch and end program
+// are almost the same except this signal.
+//
+// PD related signals
+// If kernel mode is on, other module can write or read
+// the register file in this core through PD interface
+//
+// MRTI related signals
+// Used for reading instructions
+// Address will be ready before the rising clock edge while
+// data should be ready after the rising clock edge
+//
+// MEM related signals
+// If Constant Memory read: two cycles, similar to MRTI
+// If Main Memory write: one cycle.
+// If Main Memory read: x cycle, waiting for MEM_done
+// Constant memory only support scalar read.
+//
+// Author: Yan Xiao
+// Last modify: 5/11
+///////////////////////////////
+
 module RT_core_single (
     clk, rst_n, rst,
     kernel_mode, End_program, Context_switch, 
@@ -9,20 +38,11 @@ module RT_core_single (
     PD_scalar_read1, PD_scalar_read2,
     PD_vector_read1, PD_vector_read2,
 
-    DEBUG_scalar_wb_address, DEBUG_scalar_wb_data,
-    DEBUG_vector_wb_address, DEBUG_vector_wb_data,
-    DEBUG_scalar_read_address1, DEBUG_scalar_read_address2, 
-    DEBUG_vector_read_address1, DEBUG_vector_read_address2,
-    DEBUG_scalar_read1, DEBUG_scalar_read2,
-    DEBUG_vector_read1, DEBUG_vector_read2, DEBUG_PC, DEBUG_inst,
-    DEBUG_memory_address, DEBUG_memory_R_enable, DEBUG_memory_W_enable,
-    DEBUG_memory_R_data, DEBUG_memory_W_data,
-
     MRTI_addr, MRTI_data,
     MEM_addr, MEM_data_write, MEM_data_read, MEM_read_en, MEM_write_en, MEM_done, MEM_s_or_v
 );
     // Control / Normal signals
-    input clk, rst_n, rst;;
+    input clk, rst_n, rst;
     input kernel_mode;
     output End_program, Context_switch;
 
@@ -46,20 +66,6 @@ module RT_core_single (
     input [127:0] MEM_data_read;
     input MEM_done;    
     
-    // Debug signals
-    output [4:0] DEBUG_scalar_wb_address, DEBUG_scalar_read_address1, DEBUG_scalar_read_address2;
-    output [3:0] DEBUG_vector_wb_address, DEBUG_vector_read_address1, DEBUG_vector_read_address2;
-    output [31:0] DEBUG_scalar_wb_data;
-    output [127:0] DEBUG_vector_wb_data;
-    output [31:0] DEBUG_scalar_read1, DEBUG_scalar_read2;
-    output [127:0] DEBUG_vector_read1, DEBUG_vector_read2;
-    output [31:0] DEBUG_PC, DEBUG_inst;
-    output [31:0] DEBUG_memory_address;
-	output DEBUG_memory_R_enable;
-	output DEBUG_memory_W_enable;
-	output [127:0] DEBUG_memory_R_data;
-	output [127:0] DEBUG_memory_W_data;
-
     typedef enum logic [1:0] { idle, waiting_int_MEM, waiting_float, waiting_done } waiting_state;
     typedef enum logic[1:0] { running, done, kernel_mode_wait } FIN_state;
 
@@ -70,9 +76,10 @@ module RT_core_single (
     logic IF_FIN;
     FIN_state IF_FIN_current_state, IF_FIN_next_state;
 
-    logic [31:0] PC_reg;
+    logic [31:0] PC_reg, IF_next_PC_reg;
     logic [1:0] IF_next_pc_select;
-    logic [31:0] IF_PC_plus_four, IF_next_PC, IF_instruction, IF_DE_link_address, IF_DE_PC_plus_four_offset;
+    logic [31:0] IF_PC_plus_four, IF_DE_link_address, IF_DE_PC_plus_four_offset;
+    logic [31:0] IF_instruction;
 
     //////////////////////////////////////////////////////////////////
     //////////////// IF_DE_pipeline registers ////////////////////////
@@ -80,7 +87,7 @@ module RT_core_single (
 
     logic IF_DE_stall;
     logic IF_DE_FIN;
-    logic [31:0] IF_DE_current_PC, IF_DE_instruction, IF_DE_current_PC_plus_four, IF_DE_instruction_bypass;
+    logic [31:0] IF_DE_instruction, IF_DE_current_PC_plus_four, IF_DE_instruction_bypass;
 
     //////////////////////////////////////////////////////////////////
     //////////////// DE registers ////////////////////////////////////
@@ -91,7 +98,7 @@ module RT_core_single (
     logic [4:0] DE_S1bp_address, DE_S2bp_address;
     logic [3:0] DE_V1bp_address, DE_V2bp_address;
 
-    logic [31:0] RF_scalar1_out, RF_scalar2_out, DE_scalar1, DE_scalar2;
+    logic [31:0] DE_scalar1, DE_scalar2;
     logic [127:0] DE_vector1, DE_vector2;
 
     logic DE_intALU_op2_select, DE_floatALU1_op1_select;
@@ -100,7 +107,7 @@ module RT_core_single (
     logic [1:0] DE_floatALU3_op2_select;
     logic DE_floatALU4_op1_select, DE_floatALU4_op2_select;
 
-    logic DE_intALU_en, DE_floatALU1_en, DE_floatALU2_en, DE_floatALU3_en, DE_floatALU4_en;
+    logic DE_intALU_en, DE_floatALU1_en, DE_floatALU234_en;
     logic DE_update_int_flag, DE_update_float_flag;
 
     logic [2:0] DE_Scalar_out_select, DE_memory_op;
@@ -113,16 +120,16 @@ module RT_core_single (
     //////////////// DE_EX_pipeline registers ////////////////////////
     //////////////////////////////////////////////////////////////////
 
-    logic DE_EX_S1_select, DE_EX_S2_select, DE_EX_V1_select, DE_EX_V2_select;
+    logic DE_EX_FIN, DE_EX_context_switch;
+
+    // Forwarding address. If address = 0 means no forwarding needed
+    logic [4:0] DE_EX_S1_address, DE_EX_S2_address, DE_EX_Swb_address;
+    logic [3:0] DE_EX_V1_address, DE_EX_V2_address, DE_EX_Vwb_address;
 
     logic [31:0] DE_EX_scalar1, DE_EX_scalar2;
     logic [127:0] DE_EX_vector1, DE_EX_vector2;
     logic [15:0] DE_EX_immediate;
     
-    // Forwarding address. If address = 0 means no forwarding needed
-    logic [4:0] DE_EX_S1_address, DE_EX_S2_address, DE_EX_Swb_address;
-    logic [3:0] DE_EX_V1_address, DE_EX_V2_address, DE_EX_Vwb_address;
-
     // Control Pipeline
     logic DE_EX_intALU_op2_select;
     logic DE_EX_floatALU1_op1_select;
@@ -131,21 +138,17 @@ module RT_core_single (
     logic [1:0] DE_EX_floatALU3_op2_select;
     logic DE_EX_floatALU4_op1_select, DE_EX_floatALU4_op2_select;
     
-    logic DE_EX_intALU_en, DE_EX_floatALU1_en, DE_EX_floatALU2_en, DE_EX_floatALU3_en, DE_EX_floatALU4_en;
+    logic DE_EX_intALU_en, DE_EX_floatALU1_en, DE_EX_floatALU234_en;
     logic DE_EX_update_int_flag, DE_EX_update_float_flag;
 
     logic [3:0] DE_EX_integer_ALU_opcode;
     logic [2:0] DE_EX_float_ALU_opcode;
     logic [2:0] DE_EX_Scalar_out_select, DE_EX_memory_op;
     logic DE_EX_vector_reduce_en;
-    logic DE_EX_FIN, DE_EX_context_switch;
-
+    
     //////////////////////////////////////////////////////////////////
     //////////////// EX registers ////////////////////////////////////
     //////////////////////////////////////////////////////////////////
-
-    logic [31:0] EX_forwarded_scalar1, EX_forwarded_scalar2;
-    logic [127:0] EX_forwarded_vector1, EX_forwarded_vector2;
 
     logic [31:0] EX_integer_ALU_OP1, EX_integer_ALU_OP2, EX_integer_ALU_out;
 
@@ -156,19 +159,19 @@ module RT_core_single (
     logic [1:0] EX_int_flag, EX_float_flag;
     logic EX_int_flag_en, EX_float_flag_en;
 
-    logic EX_integer_done, EX_float_done;
-    logic EX_int_knockdown, EX_float1_knockdown, EX_float2_knockdown, EX_float3_knockdown, EX_float4_knockdown;
+    waiting_state EX_current_state, EX_next_state;
     logic EX_busy;
-
+    logic EX_integer_done, EX_float_done;
+    logic EX_int_knockdown, EX_float1_knockdown, EX_float234_knockdown;
+    
     logic [31:0] EX_S_out;
     logic [127:0] EX_V_out;
 
-    waiting_state EX_current_state, EX_next_state;
-    
     ///////////////////////////////////////////////////////////////////
     //////////////// EX_MEM_pipeline registers ////////////////////////
     ///////////////////////////////////////////////////////////////////
-     
+    logic EX_MEM_FIN, EX_MEM_context_switch;
+
     logic [4:0] EX_MEM_S_data_address, EX_MEM_Swb_address;
     logic [3:0] EX_MEM_V_data_address, EX_MEM_Vwb_address;
     // data 
@@ -179,33 +182,56 @@ module RT_core_single (
     logic [2:0] EX_MEM_memory_op_stay;
     logic EX_MEM_vector_reduce_en;
     logic EX_MEM_vector_reduce_en_stay;
-    logic EX_MEM_FIN, EX_MEM_context_switch;
-
+    
     //////////////////////////////////////////////////////////////////
     //////////////// MEM registers ///////////////////////////////////
     //////////////////////////////////////////////////////////////////
 
-    logic [31:0] MEM_address_bypass;
-    logic [31:0] MEM_reduce_out, MEM_forwarded_s_data;
+    logic [31:0] MEM_forwarded_s_data;
     logic [127:0] MEM_forwarded_v_data;
-    logic MEM_v_reduce_knockdown, MEM_knockdown;
+
+    waiting_state MEM_current_state, MEM_next_state;
     logic MEM_busy;
     logic MEM_V_reduce_done;
-
+    logic MEM_v_reduce_knockdown, MEM_knockdown;
+    
+    logic [31:0] MEM_reduce_out;
     logic [31:0] MEM_S_out;
     logic [127:0] MEM_V_out;
-    waiting_state MEM_current_state, MEM_next_state;
-
+    
     ///////////////////////////////////////////////////////////////////
     //////////////// MEM_WB_pipeline registers ////////////////////////
     ///////////////////////////////////////////////////////////////////
+
+    logic MEM_WB_FIN, MEM_WB_context_switch;
 
     logic [127:0] MEM_WB_vector; 
     logic [31:0] MEM_WB_scalar;
     logic [4:0] MEM_WB_Swb_address;
     logic [3:0] MEM_WB_Vwb_address;
     
-    logic MEM_WB_FIN, MEM_WB_context_switch;
+    ///////////////////////////////////////////////////////////////////
+    //////////////////// DEBUG OUT signals  ///////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    logic [4:0] DEBUG_scalar_wb_address, DEBUG_scalar_read_address1, DEBUG_scalar_read_address2;
+    logic [3:0] DEBUG_vector_wb_address, DEBUG_vector_read_address1, DEBUG_vector_read_address2;
+    logic [31:0] DEBUG_scalar_wb_data;
+    logic [127:0] DEBUG_vector_wb_data;
+    logic [31:0] DEBUG_scalar_read1, DEBUG_scalar_read2;
+    logic [127:0] DEBUG_vector_read1, DEBUG_vector_read2;
+    logic [31:0] DEBUG_PC, DEBUG_inst;
+    logic [31:0] DEBUG_memory_address;
+	logic DEBUG_memory_R_enable;
+	logic DEBUG_memory_W_enable;
+	logic [127:0] DEBUG_memory_R_data;
+	logic [127:0] DEBUG_memory_W_data;
+
+    ///////////////////////////////////////////////////////////////////
+    ////////////// DEBUG IF_DE_EX_Pipeline signals  ///////////////////
+    ///////////////////////////////////////////////////////////////////
+    logic [31:0] DEBUG_IF_DE_PC;
+    logic [31:0] DEBUG_DE_EX_inst, DEBUG_DE_EX_PC;
+
 
     //////////////////////////
     // Instruction Fetch Stage
@@ -214,29 +240,29 @@ module RT_core_single (
     assign IF_PC_plus_four = PC_reg + 4;
 
     always_comb begin : Select_next_PC
-        IF_next_PC = IF_PC_plus_four;
+        IF_next_PC_reg = IF_PC_plus_four;
         case (IF_next_pc_select)
-            2'b00: IF_next_PC = IF_PC_plus_four;
-            2'b10: IF_next_PC = IF_DE_PC_plus_four_offset;
-            default: IF_next_PC = IF_DE_link_address;
+            2'b00: IF_next_PC_reg = IF_PC_plus_four;
+            2'b10: IF_next_PC_reg = IF_DE_PC_plus_four_offset;
+            default: IF_next_PC_reg = IF_DE_link_address;
         endcase
-        if (IF_FIN || IF_DE_stall) IF_next_PC = PC_reg;
+        if (IF_FIN || IF_DE_stall) IF_next_PC_reg = PC_reg;
     end
 
-    // Read instruction bypass
-    assign MRTI_addr = IF_next_PC;
+    // Instruction read address bypass
+    assign MRTI_addr = IF_next_PC_reg;
     assign IF_instruction = MRTI_data;
 
-    always_ff @(posedge clk, negedge rst_n) begin : Update_PC_Reg   
+    always_ff @(posedge clk, negedge rst_n) begin : IF_update_PC_Reg   
         if (!rst_n) 
             PC_reg <= 32'h0000;
         else if (kernel_mode == 1'b1 && PD_scalar_wen && PD_scalar_wb_address == 5'b11111)
             PC_reg <= PD_scalar_wb_data;
         else if (!IF_DE_stall && !IF_FIN)
-            PC_reg <= IF_next_PC;   
+            PC_reg <= IF_next_PC_reg;   
     end
 
-    always_ff @( posedge clk, negedge rst_n ) begin : IF_FIN_next_state_assign
+    always_ff @( posedge clk, negedge rst_n ) begin : IF_update_IF_FIN_state
         if (!rst_n)
             IF_FIN_current_state <= done;
         else 
@@ -276,7 +302,7 @@ module RT_core_single (
     
     always @(posedge clk, negedge rst_n) begin : IF_DE_pipeline
         if (!rst_n) begin
-            IF_DE_current_PC <= 32'h0000;
+            DEBUG_IF_DE_PC <= 32'h0000;
             IF_DE_instruction <= 32'h30000000;
             IF_DE_current_PC_plus_four <= 32'h0000;
             IF_DE_FIN <= 1'b1;
@@ -285,11 +311,11 @@ module RT_core_single (
                 if (IF_next_pc_select != 2'b00) begin
                     IF_DE_instruction <= 32'h30000000;
                     IF_DE_current_PC_plus_four <= 32'h0000;
-                    IF_DE_current_PC <= PC_reg;
+                    DEBUG_IF_DE_PC <= PC_reg;
                     IF_DE_FIN <= 1'b0;
                 end else begin
                     IF_DE_FIN <= IF_FIN;
-                    IF_DE_current_PC <= PC_reg;
+                    DEBUG_IF_DE_PC <= PC_reg;
                     IF_DE_instruction <= IF_instruction;
                     IF_DE_current_PC_plus_four <= IF_PC_plus_four;
                 end
@@ -345,32 +371,29 @@ module RT_core_single (
     Register_file RF(.clk(clk), 
         .scalar_read_address1(kernel_mode? PD_scalar_read_address1 : DE_S1bp_address), .scalar_read_address2(kernel_mode? PD_scalar_read_address2 : DE_S2bp_address), 
         .vector_read_address1(kernel_mode? PD_vector_read_address1 : DE_V1bp_address), .vector_read_address2(kernel_mode? PD_vector_read_address2 : DE_V2bp_address), 
-        .scalar_read1(RF_scalar1_out), .scalar_read2(RF_scalar2_out), 
+        .scalar_read1(DE_scalar1), .scalar_read2(DE_scalar2), 
         .vector_read1(DE_vector1), .vector_read2(DE_vector2),
         .scalar_wen(kernel_mode? PD_scalar_wen : |MEM_WB_Swb_address), .scalar_wb_address(kernel_mode? PD_scalar_wb_address : MEM_WB_Swb_address), 
         .vector_wen(kernel_mode? PD_vector_wen : |MEM_WB_Vwb_address), .vector_wb_address(kernel_mode? PD_vector_wb_address : MEM_WB_Vwb_address), 
         .scalar_wb_data(kernel_mode? PD_scalar_wb_data : MEM_WB_scalar), .vector_wb_data(kernel_mode? PD_vector_wb_data : MEM_WB_vector)
     );
 
-    assign DE_scalar1 = DE_S1_address == 5'b11111 ? IF_DE_current_PC_plus_four : RF_scalar1_out;
-    assign DE_scalar2 = DE_S2_address == 5'b11111 ? IF_DE_current_PC_plus_four : RF_scalar2_out;
-
-    assign PD_scalar_read1 = PD_scalar_read_address1 == 5'b11111 ? IF_PC_plus_four : RF_scalar1_out;
-    assign PD_scalar_read2 = PD_scalar_read_address2 == 5'b11111 ? IF_PC_plus_four : RF_scalar2_out;
+    assign PD_scalar_read1 = PD_scalar_read_address1 == 5'b11111 ? IF_PC_plus_four : DE_scalar1;
+    assign PD_scalar_read2 = PD_scalar_read_address2 == 5'b11111 ? IF_PC_plus_four : DE_scalar2;
     assign PD_vector_read1 = DE_vector1;
     assign PD_vector_read2 = DE_vector2;
 
     assign IF_DE_PC_plus_four_offset = IF_DE_current_PC_plus_four + {{17{IF_DE_instruction[15]}}, IF_DE_instruction[14:0]}; 
     assign IF_DE_link_address = DE_scalar1;
     
+    // Decode the opcode
     instruction_decode_unit IDU(.opcode(IF_DE_instruction[31:26]), .immediate(IF_DE_instruction[1:0]),
         .intALU_op2_select(DE_intALU_op2_select),
         .floatALU1_op1_select(DE_floatALU1_op1_select), .floatALU2_op1_select(DE_floatALU2_op1_select),
         .floatALU3_op1_select(DE_floatALU3_op1_select), .floatALU4_op1_select(DE_floatALU4_op1_select),
         .floatALU1_op2_select(DE_floatALU1_op2_select), .floatALU2_op2_select(DE_floatALU2_op2_select),
         .floatALU3_op2_select(DE_floatALU3_op2_select), .floatALU4_op2_select(DE_floatALU4_op2_select),
-        .intALU_en(DE_intALU_en), .floatALU1_en(DE_floatALU1_en), .floatALU2_en(DE_floatALU2_en), 
-        .floatALU3_en(DE_floatALU3_en), .floatALU4_en(DE_floatALU4_en),
+        .intALU_en(DE_intALU_en), .floatALU1_en(DE_floatALU1_en), .floatALU234_en(DE_floatALU234_en), 
         .Scalar_out_select(DE_Scalar_out_select), .memory_op(DE_memory_op),
         .vector_reduce_en(DE_vector_reduce_en), .update_int_flag(DE_update_int_flag), .update_float_flag(DE_update_float_flag),
         .context_switch(DE_context_switch)
@@ -390,10 +413,9 @@ module RT_core_single (
     );
 
     Forwarding_decode Decode_stage_data_hazard(
-        .DE_EX_Swb_address(DE_EX_Swb_address), .DE_EX_Vwb_address(DE_EX_Vwb_address), .MEM_WB_Swb_address(MEM_WB_Swb_address), .MEM_WB_Vwb_address(MEM_WB_Vwb_address), 
+        .DE_EX_Swb_address(DE_EX_Swb_address), .DE_EX_Vwb_address(DE_EX_Vwb_address), .MEM_WB_Swb_address(MEM_WB_Swb_address), 
         .DE_EX_MEM_read(DE_EX_memory_op[2:1] == 2'b10), .DE_EX_V_reduce(DE_EX_vector_reduce_en), .DE_stall(DE_Mem_address_stall), 
         .DE_S1_address(DE_S1_address), .DE_S2_address(DE_S2_address), .DE_V1_address(DE_V1_address), .DE_V2_address(DE_V2_address),
-        .DE_EX_S1_select(DE_EX_S1_select), .DE_EX_S2_select(DE_EX_S2_select), .DE_EX_V1_select(DE_EX_V1_select), .DE_EX_V2_select(DE_EX_V2_select), 
         .EX_MEM_Swb_address(EX_MEM_Swb_address), .link_en(IF_next_pc_select == 2'b11)
     );
 
@@ -402,7 +424,6 @@ module RT_core_single (
     //////////////////////////
     // DE EX Pipeline
     ////////////////////////// 
-    logic [31:0] DEBUG_DE_EX_inst, DEBUG_DE_EX_PC;
 
     always_ff @( posedge clk, negedge rst_n ) begin : Debug_DE_EX_pipeline
         if (!rst_n) begin 
@@ -411,12 +432,11 @@ module RT_core_single (
         end else begin
             if (!EX_busy && !MEM_busy) begin
                 DEBUG_DE_EX_inst <= IF_DE_stall ? 32'hF8000000 : IF_DE_instruction;
-                DEBUG_DE_EX_PC <= IF_DE_current_PC;
+                DEBUG_DE_EX_PC <= DEBUG_IF_DE_PC;
             end
         end
     end
 
-    // data pipeline
     always_ff @( posedge clk, negedge rst_n ) begin : DE_EX_data_pipeline
         if (!rst_n) begin 
             DE_EX_scalar1 <= 32'b0;
@@ -433,7 +453,7 @@ module RT_core_single (
                 else if (DE_S1_address == MEM_WB_Swb_address && DE_S1_address != 5'b0)
                     DE_EX_scalar1 <= MEM_WB_scalar;
                 else 
-                    DE_EX_scalar1 <= DE_scalar1;
+                    DE_EX_scalar1 <= DE_S1_address == 5'b11111 ? IF_DE_current_PC_plus_four : DE_scalar1;
 
                 if (DE_S2_address == DE_EX_Swb_address && DE_S2_address != 5'b0 && DE_EX_memory_op[2:1] != 2'b10 && DE_EX_vector_reduce_en != 1'b1)
                     DE_EX_scalar2 <= EX_S_out;
@@ -442,7 +462,7 @@ module RT_core_single (
                 else if (DE_S2_address == MEM_WB_Swb_address && DE_S2_address != 5'b0)
                     DE_EX_scalar2 <= MEM_WB_scalar;
                 else 
-                    DE_EX_scalar2 <= DE_scalar2;
+                    DE_EX_scalar2 <= DE_S2_address == 5'b11111 ? IF_DE_current_PC_plus_four : DE_scalar2;
                 
                 if (DE_V1_address == DE_EX_Vwb_address && DE_V1_address != 4'b0 && DE_EX_memory_op[2:1] != 2'b10)
                     DE_EX_vector1 <= EX_V_out;
@@ -466,7 +486,6 @@ module RT_core_single (
         end
     end
 
-    // forwarding pipeline
     always @(posedge clk, negedge rst_n) begin : DE_EX_address_pipeline
         if (!rst_n) begin
             DE_EX_S1_address <= 5'b0;
@@ -487,7 +506,6 @@ module RT_core_single (
         end 
     end
     
-    // Control Pipeline
     always_ff @( posedge clk, negedge rst_n ) begin : DE_EX_control_pipeline
         if (!rst_n) begin
             DE_EX_integer_ALU_opcode <= 4'b0;
@@ -544,14 +562,11 @@ module RT_core_single (
         end
     end
     
-    // Enable pipeline
     always_ff @( posedge clk, negedge rst_n ) begin : DE_EX_enable_pipeline
         if (!rst_n) begin
             DE_EX_intALU_en <= 1'b0;
             DE_EX_floatALU1_en <= 1'b0;
-            DE_EX_floatALU2_en <= 1'b0;
-            DE_EX_floatALU3_en <= 1'b0;
-            DE_EX_floatALU4_en <= 1'b0;
+            DE_EX_floatALU234_en <= 1'b0;
         end
         else begin
             if (!EX_busy && !MEM_busy)
@@ -565,19 +580,9 @@ module RT_core_single (
                 DE_EX_floatALU1_en <= 1'b0;
 
             if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU2_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU2_en;
-            else if (EX_float2_knockdown)
-                DE_EX_floatALU2_en <= 1'b0;
-
-            if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU3_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU3_en;
-            else if (EX_float3_knockdown)
-                DE_EX_floatALU3_en <= 1'b0;
-
-            if (!EX_busy && !MEM_busy)
-                DE_EX_floatALU4_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 :  DE_floatALU4_en;
-            else if (EX_float4_knockdown)
-                DE_EX_floatALU4_en <= 1'b0;
+                DE_EX_floatALU234_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU234_en;
+            else if (EX_float234_knockdown)
+                DE_EX_floatALU234_en <= 1'b0;
         end
 
     end
@@ -586,7 +591,7 @@ module RT_core_single (
     // EX Stage
     //////////////////////////  
     
-    always_ff @( posedge clk, negedge rst_n ) begin : EX_waiting_update_state     
+    always_ff @( posedge clk, negedge rst_n ) begin : EX_update_waiting_state     
         if (!rst_n)
             EX_current_state <= idle;
         else
@@ -625,97 +630,67 @@ module RT_core_single (
         endcase
     end
 
-    always_comb begin : EX_forwarding
-        // if (DE_EX_S1_address == EX_MEM_Swb_address && DE_EX_S1_address != 5'b0) 
-        //     EX_forwarded_scalar1 = EX_MEM_s_out;
-        // else if (DE_EX_S1_address == MEM_WB_Swb_address && DE_EX_S1_address != 5'b0)
-        //     EX_forwarded_scalar1 = MEM_WB_scalar;
-        // else
-            EX_forwarded_scalar1 = DE_EX_scalar1;
-
-        // if (DE_EX_S2_address == EX_MEM_Swb_address && DE_EX_S2_address != 5'b0) 
-        //     EX_forwarded_scalar2 = EX_MEM_s_out;
-        // else if (DE_EX_S2_address == MEM_WB_Swb_address && DE_EX_S2_address != 5'b0)
-        //     EX_forwarded_scalar2 = MEM_WB_scalar;
-        // else
-            EX_forwarded_scalar2 = DE_EX_scalar2;
-
-        // if (DE_EX_V1_address == EX_MEM_Vwb_address && DE_EX_V1_address != 4'b0) 
-        //     EX_forwarded_vector1 = EX_MEM_v_out;
-        // else if (DE_EX_V1_address == MEM_WB_Vwb_address && DE_EX_V1_address != 4'b0)
-        //     EX_forwarded_vector1 = MEM_WB_vector;
-        // else
-            EX_forwarded_vector1 = DE_EX_vector1;
-
-        // if (DE_EX_V2_address == EX_MEM_Vwb_address && DE_EX_V2_address != 4'b0) 
-        //     EX_forwarded_vector2 = EX_MEM_v_out;
-        // else if (DE_EX_V2_address == MEM_WB_Vwb_address && DE_EX_V2_address != 4'b0)
-        //     EX_forwarded_vector2 = MEM_WB_vector;
-        // else
-            EX_forwarded_vector2 = DE_EX_vector2;
-    end
-
     // Int ALU
     always_comb begin : EX_int_ALU_op_select
-        EX_integer_ALU_OP1 = EX_forwarded_scalar1;
+        EX_integer_ALU_OP1 = DE_EX_scalar1;
         if (DE_EX_intALU_op2_select) 
             EX_integer_ALU_OP2 = {{17{DE_EX_immediate[15]}}, DE_EX_immediate[14:0]}; 
         else 
-            EX_integer_ALU_OP2 = EX_forwarded_scalar2; 
+            EX_integer_ALU_OP2 = DE_EX_scalar2; 
     end
 
     // float ALU1
     always_comb begin : EX_float_ALU1_op_select
         if (DE_EX_floatALU1_op1_select)
-            EX_float_ALU1_OP1 = EX_forwarded_scalar1;
+            EX_float_ALU1_OP1 = DE_EX_scalar1;
         else 
-            EX_float_ALU1_OP1 = EX_forwarded_vector1[31:0];
+            EX_float_ALU1_OP1 = DE_EX_vector1[31:0];
 
         case (DE_EX_floatALU1_op2_select)
-            2'b00: EX_float_ALU1_OP2 = EX_forwarded_vector2[31:0];
-            2'b01: EX_float_ALU1_OP2 = EX_forwarded_scalar2;
-            default: EX_float_ALU1_OP2 = EX_forwarded_vector1[63:32];
+            2'b00: EX_float_ALU1_OP2 = DE_EX_vector2[31:0];
+            2'b01: EX_float_ALU1_OP2 = DE_EX_scalar2;
+            default: EX_float_ALU1_OP2 = DE_EX_vector1[63:32];
         endcase
     end
 
     // float ALU2
     always_comb begin : EX_float_ALU2_op_select
         if (DE_EX_floatALU2_op1_select)
-            EX_float_ALU2_OP1 = EX_forwarded_scalar1;
+            EX_float_ALU2_OP1 = DE_EX_scalar1;
         else 
-            EX_float_ALU2_OP1 = EX_forwarded_vector1[63:32];
+            EX_float_ALU2_OP1 = DE_EX_vector1[63:32];
 
         if (DE_EX_floatALU2_op2_select)
-            EX_float_ALU2_OP2 = EX_forwarded_scalar2;
+            EX_float_ALU2_OP2 = DE_EX_scalar2;
         else
-            EX_float_ALU2_OP2 = EX_forwarded_vector2[63:32];
+            EX_float_ALU2_OP2 = DE_EX_vector2[63:32];
     end
 
     // float ALU3
     always_comb begin : EX_float_ALU3_op_select
         if (DE_EX_floatALU3_op1_select)
-            EX_float_ALU3_OP1 = EX_forwarded_scalar1;
+            EX_float_ALU3_OP1 = DE_EX_scalar1;
         else 
-            EX_float_ALU3_OP1 = EX_forwarded_vector1[95:64];
+            EX_float_ALU3_OP1 = DE_EX_vector1[95:64];
 
         case (DE_EX_floatALU3_op2_select)
-            2'b00: EX_float_ALU3_OP2 = EX_forwarded_vector2[95:64];
-            2'b01: EX_float_ALU3_OP2 = EX_forwarded_scalar2;
-            default: EX_float_ALU3_OP2 = EX_forwarded_vector1[127:96];
+            2'b00: EX_float_ALU3_OP2 = DE_EX_vector2[95:64];
+            2'b01: EX_float_ALU3_OP2 = DE_EX_scalar2;
+            default: EX_float_ALU3_OP2 = DE_EX_vector1[127:96];
         endcase
     end
 
     // float ALU4
     always_comb begin : EX_float_ALU4_op_select
         if (DE_EX_floatALU4_op1_select)
-            EX_float_ALU4_OP1 = EX_forwarded_scalar1;
+            EX_float_ALU4_OP1 = DE_EX_scalar1;
         else 
-            EX_float_ALU4_OP1 = EX_forwarded_vector1[127:96];
+            EX_float_ALU4_OP1 = DE_EX_vector1[127:96];
 
         if (DE_EX_floatALU4_op2_select)
-            EX_float_ALU4_OP2 = EX_forwarded_scalar2;
+            EX_float_ALU4_OP2 = DE_EX_scalar2;
         else
-            EX_float_ALU4_OP2 = EX_forwarded_vector2[127:96];
+            EX_float_ALU4_OP2 = DE_EX_vector2[127:96];
     end
 
     Integer_alu IALU(.op1(EX_integer_ALU_OP1), .op2(EX_integer_ALU_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_intALU_en), .en_knock_down(EX_int_knockdown),
@@ -723,15 +698,31 @@ module RT_core_single (
     
     Float_alu FALU1(.op1(EX_float_ALU1_OP1), .op2(EX_float_ALU1_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU1_en), .en_knock_down(EX_float1_knockdown),
         .out(EX_float_ALU1_out), .done(EX_float_done), .operation(DE_EX_float_ALU_opcode), .flag(EX_float_flag), .rst(rst));
-    Float_alu FALU2(.op1(EX_float_ALU2_OP1), .op2(EX_float_ALU2_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU2_en), .en_knock_down(EX_float2_knockdown),
+    Float_alu FALU2(.op1(EX_float_ALU2_OP1), .op2(EX_float_ALU2_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), .en_knock_down(EX_float234_knockdown),
         .out(EX_float_ALU2_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
-    Float_alu FALU3(.op1(EX_float_ALU3_OP1), .op2(EX_float_ALU3_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU3_en), .en_knock_down(EX_float3_knockdown),
+    Float_alu FALU3(.op1(EX_float_ALU3_OP1), .op2(EX_float_ALU3_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), .en_knock_down(),
         .out(EX_float_ALU3_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
-    Float_alu FALU4(.op1(EX_float_ALU4_OP1), .op2(EX_float_ALU4_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU4_en), .en_knock_down(EX_float4_knockdown),
+    Float_alu FALU4(.op1(EX_float_ALU4_OP1), .op2(EX_float_ALU4_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), .en_knock_down(),
         .out(EX_float_ALU4_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
 
     assign EX_int_flag_en = EX_integer_done & DE_EX_update_int_flag;
     assign EX_float_flag_en = EX_float_done & DE_EX_update_float_flag;
+
+    always_comb begin : EX_select_output
+        EX_S_out = 32'b0;
+        EX_V_out = 128'b0;
+
+        EX_V_out = {EX_float_ALU4_out, EX_float_ALU3_out, EX_float_ALU2_out, EX_float_ALU1_out};
+        if (DE_EX_Scalar_out_select[2] == 1'b0)
+            EX_S_out = EX_integer_ALU_out;
+        else 
+            case (DE_EX_Scalar_out_select[1:0])
+                2'b00: EX_S_out = EX_float_ALU1_out;
+                2'b01: EX_S_out = EX_float_ALU2_out;
+                2'b10: EX_S_out = EX_float_ALU3_out;
+                default: EX_S_out = EX_float_ALU4_out;
+            endcase
+    end
 
     //////////////////////////
     // EX MEM Pipeline
@@ -776,22 +767,6 @@ module RT_core_single (
         end
     end
 
-    always_comb begin : EX_select_output
-        EX_S_out = 32'b0;
-        EX_V_out = 128'b0;
-
-        EX_V_out = {EX_float_ALU4_out, EX_float_ALU3_out, EX_float_ALU2_out, EX_float_ALU1_out};
-        if (DE_EX_Scalar_out_select[2] == 1'b0)
-            EX_S_out = EX_integer_ALU_out;
-        else 
-            case (DE_EX_Scalar_out_select[1:0])
-                2'b00: EX_S_out = EX_float_ALU1_out;
-                2'b01: EX_S_out = EX_float_ALU2_out;
-                2'b10: EX_S_out = EX_float_ALU3_out;
-                default: EX_S_out = EX_float_ALU4_out;
-            endcase
-    end
-
     always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_data_pipeline
         if (!rst_n) begin
             EX_MEM_v_out <= 128'b0;
@@ -800,7 +775,7 @@ module RT_core_single (
         end
         else begin
             if (!MEM_busy) begin
-                EX_MEM_memory_data <= EX_forwarded_scalar2;
+                EX_MEM_memory_data <= DE_EX_scalar2;
                 EX_MEM_v_out <= EX_V_out;
                 EX_MEM_s_out <= EX_S_out;
             end
@@ -808,7 +783,7 @@ module RT_core_single (
 
     end
 
-    always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_forwarding_pipeline
+    always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_address_pipeline
         if (!rst_n) begin
             EX_MEM_Swb_address <= 5'b0;
             EX_MEM_S_data_address <= 5'b0;
@@ -825,7 +800,7 @@ module RT_core_single (
     end
 
 
-    always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_control_pipeline
+    always_ff @( posedge clk, negedge rst_n ) begin : EX_MEM_control_and_enable_pipeline
         if (!rst_n) begin
             EX_MEM_memory_op <= 3'b0;
             EX_MEM_memory_op_stay <= 3'b0;
@@ -870,8 +845,19 @@ module RT_core_single (
     //////////////////////////
     // MEM Stage
     ////////////////////////// 
-    
-    // assign MEM_address_bypass = EX_MEM_s_out[31:29] == 3'b100 ? EX_MEM_s_out : EX_integer_ALU_out;
+    always_comb begin : MEM_forwarding
+        if (EX_MEM_S_data_address == MEM_WB_Swb_address && EX_MEM_S_data_address != 5'b0) 
+            MEM_forwarded_s_data = MEM_WB_scalar;
+        else 
+            MEM_forwarded_s_data = EX_MEM_memory_data;
+
+        if (EX_MEM_V_data_address == MEM_WB_Vwb_address && EX_MEM_V_data_address != 4'b0) 
+            MEM_forwarded_v_data = MEM_WB_vector;
+        else 
+            MEM_forwarded_v_data = EX_MEM_v_out;
+
+    end
+
     assign MEM_knockdown = EX_MEM_memory_op[2];
     assign MEM_v_reduce_knockdown = EX_MEM_vector_reduce_en;
     assign MEM_s_or_v = EX_MEM_memory_op[0];
@@ -885,7 +871,7 @@ module RT_core_single (
     FPU Reduce_adder(.op1_in(EX_MEM_v_out[31:0]), .op2_in(EX_MEM_v_out[95:64]), .operation(2'b00), .out(MEM_reduce_out), .en(EX_MEM_vector_reduce_en), 
         .clk(clk), .rst_n(rst_n), .done(MEM_V_reduce_done), .flag(), .rst(rst));
 
-    always_ff @( posedge clk, negedge rst_n ) begin : MEM_waiting_update_state     
+    always_ff @( posedge clk, negedge rst_n ) begin : MEM_update_waiting_state     
         if (!rst_n)
             MEM_current_state <= idle;
         else
@@ -930,19 +916,6 @@ module RT_core_single (
         endcase
     end
 
-    always_comb begin : MEM_forwarding
-        if (EX_MEM_S_data_address == MEM_WB_Swb_address && EX_MEM_S_data_address != 5'b0) 
-            MEM_forwarded_s_data = MEM_WB_scalar;
-        else 
-            MEM_forwarded_s_data = EX_MEM_memory_data;
-
-        if (EX_MEM_V_data_address == MEM_WB_Vwb_address && EX_MEM_V_data_address != 4'b0) 
-            MEM_forwarded_v_data = MEM_WB_vector;
-        else 
-            MEM_forwarded_v_data = EX_MEM_v_out;
-
-    end
-
     always_comb begin : MEM_select_output
         MEM_S_out = 32'b0;
         MEM_V_out = 128'b0;
@@ -961,7 +934,7 @@ module RT_core_single (
     // MEM_WB Pipeline
     ////////////////////////// 
 
-    always_ff @( posedge clk, negedge rst_n ) begin : MEM_WB_data_pipeline
+    always_ff @( posedge clk, negedge rst_n ) begin : MEM_WB_pipeline
         if (!rst_n) begin
             MEM_WB_vector <= 128'b0;
             MEM_WB_scalar <= 32'b0;

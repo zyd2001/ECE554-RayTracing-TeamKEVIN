@@ -1,4 +1,8 @@
 /////////////////////
+// This is the branch stalling state machine
+// it will stall IF_DE until the flag has been written
+// EX_done and write flag --next edge--> compute next PC --next edge--> jump
+//
 // branch_opcode
 // 000	be	Branch if equal
 // 001	bne	Branch if not equal
@@ -13,7 +17,10 @@
 // 00: normal PC+4
 // 10: PC of this instruction + 4 + offset
 // 11: Reg File R30 (Link Reg) 
-
+//
+// Author: Yan Xiao
+// Last Modified: 5/11
+///////////////////////
 module branch (
     clk, rst_n, EX_busy, MEM_busy, IF_DE_stall, next_pc_select, int_flag, float_flag, int_flag_en, float_flag_en, branch_opcode, branch_en
 );
@@ -29,8 +36,6 @@ module branch (
     branch_state current_state, next_state;
     logic [1:0] flag;
     logic link_en;
-
-  
 
     always_ff @( posedge clk, negedge rst_n ) begin 
         if (!rst_n) begin
