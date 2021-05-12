@@ -1,22 +1,30 @@
-//////////
-// Select
-// 0 -> original, 1 -> WB data
-//////////
+//////////////////////////////////////////////////
+// This module will make sure the forwarding will work
+// It will stall if the data cannot be forwarded
+// 
+// Reasons why forwarding will not work
+// Instruction at DE stage need data to perform compute in EX
+// However, the data will not be ready until
+//      Instruction at EX stage moved to MEM stage and load from Memory
+//      Instruction at EX stage moved to MEM stage and compute final V reduce
+// Or Link register has not written back to memory
+// 
+// Author: Yan Xiao
+// Last Modified: 5/11
+//////////////////////////////////////////////////
 
 module Forwarding_decode (
-    DE_EX_Swb_address, DE_EX_Vwb_address, EX_MEM_Swb_address, MEM_WB_Swb_address, MEM_WB_Vwb_address, DE_EX_MEM_read, DE_EX_V_reduce, 
-    DE_stall, DE_S1_address, DE_S2_address, DE_V1_address, DE_V2_address,
-    DE_EX_S1_select, DE_EX_S2_select, DE_EX_V1_select, DE_EX_V2_select, link_en
+    DE_EX_Swb_address, DE_EX_Vwb_address, EX_MEM_Swb_address, MEM_WB_Swb_address, DE_EX_MEM_read, DE_EX_V_reduce, 
+    DE_stall, DE_S1_address, DE_S2_address, DE_V1_address, DE_V2_address, link_en
 );
     input [4:0] DE_EX_Swb_address, MEM_WB_Swb_address, EX_MEM_Swb_address;
-    input [3:0] MEM_WB_Vwb_address, DE_EX_Vwb_address;
+    input [3:0] DE_EX_Vwb_address;
 
     input [4:0] DE_S1_address, DE_S2_address;
     input [3:0] DE_V1_address, DE_V2_address;
     input DE_EX_MEM_read, DE_EX_V_reduce, link_en;
 
     output logic DE_stall;
-    output logic DE_EX_S1_select, DE_EX_S2_select, DE_EX_V1_select, DE_EX_V2_select;
     
     logic memory_address_stall, link_stall;
 
@@ -39,6 +47,7 @@ module Forwarding_decode (
         end
     end
 
+    // We will stall until the link register WB
     always_comb begin : link_stall_comb
         link_stall = 1'b0;
         if (link_en) begin
@@ -47,27 +56,5 @@ module Forwarding_decode (
         end
     end
 
-    // By pass the write back value to
-    always_comb begin : WB_bypass
-        if (DE_S1_address == MEM_WB_Swb_address && DE_S1_address != 5'b0)
-            DE_EX_S1_select = 1'b1;
-        else 
-            DE_EX_S1_select = 1'b0;
-        
-        if (DE_S2_address == MEM_WB_Swb_address && DE_S2_address != 5'b0)
-            DE_EX_S2_select = 1'b1;
-        else 
-            DE_EX_S2_select = 1'b0;
-
-        if (DE_V1_address == MEM_WB_Vwb_address && DE_V1_address != 4'b0)
-            DE_EX_V1_select = 1'b1;
-        else 
-            DE_EX_V1_select = 1'b0;
-
-        if (DE_V2_address == MEM_WB_Vwb_address && DE_V2_address != 4'b0)
-            DE_EX_V2_select = 1'b1;
-        else 
-            DE_EX_V2_select = 1'b0;
-    end
 
 endmodule
