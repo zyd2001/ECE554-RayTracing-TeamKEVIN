@@ -72,23 +72,24 @@ ifstream::pos_type filesize(ifstream &f)
 
 void getOutput(dma_data_t *data, ofstream &out)
 {
-    volatile float *ptr = (volatile float *)data;
+    // volatile float *ptr = (volatile float *)data;
+    volatile int *ptr = (volatile int *)data;
     for (int i = 0; i < OUTPUT_SIZE / 4; i++)
     {
-        for (int j = 0; j < 3; j++)
-        {
-            out << *ptr * 255;
-            out << " ";
-            ptr++;
-        }
-        ptr++;
-        out << "\n";
-        // for (int j = 0; j < 4; j++, ptr++)
+        // for (int j = 0; j < 3; j++)
         // {
-        //     out << *ptr;
+        //     out << *ptr * 255;
         //     out << " ";
+        //     ptr++;
         // }
+        // ptr++;
         // out << "\n";
+        for (int j = 0; j < 4; j++, ptr++)
+        {
+            out << *ptr;
+            out << " ";
+        }
+        out << "\n";
     }
 }
 
@@ -136,7 +137,7 @@ int main(int argc, char *argv[])
         // for (unsigned test = 0; test < num_tests; test++)
         // {
 
-        ifstream cp("CP.binary", ios::binary), rt("main.asm.out", ios::binary),
+        ifstream cp("CP.binary", ios::binary), rt("test.asm.out", ios::binary),
             con("constant.binary", ios::binary), tri("box.binary", ios::binary);
 
         ofstream out("output.ppm");
