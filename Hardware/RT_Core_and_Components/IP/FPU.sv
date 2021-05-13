@@ -66,7 +66,7 @@ module FPU (
   end
   
   logic [31:0] out_temp;
-  always_ff(posedge clk, negedge rst_n) begin
+  always_ff @(posedge clk, negedge rst_n) begin
     if (!rst_n) 
       out <= '0;
     else 
