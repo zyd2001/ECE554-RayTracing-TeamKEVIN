@@ -74,9 +74,17 @@ module ICU (
       Multiplier_result_reg <= Multiplier_result;
     end
   end
-  
+
+  logic [63:0] out_temp;
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      out <= '0;
+    else 
+      out <= out_temp;
+  end
+
   always_comb begin
-    out = '0;
+    out_temp = '0;
     done = 1'b0;
     counter_in = '0;
     Adder_enable = 1'b0;
@@ -87,7 +95,7 @@ module ICU (
       DIV: 
         begin
           if (counter == DIV_LATENCY) begin
-            out = {{32{Divider_result[31]}}, Divider_result};
+            out_temp = {{32{Divider_result[31]}}, Divider_result};
             done = 1'b1;
           end
           else begin
@@ -99,7 +107,7 @@ module ICU (
       MUL: 
         begin
           if (counter == MUL_LATENCY) begin
-            out = Multiplier_result;
+            out_temp = Multiplier_result;
             done = 1'b1;
           end
           else begin
@@ -111,7 +119,7 @@ module ICU (
       ADDSUB: 
         begin
           if (counter == ADD_LATENCY) begin
-            out = {{31{Adder_result[32]}}, Adder_result};
+            out_temp = {{31{Adder_result[32]}}, Adder_result};
             done = 1'b1;
           end
           else begin
@@ -145,7 +153,7 @@ module ICU (
   Fix_Add Adder (
 		.clk    (clk),                  //   input,   width = 1,    clk.clk
 		.rst    (rst),               //   input,   width = 1,    rst.reset
-		.en     (Adder_enable),         //   input,   width = 1,     en.en
+		.en     (1'h1),         //   input,   width = 1,     en.en
 		.a0     (op1_in),               //   input,  width = 32,     a0.a0
 		.a1     (Adder_b),              //   input,  width = 32,     a1.a1
 		.result (Adder_result)          //  output,  width = 33, result.result
@@ -154,7 +162,7 @@ module ICU (
 	Fix_Mul Multiplier (
 		.clk    (clk),                  //   input,   width = 1,    clk.clk
 		.rst    (rst),               //   input,   width = 1,    rst.reset
-		.en     (Multiplier_enable),    //   input,   width = 1,     en.en
+		.en     (1'h1),    //   input,   width = 1,     en.en
 		.a      (op1_in),               //   input,  width = 32,      a.a
 		.b      (op2_in),               //   input,  width = 32,      b.b
 		.result (Multiplier_result)     //  output,  width = 64, result.result
@@ -163,18 +171,18 @@ module ICU (
 	Fix_Div Divider (
 		.clk         (clk),             //   input,   width = 1,         clk.clk
 		.rst         (rst),          //   input,   width = 1,         rst.reset
-		.en          (Divider_enable),  //   input,   width = 1,          en.en
+		.en          (1'h1),  //   input,   width = 1,          en.en
 		.numerator   (op1_in),          //   input,  width = 32,   numerator.numerator
 		.denominator (op2_in),          //   input,  width = 32, denominator.denominator
 		.result      (Divider_result)   //  output,  width = 32,      result.result
 	);
 
   always_comb begin 
-    if (out == 0)
+    if (out_temp == 0)
       flag[1] = 0;
     else 
       flag[1] = 1;
-    flag[0] = out[63];      
+    flag[0] = out_temp[63];      
   end
   
 endmodule
