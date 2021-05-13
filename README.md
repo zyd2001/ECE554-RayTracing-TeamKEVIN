@@ -1,4 +1,7 @@
-# ECE554-RayTracing-TeamKEVIN
+# Hardware Ray-tracing Graphical Processor
+![C++ render result](./Outputs/C++Output.jpg)
+
+This project is the work of Team KEVIN on a dedicated graphical processor for ray tracing. This project, completed under the supervision of Mikko Lipasti, aims to implement and streamline the process of ray tracing in software and hardware. 
 
 # How to run simulation on AFU_ASE
 
