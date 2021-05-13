@@ -65,8 +65,16 @@ module FPU (
     end
   end
   
+  logic [31:0] out_temp;
+  always_ff(posedge clk, negedge rst_n) begin
+    if (!rst_n) 
+      out <= '0;
+    else 
+      out <= out_temp;
+  end
+
   always_comb begin
-    out = '0;
+    out_temp = '0;
     done = 1'b0;
     counter_in = '0;
     Adder_enable = 1'b0;
@@ -77,7 +85,7 @@ module FPU (
       DIV: 
         begin
           if (counter == DIV_LATENCY) begin
-            out = Divider_result;
+            out_temp = Divider_result;
             done = 1'b1;
           end
           else begin
@@ -89,7 +97,7 @@ module FPU (
       MUL: 
         begin
           if (counter == MUL_LATENCY) begin
-            out = Multiplier_result;
+            out_temp = Multiplier_result;
             done = 1'b1;
           end
           else begin
@@ -101,7 +109,7 @@ module FPU (
       ADDSUB: 
         begin
           if (counter == ADD_LATENCY) begin
-            out = Adder_result;
+            out_temp = Adder_result;
             done = 1'b1;
           end
           else begin
@@ -131,7 +139,7 @@ module FPU (
   Float_Add Adder (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
-		.en     (Adder_enable),       //   input,   width = 1,     en.en
+		.en     (1'h1),       //   input,   width = 1,     en.en
 		.a      (op1_reg),             //   input,  width = 32,      a.a
 		.b      (op2_reg),             //   input,  width = 32,      b.b
 		.q      (Adder_result),       //  output,  width = 32,      q.q
@@ -141,7 +149,7 @@ module FPU (
 	Float_Mul Multiplier (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
-		.en     (Multiplier_enable),  //   input,   width = 1,     en.en
+		.en     (1'h1),  //   input,   width = 1,     en.en
 		.a      (op1_reg),             //   input,  width = 32,      a.a
 		.b      (op2_reg),             //   input,  width = 32,      b.b
 		.q      (Multiplier_result)   //  output,  width = 32,      q.q
@@ -150,18 +158,18 @@ module FPU (
 	Float_Div Divider (
 		.clk    (clk),                //   input,   width = 1,    clk.clk
 		.areset (rst),             //   input,   width = 1, areset.reset
-		.en     (Divider_enable),     //   input,   width = 1,     en.en
+		.en     (1'h1),     //   input,   width = 1,     en.en
 		.a      (op1_reg),             //   input,  width = 32,      a.a
 		.b      (op2_reg),             //   input,  width = 32,      b.b
 		.q      (Divider_result)      //  output,  width = 32,      q.q
 	);
 
   always_comb begin 
-    if (out == 0)
+    if (out_temp == 0)
       flag[1] = 0;
     else 
       flag[1] = 1;
-    flag[0] = out[31];      
+    flag[0] = out_temp[31];      
   end
 
 

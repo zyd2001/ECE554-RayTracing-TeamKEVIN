@@ -30,7 +30,7 @@ module Integer_alu (
     itf itof(.in_in(op1), .out(itof_out), .clk(clk), .en(itof_en), .done(itof_done), .rst_n(rst_n), .rst(rst));
     fti ftoi(.in_in(op1), .out(ftoi_out), .clk(clk), .en(ftoi_en), .done(ftoi_done), .rst_n(rst_n), .rst(rst));
     ICU integer_unit(.op1_in(op1), .op2_in(op2), .out(ASMD_out), .operation(operation[1:0]), 
-        .flag(flag), .clk(clk), .en(ICU_en), .done(ICU_done), .rst_n(rst_n), .rst(rst));
+        .flag(flag), .clk(clk), .en(1'h1), .done(ICU_done), .rst_n(rst_n), .rst(rst));
     
     always_comb begin 
         itof_en = 1'b0;

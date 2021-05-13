@@ -48,12 +48,21 @@ module Sqrt(in_in, out, clk, en, done, rst_n, rst);
     endcase
   end
   
+  logic [31:0] out_temp;
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      out <= '0;
+    else 
+      out <= out_temp;
+  end
+
   Float_Sqrt sqrter (
 		.clk    (clk),      //   input,   width = 1,    clk.clk
 		.areset (rst),   //   input,   width = 1, areset.reset
-		.en     (enable),   //   input,   width = 1,     en.en
+		.en     (1'h1),   //   input,   width = 1,     en.en
 		.a      (in_in),    //   input,  width = 32,      a.a
-		.q      (out)       //  output,  width = 32,      q.q
+		.q      (out_temp)       //  output,  width = 32,      q.q
 	);
   
 endmodule
