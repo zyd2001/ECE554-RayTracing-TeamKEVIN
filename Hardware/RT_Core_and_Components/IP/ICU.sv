@@ -74,9 +74,17 @@ module ICU (
       Multiplier_result_reg <= Multiplier_result;
     end
   end
+
+  logic [63:0] out_temp;
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      out <= '0;
+    else 
+      out <= out_temp;
+  end
   
   always_comb begin
-    out = '0;
+    out_temp = '0;
     done = 1'b0;
     counter_in = '0;
     Adder_enable = 1'b0;
@@ -87,7 +95,7 @@ module ICU (
       DIV: 
         begin
           if (counter == LATENCY) begin
-            out = {{32{Divider_result_reg[31]}}, Divider_result_reg};
+            out_temp = {{32{Divider_result_reg[31]}}, Divider_result_reg};
             done = 1'b1;
           end
           else begin
@@ -99,7 +107,7 @@ module ICU (
       MUL: 
         begin
           if (counter == LATENCY) begin
-            out = Multiplier_result_reg;
+            out_temp = Multiplier_result_reg;
             done = 1'b1;
           end
           else begin
@@ -111,7 +119,7 @@ module ICU (
       ADDSUB: 
         begin
           if (counter == LATENCY) begin
-            out = {{31{Adder_result_reg[32]}}, Adder_result_reg};
+            out_temp = {{31{Adder_result_reg[32]}}, Adder_result_reg};
             done = 1'b1;
           end
           else begin
@@ -143,11 +151,11 @@ module ICU (
   assign Divider_result = Divider_enable ? (op1_reg / op2_reg) : Divider_result_reg;
   
   always_comb begin 
-    if (out == 0)
+    if (out_temp == 0)
       flag[1] = 0;
     else 
       flag[1] = 1;
-    flag[0] = out[63];      
+    flag[0] = out_temp[63];      
   end
   
 endmodule
