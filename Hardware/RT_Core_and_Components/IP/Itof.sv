@@ -48,7 +48,7 @@ module itf (in_in, out, clk, en, done, rst_n, rst);
     endcase
   end
   
-  logic [31:0] signed out_temp;
+  logic signed [31:0] out_temp;
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n)
       out <= '0;
