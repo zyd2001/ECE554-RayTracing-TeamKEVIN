@@ -14,8 +14,8 @@ module FtoI (
         in = $bitstoshortreal(a);
     end
 
-    always_ff @( posedge clk, posedge rst ) begin : internal_pipe
-        if (rst) begin
+    always_ff @( posedge clk, posedge areset ) begin : internal_pipe
+        if (areset) begin
             pip0 <= '0;
 
         end else begin

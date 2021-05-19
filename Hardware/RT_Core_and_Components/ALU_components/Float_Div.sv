@@ -17,26 +17,28 @@ module Float_Div (
         float_output =  operand1 / operand2;
     end
 
-    always_ff @( posedge clk, posedge rst ) begin : internal_pipe
-        if (rst) begin
+    always_ff @( posedge clk, posedge areset ) begin : internal_pipe
+        if (areset) begin
             pip0 <= '0;
             pip1 <= '0;
             pip2 <= '0;
             pip3 <= '0;
             pip4 <= '0;
         end else begin
-            if (en)
+            if (en) begin
                 pip0 <= $shortrealtobits(float_output);
                 pip1 <= pip0;
                 pip2 <= pip1;
                 pip3 <= pip2;
                 pip4 <= pip3;
-            else 
+            end
+            else begin
                 pip0 <= '0;
                 pip1 <= '0;
                 pip2 <= '0;
                 pip3 <= '0;
                 pip4 <= '0;
+            end
         end
         
     end
