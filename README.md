@@ -1,9 +1,52 @@
 # Hardware Ray-tracing Graphical Processor
 ![C++ render result](./Outputs/C++Output.jpg)
 
-This project is the work of Team KEVIN on a dedicated graphical processor for ray tracing. This project, completed under the supervision of Mikko Lipasti, aims to implement and streamline the process of ray tracing in software and hardware. 
+This project is the work of Team KEVIN on a dedicated graphical processor for ray tracing. It is completed under the supervision of Mikko Lipasti and aims to implement and streamline the process of ray tracing in software and hardware. Inspired by current GPU architecture, we designed a multi-thread processor that can render millions of pixels on the hardware. RT-core is a general-purpose compute unit and the smallest component in our hardware. It can run one thread at a time with our custom ISA that supports 32-bit floating-point and vector operations. Four of such compute units and eight ray-triangle intersection accelerators (IC core) form streaming multiprocessors (SM), and it can take up to 32 threads at the same time. The host will provide a launch size (usually width * height of the image), and our hardware will split it into 32 thread wrap and assign them to each SM. Currently, we only have one SM in our design, but it can effortlessly scale up to any number.
+
+Alongside with our hardware, we created a complier and a assembler to transform C like language, Kevin++, into machine code. We also wrote a assembly simulator that can simulate one pixel using assembly code and Kevin++ simulator that can run Kevin++ in C. THe image at the front is our demo code. It is a physically based shader written in Kevin++ and simulated in C.
+
+Our system is targeted at Intel FPGA and Intel Devcloud. 
+# What you might find useful in this Repo
+- [RT Core](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/RT_Core_and_Components): Five stage pipelined CPU with floating point and vector support.
+- [Intel floating-point and fix-point IP](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/RT_Core_and_Components/IP): Example about how to integrate Intel IP into your design.
+- [IC Core](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/IC): Pipelined ray-triangle intersection accelerator.
+- [Ray-generation kernel and PBR shader](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Software/Real_RT_instruction_simulation): Simple pinhole camera model and physically based shader using roughness/metallic.
+# Current Progress
+⭕ All components written and integrated 
+
+⭕ All components successfully passed simulation
+
+⭕ Mapping complete
+
+⭕ MMIO and DMA passed the tests on real FPGA
+
+❌ IP on FPGA works as expected
+
+❌ Generate images from real FPGA
+# Architecture 
+![ID](./Outputs/ThreadID.png)
+Each thread will be assigned with a thread ID and pixel ID, telling pixel they are responsible to. Then each thread will start executing instruction at position 0. They will terminal when FIN is called. For more information, please refer to the document.
+
+![cycle](./Outputs/Thread_cycle.png)
+
+
+# Micro Architecture 
+![Top-level](./Outputs/top-level.png)
+
+Our hardware aims to supports all the functionality we defined in the Architecture Chapter. Host and self-made memory controller work together through DMA and MMIO interface to move instructions and triangles from host to chip and move the chip to the host. 
+
+Host will tell the Command Patcher the total number of Pixels and it will break them into a 32-thread chunk. Then it will assign this chunk to Patch Dispatcher. It will also communicate with host when a patch has completed and move the output back to the host. 
+
+Patch dispatcher is responsible for scheduling 32 thread to 4 RT Core and 8 IC Core. When a thread evoke trace, it will push this thread to a queue and assign a new thread to this RT Core. It interacts with IC Core in a similar fashion. When all 32 threads have completed, it will signal the Command Patcher that it is ready for the next 32 threads.
+
+RT Core is a generic CPU core with vector and floating-point support and the intersection core is a hardware accelerator. It utilizes the Möller-Trumbore algorithm to achieve a faster execution. The RT Core passes the ray information to IC Buffer. The intersection cores fetch triangle information from triangle memory. A pipeline is used to reduce the down time of the hardware, utilizing the advantages of the algorithm. 
+
+Since the Instruction memory, triangle memory and the constant memory is read-only to all the thread, we can simply duplicate them to avoid bank conflict. Each RT Core has its own Instruction and Constant memory, and each IC Core has its own Triangle memory. However, RT Core can read-write main memory therefore we have a unified main memory for all the RT Core.
+
+![flowchart](./Outputs/flowchart.png)
 
 # How to run simulation on AFU_ASE
+You can test this project in a simulated environment.
 
 `git clone` this repository
 
@@ -43,3 +86,7 @@ After hardware simulation start, make sure to set the `ASE_WORKDIR` according to
 
 `ASE_LOG=0 ./afu_ase` to run. Several `get` and a `break` will be printed in a while. Then the output image will be written to `output.ppm`. The example here is at `16×12` resolution (for faster simulation).
 
+# How to build and run on real FPGA
+
+# Documents
+[Architectural and Micro Architectural Document](./Outputs/A&MA.jpg)
