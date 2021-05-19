@@ -1,4 +1,4 @@
-//////// 
+//////////////////
 // Only decode, active in decode stage
 // forwarding will be resolved in EX or MEM stage
 // 
@@ -28,7 +28,10 @@
 // 1xx -> memory activated
 //  _  -> 0 for read, 1 for write
 //   _ -> 0 for scalar, 1 for vector 
-// 
+//
+// Author: Yan Xiao
+// Last Modified: 5/11
+//////////////////
 
 
 module instruction_decode_unit (
@@ -38,8 +41,7 @@ module instruction_decode_unit (
     floatALU3_op1_select, floatALU4_op1_select,
     floatALU1_op2_select, floatALU2_op2_select,
     floatALU3_op2_select, floatALU4_op2_select,
-    floatALU1_en, floatALU2_en,
-    floatALU3_en, floatALU4_en,
+    floatALU1_en, floatALU234_en,
     Scalar_out_select, memory_op,
     vector_reduce_en, update_int_flag, update_float_flag,
     context_switch
@@ -49,7 +51,7 @@ module instruction_decode_unit (
     output logic intALU_op2_select, floatALU1_op1_select, floatALU2_op1_select,
         floatALU3_op1_select, floatALU4_op1_select,floatALU2_op2_select, floatALU4_op2_select;
     output logic [1:0] floatALU1_op2_select, floatALU3_op2_select;
-    output logic intALU_en, floatALU1_en, floatALU2_en, floatALU3_en, floatALU4_en, vector_reduce_en;
+    output logic intALU_en, floatALU1_en, floatALU234_en, vector_reduce_en;
     output logic [2:0] Scalar_out_select, memory_op;
     output logic update_int_flag, update_float_flag;
     output logic context_switch;
@@ -68,9 +70,7 @@ module instruction_decode_unit (
 
         intALU_en = 1'b0;
         floatALU1_en = 1'b0; 
-        floatALU2_en = 1'b0;
-        floatALU3_en = 1'b0;
-        floatALU4_en = 1'b0;
+        floatALU234_en = 1'b0;
 
         Scalar_out_select = 3'b0;
         memory_op = 3'b0;
@@ -122,18 +122,10 @@ module instruction_decode_unit (
         if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:3] == 3'b010 | opcode[5:2] == 4'b1001)
             floatALU1_en = 1'b1;
 
-        // VV, VF
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 6'b100111)
-            floatALU2_en = 1'b1;
-
         // VV, VF, reduce
         if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 6'b100100 | opcode[5:0] == 6'b100111)
-            floatALU3_en = 1'b1;
-
-        // VV, VF
-        if (opcode[5:3] == 3'b000 | opcode[5:2] == 4'b0010 | opcode[5:0] == 6'b100111)
-            floatALU4_en = 1'b1;
-
+            floatALU234_en = 1'b1;
+            
         // FF and Sqrt
         if (opcode[5:2] == 4'b0100 | opcode == 6'b100110) 
             Scalar_out_select = 3'b100;

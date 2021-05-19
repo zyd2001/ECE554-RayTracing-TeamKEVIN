@@ -1,3 +1,11 @@
+/////////////////////
+// This module will find which register we care about
+// If we don't care about an register, it is R0
+// 
+// Author: Yan Xiao
+// Last Modified: 5/11
+///////////////////////
+
 module address_decode_unit (
     instruction, DE_S1_address, DE_S2_address, DE_Swb_address,
     DE_V1_address, DE_V2_address, DE_Vwb_address
