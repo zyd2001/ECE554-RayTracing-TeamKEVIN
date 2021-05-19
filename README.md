@@ -89,4 +89,4 @@ After hardware simulation start, make sure to set the `ASE_WORKDIR` according to
 # How to build and run on real FPGA
 
 # Documents
-[Architectural and Micro Architectural Document](./Outputs/A%26MA.jpg)
+[Architectural and Micro Architectural Document](./Outputs/A%26MA.pdf)
