@@ -571,17 +571,17 @@ module RT_core_single (
         else begin
             if (!EX_busy && !MEM_busy)
                 DE_EX_intALU_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_intALU_en;
-            else if (EX_int_knockdown)
+            else if (EX_integer_done)
                 DE_EX_intALU_en <= 1'b0;
             
             if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU1_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU1_en;
-            else if (EX_float1_knockdown)
+            else if (EX_float_done)
                 DE_EX_floatALU1_en <= 1'b0;
 
             if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU234_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU234_en;
-            else if (EX_float234_knockdown)
+            else if (EX_float_done)
                 DE_EX_floatALU234_en <= 1'b0;
         end
 
