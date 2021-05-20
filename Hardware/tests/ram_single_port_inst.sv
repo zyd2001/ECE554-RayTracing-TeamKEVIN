@@ -14,7 +14,7 @@ module single_port_ram_inst
 
 	initial begin
 		// When using RT_Core_Single_tb, Data_instruction_full will not work
-		$readmemb({getenv("PWD"), "/tests/RT_Core_testbench_input/Data_instruction_full.in"}, ram);
+		$readmemb({getenv("PWD"), "/tests/RT_Core_testbench_input/Data_instruction_branch.in"}, ram);
    	end
 
 	always @ (posedge clk)
