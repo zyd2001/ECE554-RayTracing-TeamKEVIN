@@ -33,7 +33,7 @@ module Integer_alu (
     input signed [31:0] op1, op2;
     input [3:0] operation;
     output logic signed [31:0] out;
-    output [1:0]flag;
+    output logic [1:0]flag;
     output logic done;
 
     logic [63:0] ASMD_out;
@@ -144,26 +144,27 @@ module Integer_alu (
             if (operation[2] === 1'b0) begin
                 case (operation[1:0])
                     2'b00: begin
-                        out = Adder_result[31:0];
+                        ASMD_out = {{31{Adder_result[32]}}, Adder_result};
                         done = 1'b1;
                     end 
                     2'b01: begin
-                        out = Adder_result[31:0];
+                        ASMD_out = {{31{Adder_result[32]}}, Adder_result};
                         done = 1'b1;
                     end
                     2'b10: begin
-                        out = Multiplier_result[31:0];
+                        ASMD_out = Multiplier_result;
                         wait_start = en;
                         waiting_time = MUL_LATENCY;
                         done = waiting_done;
                     end
                     default: begin
-                        out = Divider_result;
+                        ASMD_out = {{32{Divider_result[31]}}, Divider_result};
                         wait_start = en;
                         waiting_time = DIV_LATENCY;
                         done = waiting_done;
                     end
                 endcase
+                out = ASMD_out[31:0];
             end 
             else begin
                 done = 1'b1;
@@ -200,6 +201,14 @@ module Integer_alu (
 
         end
         
+    end
+
+    always_comb begin 
+        if (ASMD_out == 0)
+            flag[1] = 0;
+        else 
+            flag[1] = 1;
+        flag[0] = ASMD_out[63];      
     end
 
 endmodule

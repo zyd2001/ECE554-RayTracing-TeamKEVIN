@@ -8,60 +8,168 @@
 ///////////////////////////////
 
 module Float_alu (
-    op1, op2, clk, out, done, operation, flag, en, rst_n, en_knock_down, rst
+    op1, op2, clk, out, done, operation, flag, en, rst_n, rst
 );
+    parameter ADD_LATENCY_R = 2,
+              MUL_LATENCY_R = 2,
+              DIV_LATENCY_R = 24,
+              SQRT_LATENCY_R = 16;
+
+    parameter ADD_LATENCY = 1,
+              MUL_LATENCY = 1,
+              DIV_LATENCY = 23,
+              SQRT_LATENCY = 15;
+
     input clk, en, rst_n, rst;
     input [31:0] op1, op2;
     input [2:0] operation;
     output logic [31:0] out;
     output [1:0]flag;
-    output logic en_knock_down, done;
+    output logic done;
 
-    logic [31:0] FPU_out, Sqrt_out;
-    logic FPU_en, Sqrt_en, FPU_done, Sqrt_done;
+    logic [31:0] Multiplier_result, Adder_result, Divider_result, Sqrt_result;
 
-    FPU floating_point_unit(.op1_in(op1), .op2_in(op2), .out(FPU_out), .operation(operation[1:0]), 
-        .flag(flag), .clk(clk), .en(FPU_en), .done(FPU_done), .rst_n(rst_n), .rst(rst));
-    Sqrt square_root_unit(.in_in(op1), .out(Sqrt_out), .clk(clk), .en(Sqrt_en), .done(Sqrt_done), .rst_n(rst_n), .rst(rst));
+    Float_Sqrt sqrter (
+		.clk    (clk),      //   input,   width = 1,    clk.clk
+		.areset (rst),   //   input,   width = 1, areset.reset
+		.en     (1'h1),   //   input,   width = 1,     en.en
+		.a      (op1),    //   input,  width = 32,      a.a
+		.q      (Sqrt_result)       //  output,  width = 32,      q.q
+	);
+
+    Float_Add Adder (
+		.clk    (clk),                //   input,   width = 1,    clk.clk
+		.areset (rst),             //   input,   width = 1, areset.reset
+		.en     (1'h1),       //   input,   width = 1,     en.en
+		.a      (op1),             //   input,  width = 32,      a.a
+		.b      (op2),             //   input,  width = 32,      b.b
+		.q      (Adder_result),       //  output,  width = 32,      q.q
+		.opSel  (!operation[0])       //   input,   width = 1,  opSel.opSel
+	);
+
+	Float_Mul Multiplier (
+		.clk    (clk),                //   input,   width = 1,    clk.clk
+		.areset (rst),             //   input,   width = 1, areset.reset
+		.en     (1'h1),  //   input,   width = 1,     en.en
+		.a      (op1),             //   input,  width = 32,      a.a
+		.b      (op2),             //   input,  width = 32,      b.b
+		.q      (Multiplier_result)   //  output,  width = 32,      q.q
+	);
+
+	Float_Div Divider (
+		.clk    (clk),                //   input,   width = 1,    clk.clk
+		.areset (rst),             //   input,   width = 1, areset.reset
+		.en     (1'h1),     //   input,   width = 1,     en.en
+		.a      (op1),             //   input,  width = 32,      a.a
+		.b      (op2),             //   input,  width = 32,      b.b
+		.q      (Divider_result)      //  output,  width = 32,      q.q
+	);
+
+    typedef enum logic { idle, busy } waiting_state;
+    waiting_state current_state, next_state;
+    logic wait_start, waiting_done;
+    logic [5:0] counter, next_counter;
+    logic [5:0] max_count, waiting_time;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= '0;
+            max_count <= '0;
+            current_state <= idle;
+        end else begin 
+            current_state <= next_state;
+            counter <= next_counter;
+            if (wait_start) 
+                max_count <= waiting_time;
+        end
+    end
+    
+    always_comb begin : waiting_state_machine
+        next_state = current_state;
+        next_counter = counter;  
+        waiting_done = 1'b0;
+        case (current_state)
+            idle: begin
+                if (wait_start) begin
+                    next_state = busy;
+                    next_counter = 1'b1;
+                end
+            end
+            default : begin
+                next_counter = counter+1;
+                if (counter == max_count) begin
+                    next_counter = '0;
+                    next_state = idle;
+                    waiting_done = 1'b1;
+                end
+            end
+        endcase
+    end
 
     always_comb begin
-        FPU_en = 1'b0;
-        Sqrt_en = 1'b0;
-        en_knock_down = 1'b0;
         done = 1'b0;
         out = op1;
-       
+        wait_start = '0;
+        waiting_time = '0;
         // Float ALU
         if (operation[2] == 1'b0) begin
-            out = FPU_out;
-            FPU_en = en;
-            en_knock_down = en;
-            done = FPU_done;
+            case (operation[1:0])
+                2'b00: begin
+                    out = Adder_result;
+                    wait_start = en;
+                    waiting_time = ADD_LATENCY;
+                    done = waiting_done;
+                end 
+                2'b01: begin
+                    out = Adder_result;
+                    wait_start = en;
+                    waiting_time = ADD_LATENCY;
+                    done = waiting_done;
+                end
+                2'b10: begin
+                    out = Multiplier_result;
+                    wait_start = en;
+                    waiting_time = MUL_LATENCY;
+                    done = waiting_done;
+                end
+                default: begin
+                    out = Divider_result;
+                    wait_start = en;
+                    waiting_time = DIV_LATENCY;
+                    done = waiting_done;
+                end
+            endcase
         end
         else begin
             case (operation[1:0])
                 2'b00: begin
-                    out = FPU_out; 
-                    FPU_en = en;
-                    en_knock_down = en;
-                    done = FPU_done;
+                    out = Adder_result;
+                    wait_start = en;
+                    waiting_time = ADD_LATENCY;
+                    done = waiting_done;
                 end 
                 2'b10: begin 
-                    out = Sqrt_out;
-                    Sqrt_en = en;
-                    en_knock_down = en;
-                    done = Sqrt_done;
+                    out = Sqrt_result;
+                    wait_start = en;
+                    waiting_time = SQRT_LATENCY;
+                    done = waiting_done;
                 end
                 default: begin
                     // it is always ready 
                     done = 1'b1;
                     out = op1;
-                    en_knock_down = en;
                 end
             endcase
         end
         
     end
-  
+    always_comb begin 
+        if (out == 0)
+            flag[1] = 0;
+        else 
+            flag[1] = 1;
+        flag[0] = out[31];      
+  end
+
 
 endmodule
