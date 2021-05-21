@@ -19,12 +19,13 @@ module Float_Grtr (
     if (areset) begin
       q_in <= 1'b0;
     end
-    else begin
+    else if (en) begin
       q_in <= out;
-    end
+    end else
+        q_in <= '0;
   end
   
-  assign q = q_in;
+  assign q = en ? q_in : '0;
   
 endmodule
 
