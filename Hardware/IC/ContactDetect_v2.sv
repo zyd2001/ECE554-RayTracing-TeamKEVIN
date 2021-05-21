@@ -27,6 +27,7 @@ module ContactDetect_v2(
 	Float_Less Less1 (
 		.clk    (clk),            //   input,   width = 1,    clk.clk
 		.areset (rst),            //   input,   width = 1, areset.reset
+    .en     (1'b1),
 		.a      (u),              //   input,  width = 32,      a.a
 		.b      (32'b0),             //   input,  width = 32,      b.b
 		.q      (Less1_out)       //  output,   width = 1,      q.q
@@ -35,6 +36,7 @@ module ContactDetect_v2(
 	Float_Less Less2 (
 		.clk    (clk),            //   input,   width = 1,    clk.clk
 		.areset (rst),            //   input,   width = 1, areset.reset
+    .en     (1'b1),
 		.a      (v),              //   input,  width = 32,      a.a
 		.b      (32'b0),             //   input,  width = 32,      b.b
 		.q      (Less2_out)       //  output,   width = 1,      q.q
