@@ -24,7 +24,7 @@ module Float_alu (
     input [31:0] op1, op2;
     input [2:0] operation;
     output logic [31:0] out;
-    output [1:0]flag;
+    output logic [1:0]flag;
     output logic done;
 
     logic [31:0] Multiplier_result, Adder_result, Divider_result, Sqrt_result;
@@ -110,7 +110,7 @@ module Float_alu (
         done = 1'b0;
         out = op1;
         wait_start = '0;
-        waiting_time = '0;
+        waiting_time = ADD_LATENCY;
         // Float ALU
         if (operation[2] == 1'b0) begin
             case (operation[1:0])
