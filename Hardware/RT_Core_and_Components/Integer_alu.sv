@@ -17,16 +17,16 @@ module Integer_alu (
     op1, op2, clk, out, done, operation, flag, en, rst_n, rst
 );
 
-    parameter ADD_LATENCY_R = 0,
-            MUL_LATENCY_R = 5,
-            DIV_LATENCY_R = 37,
-            ITOF_LATENCY_R = 6,
+    parameter ADD_LATENCY_R = 1,
+            MUL_LATENCY_R = 3,
+            DIV_LATENCY_R = 22,
+            ITOF_LATENCY_R = 4,
             FTOI_LATENCY_R = 2;
 
     parameter ADD_LATENCY = 0,
-            MUL_LATENCY = 4,
-            DIV_LATENCY = 36,
-            ITOF_LATENCY = 5,
+            MUL_LATENCY = 2,
+            DIV_LATENCY = 21,
+            ITOF_LATENCY = 3,
             FTOI_LATENCY = 1;
 
     input clk, en, rst_n, rst;
