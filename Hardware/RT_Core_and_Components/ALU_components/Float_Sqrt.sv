@@ -12,7 +12,10 @@ module Float_Sqrt (
     assign q = en ? pip4 : '0;
     always_comb begin 
         in = $bitstoshortreal(a);
-        out = $sqrt(in);
+        if (in >= 0)
+            out = $sqrt(in);
+        else 
+            out = 0;
     end
 
     always_ff @( posedge clk, posedge areset ) begin : internal_pipe

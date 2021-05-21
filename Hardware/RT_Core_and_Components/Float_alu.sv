@@ -10,15 +10,15 @@
 module Float_alu (
     op1, op2, clk, out, done, operation, flag, en, rst_n, rst
 );
-    parameter ADD_LATENCY_R = 2,
-              MUL_LATENCY_R = 2,
-              DIV_LATENCY_R = 24,
-              SQRT_LATENCY_R = 16;
+    parameter ADD_LATENCY_R = 3,
+              MUL_LATENCY_R = 3,
+              DIV_LATENCY_R = 12,
+              SQRT_LATENCY_R = 8;
 
-    parameter ADD_LATENCY = 1,
-              MUL_LATENCY = 1,
-              DIV_LATENCY = 23,
-              SQRT_LATENCY = 15;
+    parameter ADD_LATENCY = 2,
+              MUL_LATENCY = 2,
+              DIV_LATENCY = 11,
+              SQRT_LATENCY = 7;
 
     input clk, en, rst_n, rst;
     input [31:0] op1, op2;

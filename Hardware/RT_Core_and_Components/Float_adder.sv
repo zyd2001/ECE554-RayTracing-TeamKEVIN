@@ -9,8 +9,8 @@ module Float_adder (
     op1, op2, clk, out, done, en, rst_n, rst
 );
 
-    parameter ADD_LATENCY_R = 2;
-    parameter ADD_LATENCY = 1;
+    parameter ADD_LATENCY_R = 3;
+    parameter ADD_LATENCY = 2;
 
     input clk, en, rst_n, rst;
     input [31:0] op1, op2;
