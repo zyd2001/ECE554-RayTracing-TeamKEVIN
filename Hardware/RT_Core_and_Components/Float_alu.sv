@@ -13,12 +13,12 @@ module Float_alu (
     parameter ADD_LATENCY_R = 3,
               MUL_LATENCY_R = 3,
               DIV_LATENCY_R = 12,
-              SQRT_LATENCY_R = 8;
+              SQRT_LATENCY_R = 10;
 
     parameter ADD_LATENCY = 2,
               MUL_LATENCY = 2,
               DIV_LATENCY = 11,
-              SQRT_LATENCY = 7;
+              SQRT_LATENCY = 9;
 
     input clk, en, rst_n, rst;
     input [31:0] op1, op2;
@@ -33,7 +33,7 @@ module Float_alu (
 		.clk    (clk),      //   input,   width = 1,    clk.clk
 		.areset (rst),   //   input,   width = 1, areset.reset
 		.en     (1'h1),   //   input,   width = 1,     en.en
-		.a      (op1),    //   input,  width = 32,      a.a
+		.a      ({{1'b0}, op1[30:0]}),    //   input,  width = 32,      a.a
 		.q      (Sqrt_result)       //  output,  width = 32,      q.q
 	);
 
