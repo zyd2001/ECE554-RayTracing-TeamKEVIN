@@ -185,20 +185,22 @@ main:	s_push R28
 	s_push R5
 	s_push R30
 	s_push R28
-	Trace
-	
+	Trace	
+
 	s_pop R28
 	s_pop R30
 	s_pop R5
 	v_pop R2
 	v_mov R3 R14
+	s_get_from_v R27 R14 3
+	v_get_from_s R3 R27 3
 	v_mov R4 R15
 	v_mov R1 R4
 	s_push R30
 	
 	v_push R2
 	jmp_link normalize
-	
+
 	v_pop R2
 	s_pop R30
 
@@ -231,6 +233,7 @@ main:	s_push R28
 	
 	s_push R5
 	jmp_link hit_shader
+	
 	
 	s_pop R5
 	s_pop R30
@@ -530,6 +533,8 @@ L5:	s_write_low R1 46871
 	v_pop R10
 	v_pop R11
 	v_mov R3 R14
+	s_get_from_v R27 R14 3
+        v_get_from_s R3 R27 3
 
 	v_mov R1 R15
 	s_push R30
