@@ -7,40 +7,39 @@ module Fix_Div (
     output logic signed [31:0] result 
 );
 
-    logic signed [31:0] pip0, pip1, pip2, pip3, pip4;
+    logic signed [31:0] pip [21:0];
     longint operand1, operand2, int_output;
 
-    assign result = en ? pip4 : '0;
+    assign result = en ? pip[21] : '0;
     always_comb begin 
         operand1 = numerator;
         operand2 = denominator;
         int_output = operand1 / operand2;
     end
 
+    genvar i;
+    generate;
+        for (int i=1; i<22; ++i) begin
+            always_ff@( posedge clk, posedge rst ) begin
+                if (rst) 
+                    pip[i] <= '0;
+                else if (en)
+                    pip[i] <= pip[i-1];
+                else
+                    pip[i] <= '0;
+            end
+        end
+    endgenerate
+
     always_ff @( posedge clk, posedge rst ) begin : internal_pipe
         if (rst) begin
-            pip0 <= '0;
-            pip1 <= '0;
-            pip2 <= '0;
-            pip3 <= '0;
-            pip4 <= '0;
-
+            pip[0] <= '0;
         end else begin
             if (en) begin
-                pip0 <= int_output;
-                pip1 <= pip0;
-                pip2 <= pip1;
-                pip3 <= pip2;
-                pip4 <= pip3;
+                pip[0] <= int_output;
             end else begin
-                pip0 <= '0;
-                pip1 <= '0;
-                pip2 <= '0;
-                pip3 <= '0;
-                pip4 <= '0;
-            end
-                
+                pip[0] <= '0;
+            end     
         end
-        
     end
 endmodule
