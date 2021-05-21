@@ -157,7 +157,7 @@ module RT_core_single (
     logic [31:0] EX_float_ALU1_out, EX_float_ALU2_out, EX_float_ALU3_out, EX_float_ALU4_out;
     
     logic [1:0] EX_int_flag, EX_float_flag;
-    logic EX_int_flag_en, EX_float_flag_en;
+    logic EX_int_flag_en, EX_float_flag_en, EX_flag_update;
 
     waiting_state EX_current_state, EX_next_state;
     logic EX_busy;
@@ -193,7 +193,7 @@ module RT_core_single (
     waiting_state MEM_current_state, MEM_next_state;
     logic MEM_busy;
     logic MEM_V_reduce_done;
-    logic MEM_v_reduce_knockdown, MEM_knockdown;
+    logic MEM_knockdown;
     
     logic [31:0] MEM_reduce_out;
     logic [31:0] MEM_S_out;
@@ -571,17 +571,17 @@ module RT_core_single (
         else begin
             if (!EX_busy && !MEM_busy)
                 DE_EX_intALU_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_intALU_en;
-            else if (EX_int_knockdown)
+            else if (EX_integer_done)
                 DE_EX_intALU_en <= 1'b0;
             
             if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU1_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU1_en;
-            else if (EX_float1_knockdown)
+            else if (EX_float_done)
                 DE_EX_floatALU1_en <= 1'b0;
 
             if (!EX_busy && !MEM_busy)
                 DE_EX_floatALU234_en <= (IF_DE_stall || IF_DE_FIN) == 1'b1 ? 1'b0 : DE_floatALU234_en;
-            else if (EX_float234_knockdown)
+            else if (EX_float_done)
                 DE_EX_floatALU234_en <= 1'b0;
         end
 
@@ -600,6 +600,7 @@ module RT_core_single (
 
     always_comb begin : EX_waiting_state_machine
         EX_busy = 1'b0;
+        EX_flag_update = 1'b0;
         EX_next_state = EX_current_state;
         case (EX_current_state)
             idle: begin
@@ -626,6 +627,7 @@ module RT_core_single (
             end
             default:begin
                 EX_next_state = idle;
+                EX_flag_update = 1'b1;
             end
         endcase
     end
@@ -693,20 +695,20 @@ module RT_core_single (
             EX_float_ALU4_OP2 = DE_EX_vector2[127:96];
     end
 
-    Integer_alu IALU(.op1(EX_integer_ALU_OP1), .op2(EX_integer_ALU_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_intALU_en), .en_knock_down(EX_int_knockdown),
+    Integer_alu IALU(.op1(EX_integer_ALU_OP1), .op2(EX_integer_ALU_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_intALU_en), 
         .out(EX_integer_ALU_out), .done(EX_integer_done), .operation(DE_EX_integer_ALU_opcode), .flag(EX_int_flag), .rst(rst));
     
-    Float_alu FALU1(.op1(EX_float_ALU1_OP1), .op2(EX_float_ALU1_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU1_en), .en_knock_down(EX_float1_knockdown),
+    Float_alu FALU1(.op1(EX_float_ALU1_OP1), .op2(EX_float_ALU1_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU1_en), 
         .out(EX_float_ALU1_out), .done(EX_float_done), .operation(DE_EX_float_ALU_opcode), .flag(EX_float_flag), .rst(rst));
-    Float_alu FALU2(.op1(EX_float_ALU2_OP1), .op2(EX_float_ALU2_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), .en_knock_down(EX_float234_knockdown),
+    Float_alu FALU2(.op1(EX_float_ALU2_OP1), .op2(EX_float_ALU2_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), 
         .out(EX_float_ALU2_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
-    Float_alu FALU3(.op1(EX_float_ALU3_OP1), .op2(EX_float_ALU3_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), .en_knock_down(),
+    Float_alu FALU3(.op1(EX_float_ALU3_OP1), .op2(EX_float_ALU3_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en),
         .out(EX_float_ALU3_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
-    Float_alu FALU4(.op1(EX_float_ALU4_OP1), .op2(EX_float_ALU4_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en), .en_knock_down(),
+    Float_alu FALU4(.op1(EX_float_ALU4_OP1), .op2(EX_float_ALU4_OP2), .clk(clk), .rst_n(rst_n), .en(DE_EX_floatALU234_en),
         .out(EX_float_ALU4_out), .done(), .operation(DE_EX_float_ALU_opcode), .flag(), .rst(rst));
 
-    assign EX_int_flag_en = EX_integer_done & DE_EX_update_int_flag;
-    assign EX_float_flag_en = EX_float_done & DE_EX_update_float_flag;
+    assign EX_int_flag_en = EX_flag_update & DE_EX_update_int_flag;
+    assign EX_float_flag_en = EX_flag_update & DE_EX_update_float_flag;
 
     always_comb begin : EX_select_output
         EX_S_out = 32'b0;
@@ -833,7 +835,7 @@ module RT_core_single (
                 EX_MEM_vector_reduce_en <= (EX_busy || DE_EX_FIN) == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
                 EX_MEM_vector_reduce_en_stay <= (EX_busy || DE_EX_FIN) == 1'b1 ? 1'b0 : DE_EX_vector_reduce_en;
             end
-            else if (MEM_v_reduce_knockdown)
+            else if (MEM_V_reduce_done)
                 EX_MEM_vector_reduce_en <= 3'b0;
 
             if (kernel_mode) begin
@@ -868,8 +870,8 @@ module RT_core_single (
     assign MEM_read_en = EX_MEM_memory_op[2:1] == 2'b10;
     assign MEM_write_en = EX_MEM_memory_op[2:1] == 2'b11;
 
-    FPU Reduce_adder(.op1_in(EX_MEM_v_out[31:0]), .op2_in(EX_MEM_v_out[95:64]), .operation(2'b00), .out(MEM_reduce_out), .en(EX_MEM_vector_reduce_en), 
-        .clk(clk), .rst_n(rst_n), .done(MEM_V_reduce_done), .flag(), .rst(rst));
+    Float_adder Reduce_adder(.op1(EX_MEM_v_out[31:0]), .op2(EX_MEM_v_out[95:64]), .out(MEM_reduce_out), .en(EX_MEM_vector_reduce_en), 
+        .clk(clk), .rst_n(rst_n), .done(MEM_V_reduce_done), .rst(rst));
 
     always_ff @( posedge clk, negedge rst_n ) begin : MEM_update_waiting_state     
         if (!rst_n)
