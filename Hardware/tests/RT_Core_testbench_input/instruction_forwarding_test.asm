@@ -14,6 +14,7 @@ start:
     s_load_4byte r6 r4 0
     ii_addi r6 r6 2
     s_write_low r7 7
+    s_write_high r7 0
     cmp_i r6 r7
     bne wrong2
     fin

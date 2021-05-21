@@ -31,11 +31,6 @@ rta.sv
 ./RT_Core_and_Components/Integer_alu.sv
 ./RT_Core_and_Components/Register_file.sv
 ./RT_Core_and_Components/RT_Core_single.sv
-./RT_Core_and_Components/IP/FPU.sv
-./RT_Core_and_Components/IP/Ftoi.sv
-./RT_Core_and_Components/IP/ICU_fixpoint.sv
-./RT_Core_and_Components/IP/Itof.sv
-./RT_Core_and_Components/IP/Sqrt.sv
 ./RT_Core_and_Components/ALU_components/FtoI.sv
 ./RT_Core_and_Components/ALU_components/ItoF.sv
 ./RT_Core_and_Components/ALU_components/Fix_Add.sv
@@ -45,6 +40,7 @@ rta.sv
 ./RT_Core_and_Components/ALU_components/Float_Div.sv
 ./RT_Core_and_Components/ALU_components/Float_Mul.sv
 ./RT_Core_and_Components/ALU_components/Float_Sqrt.sv
+./RT_Core_and_Components/Float_adder.sv
 ./IC/Calculation_v3.sv
 ./IC/ContactDetect_v2.sv
 ./IC/ContactPoint_v2.sv
