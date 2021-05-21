@@ -7,24 +7,42 @@ module Float_Inv (
 	);
   
   shortreal in, temp;
-  logic [31:0] out, q_in;
-  
+  logic [31:0] out;
+  logic [31:0] pip [7:0];
+
   assign in = $bitstoshortreal(a);
   
   assign temp = 1/in;
   
   assign out = $shortrealtobits(temp);
-  
-    always_ff @( posedge clk, posedge areset ) begin
+
+  genvar i;
+  generate;
+    for (int i=1; i<8; ++i) begin
+        always_ff@( posedge clk, posedge rst ) begin
+            if (rst) 
+                pip[i] <= '0;
+            else if (en)
+                pip[i] <= pip[i-1];
+            else
+                pip[i] <= '0;
+        end
+    end
+  endgenerate
+
+  always_ff @( posedge clk, posedge areset ) begin : internal_pipe
     if (areset) begin
-        q_in <= 32'b0;
-    end
-    else begin
-        q_in <= out;
-    end
+        pip[0] <= '0;
+    end else begin
+        if (en) begin
+            pip[0] <= out;
+        end else begin
+            pip[0] <= '0;
+        end
+    end  
   end
   
-  assign q = q_in;
+  assign q = pip[7];
   
 endmodule
 

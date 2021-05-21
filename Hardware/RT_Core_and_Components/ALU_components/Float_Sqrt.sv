@@ -6,10 +6,10 @@ module Float_Sqrt (
     output logic [31:0] q 
 );
 
-    logic [31:0] pip0, pip1, pip2, pip3, pip4;
+    logic [31:0] pip [7:0];
     shortreal out, in;
 
-    assign q = en ? pip4 : '0;
+    assign q = en ? pip[7] : '0;
     always_comb begin 
         in = $bitstoshortreal(a);
         if (in >= 0)
@@ -18,27 +18,28 @@ module Float_Sqrt (
             out = 0;
     end
 
+    genvar i;
+    generate;
+        for (int i=1; i<8; ++i) begin
+            always_ff@( posedge clk, posedge rst ) begin
+                if (rst) 
+                    pip[i] <= '0;
+                else if (en)
+                    pip[i] <= pip[i-1];
+                else
+                    pip[i] <= '0;
+            end
+        end
+    endgenerate
+
     always_ff @( posedge clk, posedge areset ) begin : internal_pipe
         if (areset) begin
-            pip0 <= '0;
-            pip1 <= '0;
-            pip2 <= '0;
-            pip3 <= '0;
-            pip4 <= '0;
-
+            pip[0] <= '0;
         end else begin
             if (en) begin
-                pip0 <= $shortrealtobits(out);
-                pip1 <= pip0;
-                pip2 <= pip1;
-                pip3 <= pip2;
-                pip4 <= pip3;
+                pip[0] <= $shortrealtobits(out);
             end else begin
-                pip0 <= '0;
-                pip1 <= '0;
-                pip2 <= '0;
-                pip3 <= '0;
-                pip4 <= '0;
+                pip[0] <= '0;
             end
                 
         end

@@ -7,37 +7,39 @@ module Float_Div (
     output logic [31:0] q
 );
 
-    logic [31:0] pip0, pip1, pip2, pip3, pip4;
+    logic [31:0] pip [11:0];
     shortreal operand1, operand2, float_output;
 
-    assign q = en ? pip4 : '0;
+    assign q = en ? pip[11] : '0;
     always_comb begin 
         operand1 = $bitstoshortreal(a);
         operand2 = $bitstoshortreal(b);
         float_output =  operand1 / operand2;
     end
 
+    genvar i;
+    generate;
+        for (int i=1; i<12; ++i) begin
+            always_ff@( posedge clk, posedge rst ) begin
+                if (rst) 
+                    pip[i] <= '0;
+                else if (en)
+                    pip[i] <= pip[i-1];
+                else
+                    pip[i] <= '0;
+            end
+        end
+    endgenerate
+
     always_ff @( posedge clk, posedge areset ) begin : internal_pipe
         if (areset) begin
-            pip0 <= '0;
-            pip1 <= '0;
-            pip2 <= '0;
-            pip3 <= '0;
-            pip4 <= '0;
+            pip[0] <= '0;
         end else begin
             if (en) begin
-                pip0 <= $shortrealtobits(float_output);
-                pip1 <= pip0;
-                pip2 <= pip1;
-                pip3 <= pip2;
-                pip4 <= pip3;
+                pip[0] <= $shortrealtobits(float_output);
             end
             else begin
-                pip0 <= '0;
-                pip1 <= '0;
-                pip2 <= '0;
-                pip3 <= '0;
-                pip4 <= '0;
+                pip[0] <= '0;
             end
         end
         

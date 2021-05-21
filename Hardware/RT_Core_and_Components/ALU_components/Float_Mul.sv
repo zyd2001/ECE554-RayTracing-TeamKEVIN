@@ -7,7 +7,7 @@ module Float_Mul (
     output logic [31:0] q
 );
 
-    logic [31:0] pip0;
+    logic [31:0] pip0, pip1, pip2;
     shortreal operand1, operand2, float_output;
 
     assign q = en ? pip0 : '0;
@@ -20,11 +20,18 @@ module Float_Mul (
     always_ff @( posedge clk, posedge areset ) begin : internal_pipe
         if (areset) begin
             pip0 <= '0;
+            pip1 <= '0;
+            pip2 <= '0;
         end else begin
-            if (en)
+            if (en) begin
                 pip0 <= $shortrealtobits(float_output);
-            else 
+                pip1 <= pip0;
+                pip2 <= pip1;
+            end else begin
                 pip0 <= '0;
+                pip1 <= '0;
+                pip2 <= '0;
+            end
         end
         
     end
