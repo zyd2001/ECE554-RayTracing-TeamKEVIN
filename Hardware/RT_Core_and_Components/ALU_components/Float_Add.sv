@@ -15,7 +15,7 @@ module Float_Add (
     always_comb begin 
         operand1 = $bitstoshortreal(a);
         operand2 = $bitstoshortreal(b);
-        float_output = opSel ? operand1 - operand2 : operand1 + operand2;
+        float_output = opSel ? operand1 + operand2 : operand1 - operand2;
     end
 
     always_ff @( posedge clk, posedge areset ) begin : internal_pipe
