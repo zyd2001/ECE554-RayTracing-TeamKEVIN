@@ -19,7 +19,7 @@ module Fix_Div (
 
     genvar i;
     generate;
-        for (int i=1; i<22; ++i) begin
+        for (i=1; i<22; ++i) begin
             always_ff@( posedge clk, posedge rst ) begin
                 if (rst) 
                     pip[i] <= '0;

@@ -24,7 +24,7 @@ module Float_Add (
             pip1 <= '0;
             pip2 <= '0;
         end else begin
-            if (en)
+            if (en) begin
                 pip0 <= $shortrealtobits(float_output);
                 pip1 <= pip0;
                 pip2 <= pip1;
