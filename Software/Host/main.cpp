@@ -43,6 +43,8 @@
 
 using namespace std;
 
+int width, height;
+
 void clearMem(dma_data_t *mem, int size)
 {
     for (int i = 0; i < size; i++)
@@ -77,7 +79,7 @@ void getOutput(dma_data_t *data, ofstream &out, short * buffer)
     {
         for (int j = 0; j < 3; j++)
         {
-            buff+3er[i * 3 + j] = *ptr * 255;
+            buffer[i * 3 + j] = *ptr * 255;
             ptr++;
         }
         ptr++;
@@ -151,7 +153,6 @@ int main(int argc, char *argv[])
         short * buffer = new short[width * height * 3];
 
         ofstream out("output.ppm");
-        string str = "P3\n16 12\n255\n";
         out << "P3\n" << argv[1] << " " << argv[2] << "\n255\n";
 
         cout << "Starting...\n";
