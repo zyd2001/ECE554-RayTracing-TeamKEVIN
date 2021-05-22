@@ -70,48 +70,53 @@ ifstream::pos_type filesize(ifstream &f)
     return size;
 }
 
-void getOutput(dma_data_t *data, ofstream &out)
+void getOutput(dma_data_t *data, ofstream &out, short * buffer)
 {
     volatile float *ptr = (volatile float *)data;
-    // volatile int *ptr = (volatile int *)data;
     for (int i = 0; i < OUTPUT_SIZE / 4; i++)
     {
         for (int j = 0; j < 3; j++)
         {
-            out << *ptr * 255;
-            out << " ";
+            buff+3er[i * 3 + j] = *ptr * 255;
             ptr++;
         }
         ptr++;
-        out << "\n";
-        // for (int j = 0; j < 4; j++, ptr++)
-        // {
-        //     out << *ptr;
-        //     out << " ";
-        // }
-        // out << "\n";
     }
 }
 
-void run(AFU &afu, dma_data_t *data, ofstream &out)
+void outputImage(short * buffer,  ofstream &out)
+{
+    for (int i = 0; i < width * height; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            out << buffer[i * 3 + j] << " ";
+        }
+        out << "\n";
+    }
+}
+
+void run(AFU &afu, dma_data_t *data, ofstream &out, short * buffer)
 {
     afu.write(CONDITION, (uint64_t)3);
+    short * internal_buffer = buffer;
     while (true)
     {
-        this_thread::sleep_for(chrono::milliseconds(SLEEP_MS));
         auto ret = afu.read(CONDITION);
         bool patch_done = !(ret & 1);
         bool all_done = !(ret & 2);
         if (patch_done)
         {
-            fprintf(stderr, "get\n");
-            getOutput(data, out);
+            // fprintf(stderr, "get\n");
+            getOutput(data, out, internal_buffer);
+            internal_buffer += 32 * 3;
             afu.write(CONDITION, 3);
         }
         if (all_done)
         {
-            fprintf(stderr, "done\n");
-            getOutput(data, out);
+            getOutput(data, out, internal_buffer);
+            cout << "done\n";
+            outputImage(buffer, out);
             break;
         }
     }
@@ -140,9 +145,14 @@ int main(int argc, char *argv[])
         ifstream cp("CP.binary", ios::binary), rt("main.asm.out", ios::binary),
             con("constant.binary", ios::binary), tri("box.binary", ios::binary);
 
+        int width, height;
+        width = atoi(argv[1]);
+        height = atoi(argv[2]);
+        short * buffer = new short[width * height * 3];
+
         ofstream out("output.ppm");
         string str = "P3\n16 12\n255\n";
-        out << str;
+        out << "P3\n" << argv[1] << " " << argv[2] << "\n255\n";
 
         cout << "Starting...\n";
 
@@ -198,7 +208,7 @@ int main(int argc, char *argv[])
         afu.write(TRI_SIZE, (uint64_t)(triangleSize / AFU::CL_BYTES));
         afu.write(TRI_LOAD, (uint64_t)1);
         afu.write(OUT_ADDR, (uint64_t)output);
-        run(afu, output, out);
+        run(afu, output, out, buffer);
 
         // The FPGA DMA only handles cache-line transfers, so we need to convert
         // the array size to cache lines.
@@ -218,6 +228,7 @@ int main(int argc, char *argv[])
         // }
 
         out.close();
+        delete buffer;
         // Free the allocated memory.
         afu.free(CPIns);
         afu.free(RTIns);
