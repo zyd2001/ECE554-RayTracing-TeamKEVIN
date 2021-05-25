@@ -1,5 +1,5 @@
 # Hardware Ray-tracing Graphical Processor
-![C++ render result](./Outputs/C++Output.jpg)
+![Hardware render result](./Outputs/1080p_hardware.png)
 
 This project is the work of Team KEVIN on a dedicated graphical processor for ray tracing. It is completed under the supervision of Mikko Lipasti and aims to implement and streamline the process of ray tracing in software and hardware. Inspired by current GPU architecture, we designed a multi-thread processor that can render millions of pixels on the hardware. RT-core is a general-purpose compute unit and the smallest component in our hardware. It can run one thread at a time with our custom ISA that supports 32-bit floating-point and vector operations. Four of such compute units and eight ray-triangle intersection accelerators (IC core) form streaming multiprocessors (SM), and it can take up to 32 threads at the same time. The host will provide a launch size (usually width * height of the image), and our hardware will split it into 32 thread wrap and assign them to each SM. Currently, we only have one SM in our design, but it can effortlessly scale up to any number.
 
@@ -8,8 +8,9 @@ Alongside with our hardware, we created a complier and a assembler to transform 
 Our system is targeted at Intel FPGA and Intel Devcloud. 
 # What you might find useful in this Repo
 - [RT Core](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/RT_Core_and_Components): Five stage pipelined CPU with floating point and vector support.
-- [Intel floating-point and fix-point IP](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/RT_Core_and_Components/IP): Example about how to integrate Intel IP into your design.
-- [IC Core](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/IC): Pipelined ray-triangle intersection accelerator.
+- [Intel floating-point and fix-point IP](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/IP): Generated Intel IPs with latency. Examples about how to integrate Intel IP into your design can be found here [FPU](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/RT_Core_and_Components/Float_alu.sv).
+- [IC Core](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/IC) & [Triangle Memory](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/mem_triangle.sv): Ray-triangle intersection accelerator.
+- [Patch Dispatcher](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/patch_dispatcher.sv) & [16 Bank Memory](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/mem_main.sv): Examples about how to schedule a multi-threaded system and support multi-thread memory operations.
 - [Ray-generation kernel and PBR shader](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Software/Real_RT_instruction_simulation): Simple pinhole camera model and physically based shader using roughness/metallic.
 # Current Progress
 ✔ All components written and integrated 
@@ -24,14 +25,19 @@ Our system is targeted at Intel FPGA and Intel Devcloud.
 
 ✔ Generate images from real FPGA
 # Architecture 
-![ID](./Outputs/ThreadID.png)
+<p align="center">
+    <img src="./Outputs/ThreadID.png" alt="ID" width="400">
+</p>
 Each thread will be assigned with a thread ID and pixel ID, telling pixel they are responsible to. Then each thread will start executing instruction at position 0. They will terminal when FIN is called. For more information, please refer to the document.
 
-![cycle](./Outputs/Thread_cycle.png)
-
+<p align="center">
+    <img src="./Outputs/Thread_cycle.png" alt="cycle" width="600">
+</p>
 
 # Micro Architecture 
-![Top-level](./Outputs/top-level.png)
+<p align="center">
+    <img src="./Outputs/top-level.png" alt="top-level">
+</p>
 
 Our hardware aims to supports all the functionality we defined in the Architecture Chapter. Host and self-made memory controller work together through DMA and MMIO interface to move instructions and triangles from host to chip and move the chip to the host. 
 
@@ -43,7 +49,9 @@ RT Core is a generic CPU core with vector and floating-point support and the int
 
 Since the Instruction memory, triangle memory and the constant memory is read-only to all the thread, we can simply duplicate them to avoid bank conflict. Each RT Core has its own Instruction and Constant memory, and each IC Core has its own Triangle memory. However, RT Core can read-write main memory therefore we have a unified main memory for all the RT Core.
 
-![flowchart](./Outputs/flowchart.png)
+<p align="center">
+    <img src="./Outputs/flowchart.png" alt="flowchart">
+</p>
 
 # How to run simulation on AFU_ASE
 You can test this project in a simulated environment.
