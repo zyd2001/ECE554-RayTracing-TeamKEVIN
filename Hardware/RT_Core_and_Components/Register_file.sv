@@ -1,3 +1,10 @@
+///////////////////////////////
+// This module that have 32 scalar registers and 16 vector registers
+// Register at position 0 is always 0 
+//
+// Author: Yan Xiao
+// Last modify: 4/14
+///////////////////////////////
 module Register_file (
     clk,  
     scalar_wen, scalar_wb_address, scalar_wb_data,
