@@ -3,18 +3,18 @@ rta.json
 C:/home/u59679/intel-fpga-bbb/BBB_cci_mpf/hw/rtl/cci_mpf_sources.txt
 
 +incdir+.
-./RT_Core_and_Components/IP/100hz/Fix_Add.ip
-./RT_Core_and_Components/IP/100hz/Fix_Div.ip
-./RT_Core_and_Components/IP/100hz/Fix_Mul.ip
-./RT_Core_and_Components/IP/100hz/Float_Add.ip
-./RT_Core_and_Components/IP/100hz/Float_Div.ip
-./RT_Core_and_Components/IP/100hz/Float_Grtr.ip
-./RT_Core_and_Components/IP/100hz/Float_Inv.ip
-./RT_Core_and_Components/IP/100hz/Float_Less.ip
-./RT_Core_and_Components/IP/100hz/Float_Mul.ip
-./RT_Core_and_Components/IP/100hz/Float_Sqrt.ip
-./RT_Core_and_Components/IP/100hz/FtoI.ip
-./RT_Core_and_Components/IP/100hz/ItoF.ip
+./IP/100hz/Fix_Add.ip
+./IP/100hz/Fix_Div.ip
+./IP/100hz/Fix_Mul.ip
+./IP/100hz/Float_Add.ip
+./IP/100hz/Float_Div.ip
+./IP/100hz/Float_Grtr.ip
+./IP/100hz/Float_Inv.ip
+./IP/100hz/Float_Less.ip
+./IP/100hz/Float_Mul.ip
+./IP/100hz/Float_Sqrt.ip
+./IP/100hz/FtoI.ip
+./IP/100hz/ItoF.ip
 
 fifo.sv
 cci_dma.sv

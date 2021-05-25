@@ -3,18 +3,18 @@ rta.json
 C:/home/u59679/intel-fpga-bbb/BBB_cci_mpf/hw/rtl/cci_mpf_sources.txt
 
 +incdir+.
-./RT_Core_and_Components/IP/Arria_200/Fix_Add.ip
-./RT_Core_and_Components/IP/Arria_200/Fix_Div.ip
-./RT_Core_and_Components/IP/Arria_200/Fix_Mul.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Add.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Div.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Grtr.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Inv.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Less.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Mul.ip
-./RT_Core_and_Components/IP/Arria_200/Float_Sqrt.ip
-./RT_Core_and_Components/IP/Arria_200/FtoI.ip
-./RT_Core_and_Components/IP/Arria_200/ItoF.ip
+./IP/Arria_200/Fix_Add.ip
+./IP/Arria_200/Fix_Div.ip
+./IP/Arria_200/Fix_Mul.ip
+./IP/Arria_200/Float_Add.ip
+./IP/Arria_200/Float_Div.ip
+./IP/Arria_200/Float_Grtr.ip
+./IP/Arria_200/Float_Inv.ip
+./IP/Arria_200/Float_Less.ip
+./IP/Arria_200/Float_Mul.ip
+./IP/Arria_200/Float_Sqrt.ip
+./IP/Arria_200/FtoI.ip
+./IP/Arria_200/ItoF.ip
 
 fifo.sv
 cci_dma.sv
