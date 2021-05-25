@@ -3,7 +3,7 @@
 
 This project is the work of Team KEVIN on a dedicated graphical processor for ray tracing. It is completed under the supervision of Mikko Lipasti and aims to implement and streamline the process of ray tracing in software and hardware. Inspired by current GPU architecture, we designed a multi-thread processor that can render millions of pixels on the hardware. RT-core is a general-purpose compute unit and the smallest component in our hardware. It can run one thread at a time with our custom ISA that supports 32-bit floating-point and vector operations. Four of such compute units and eight ray-triangle intersection accelerators (IC core) form streaming multiprocessors (SM), and it can take up to 32 threads at the same time. The host will provide a launch size (usually width * height of the image), and our hardware will split it into 32 thread wrap and assign them to each SM. Currently, we only have one SM in our design, but it can effortlessly scale up to any number.
 
-Alongside with our hardware, we created a complier and a assembler to transform C like language, Kevin++, into machine code. We also wrote a assembly simulator that can simulate one pixel using assembly code and Kevin++ simulator that can run Kevin++ in C. THe image at the front is our demo code. It is a physically based shader written in Kevin++ and simulated in C.
+Alongside with our hardware, we created a complier and a assembler to transform C like language, Kevin++, into machine code. We also wrote a assembly simulator that can simulate one pixel using assembly code and Kevin++ simulator that can run Kevin++ in C. The image at the front is our demo code. It is a physically based shader written in Kevin++ and simulated in C.
 
 Our system is targeted at Intel FPGA and Intel Devcloud. 
 # What you might find useful in this Repo
@@ -12,17 +12,17 @@ Our system is targeted at Intel FPGA and Intel Devcloud.
 - [IC Core](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Hardware/IC): Pipelined ray-triangle intersection accelerator.
 - [Ray-generation kernel and PBR shader](https://github.com/zyd2001/ECE554-RayTracing-TeamKEVIN/tree/master/Software/Real_RT_instruction_simulation): Simple pinhole camera model and physically based shader using roughness/metallic.
 # Current Progress
-⭕ All components written and integrated 
+✔ All components written and integrated 
 
-⭕ All components successfully passed simulation
+✔ All components successfully passed simulation
 
-⭕ Mapping complete
+✔ Mapping complete
 
-⭕ MMIO and DMA passed the tests on real FPGA
+✔ MMIO and DMA passed the tests on real FPGA
 
-❌ IP on FPGA works as expected
+✔ IP on FPGA works as expected
 
-❌ Generate images from real FPGA
+✔ Generate images from real FPGA
 # Architecture 
 ![ID](./Outputs/ThreadID.png)
 Each thread will be assigned with a thread ID and pixel ID, telling pixel they are responsible to. Then each thread will start executing instruction at position 0. They will terminal when FIN is called. For more information, please refer to the document.
