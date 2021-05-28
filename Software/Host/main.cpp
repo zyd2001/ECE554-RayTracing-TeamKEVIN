@@ -137,6 +137,11 @@ void changeConstantInt(dma_data_t *data, int value, int offset)
     *ptr = value;
 }
 
+float position(float start, float end, int time, int total)
+{
+    return (end - start) * ((float)time / total) + start;
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -195,7 +200,7 @@ int main(int argc, char *argv[])
         
         changeConstantInt(constant, width, 0);
         changeConstantInt(constant, height, 4);
-        changeConstant(constant, -3.0, 16);
+        // changeConstant(constant, -3.0, 16);
         
         // Inform the FPGA of the starting read and write address of the arrays.
         afu.write(CP_ADDR, (uint64_t)CPIns);
@@ -220,11 +225,33 @@ int main(int argc, char *argv[])
         afu.write(CON_LOAD, (uint64_t)0);
         afu.write(TRI_LOAD, (uint64_t)0);
 
-        for (int i = 1; i < 24 * 5; i++)
+        int counter = 1;
+
+        for (int i = 1; i < 24 * 0.75; i++)
         {
-            changeConstant(constant, -3.0 + i * 6.0 / 120, 16);
+            // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
+            changeConstant(constant, position(0, -3, i, 9), 0xb0 + 0x08);
             afu.write(CON_LOAD, 1);
-            run(afu, output, buffer, i);
+            run(afu, output, buffer, counter);
+            counter++;
+        }
+
+        for (int i = 0; i < 24 * 1.5; i++)
+        {
+            // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
+            changeConstant(constant, position(-3, 3, i, 24 * 1.5), 0xb0 + 0x08);
+            afu.write(CON_LOAD, 1);
+            run(afu, output, buffer, counter);
+            counter++;
+        }
+
+        for (int i = 0; i < 24 * 0.75; i++)
+        {
+            // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
+            changeConstant(constant, position(3, 0, i, 24 * 0.75), 0xb0 + 0x08);
+            afu.write(CON_LOAD, 1);
+            run(afu, output, buffer, counter);
+            counter++;
         }
 
         int error = system("cd out && ffmpeg -r 24 -f image2 -s 480x360 -i ./output%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4");
