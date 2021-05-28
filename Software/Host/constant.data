@@ -10,14 +10,14 @@ const vector sky_top_color(0.53, 0.808, 0.92, 1.0);
 const vector ambient_light(0.3, 0.3, 0.3, 1.0);
 
 #
-{vector(4.0, 0, 5.0, 6.0), vector(0.992, 0.9215, 0.8157, 1.0), vector(-4.0, 0, 5.0, 6.0), vector(0.949, 0.843, 0.8353, 1.0), vector(0, 0, 0, 0)};
-vector(0, 3.8, 0, 8.0)
-vector(1.0, 1.0, 1.0, 1.0)
+vector(4.0, 0, 5.0, 6.0), vector(1.0, 0.5, 0.5, 1.0), vector(-4.0, 0, 5.0, 6.0), vector(0.5, 0.5, 1.0, 1.0)
+vector(0, 4.0, 0, 4.0)
+vector(0.8, 0.8, 0.8, 1.0)
 vector(0, 0, 0, 0)
 #
 Material one subsurface albedo(1.0, 1.0, 1.0, 1.0);
 Material one roughness metallic(1.0, 0, 0, 0)
-Material two subsurface albedo(0.562, 0.565, 0.578, 1.0);
-Material two roughness metallic(0.1, 1.0, 0, 0);
+Material two subsurface vector(0.09,0.647,0.537,1);
+Material two roughness metallic(0.1, 0.8, 0, 0);
 Material three subsurface albedo(0.796, 0.2627, 0.2078, 1.0);
 Material three roughness metallic(1.0, 0, 0, 0)
