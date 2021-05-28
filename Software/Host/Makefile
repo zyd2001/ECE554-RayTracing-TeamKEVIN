@@ -21,6 +21,8 @@ all: $(TEST) $(TEST)_ase
 	python3 ./constant.py constant.data
 	mv constant.data.out constant.binary
 	python3 ./Assembler.py -r main.asm
+	python3 ./triangle.py box_kevin.obj
+	mv box_kevin.out box.binary
 
 # AFU info from JSON file, including AFU UUID
 AFU_JSON_INFO = $(OBJDIR)/afu_json_info.h
