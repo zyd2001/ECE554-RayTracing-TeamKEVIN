@@ -15,9 +15,15 @@ vector(-4.0,0,5.0,6.0), vector(0.217638,0.217638,0.5,1.0),
 vector(0,4.0,0,4.0), vector(1.67106, 0.640764, 0.147656,1.0), 
 vector(0,0,0,0)};
 #
-Material one subsurface albedo(1.0, 1.0, 1.0, 1.0);
-Material one roughness metallic(1.0, 0, 0, 0)
-Material two subsurface vector(0.005,0.3836,0.25465,1.0);
-Material two roughness metallic(0.1, 0.8, 0, 0);
-Material three subsurface albedo(0.605353,0.0528217,0.0315370,1.0);
-Material three roughness metallic(1.0, 0, 0, 0)
+Material Black
+0.972, 0.960, 0.915, 1.0
+0.4, 0.9, 0, 0
+Material Green
+0.005,0.3836,0.25465,1.0
+0.1, 0.8, 0, 0
+Material Red
+0.605353,0.0528217,0.0315370,1.0
+1.0, 0.0, 0, 0
+Material White
+1.0, 1.0, 1.0, 1.0
+1.0, 0.0, 0, 0
