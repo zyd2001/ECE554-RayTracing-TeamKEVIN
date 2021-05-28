@@ -230,7 +230,11 @@ int main(int argc, char *argv[])
         {
             // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
             changeConstant(constant, position(0, -3, i, 24 * 0.75), 0xb0 + 0x08);
-            afu.write(CON_LOAD, 1);
+            afu.write(CP_LOAD, (uint64_t)0);
+            afu.write(RT_LOAD, (uint64_t)0);
+            // afu.write(CON_LOAD, (uint64_t)0);
+            afu.write(TRI_LOAD, (uint64_t)0);
+            // afu.write(CON_LOAD, 1);
             run(afu, output, buffer, counter);
             counter++;
         }
