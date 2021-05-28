@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
             run(afu, output, buffer, i);
         }
 
-        system("cd out && ffmpeg -r 24 -f image2 -s 480x360 -i ./output%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4");
+        int error = system("cd out && ffmpeg -r 24 -f image2 -s 480x360 -i ./output%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4");
 
         delete[] buffer;
         // Free the allocated memory.

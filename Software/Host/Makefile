@@ -40,7 +40,7 @@ $(OBJDIR)/%.o: %.cpp config.h AFU.h | objdir
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(TEST) $(TEST)_ase $(OBJDIR)
+	rm -rf $(TEST) $(TEST)_ase $(OBJDIR) box.binary main.asm.out constant.binary
 
 objdir:
 	@mkdir -p $(OBJDIR)
