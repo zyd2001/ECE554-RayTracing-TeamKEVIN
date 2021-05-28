@@ -18,6 +18,9 @@ OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(SRCS)))
 
 # Targets
 all: $(TEST) $(TEST)_ase
+	python3 ./constant.py constant.data
+	mv constant.data.out constant.binary
+	python3 ./Assembler.py -r main.asm
 
 # AFU info from JSON file, including AFU UUID
 AFU_JSON_INFO = $(OBJDIR)/afu_json_info.h
