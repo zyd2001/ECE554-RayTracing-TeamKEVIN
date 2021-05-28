@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
         
         changeConstantInt(constant, width, 0);
         changeConstantInt(constant, height, 4);
-        changeConstant(constant, -4.0, 16);
+        changeConstant(constant, -3.0, 16);
         
         // Inform the FPGA of the starting read and write address of the arrays.
         afu.write(CP_ADDR, (uint64_t)CPIns);
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 
         for (int i = 1; i < 24 * 5; i++)
         {
-            changeConstant(constant, -4.0 + i * 6.0 / 120, 16);
+            changeConstant(constant, -3.0 + i * 6.0 / 120, 16);
             afu.write(CON_LOAD, 1);
             run(afu, output, buffer, i);
         }
