@@ -82,7 +82,7 @@ void getOutput(dma_data_t *data, uint8_t * buffer)
     {
         for (int j = 0; j < 3; j++)
         {
-            buffer[i * 3 + j] = pow(*ptr * 255, 1 / 2.2);
+            buffer[i * 3 + j] = pow(*ptr, 1 / 2.2) * 255;
             ptr++;
         }
         ptr++;
