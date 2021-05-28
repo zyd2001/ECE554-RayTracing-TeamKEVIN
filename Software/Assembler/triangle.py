@@ -11,7 +11,7 @@ mtlfile = open(name + ".mtl")
 material_list = {}
 
 current_mtl = None
-counter = 1
+counter = 2 # for convinence, vector minus 1
 for line in mtlfile:
     line = line.split()
     if line:
