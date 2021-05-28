@@ -216,21 +216,20 @@ int main(int argc, char *argv[])
         afu.write(TRI_SIZE, (uint64_t)(triangleSize / AFU::CL_BYTES));
         afu.write(TRI_LOAD, (uint64_t)1);
         afu.write(OUT_ADDR, (uint64_t)output);
-        run(afu, output, buffer, 0);
 
         // The FPGA DMA only handles cache-line transfers, so we need to convert
         // the array size to cache lines.
-        afu.write(CP_LOAD, (uint64_t)0);
-        afu.write(RT_LOAD, (uint64_t)0);
-        afu.write(CON_LOAD, (uint64_t)0);
-        afu.write(TRI_LOAD, (uint64_t)0);
+        // afu.write(CP_LOAD, (uint64_t)0);
+        // afu.write(RT_LOAD, (uint64_t)0);
+        // afu.write(CON_LOAD, (uint64_t)0);
+        // afu.write(TRI_LOAD, (uint64_t)0);
 
-        int counter = 1;
+        int counter = 0;
 
-        for (int i = 1; i < 24 * 0.75; i++)
+        for (int i = 0; i < 24 * 0.75; i++)
         {
             // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
-            changeConstant(constant, position(0, -3, i, 9), 0xb0 + 0x08);
+            changeConstant(constant, position(0, -3, i, 24 * 0.75), 0xb0 + 0x08);
             afu.write(CON_LOAD, 1);
             run(afu, output, buffer, counter);
             counter++;
