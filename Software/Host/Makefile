@@ -23,6 +23,7 @@ all: $(TEST) $(TEST)_ase
 	python3 ./Assembler.py -r main.asm
 	python3 ./triangle.py box_kevin.obj
 	mv box_kevin.out box.binary
+	mkdir out
 
 # AFU info from JSON file, including AFU UUID
 AFU_JSON_INFO = $(OBJDIR)/afu_json_info.h
@@ -40,7 +41,7 @@ $(OBJDIR)/%.o: %.cpp config.h AFU.h | objdir
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(TEST) $(TEST)_ase $(OBJDIR) box.binary main.asm.out constant.binary
+	rm -rf $(TEST) $(TEST)_ase $(OBJDIR) box.binary main.asm.out constant.binary out/
 
 objdir:
 	@mkdir -p $(OBJDIR)
