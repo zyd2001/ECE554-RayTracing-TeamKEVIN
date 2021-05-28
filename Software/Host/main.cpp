@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < 24 * 0.75; i++)
         {
             // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
-            changeConstant(constant, position(0, -3, i, 24 * 0.75), 0xb0 + 0x08);
+            changeConstant(constant, position(0, -2.9, i, 24 * 0.75), 0xb0 + 0x08);
             // afu.write(CON_LOAD, (uint64_t)0);
             // afu.write(CON_LOAD, 1);
             run(afu, output, buffer, counter);
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < 24 * 1.5; i++)
         {
             // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
-            changeConstant(constant, position(-3, 3, i, 24 * 1.5), 0xb0 + 0x08);
+            changeConstant(constant, position(-2.9, 3, i, 24 * 1.5), 0xb0 + 0x08);
             afu.write(CON_LOAD, 1);
             run(afu, output, buffer, counter);
             counter++;
