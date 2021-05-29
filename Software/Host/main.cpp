@@ -231,14 +231,15 @@ int main(int argc, char *argv[])
         // afu.write(RT_LOAD, (uint64_t)0);
         // afu.write(CON_LOAD, (uint64_t)0);
         // afu.write(TRI_LOAD, (uint64_t)0);
-        const int fps = 60;
+        const int fps = 6;
         int counter = 0;
 
         // first segment: stop
         changeConstant(constant, 0, CAMERA_LOC);
-        changeConstant(constant, 3, CAMERA_LOC + 0x4);
-        changeConstant(constant, 0, CAMERA_LOC + 0x8);
+        changeConstant(constant, 3.5, CAMERA_LOC + 0x4);
+        changeConstant(constant, -1, CAMERA_LOC + 0x8);
         changeConstant(constant, 0, CAMERA_LOOK + 0x4);
+        changeConstant(constant, -2, CAMERA_LOOK + 0x8);
     
         run(afu, output, buffer, counter);
         counter++;
@@ -304,17 +305,22 @@ int main(int argc, char *argv[])
         {
             float x, y;
             tie(x, y) = circlePosition(0, 2 * M_PI, i, fps * 5);
-            x *= 4;
-            y *= 4;
+            x *= 3;
+            y *= 3;
             changeConstant(constant, x, CAMERA_LOC);
             changeConstant(constant, y, CAMERA_LOC + 0x4);
             run(afu, output, buffer, counter);
             counter++;
         }
 
-        int error = system("cd out && ffmpeg -r 24 -f image2 -s 480x360 -i ./output%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4");
+        char * cmd = new char[1000];
+        snprintf(cmd, 1000, "ffmpeg -r %d -f image2 -s %dx%d -i ./output%%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4", 
+            fps, width, height);
 
-        delete[] buffer;
+        int error = system(cmd);
+
+        delete [] cmd;
+        delete [] buffer;
         // Free the allocated memory.
         afu.free(CPIns);
         afu.free(RTIns);
