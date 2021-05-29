@@ -162,8 +162,10 @@ int main(int argc, char *argv[])
 
         ifstream rt("main.asm.out", ios::binary), con("constant.binary", ios::binary), tri("box.binary", ios::binary);
 
+        int fps;
         width = atoi(argv[1]);
         height = atoi(argv[2]);
+        fps = atoi(argv[3]);
         uint8_t * buffer = new uint8_t[width * height * 3];
 
         cout << "Starting...\n";
@@ -231,7 +233,6 @@ int main(int argc, char *argv[])
         // afu.write(RT_LOAD, (uint64_t)0);
         // afu.write(CON_LOAD, (uint64_t)0);
         // afu.write(TRI_LOAD, (uint64_t)0);
-        const int fps = 6;
         int counter = 0;
 
         // first segment: stop
@@ -305,8 +306,8 @@ int main(int argc, char *argv[])
         {
             float x, y;
             tie(x, y) = circlePosition(0, 2 * M_PI, i, fps * 5);
-            x *= 3;
-            y *= 3;
+            x *= 2.8;
+            y *= 2.8;
             changeConstant(constant, x, CAMERA_LOC);
             changeConstant(constant, y, CAMERA_LOC + 0x4);
             run(afu, output, buffer, counter);
