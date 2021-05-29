@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
         // move up
         for (int i = 0; i < fps * 0.5; i++)
         {
-            changeConstant(constant, position(1, 4, i, fps * 0.5), CAMERA_LOC + 0x4);
+            changeConstant(constant, position(1, 3.8, i, fps * 0.5), CAMERA_LOC + 0x4);
             run(afu, output, buffer, counter);
             counter++;
         }
@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
             tie(x, y) = circlePosition(0, 2 * M_PI, i, fps * 5);
             x *= 2.8;
             y *= 2.8;
+            y += 1;
             changeConstant(constant, x, CAMERA_LOC);
             changeConstant(constant, y, CAMERA_LOC + 0x4);
             run(afu, output, buffer, counter);
@@ -315,7 +316,7 @@ int main(int argc, char *argv[])
         }
 
         char * cmd = new char[1000];
-        snprintf(cmd, 1000, "ffmpeg -r %d -f image2 -s %dx%d -i ./output%%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4", 
+        snprintf(cmd, 1000, "cd out && ffmpeg -r %d -f image2 -s %dx%d -i ./output%%d -vcodec libx264 -crf 25 -pix_fmt yuv420p output.mp4", 
             fps, width, height);
 
         int error = system(cmd);
