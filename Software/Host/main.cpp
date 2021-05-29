@@ -41,6 +41,7 @@
 #include "afu_json_info.h"
 #include <string>
 #include <cinttypes>
+#include <tuple>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
@@ -142,6 +143,13 @@ float position(float start, float end, int time, int total)
     return (end - start) * ((float)time / total) + start;
 }
 
+tuple<float, float> circlePosition(float start, float end, int time, int total)
+{
+    float x = sin((end - start) * ((float)time / total) + start);
+    float y = cos((end - start) * ((float)time / total) + start);
+    return make_tuple(x, y);
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -223,36 +231,83 @@ int main(int argc, char *argv[])
         // afu.write(RT_LOAD, (uint64_t)0);
         // afu.write(CON_LOAD, (uint64_t)0);
         // afu.write(TRI_LOAD, (uint64_t)0);
-
+        const int fps = 60;
         int counter = 0;
 
-        for (int i = 0; i < 60 * 8 / 4; i++)
+        // first segment: stop
+        changeConstant(constant, 0, CAMERA_LOC);
+        changeConstant(constant, 3, CAMERA_LOC + 0x4);
+        changeConstant(constant, 0, CAMERA_LOC + 0x8);
+        changeConstant(constant, 0, CAMERA_LOOK + 0x4);
+    
+        run(afu, output, buffer, counter);
+        counter++;
+        afu.write(CP_LOAD, (uint64_t)0);
+        afu.write(RT_LOAD, (uint64_t)0);
+        afu.write(TRI_LOAD, (uint64_t)0);
+        for (int i = 1; i < fps * 0.5; i++) // don't need run same
         {
-            // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
-            changeConstant(constant, position(0, -2.8, i, 60 * 8 / 4), 0xb0 + 0x08);
-            // afu.write(CON_LOAD, (uint64_t)0);
-            // afu.write(CON_LOAD, 1);
-            run(afu, output, buffer, counter);
-            afu.write(CP_LOAD, (uint64_t)0);
-            afu.write(RT_LOAD, (uint64_t)0);
-            afu.write(TRI_LOAD, (uint64_t)0);
+            outputImage(buffer, counter);
             counter++;
         }
 
-        for (int i = 0; i < 60 * 8 / 2; i++)
+        // second segment: move out
+        for (int i = 0; i < fps * 3; i++)
         {
-            // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
-            changeConstant(constant, position(-2.8, 3, i, 60 * 8 / 2), 0xb0 + 0x08);
-            afu.write(CON_LOAD, 1);
+            // camera location (0, 3, 0) -> (0, 1, 7.5)
+            changeConstant(constant, position(3, 1, i, fps * 3), CAMERA_LOC + 0x4);
+            changeConstant(constant, position(0, 7.5, i, fps * 3), CAMERA_LOC + 0x8);
+
+            // camera lookat pos (0, 0, 0) -> (0, 1, 0)
+            changeConstant(constant, position(0, 1, i, fps * 3), CAMERA_LOOK + 0x4);
             run(afu, output, buffer, counter);
             counter++;
         }
+        // camera location (0, 3, 0) -> (0, 1, 7.5)
+        changeConstant(constant, 1, CAMERA_LOC + 0x4);
+        changeConstant(constant, 7.5, CAMERA_LOC + 0x8);
+        // camera lookat pos (0, 0, 0) -> (0, 1, 0)
+        changeConstant(constant, 1, CAMERA_LOOK + 0x4);
 
-        for (int i = 0; i < 60 * 8 / 4; i++)
+        // light
+        for (int i = 0; i < fps * 1; i++)
         {
-            // changeConstant(constant, -3.0 + i * 6.0 / 120, 16);s
-            changeConstant(constant, position(3, 0, i, 60 * 8 / 4), 0xb0 + 0x08);
-            afu.write(CON_LOAD, 1);
+            changeConstant(constant, position(0, -2.8, i, fps * 1), LIGHT + VECTOR_SIZE * 4);
+            run(afu, output, buffer, counter);
+            counter++;
+        }
+        for (int i = 0; i < fps * 2; i++)
+        {
+            changeConstant(constant, position(-2.8, 3, i, fps * 2), LIGHT + VECTOR_SIZE * 4);
+            run(afu, output, buffer, counter);
+            counter++;
+        }
+        for (int i = 0; i < fps * 1; i++)
+        {
+            changeConstant(constant, position(3, 0, i, fps * 1), LIGHT + VECTOR_SIZE * 4);
+            run(afu, output, buffer, counter);
+            counter++;
+        }
+        changeConstant(constant, 0, LIGHT + VECTOR_SIZE * 4);
+
+        // move up
+        for (int i = 0; i < fps * 0.5; i++)
+        {
+            changeConstant(constant, position(1, 4, i, fps * 0.5), CAMERA_LOC + 0x4);
+            run(afu, output, buffer, counter);
+            counter++;
+        }
+        changeConstant(constant, 4, CAMERA_LOC + 0x4);
+
+        // circle
+        for (int i = 0; i < fps * 5; i++)
+        {
+            float x, y;
+            tie(x, y) = circlePosition(0, 2 * M_PI, i, fps * 5);
+            x *= 4;
+            y *= 4;
+            changeConstant(constant, x, CAMERA_LOC);
+            changeConstant(constant, y, CAMERA_LOC + 0x4);
             run(afu, output, buffer, counter);
             counter++;
         }
