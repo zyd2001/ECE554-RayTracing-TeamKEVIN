@@ -239,6 +239,7 @@ int main(int argc, char *argv[])
         changeConstant(constant, 0, CAMERA_LOC);
         changeConstant(constant, 3.5, CAMERA_LOC + 0x4);
         changeConstant(constant, -1, CAMERA_LOC + 0x8);
+        changeConstant(constant, 0, CAMERA_LOOK);
         changeConstant(constant, 0, CAMERA_LOOK + 0x4);
         changeConstant(constant, -2, CAMERA_LOOK + 0x8);
     
@@ -256,12 +257,13 @@ int main(int argc, char *argv[])
         // second segment: move out
         for (int i = 0; i < fps * 3; i++)
         {
-            // camera location (0, 3, 0) -> (0, 1, 7.5)
-            changeConstant(constant, position(3, 1, i, fps * 3), CAMERA_LOC + 0x4);
-            changeConstant(constant, position(0, 7.5, i, fps * 3), CAMERA_LOC + 0x8);
+            // camera location (0, 3.5, -1) -> (0, 1, 7.5)
+            changeConstant(constant, position(3.5, 1, i, fps * 3), CAMERA_LOC + 0x4);
+            changeConstant(constant, position(-1, 7.5, i, fps * 3), CAMERA_LOC + 0x8);
 
-            // camera lookat pos (0, 0, 0) -> (0, 1, 0)
+            // camera lookat pos (0, 0, -2) -> (0, 1, 0)
             changeConstant(constant, position(0, 1, i, fps * 3), CAMERA_LOOK + 0x4);
+            changeConstant(constant, position(-2, 0, i, fps * 3), CAMERA_LOOK + 0x8);
             run(afu, output, buffer, counter);
             counter++;
         }
@@ -270,6 +272,7 @@ int main(int argc, char *argv[])
         changeConstant(constant, 7.5, CAMERA_LOC + 0x8);
         // camera lookat pos (0, 0, 0) -> (0, 1, 0)
         changeConstant(constant, 1, CAMERA_LOOK + 0x4);
+        changeConstant(constant, 0, CAMERA_LOOK + 0x8);
 
         // light
         for (int i = 0; i < fps * 1; i++)
