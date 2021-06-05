@@ -5,14 +5,14 @@ const int height = 760;
 const float epsilon = 0.001;
 // Assume Horizontal Fov is 90 degree, so tan(90/2) = 1
 const float fov = 1;
-const vector camera_location (0, 1, 7.5, 0 );
-const vector camera_lookat_pos (0, 1, 0, 0 );
+const vector camera_location (0, 3.5, -1, 0 );
+const vector camera_lookat_pos (0, 0, -2, 0 );
 const vector camera_up (0, 1, 0, 1 );
-const vector sky_horizon_color (0.76, 0.765, 0.827, 1 );
-const vector sky_top_color (0.53, 0.808, 0.92, 1 );
-const vector ambient_light(0.3, 0.3, 0.3, 1);
+const vector sky_horizon_color (0.546751, 0.554696, 0.658434, 1 );
+const vector sky_top_color (0.247404, 0.625612, 0.832402, 1 );
+const vector ambient_light(0.05, 0.05, 0.05, 1);
 
-const vector light_start_address[] = {vector(4,0,5,6), vector(1,0.5,0.5,1), vector(-4,0,5,6), vector(0.5,0.5,1,1), vector(0,0,0,0)};
+const vector light_start_address[] = {vector(4,0,5,6), vector(0.5,0.217638,0.217638,1), vector(-4,0,5,6), vector(0.217638,0.217638,0.5,1), vector(0,4,0,4), vector(1.67106, 0.640764, 0.147656,1), vector(0,0,0,0)};
 
 vector miss_shader(vector origin, vector dir, vector hit, vector normal)
 {
@@ -29,12 +29,12 @@ vector hit_shader(vector origin, vector dir, vector hit, vector normal, int mate
 
     // Use material number to get these
     if (material_number == 2) {
-        subsurface_albedo = vector(0.09,0.647,0.537,1);
+        subsurface_albedo = vector(0.005,0.3836,0.25465,1);
         roughness = 0.1;
-        metallic = 1;
+        metallic = 0.8;
     }
     else if (material_number == 3) {
-        subsurface_albedo = vector(0.796,0.2627,0.2078,1);
+        subsurface_albedo = vector(0.605353,0.0528217,0.0315370,1);
         roughness = 1;
         metallic = 0;
     }
@@ -227,7 +227,7 @@ int main()
     for (int i = 0; i < width * height; i++)
     {
         auto color = run(i, i == 37);
-        ofs << color.x * 255 << " " << color.y * 255 << " " << color.z * 255 << "\n";
+        ofs << pow(color.x, 1/2.2) * 255 << " " << pow(color.y, 1/2.2) * 255 << " " << pow(color.z, 1/2.2) * 255 << "\n";
     }
     ofs.close();
 }
