@@ -1,5 +1,9 @@
 # Hardware Ray-tracing Graphical Processor
-![Hardware render result](./Outputs/1080p_hardware.png)
+
+[![Hardware render result](https://img.youtube.com/vi/6l9uZERgd3Q/0.jpg)](https://www.youtube.com/watch?v=6l9uZERgd3Q)
+
+**Here is a video showcase the render result**
+
 
 This project is the work of Team KEVIN on a dedicated graphical processor for ray tracing. It is completed under the supervision of Mikko Lipasti and aims to implement and streamline the process of ray tracing in software and hardware. Inspired by current GPU architecture, we designed a multi-thread processor that can render millions of pixels on the hardware. RT-core is a general-purpose compute unit and the smallest component in our hardware. It can run one thread at a time with our custom ISA that supports 32-bit floating-point and vector operations. Four of such compute units and eight ray-triangle intersection accelerators (IC core) form streaming multiprocessors (SM), and it can take up to 32 threads at the same time. The host will provide a launch size (usually width * height of the image), and our hardware will split it into 32 thread wrap and assign them to each SM. Currently, we only have one SM in our design, but it can effortlessly scale up to any number.
 
