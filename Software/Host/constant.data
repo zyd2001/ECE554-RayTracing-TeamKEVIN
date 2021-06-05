@@ -1,0 +1,29 @@
+const int width = 32;
+const int height = 24;
+const float epsilon = 0.001;
+const float fov = 1.0;
+const vector camera_location(0, 1.0, 7.5, 0);
+const vector camera_lookat_pos(0, 1.0, 0, 0);
+const vector camera_up(0, 1.0, 0, 1.0);
+const vector sky_horizon_color (0.546751, 0.554696, 0.658434, 1 );
+const vector sky_top_color (0.247404, 0.625612, 0.832402, 1 );
+const vector ambient_light(0.05, 0.05, 0.05, 1);
+
+#
+vector(4.0,0,5.0,6.0), vector(0.5,0.217638,0.217638,1.0), 
+vector(-4.0,0,5.0,6.0), vector(0.217638,0.217638,0.5,1.0), 
+vector(0,4.0,0,4.0), vector(1.67106, 0.640764, 0.147656,1.0), 
+vector(0,0,0,0)};
+#
+Material Black
+1.372, 1.360, 1.315, 1.0
+0.4, 0.9, 0, 0
+Material Green
+0.005,0.3836,0.25465,1.0
+0.1, 0.8, 0, 0
+Material Red
+0.605353,0.0528217,0.0315370,1.0
+1.0, 0.0, 0, 0
+Material White
+0.75, 0.75, 0.75, 1.0
+1.0, 0.0, 0, 0

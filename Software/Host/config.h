@@ -32,6 +32,19 @@ const unsigned SLEEP_MS = 10;
 
 const int OUTPUT_SIZE = 32 * 4;
 
+const int VECTOR_SIZE = 0x10;
+
+enum ConstantAddr
+{
+    CAMERA_LOC = 0x10,
+    CAMERA_LOOK = 0x20,
+    SKY_HORIZON = 0x40,
+    SKY_TOP = 0x50,
+    AMBIENT = 0x60,
+    
+    LIGHT = 0x78
+};
+
 //=============================================================
 // AFU MMIO Addresses
 
